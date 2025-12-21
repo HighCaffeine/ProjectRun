@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WwiseDocument Type="WorkUnit" ID="{DF0AFA49-FE37-4452-9566-F6B4ABB85718}" SchemaVersion="133">
+	<Events>
+		<WorkUnit Name="Default Work Unit" ID="{DF0AFA49-FE37-4452-9566-F6B4ABB85718}" PersistMode="Standalone">
+			<ChildrenList>
+				<Event Name="Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono" ID="{EA781F26-6449-4A68-AFF3-CDE43561D3B5}">
+					<ChildrenList>
+						<Action Name="" ID="{DF3ECBD0-04C9-4E2E-AB3E-3BA6EE7E1EFC}" ShortID="24348063">
+							<ReferenceList>
+								<Reference Name="Target">
+									<ObjectRef Name="8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono" ID="{A63D3641-E52C-4CDE-899D-91F77575371E}" WorkUnitID="{F6D0BC03-2CEA-43FD-93F3-314C287EE4B8}"/>
+								</Reference>
+							</ReferenceList>
+						</Action>
+					</ChildrenList>
+				</Event>
+			</ChildrenList>
+		</WorkUnit>
+	</Events>
+</WwiseDocument>
