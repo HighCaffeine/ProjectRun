@@ -30,5 +30,11 @@
 *.wproj text
 *.wack text
 
-# 유니티용 Wwise 어드레서블 에셋 (바이너리 데이터 포함 가능성)
+# 유니티용 Wwise 어드레서블 에셋
 *.asset filter=lfs diff=lfs merge=lfs -text
+
+*.akd filter=lfs diff=lfs merge=lfs -text
+*.prof filter=lfs diff=lfs merge=lfs -text
+
+*.wwu text merge=unityyaml
+*.wproj text merge=unityyaml

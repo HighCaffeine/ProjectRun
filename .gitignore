@@ -23,6 +23,13 @@ Wwise/CKFinalProject/Originals/Cache/
 Wwise/CKFinalProject/ConversionSettings/
 Wwise/CKFinalProject/Operations/
 
+Wwise/CKFinalProject/*.user
+Wwise/CKFinalProject/*.p_eb
+
+# 유니티 임시 및 로컬 설정 파일 [cite: 3]
+Client/[Aa]ssets/WwiseSettings.xml.meta
+Client/[Aa]ssets/WwiseSettings.xml
+
 # 유니티 내 Wwise 자동 생성 로그 및 임시 파일
 logRunSetup.txt
 WwiseUnityIntegration_*_Src.zip
