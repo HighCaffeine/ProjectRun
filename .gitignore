@@ -15,3 +15,14 @@
 # Wwise 에디터 개인 설정
 *.p_eb
 *.user
+*.log
+.backup/
+
+Wwise/CKFinalProject/.cache/
+Wwise/CKFinalProject/Originals/Cache/
+Wwise/CKFinalProject/ConversionSettings/
+Wwise/CKFinalProject/Operations/
+
+# 유니티 내 Wwise 자동 생성 로그 및 임시 파일
+logRunSetup.txt
+WwiseUnityIntegration_*_Src.zip

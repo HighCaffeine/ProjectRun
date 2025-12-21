@@ -23,8 +23,12 @@
 *.bnk filter=lfs diff=lfs merge=lfs -text
 *.wem filter=lfs diff=lfs merge=lfs -text
 *.wav filter=lfs diff=lfs merge=lfs -text
+*.akd filter=lfs diff=lfs merge=lfs -text
 
 # Wwise 작업 단위 (XML 형식이므로 텍스트로 취급하여 병합 가능하게 설정)
 *.wwu text
 *.wproj text
 *.wack text
+
+# 유니티용 Wwise 어드레서블 에셋 (바이너리 데이터 포함 가능성)
+*.asset filter=lfs diff=lfs merge=lfs -text
