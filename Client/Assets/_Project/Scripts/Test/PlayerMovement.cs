@@ -3,8 +3,9 @@
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController Controller;
+    private uint currentInputSeq = 0;
 
-    public void Move()
+    public void Move_Test()
     {
         if (Controller != null)
         {
@@ -22,6 +23,26 @@ public class PlayerMovement : MonoBehaviour
             // client-sided
             //Vector3 motion = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * 5f;
             //Move(motion);
+        }
+    }
+
+    public void Move()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                currentInputSeq++;
+
+                P_PlayerMovement packet = default;
+                packet.player_id = LocalPlayerInfo.ID;
+                packet.inputSeq = currentInputSeq; // 시퀀스 번호 할당
+                packet.targetPos = hit.point;
+
+                // UDP로 서버 전송
+                Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
+            }
         }
     }
 

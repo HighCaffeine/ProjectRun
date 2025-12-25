@@ -100,7 +100,17 @@ public:
 		return 0;
 	}
 
+	void SetUDPAddr(sockaddr_in addr) 
+	{
+		udpAddr = addr;
+		isUdpActive = true;
+	}
+
+	bool isUdpActive = false;
 private:
+	sockaddr_in udpAddr;
+
+
 	bool mIsConfirm = false;
 	std::string mAuthToken;
 

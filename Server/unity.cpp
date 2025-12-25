@@ -1,5 +1,20 @@
 #include "unity.h"
 
+float Vector3_Distance(Vector3 a, Vector3 b)
+{
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    float dz = a.z - b.z;
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+float Vector3_Distance2D(Vector3 a, Vector3 b)
+{
+    float dx = a.x - b.x;
+    float dz = a.z - b.z;
+    return std::sqrt(dx * dx + dz * dz);
+}
+
 Vector3 Vector3_right()
 {
     Vector3 result = { 1.0f, 0, 0 };

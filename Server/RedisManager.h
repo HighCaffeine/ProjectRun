@@ -238,139 +238,144 @@ private:
 
 					PushResponse(resTask);
 				}
-				else if (task.TaskID == RedisTaskID::REQUEST_TRADE_EXCHANGE)
-				{
-					auto pRequest = (RedisTradeReq*)task.pData;
-					RedisTradeRes resData;
-					//유저 키(해쉬 키)
-					std::string Aid = "u:" + std::string(pRequest->UserAID) + ":inven";
-					std::string Bid = "u:" + std::string(pRequest->UserBID) + ":inven";
-					std::map<std::string, std::string> invenA;
-					std::map<std::string, std::string> invenB;
-					std::deque<int> exchangeQueueA;
-					std::deque<int> exchangeQueueB;
+#pragma region Trade
 
-					uint32_t ret;
-					if (mConn.hgetall(Aid, invenA) && mConn.hgetall(Bid, invenB))
-					{
-						int arrayA[INVENTORY_SIZE]; // 현재 가지고있는 인벤토리 데이터
-						int arrayB[INVENTORY_SIZE];
 
-						std::fill(arrayA, arrayA + INVENTORY_SIZE, EMPTYITEM);
-						std::fill(arrayB, arrayB + INVENTORY_SIZE, EMPTYITEM);
 
-						for (int i = 0; i < INVENTORY_SIZE; i++) // 교환창에있는 아이템들을 Queue에 담음
-						{
-							if (pRequest->ItemsAID[i] != EMPTYITEM) exchangeQueueA.push_back(pRequest->ItemsAID[i]); 
-							if (pRequest->ItemsBID[i] != EMPTYITEM) exchangeQueueB.push_back(pRequest->ItemsBID[i]);
-						}
+				//else if (task.TaskID == RedisTaskID::REQUEST_TRADE_EXCHANGE)
+				//{
+				//	auto pRequest = (RedisTradeReq*)task.pData;
+				//	RedisTradeRes resData;
+				//	//유저 키(해쉬 키)
+				//	std::string Aid = "u:" + std::string(pRequest->UserAID) + ":inven";
+				//	std::string Bid = "u:" + std::string(pRequest->UserBID) + ":inven";
+				//	std::map<std::string, std::string> invenA;
+				//	std::map<std::string, std::string> invenB;
+				//	std::deque<int> exchangeQueueA;
+				//	std::deque<int> exchangeQueueB;
 
-						// 현재 가지고있는 아이템들을 DB에서 가져오기
-						for (auto& [key, value] : invenA)
-						{
+				//	uint32_t ret;
+				//	if (mConn.hgetall(Aid, invenA) && mConn.hgetall(Bid, invenB))
+				//	{
+				//		int arrayA[INVENTORY_SIZE]; // 현재 가지고있는 인벤토리 데이터
+				//		int arrayB[INVENTORY_SIZE];
 
-							int index = std::stoi(key);
-							if (index < INVENTORY_SIZE && index >= 0)
-							{
-								arrayA[index] = std::stoi(value);
-							}
-						}
+				//		std::fill(arrayA, arrayA + INVENTORY_SIZE, EMPTYITEM);
+				//		std::fill(arrayB, arrayB + INVENTORY_SIZE, EMPTYITEM);
 
-						for (auto& [key, value] : invenB)
-						{
-							int index = std::stoi(key);
+				//		for (int i = 0; i < INVENTORY_SIZE; i++) // 교환창에있는 아이템들을 Queue에 담음
+				//		{
+				//			if (pRequest->ItemsAID[i] != EMPTYITEM) exchangeQueueA.push_back(pRequest->ItemsAID[i]); 
+				//			if (pRequest->ItemsBID[i] != EMPTYITEM) exchangeQueueB.push_back(pRequest->ItemsBID[i]);
+				//		}
 
-							if (index < INVENTORY_SIZE && index >= 0)
-							{
-								arrayB[index] = std::stoi(value);
-							}
-						}
+				//		// 현재 가지고있는 아이템들을 DB에서 가져오기
+				//		for (auto& [key, value] : invenA)
+				//		{
 
-						for (int i = 0; i < INVENTORY_SIZE; i++) 
-						{
-							if (pRequest->ItemsASlot[i] >= 0 && pRequest->ItemsASlot[i] < INVENTORY_SIZE) 
-							{
-								if (pRequest->ItemsAID[i] != EMPTYITEM) 
-								{
-									arrayA[pRequest->ItemsASlot[i]] = EMPTYITEM;
-								}
-							}
-							if (pRequest->ItemsBSlot[i] >= 0 && pRequest->ItemsBSlot[i] < INVENTORY_SIZE) 
-							{
-								if (pRequest->ItemsBID[i] != EMPTYITEM) 
-								{
-									arrayB[pRequest->ItemsBSlot[i]] = EMPTYITEM;
-								}
-							}
-						}
+				//			int index = std::stoi(key);
+				//			if (index < INVENTORY_SIZE && index >= 0)
+				//			{
+				//				arrayA[index] = std::stoi(value);
+				//			}
+				//		}
 
-						for (int i = 0; i < INVENTORY_SIZE; i++) 
-						{
-							if (arrayA[i] == EMPTYITEM && !exchangeQueueB.empty()) 
-							{
-								arrayA[i] = exchangeQueueB.front();
-								exchangeQueueB.pop_front();
-							}
-							if (arrayB[i] == EMPTYITEM && !exchangeQueueA.empty()) 
-							{
-								arrayB[i] = exchangeQueueA.front();
-								exchangeQueueA.pop_front();
-							}
-						}
+				//		for (auto& [key, value] : invenB)
+				//		{
+				//			int index = std::stoi(key);
 
-						if (!exchangeQueueA.empty() || !exchangeQueueB.empty()) // 슬롯이 꽉 차 교환할 수 없음
-						{
-							resData.IsSuccess = false;
-							RedisTask resTaskA;
-							resTaskA.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
-							resTaskA.UserIndex = pRequest->UserA;
-							resTaskA.DataSize = sizeof(RedisTradeRes);
-							resTaskA.pData = new char[resTaskA.DataSize];
-							memcpy(resTaskA.pData, &resData, resTaskA.DataSize);
-							PushResponse(resTaskA);
+				//			if (index < INVENTORY_SIZE && index >= 0)
+				//			{
+				//				arrayB[index] = std::stoi(value);
+				//			}
+				//		}
 
-							RedisTask resTaskB;
-							resTaskB.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
-							resTaskB.UserIndex = pRequest->UserB;
-							resTaskB.DataSize = sizeof(RedisTradeRes);
-							resTaskB.pData = new char[resTaskB.DataSize];
-							memcpy(resTaskB.pData, &resData, resTaskB.DataSize);
-							PushResponse(resTaskB);
-						}
-						else // 실제 DB적용
-						{
-							redisReply* reply = mConn.redisCmd("MULTI");
-							freeReplyObject(reply);
+				//		for (int i = 0; i < INVENTORY_SIZE; i++) 
+				//		{
+				//			if (pRequest->ItemsASlot[i] >= 0 && pRequest->ItemsASlot[i] < INVENTORY_SIZE) 
+				//			{
+				//				if (pRequest->ItemsAID[i] != EMPTYITEM) 
+				//				{
+				//					arrayA[pRequest->ItemsASlot[i]] = EMPTYITEM;
+				//				}
+				//			}
+				//			if (pRequest->ItemsBSlot[i] >= 0 && pRequest->ItemsBSlot[i] < INVENTORY_SIZE) 
+				//			{
+				//				if (pRequest->ItemsBID[i] != EMPTYITEM) 
+				//				{
+				//					arrayB[pRequest->ItemsBSlot[i]] = EMPTYITEM;
+				//				}
+				//			}
+				//		}
 
-							for (int i = 0; i < INVENTORY_SIZE; i++)
-							{
-								mConn.redisCmd("HSET %s %d %d", Aid.c_str(), i, arrayA[i]);
-								mConn.redisCmd("HSET %s %d %d", Bid.c_str(), i, arrayB[i]);
-							}
+				//		for (int i = 0; i < INVENTORY_SIZE; i++) 
+				//		{
+				//			if (arrayA[i] == EMPTYITEM && !exchangeQueueB.empty()) 
+				//			{
+				//				arrayA[i] = exchangeQueueB.front();
+				//				exchangeQueueB.pop_front();
+				//			}
+				//			if (arrayB[i] == EMPTYITEM && !exchangeQueueA.empty()) 
+				//			{
+				//				arrayB[i] = exchangeQueueA.front();
+				//				exchangeQueueA.pop_front();
+				//			}
+				//		}
 
-							reply = mConn.redisCmd("EXEC");
-							freeReplyObject(reply);
+				//		if (!exchangeQueueA.empty() || !exchangeQueueB.empty()) // 슬롯이 꽉 차 교환할 수 없음
+				//		{
+				//			resData.IsSuccess = false;
+				//			RedisTask resTaskA;
+				//			resTaskA.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
+				//			resTaskA.UserIndex = pRequest->UserA;
+				//			resTaskA.DataSize = sizeof(RedisTradeRes);
+				//			resTaskA.pData = new char[resTaskA.DataSize];
+				//			memcpy(resTaskA.pData, &resData, resTaskA.DataSize);
+				//			PushResponse(resTaskA);
 
-							resData.IsSuccess = true;
-							RedisTask resTaskA;
-							resTaskA.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
-							resTaskA.UserIndex = pRequest->UserA;
-							resTaskA.DataSize = sizeof(RedisTradeRes);
-							resTaskA.pData = new char[resTaskA.DataSize];
-							memcpy(resTaskA.pData, &resData, resTaskA.DataSize);
-							PushResponse(resTaskA);
+				//			RedisTask resTaskB;
+				//			resTaskB.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
+				//			resTaskB.UserIndex = pRequest->UserB;
+				//			resTaskB.DataSize = sizeof(RedisTradeRes);
+				//			resTaskB.pData = new char[resTaskB.DataSize];
+				//			memcpy(resTaskB.pData, &resData, resTaskB.DataSize);
+				//			PushResponse(resTaskB);
+				//		}
+				//		else // 실제 DB적용
+				//		{
+				//			redisReply* reply = mConn.redisCmd("MULTI");
+				//			freeReplyObject(reply);
 
-							RedisTask resTaskB;
-							resTaskB.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
-							resTaskB.UserIndex = pRequest->UserB;
-							resTaskB.DataSize = sizeof(RedisTradeRes);
-							resTaskB.pData = new char[resTaskB.DataSize];
-							memcpy(resTaskB.pData, &resData, resTaskB.DataSize);
-							PushResponse(resTaskB);
-						}
-						
-					}
-				}
+				//			for (int i = 0; i < INVENTORY_SIZE; i++)
+				//			{
+				//				mConn.redisCmd("HSET %s %d %d", Aid.c_str(), i, arrayA[i]);
+				//				mConn.redisCmd("HSET %s %d %d", Bid.c_str(), i, arrayB[i]);
+				//			}
+
+				//			reply = mConn.redisCmd("EXEC");
+				//			freeReplyObject(reply);
+
+				//			resData.IsSuccess = true;
+				//			RedisTask resTaskA;
+				//			resTaskA.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
+				//			resTaskA.UserIndex = pRequest->UserA;
+				//			resTaskA.DataSize = sizeof(RedisTradeRes);
+				//			resTaskA.pData = new char[resTaskA.DataSize];
+				//			memcpy(resTaskA.pData, &resData, resTaskA.DataSize);
+				//			PushResponse(resTaskA);
+
+				//			RedisTask resTaskB;
+				//			resTaskB.TaskID = RedisTaskID::RESPONSE_TRADE_EXCHANGE;
+				//			resTaskB.UserIndex = pRequest->UserB;
+				//			resTaskB.DataSize = sizeof(RedisTradeRes);
+				//			resTaskB.pData = new char[resTaskB.DataSize];
+				//			memcpy(resTaskB.pData, &resData, resTaskB.DataSize);
+				//			PushResponse(resTaskB);
+				//		}
+				//		
+				//	}
+				//}
+#pragma endregion
 				else if (task.TaskID == RedisTaskID::REQUEST_SHOP_UPDATE)
 				{
 					int commandValue = 0; // 0이면 바로 초기화, 1이상이면 시간 추가 및 체크, -1은 processpacket에서 1초마다 체크용

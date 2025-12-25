@@ -82,10 +82,18 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 break;
 
             case E_PACKET.UPDATE_PLAYER_MOVEMENT:
-                P_UpdatePlayerMovement updateMovement = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
-                if (Players.TryGetValue(updateMovement.player_id, out Player player) && player != null)
+                // P_UpdatePlayerMovement updateMovement = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
+                // if (Players.TryGetValue(updateMovement.player_id, out Player player) && player != null)
+                // {
+                //     player.Movement.Move(updateMovement.motion);
+                // }
+
+                P_UpdatePlayerMovement updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
+
+                if (Players.TryGetValue(updatePkt.player_id, out Player player))
                 {
-                    player.Movement.Move(updateMovement.motion);
+                    player.serverPos = updatePkt.currentPos;
+                    player.isMoving = updatePkt.isMoving;
                 }
                 break;
 

@@ -161,7 +161,41 @@ public:
 		}
 	}
 
+	void Update(float dt)
+	{
+		for (auto pUser : mUserList) 
+		{
+			if (pUser == nullptr) continue;
+
+			// 서버 물리 시뮬
+			pUser->UpdateServerPhysics(dt);
+
+			// 동기화 패킷 생성
+			UPDATE_PLAYER_MOVEMENT_PACKET syncPkt;
+			syncPkt.lastInputSeq = pUser->GetLastInputSeq(); // Actor에서 가져옴
+			syncPkt.userUUID = pUser->GetNetConnIdx();
+			syncPkt.currentPos = pUser->GetPosition();
+			syncPkt.isMoving = pUser->GetIsMoving();
+
+			// 브로드캐스팅 
+			SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, -1, false);
+		}
+	}
+
 private:
+	bool CanSee(User* viewer, User* target) 
+	{
+		if (viewer == target) return true; // 자기 자신은 항상 보임
+
+		float dist = Vector3_Distance2D(viewer->GetPosition(), target->GetPosition());
+		if (dist > 15.0f) return false; // 일정 거리(예: 15m) 이상이면 안 보임
+
+		// 부쉬 로직 (기초)
+		// if (target->bInBush && viewer->bushID != target->bushID) return false;
+
+		return true;
+	}
+
 	INT32 mRoomNum = -1;
 
 	std::list<User*> mUserList;

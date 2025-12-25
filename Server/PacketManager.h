@@ -2,11 +2,13 @@
 
 #include "Packet.h"
 
+#include <WinSock2.h>
 #include <unordered_map>
 #include <deque>
 #include <functional>
 #include <thread>
 #include <mutex>
+#include <map>
 
 
 class User;
@@ -82,15 +84,20 @@ private:
 	typedef void(PacketManager::* PROCESS_RECV_PACKET_FUNCTION)(UINT32, UINT16, char*);
 	std::unordered_map<int, PROCESS_RECV_PACKET_FUNCTION> mRecvFuntionDictionary;
 
-	struct TradeSession
-	{
-		int userA, userB;	//A B의 id
-		bool isLockA = false, isLockB = false;	//lock상태
-		bool isConfirmA = false, isConfirmB = false;	//confirm상태
-		std::vector<int> itemsA, itemsB;	//올린 아이템들
-		std::vector<int> itemsASlot;
-		std::vector<int> itemsBSlot;
-	};
+	bool mIsRunLogicThread = false;
+	std::thread mLogicThread;
+	void LogicThread(); // 20ms 주기로 실행될 함수
+
+	// UDP 통신 관련
+	SOCKET mUdpSocket = INVALID_SOCKET;
+	std::thread mUdpRecvThread;
+	void UDPRecvThread(); // UDP 패킷 수신 전용 함수
+
+	// UDP 주소로 유저를 찾기 위한 맵 
+	std::mutex mUdpMapLock;
+	std::map<std::string, UINT32> mUdpAddrToUserIdx;
+
+	bool UDPRun();
 
 	UserManager* mUserManager;
 	RoomManager* mRoomManager;	

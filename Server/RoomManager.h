@@ -72,6 +72,13 @@ public:
 		}
 	}
 
+	void UpdateAllRooms(const float dt)
+	{
+		for (auto& room : mRoomList)
+		{
+			if (room != nullptr) room->Update(dt);
+		}
+	}
 
 		
 	std::function<void(UINT32, UINT16, char*)> SendPacketFunc;

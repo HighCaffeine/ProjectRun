@@ -70,7 +70,8 @@ public:
 		return mCurDomainState;
 	}
 
-
+	const UINT32& GetLastInputSeq() const { return lastInputSeq; }
+	const bool& GetIsMoving() const { return isMoving; }
 	const Vector3& GetPosition() const { return position;	}
 	const Quaternion& GetRotation() const { return rotation; }
 
@@ -96,7 +97,47 @@ public:
 		return motion;
 	}
 
+	
+
+	void SetTarget(Vector3& clickedPos, UINT32 seq) 
+	{
+		targetPos = clickedPos;
+		isMoving = true;
+		lastInputSeq = seq; 
+	}
+
+	void UpdateServerPhysics(float dt) 
+	{
+		if (!isMoving) return;
+
+		const float SPEED = PLAYER_SPEED; // 유니티와 일치된 속도
+
+		// 방향 벡터 계산 
+		Vector3 dir = { targetPos.x - serverPos.x, 0, targetPos.z - serverPos.z };
+		float dist = sqrt(dir.x * dir.x + dir.z * dir.z);
+
+		// 도착 여부 확인
+		if (dist < 0.1f) 
+		{
+			serverPos = targetPos;
+			isMoving = false;
+			return;
+		}
+
+		// 이동 처리
+		dir.x /= dist; 
+		dir.z /= dist;
+		serverPos.x += dir.x * SPEED * dt;
+		serverPos.z += dir.z * SPEED * dt;
+	}
+
 private:
+
+	bool isMoving = false;
+	Vector3 serverPos;   // 서버 확정 현재 위치
+	Vector3 targetPos;   // 마우스로 클릭된 최종 목적지
+	INT32 lastInputSeq;	//보정용 번호
+
 	INT32 mIndex = -1;
 
 	INT32 mRoomIndex = -1;

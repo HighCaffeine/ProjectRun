@@ -51,7 +51,6 @@ void PacketManager::CreateCompent(const UINT32 maxClient_)
 {
 	mUserManager = new UserManager;
 	mUserManager->Init(maxClient_);
-
 		
 	UINT32 startRoomNummber = 0;
 	UINT32 maxRoomCount = 10;
@@ -68,6 +67,8 @@ bool PacketManager::Run()
 		return false;
 	}
 
+	if (UDPRun() == false) return false;
+
 	int cmdValue = -1;
 	RedisTask task;
 	task.TaskID = RedisTaskID::REQUEST_SHOP_UPDATE;
@@ -76,9 +77,50 @@ bool PacketManager::Run()
 	memcpy(task.pData, &cmdValue, sizeof(int));
 	mRedisMgr->PushTask(task);
 
+	mLogicThread = std::thread([this]() 
+	{
+		auto nextTick = std::chrono::steady_clock::now();
+		while (mIsRunProcessThread) 
+		{
+			auto now = std::chrono::steady_clock::now();
+			if (now >= nextTick) 
+			{
+				// 모든 방 시뮬레이션 실행 (이동/시야/충돌)
+				mRoomManager->UpdateAllRooms(FIXED_DELTA_TIME);
+				nextTick += std::chrono::milliseconds(20);
+			}
+
+			std::this_thread::yield();
+		}
+	});
+
 	//이 부분을 패킷 처리 부분으로 이동 시킨다.
 	mIsRunProcessThread = true;
 	mProcessThread = std::thread([this]() { ProcessPacket(); });
+
+	return true;
+}
+
+bool PacketManager::UDPRun()
+{
+	mUdpSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	sockaddr_in udpServerAddr;
+	udpServerAddr.sin_family = AF_INET;
+	udpServerAddr.sin_port = htons(5025);
+	udpServerAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	if (bind(mUdpSocket, (sockaddr*)&udpServerAddr, sizeof(udpServerAddr)) == SOCKET_ERROR) 
+	{
+		printf("[Error] UDP Bind Failed: %d\n", WSAGetLastError());
+		return false;
+	}
+
+	mIsRunProcessThread = true;
+	mIsRunLogicThread = true; // 플래그 활성화
+
+	mProcessThread = std::thread([this]() { ProcessPacket(); });
+	mLogicThread = std::thread([this]() { LogicThread(); });
+	mUdpRecvThread = std::thread([this]() { UDPRecvThread(); }); // UDP 수신 스레드
 
 	return true;
 }
@@ -433,38 +475,48 @@ void PacketManager::ProcessLeaveRoom(UINT32 clientIndex_, UINT16 packetSize_, ch
 
 void PacketManager::ProcessPlayerMovement(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_)
 {
-	UNREFERENCED_PARAMETER(packetSize_);
-	UNREFERENCED_PARAMETER(pPacket_);
+	//UNREFERENCED_PARAMETER(packetSize_);
+	//UNREFERENCED_PARAMETER(pPacket_);
 
-	auto playerMovement = reinterpret_cast<PLAYER_MOVEMENT_PACKET*>(pPacket_);
+	//auto playerMovement = reinterpret_cast<PLAYER_MOVEMENT_PACKET*>(pPacket_);
 
-	if (playerMovement->userUUID != clientIndex_)
+	//if (playerMovement->userUUID != clientIndex_)
+	//{
+	//	printf("[ProcessPlayerMovement] userUUID(%lld) != clientIndex_(%ld)\n", playerMovement->userUUID, clientIndex_);
+	//	return;
+	//}
+
+
+	//printf("[ProcessPlayerMovement] userUUID(%lld) dx=%f, dy=%f, rx:%f, ry:%f, rz:%f \n", playerMovement->userUUID, 
+	//	playerMovement->dx, playerMovement->dy, playerMovement->rotation.x, playerMovement->rotation.y, playerMovement->rotation.z);
+
+	//auto reqUser = mUserManager->GetUserByConnIdx(clientIndex_);
+	//auto roomNum = reqUser->GetCurrentRoom();
+
+	//auto pRoom = mRoomManager->GetRoomByNumber(roomNum);
+	//if (pRoom == nullptr)
+	//{
+	//	printf("[ProcessPlayerMovement] pRoom == nullptr userUUID(%lld), roomNum(%d)\n", playerMovement->userUUID, roomNum);
+	//	return;
+	//}
+
+	//UPDATE_PLAYER_MOVEMENT_PACKET updateMovement;
+	//updateMovement.userUUID = playerMovement->userUUID;
+	//updateMovement.rotation = playerMovement->rotation;
+	//// Movement 처리
+	//updateMovement.motion = reqUser->UpdateMovement(playerMovement->dx, playerMovement->dy, playerMovement->rotation);
+	//
+	//pRoom->SendToAllUser(updateMovement.PacketLength, (char*)&updateMovement, clientIndex_, false);
+
+	auto pMovePkt = reinterpret_cast<PLAYER_MOVEMENT_PACKET*>(pPacket_);
+	auto pUser = mUserManager->GetUserByConnIdx(clientIndex_);
+
+	if (pUser) 
 	{
-		printf("[ProcessPlayerMovement] userUUID(%lld) != clientIndex_(%ld)\n", playerMovement->userUUID, clientIndex_);
-		return;
+		// 서버의 Actor 객체에 목적지 좌표만 설정함
+		// 실제 이동은 LogicThread -> Room::Update -> Actor::UpdateServerPhysics에서 처리
+		pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);
 	}
-
-
-	printf("[ProcessPlayerMovement] userUUID(%lld) dx=%f, dy=%f, rx:%f, ry:%f, rz:%f \n", playerMovement->userUUID, 
-		playerMovement->dx, playerMovement->dy, playerMovement->rotation.x, playerMovement->rotation.y, playerMovement->rotation.z);
-
-	auto reqUser = mUserManager->GetUserByConnIdx(clientIndex_);
-	auto roomNum = reqUser->GetCurrentRoom();
-
-	auto pRoom = mRoomManager->GetRoomByNumber(roomNum);
-	if (pRoom == nullptr)
-	{
-		printf("[ProcessPlayerMovement] pRoom == nullptr userUUID(%lld), roomNum(%d)\n", playerMovement->userUUID, roomNum);
-		return;
-	}
-
-	UPDATE_PLAYER_MOVEMENT_PACKET updateMovement;
-	updateMovement.userUUID = playerMovement->userUUID;
-	updateMovement.rotation = playerMovement->rotation;
-	// Movement 처리
-	updateMovement.motion = reqUser->UpdateMovement(playerMovement->dx, playerMovement->dy, playerMovement->rotation);
-	
-	pRoom->SendToAllUser(updateMovement.PacketLength, (char*)&updateMovement, clientIndex_, false);
 }
 
 
@@ -942,7 +994,73 @@ void PacketManager::ProcessShopBuyDBResult(UINT32 clientIndex_, UINT16 packetSiz
 	mRedisMgr->PushTask(task);
 }
 
-Vector3 stringToVector3(const std::string& s) {
+//50ms마다 게임 상태 업데이트
+void PacketManager::LogicThread()
+{
+	auto nextTick = std::chrono::steady_clock::now();
+	const auto tickInterval = std::chrono::milliseconds(20); // 50Hz (0.02s)
+
+	while (mIsRunLogicThread) 
+	{
+		auto now = std::chrono::steady_clock::now();
+
+		if (now >= nextTick) 
+		{
+			// 1. 모든 방(Room)의 물리 및 로직 업데이트
+			// mRoomManager 내의 모든 Room을 순회하며 Update(0.02f) 호출
+			for (int i = 0; i < mRoomManager->GetMaxRoomCount(); ++i) 
+			{
+				if (auto pRoom = mRoomManager->GetRoomByNumber(i)) 
+				{
+					pRoom->Update(FIXED_DELTA_TIME);
+				}
+			}
+
+			// 2. 다음 틱 시간 예약
+			nextTick += tickInterval;
+		}
+
+		// CPU 과점유 방지
+		std::this_thread::sleep_for(std::chrono::microseconds(100));
+	}
+}
+
+//UDP client 접속 받는 곳
+void PacketManager::UDPRecvThread()
+{
+	sockaddr_in clientAddr;
+	int addrLen = sizeof(clientAddr);
+	char buf[2048];
+
+	while (mIsRunLogicThread) 
+	{
+		int recvLen = recvfrom(mUdpSocket, buf, 2048, 0, (sockaddr*)&clientAddr, &addrLen);
+		if (recvLen > 0) {
+			auto pHeader = (PACKET_HEADER*)buf;
+
+			if (pHeader->PacketId == (UINT16)PACKET_ID::PLAYER_MOVEMENT) 
+			{
+				auto pMovePkt = (PLAYER_MOVEMENT_PACKET*)buf;
+
+				// 패킷 내의 userUUID나 clientAddr를 통해 유저 식별
+				auto pUser = mUserManager->GetUserByConnIdx(pMovePkt->userUUID);
+				if (pUser) 
+				{
+					// 유저의 UDP 주소가 처음 왔다면 등록 (응답 전송용)
+					if (!pUser->isUdpActive) 
+					{
+						pUser->SetUDPAddr(clientAddr);
+					}
+					// 서버측 Actor에 목적지 좌표 설정
+					pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);
+				}
+			}
+		}
+	}
+}
+
+Vector3 stringToVector3(const std::string& s) 
+{
 	std::stringstream ss(s);
 	char discardChar; // To consume parentheses and commas
 	float x, y, z;

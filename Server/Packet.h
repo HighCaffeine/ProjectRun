@@ -180,22 +180,40 @@ struct ROOM_USER_INFO_NTF_PACKET : public PACKET_HEADER
 #pragma endregion
 
 #pragma region Player Movement Packets
+//struct PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
+//{
+//	INT64 userUUID;
+//	float dx;
+//	float dy;
+//	Quaternion rotation;
+//
+//	PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::PLAYER_MOVEMENT) {}
+//};
+
+
+//struct UPDATE_PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
+//{
+//	INT64 userUUID;
+//	Quaternion rotation;
+//	Vector3 motion;
+//
+//	UPDATE_PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::UPDATE_PLAYER_MOVEMENT) {}
+//};
 struct PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
 {
 	INT64 userUUID;
-	float dx;
-	float dy;
-	Quaternion rotation;
+	UINT32 inputSeq; // 보정용 번호
+	Vector3 targetPos;	
 
 	PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::PLAYER_MOVEMENT) {}
 };
 
-
 struct UPDATE_PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
 {
+	UINT32 lastInputSeq; // 처리된 번호
 	INT64 userUUID;
-	Quaternion rotation;
-	Vector3 motion;
+	Vector3 currentPos;  // 서버가 계산한 현재 실시간 좌표
+	bool isMoving;       // 현재 이동 중인지 여부
 
 	UPDATE_PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::UPDATE_PLAYER_MOVEMENT) {}
 };
