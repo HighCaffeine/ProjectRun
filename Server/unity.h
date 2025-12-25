@@ -1,10 +1,14 @@
 #pragma once
 
+#include <cmath>
+
 #ifndef UNITY_H
 
-#define FIXED_DELTA_TIME 0.033333f
+#define FIXED_DELTA_TIME 0.02f
+
 
 constexpr int INVENTORY_SIZE = 5;   //인벤토리 사이즈
+constexpr int PLAYER_SPEED = 5;
 constexpr int TRADE_INVENTORY_SIZE = 9;
 
 typedef struct Vector3
@@ -22,6 +26,8 @@ typedef struct Quaternion
     float w;
 } Quaternion;
 
+float Vector3_Distance(Vector3 a, Vector3 b);
+float Vector3_Distance2D(Vector3 a, Vector3 b);
 Vector3 Vector3_right();
 Vector3 Vector3_forward();
 Vector3 Vector3_Multiply(Vector3 a, float b);
