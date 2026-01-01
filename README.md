@@ -1,7 +1,3 @@
-# CKFinalProject
-
-CK Final Project Client
-
 # MOONSCAR (월흔)
 
 > "달의 파편이 꿰뚫은 해적들의 요새, 그 유쾌한 지옥에서의 사투"
