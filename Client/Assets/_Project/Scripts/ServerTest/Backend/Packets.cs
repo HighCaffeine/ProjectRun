@@ -17,20 +17,20 @@ public enum E_PACKET
     ROOM_LEAVE_RESPONSE = 216,
     ROOM_LEAVE_USER_NTF = 217, // PLAYER_LEFT
 
-
-    // Move
-    PLAYER_MOVEMENT,
-    UPDATE_PLAYER_MOVEMENT,
-
     // Chat
     ROOM_CHAT_REQUEST = 221, // SEND_CHAT_MESSAGE
     ROOM_CHAT_RESPONSE = 222,
     ROOM_CHAT_NOTIFY = 223, // RECEIVE_CHAT_MESSAGE
 
+    // Move
+    PLAYER_MOVEMENT = 231,
+    UPDATE_PLAYER_MOVEMENT = 232,
+    PLAYER_STATUS_NTF = 233,
+
     // Path
-    MOVE_PATH_REQUEST = 225,
-    MOVE_PATH_RESPONSE = 226,
-    MOVE_PATH_NOTIFY = 227,
+    MOVE_PATH_REQUEST = 241,
+    MOVE_PATH_RESPONSE = 242,
+    MOVE_PATH_NOTIFY = 243,
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -56,13 +56,13 @@ public enum E_PACKET
     TRADE_CONFIRM_NTF = 320,
 }
 
+#region Login Packet
 [StructLayout(LayoutKind.Sequential, Size = 16)]
 struct P_PlayerName
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
     public string userName;
 }
-
 [StructLayout(LayoutKind.Sequential, Size = 66)]
 struct P_LoginReq
 {
@@ -81,7 +81,9 @@ struct P_LoginRes
     public ushort result;
 
 }
+#endregion
 
+#region Room, PlayerJoin, CreateMatch
 [StructLayout(LayoutKind.Sequential, Size = 24)]
 struct P_PlayerJoined
 {
@@ -157,7 +159,10 @@ struct P_RoomLeaveUserNotify
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
     public string userName;
 }
+#endregion
 
+#region Player Move Packet
+#region Old Version
 [StructLayout(LayoutKind.Sequential, Size = 32)]
 struct P_PlayerMovement
 {
@@ -187,8 +192,49 @@ struct P_UpdatePlayerMovement
     public Vector3 motion;
 
 }
+#endregion
 
+#region Sync Modifier Move Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerMovement
+{
+    [MarshalAs(UnmanagedType.I4)]
+    public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
+    [MarshalAs(UnmanagedType.R4)]
+    public float dx;         // Horizontal 입력 (-1 ~ 1)
+    [MarshalAs(UnmanagedType.R4)]
+    public float dz;         // Vertical 입력 (-1 ~ 1)
+}
 
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_UpdatePlayerMovement
+{
+    [MarshalAs(UnmanagedType.I4)]
+    public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
+    [MarshalAs(UnmanagedType.I8)]
+    public long player_id;
+    [MarshalAs(UnmanagedType.Struct)]
+    public Vector3 currentPos; // 서버 확정 좌표
+    [MarshalAs(UnmanagedType.R4)]
+    public float currentSpeed; // 모디파이어 적용 속도
+    [MarshalAs(UnmanagedType.I1)]
+    public bool isMoving;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerStatusNtf
+{
+    [MarshalAs(UnmanagedType.I8)]
+    public long player_id;
+    [MarshalAs(UnmanagedType.R4)]
+    public float moveSpeed;    // 현재 이동 속도 수치
+    [MarshalAs(UnmanagedType.I4)]
+    public uint statusFlags;   // 상태 플래그 (0:정상, 1:슬로우, 2:스턴 등)
+}
+#endregion
+#endregion
+
+#region Chat Packet
 [StructLayout(LayoutKind.Sequential, Size = 257)]
 struct P_RoomChatRequest
 {
@@ -206,6 +252,8 @@ struct P_RoomChatNotify
     public string message;
 }
 
+#endregion
+#region Path Packet
 [StructLayout(LayoutKind.Sequential, Size = 32)]
 struct P_MovePathRequest
 {
@@ -249,8 +297,9 @@ struct P_MovePathResponse
     [MarshalAs(UnmanagedType.I2)]
     public short path_count;
 }
+#endregion
 
-
+#region Inventory
 //인벤토리 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_InventoryInfo
@@ -261,7 +310,9 @@ public struct P_InventoryInfo
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
     public int[] itemIDs;
 }
+#endregion
 
+#region Trade Packet
 //상점 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_ShopInfo
@@ -287,7 +338,9 @@ public struct P_ShopBuyResponse
     [MarshalAs(UnmanagedType.I1)]
     public bool isSuccess;
 }
+#endregion
 
+#region Trade Packet
 //거래 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_TradeRequest
@@ -370,3 +423,4 @@ public struct P_TradeResult
     [MarshalAs(UnmanagedType.I1)]
     public bool isSuccess;
 }
+#endregion

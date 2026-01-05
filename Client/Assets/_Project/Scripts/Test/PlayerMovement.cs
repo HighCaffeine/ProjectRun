@@ -3,8 +3,31 @@
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController Controller;
-    private uint currentInputSeq = 0;
+    private uint inputSeq = 0;
 
+    void FixedUpdate()
+    {
+        if (!IsLocal) return;
+
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        if (h != 0 || v != 0)
+        {
+            inputSeq++;
+
+            P_PlayerMovement pkt = new P_PlayerMovement
+            {
+                inputSeq = inputSeq,
+                dx = h,
+                dz = v
+            };
+
+            Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+        }
+    }
+
+    //기존 테스트 이동함수
     public void Move_Test()
     {
         if (Controller != null)
@@ -26,6 +49,32 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    //키입력 이동
+    public void Move_WASD()
+    {
+        //인풋값
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        //인풋이 있으면
+        if (h != 0 || v != 0)
+        {
+            //시퀀스 값 추가
+            currentInputSeq++;
+
+            P_PlayerMovement packet = default;
+            packet.player_id = LocalPlayerInfo.ID;
+            packet.inputSeq = currentInputSeq;
+            packet.dx = h;
+            packet.dy = v;
+            packet.rotation = transform.rotation;
+
+            Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
+        }
+    }
+
+    //마우스 입력 이동
     public void Move()
     {
         if (Input.GetMouseButtonDown(1))
