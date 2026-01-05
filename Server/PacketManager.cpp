@@ -69,6 +69,7 @@ bool PacketManager::Run()
 
 	if (UDPRun() == false) return false;
 
+	//상점 업데이트용
 	int cmdValue = -1;
 	RedisTask task;
 	task.TaskID = RedisTaskID::REQUEST_SHOP_UPDATE;
@@ -77,6 +78,7 @@ bool PacketManager::Run()
 	memcpy(task.pData, &cmdValue, sizeof(int));
 	mRedisMgr->PushTask(task);
 
+	//물리 처리 쓰레드
 	mLogicThread = std::thread([this]() 
 	{
 		auto nextTick = std::chrono::steady_clock::now();
@@ -93,6 +95,7 @@ bool PacketManager::Run()
 			std::this_thread::yield();
 		}
 	});
+
 
 	//이 부분을 패킷 처리 부분으로 이동 시킨다.
 	mIsRunProcessThread = true;
