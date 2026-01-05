@@ -88,12 +88,20 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //     player.Movement.Move(updateMovement.motion);
                 // }
 
-                P_UpdatePlayerMovement updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
-
+                var updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
                 if (Players.TryGetValue(updatePkt.player_id, out Player player))
                 {
-                    player.serverPos = updatePkt.currentPos;
-                    player.isMoving = updatePkt.isMoving;
+                    // 서버 확정 데이터 반영
+                    player.OnSyncMovement(updatePkt);
+                }
+                break;
+            case E_PACKET.PLAYER_STATUS_NTF:
+                var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
+                if (Players.TryGetValue(statusPkt.player_id, out Player targetPlayer))
+                {
+                    // 속도 및 상태 플래그 갱신
+                    targetPlayer.currentSpeed = statusPkt.moveSpeed;
+                    // UI나 이펙트 처리 로직 추가
                 }
                 break;
 
