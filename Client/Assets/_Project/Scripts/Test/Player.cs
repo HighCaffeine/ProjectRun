@@ -10,7 +10,8 @@ public class Player : MonoBehaviour
     public uint lastProcessedSeq = 0; // 서버가 처리 완료한 마지막 번호
     public Vector3 serverPos;
     public float lerpSpeed = 15f;
-
+    public float currentSpeed;       // 서버 확정 속도
+    public bool isMoving;
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
     {
         serverPos = pkt.currentPos;

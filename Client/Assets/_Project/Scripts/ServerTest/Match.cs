@@ -89,7 +89,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 // }
 
                 var updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
-                if (Players.TryGetValue(updatePkt.player_id, out Player player))
+                if (Players.TryGetValue(updatePkt.userUUID, out Player player))
                 {
                     // 서버 확정 데이터 반영
                     player.OnSyncMovement(updatePkt);
@@ -97,7 +97,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 break;
             case E_PACKET.PLAYER_STATUS_NTF:
                 var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
-                if (Players.TryGetValue(statusPkt.player_id, out Player targetPlayer))
+                if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
                 {
                     // 속도 및 상태 플래그 갱신
                     targetPlayer.currentSpeed = statusPkt.moveSpeed;

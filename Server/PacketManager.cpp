@@ -518,7 +518,7 @@ void PacketManager::ProcessPlayerMovement(UINT32 clientIndex_, UINT16 packetSize
 	{
 		// 서버의 Actor 객체에 목적지 좌표만 설정함
 		// 실제 이동은 LogicThread -> Room::Update -> Actor::UpdateServerPhysics에서 처리
-		pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);
+		pUser->SetInput(pMovePkt->dx, pMovePkt->dz, pMovePkt->inputSeq);
 	}
 }
 
@@ -1055,7 +1055,8 @@ void PacketManager::UDPRecvThread()
 						pUser->SetUDPAddr(clientAddr);
 					}
 					// 서버측 Actor에 목적지 좌표 설정
-					pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);
+					//pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);	미니맵 이동
+					pUser->SetInput(pMovePkt->dx, pMovePkt->dz, pMovePkt->inputSeq);
 				}
 			}
 		}

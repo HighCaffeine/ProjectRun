@@ -201,25 +201,25 @@ struct ROOM_USER_INFO_NTF_PACKET : public PACKET_HEADER
 //
 //	UPDATE_PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::UPDATE_PLAYER_MOVEMENT) {}
 //};
-struct PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
-{
-	INT64 userUUID;
-	UINT32 inputSeq; // 보정용 번호
-	Vector3 targetPos;	
-
-	PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::PLAYER_MOVEMENT) {}
-};
-
-struct UPDATE_PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
-{
-	UINT32 lastInputSeq; // 처리된 번호
-	INT64 userUUID;
-	Vector3 currentPos;  // 서버가 계산한 현재 실시간 좌표
-	bool isMoving;       // 현재 이동 중인지 여부
-
-	UPDATE_PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::UPDATE_PLAYER_MOVEMENT) {}
-};
-#pragma endregion
+//struct PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
+//{
+//	INT64 userUUID;
+//	UINT32 inputSeq; // 보정용 번호
+//	Vector3 targetPos;	
+//
+//	PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::PLAYER_MOVEMENT) {}
+//};
+//
+//struct UPDATE_PLAYER_MOVEMENT_PACKET : public PACKET_HEADER
+//{
+//	UINT32 lastInputSeq; // 처리된 번호
+//	INT64 userUUID;
+//	Vector3 currentPos;  // 서버가 계산한 현재 실시간 좌표
+//	bool isMoving;       // 현재 이동 중인지 여부
+//
+//	UPDATE_PLAYER_MOVEMENT_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::UPDATE_PLAYER_MOVEMENT) {}
+//};
+//#pragma endregion
 
 #pragma region Room Leave Packets
 struct ROOM_LEAVE_REQUEST_PACKET : public PACKET_HEADER
@@ -294,6 +294,7 @@ struct MOVE_PATH_RESPONSE_PACKET : public PACKET_HEADER
 // Client -> Server: WASD 입력 패킷
 struct PLAYER_MOVEMENT_PACKET : public PACKET_HEADER 
 {
+	INT64 userUUID;
 	UINT32 inputSeq;    // 클라이언트 생성 번호
 	float dx;           // Horizontal (-1.0 ~ 1.0)
 	float dz;           // Vertical (-1.0 ~ 1.0)

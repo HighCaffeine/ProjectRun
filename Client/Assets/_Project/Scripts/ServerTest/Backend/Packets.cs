@@ -163,41 +163,43 @@ struct P_RoomLeaveUserNotify
 
 #region Player Move Packet
 #region Old Version
-[StructLayout(LayoutKind.Sequential, Size = 32)]
-struct P_PlayerMovement
-{
-    [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
+// [StructLayout(LayoutKind.Sequential, Size = 32)]
+// struct P_PlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long player_id;
 
-    [MarshalAs(UnmanagedType.R4)]
-    public float dx;
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dx;
 
-    [MarshalAs(UnmanagedType.R4)]
-    public float dy;
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dy;
 
-    [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
-}
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Quaternion rotation;
+// }
 
-[StructLayout(LayoutKind.Sequential, Size = 36)]
-struct P_UpdatePlayerMovement
-{
-    [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
+// [StructLayout(LayoutKind.Sequential, Size = 36)]
+// struct P_UpdatePlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long userUUID;
 
-    [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Quaternion rotation;
 
-    [MarshalAs(UnmanagedType.Struct)]
-    public Vector3 motion;
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Vector3 motion;
 
-}
+// }
 #endregion
 
 #region Sync Modifier Move Packet
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerMovement
 {
+    [MarshalAs(UnmanagedType.I8)]
+    public long userUUID;
     [MarshalAs(UnmanagedType.I4)]
     public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
     [MarshalAs(UnmanagedType.R4)]
@@ -212,7 +214,7 @@ public struct P_UpdatePlayerMovement
     [MarshalAs(UnmanagedType.I4)]
     public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
     [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
+    public long userUUID;
     [MarshalAs(UnmanagedType.Struct)]
     public Vector3 currentPos; // 서버 확정 좌표
     [MarshalAs(UnmanagedType.R4)]
@@ -225,7 +227,7 @@ public struct P_UpdatePlayerMovement
 public struct P_PlayerStatusNtf
 {
     [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
+    public long userUUID;
     [MarshalAs(UnmanagedType.R4)]
     public float moveSpeed;    // 현재 이동 속도 수치
     [MarshalAs(UnmanagedType.I4)]

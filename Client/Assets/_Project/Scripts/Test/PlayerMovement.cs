@@ -5,6 +5,8 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController Controller;
     private uint inputSeq = 0;
 
+    private bool IsLocal = false;
+
     void FixedUpdate()
     {
         if (!IsLocal) return;
@@ -18,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
             P_PlayerMovement pkt = new P_PlayerMovement
             {
+                userUUID = LocalPlayerInfo.ID,
                 inputSeq = inputSeq,
                 dx = h,
                 dz = v
@@ -27,73 +30,75 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    //기존 테스트 이동함수
-    public void Move_Test()
-    {
-        if (Controller != null)
-        {
-            P_PlayerMovement playerMovement = default;
-            playerMovement.player_id = LocalPlayerInfo.ID;
-            playerMovement.rotation = Controller.transform.rotation;
-            playerMovement.dx = Input.GetAxis("Horizontal");
-            playerMovement.dy = Input.GetAxis("Vertical");
-            if (playerMovement.dx != 0 || playerMovement.dy != 0)
-            {
-                //Client.UDP.SendPacket(E_PACKET.PLAYER_MOVEMENT, playerMovement);
-                Client.TCP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, playerMovement);
-            }
+    // //기존 테스트 이동함수
+    // public void Move_Test()
+    // {
+    //     if (Controller != null)
+    //     {
+    //         P_PlayerMovement playerMovement = default;
+    //         playerMovement.player_id = LocalPlayerInfo.ID;
+    //         playerMovement.rotation = Controller.transform.rotation;
+    //         playerMovement.dx = Input.GetAxis("Horizontal");
+    //         playerMovement.dy = Input.GetAxis("Vertical");
+    //         if (playerMovement.dx != 0 || playerMovement.dy != 0)
+    //         {
+    //             //Client.UDP.SendPacket(E_PACKET.PLAYER_MOVEMENT, playerMovement);
+    //             Client.TCP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, playerMovement);
+    //         }
 
-            // client-sided
-            //Vector3 motion = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * 5f;
-            //Move(motion);
-        }
-    }
+    //         // client-sided
+    //         //Vector3 motion = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * 5f;
+    //         //Move(motion);
+    //     }
+    // }
 
 
-    //키입력 이동
-    public void Move_WASD()
-    {
-        //인풋값
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+    // //키입력 이동
+    // public void Move_WASD()
+    // {
+    //     //인풋값
+    //     float h = Input.GetAxis("Horizontal");
+    //     float v = Input.GetAxis("Vertical");
 
-        //인풋이 있으면
-        if (h != 0 || v != 0)
-        {
-            //시퀀스 값 추가
-            currentInputSeq++;
+    //     //인풋이 있으면
+    //     if (h != 0 || v != 0)
+    //     {
+    //         //시퀀스 값 추가
+    //         currentInputSeq++;
 
-            P_PlayerMovement packet = default;
-            packet.player_id = LocalPlayerInfo.ID;
-            packet.inputSeq = currentInputSeq;
-            packet.dx = h;
-            packet.dy = v;
-            packet.rotation = transform.rotation;
+    //         P_PlayerMovement packet = default;
+    //         packet.player_id = LocalPlayerInfo.ID;
+    //         packet.inputSeq = currentInputSeq;
+    //         packet.dx = h;
+    //         packet.dy = v;
+    //         packet.rotation = transform.rotation;
 
-            Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
-        }
-    }
+    //         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
+    //     }
+    // }
 
-    //마우스 입력 이동
-    public void Move()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                currentInputSeq++;
+    // //마우스 입력 이동
+    // public void Move()
+    // {
+    //     if (Input.GetMouseButtonDown(1))
+    //     {
+    //         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //         if (Physics.Raycast(ray, out RaycastHit hit))
+    //         {
+    //             currentInputSeq++;
 
-                P_PlayerMovement packet = default;
-                packet.player_id = LocalPlayerInfo.ID;
-                packet.inputSeq = currentInputSeq; // 시퀀스 번호 할당
-                packet.targetPos = hit.point;
-
-                // UDP로 서버 전송
-                Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
-            }
-        }
-    }
+    //             P_PlayerMovement pkt = new P_PlayerMovement
+    //             {
+    //                 userUUID = LocalPlayerInfo.ID, // [중요] 서버의 userUUID 필드에 대응
+    //                 inputSeq = inputSeq,
+    //                 dx = h,
+    //                 dz = v
+    //             };
+    //             // UDP로 서버 전송
+    //             Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, packet);
+    //         }
+    //     }
+    // }
 
     public void Move(Vector3 motion)
     {
