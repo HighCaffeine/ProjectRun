@@ -31,6 +31,7 @@ public:
 
 	UINT16 EnterUser(User* user_)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		if (mCurrentUserCount >= mMaxUserCount)
 		{
 			return (UINT16)ERROR_CODE::ENTER_ROOM_FULL_USER;
@@ -76,25 +77,17 @@ public:
 	}
 
 	Npc* CreateNpc()
-
 	{
-
 		INT32 uuid = 10000 + mNpcList.size();
-
 		auto npmID = std::to_string(uuid);
-
 		Npc* npc = new Npc();
 
 		npc->Init(uuid);
-
 		npc->SetLogin(npmID.c_str());
-
-
 
 		mNpcList.push_back(npc);
 
 		return npc;
-
 	}
 
 	UINT16 EnterNpc()
@@ -111,6 +104,7 @@ public:
 		
 	void LeaveUser(User* leaveUser_)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		mUserList.remove_if([leaveUserId = leaveUser_->GetUserId()](User* pUser) {
 			return leaveUserId == pUser->GetUserId();
 		});
@@ -147,6 +141,7 @@ public:
 
 	void SendToAllUser(const UINT16 dataSize_, char* data_, const INT32 passUserIndex_, bool exceptMe)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		for (auto pUser : mUserList)
 		{
 			if (pUser == nullptr) {
@@ -163,6 +158,7 @@ public:
 
 	void Update(float dt)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		for (auto pUser : mUserList) 
 		{
 			if (pUser == nullptr) continue;
@@ -195,7 +191,7 @@ private:
 
 		return true;
 	}
-
+	std::recursive_mutex mLock;
 	INT32 mRoomNum = -1;
 
 	std::list<User*> mUserList;

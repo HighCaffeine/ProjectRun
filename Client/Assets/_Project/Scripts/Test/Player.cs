@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public PlayerMovement Movement;
     public string Name;
     public long ID;
     public bool IsLocal;

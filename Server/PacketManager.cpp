@@ -67,7 +67,7 @@ bool PacketManager::Run()
 		return false;
 	}
 
-	if (UDPRun() == false) return false;
+	//if (UDPRun() == false) return false;
 
 	//상점 업데이트용
 	int cmdValue = -1;
@@ -1038,12 +1038,18 @@ void PacketManager::UDPRecvThread()
 	while (mIsRunLogicThread) 
 	{
 		int recvLen = recvfrom(mUdpSocket, buf, 2048, 0, (sockaddr*)&clientAddr, &addrLen);
+
 		if (recvLen > 0) {
 			auto pHeader = (PACKET_HEADER*)buf;
 
 			if (pHeader->PacketId == (UINT16)PACKET_ID::PLAYER_MOVEMENT) 
 			{
 				auto pMovePkt = (PLAYER_MOVEMENT_PACKET*)buf;
+
+				if (pMovePkt->userUUID < 0 || pMovePkt->userUUID >= mUserManager->GetMaxUserCnt())
+				{;
+					continue; 
+				}
 
 				// 패킷 내의 userUUID나 clientAddr를 통해 유저 식별
 				auto pUser = mUserManager->GetUserByConnIdx(pMovePkt->userUUID);

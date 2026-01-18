@@ -89,7 +89,7 @@ public class PlayerMovement : MonoBehaviour
 
     //             P_PlayerMovement pkt = new P_PlayerMovement
     //             {
-    //                 userUUID = LocalPlayerInfo.ID, // [중요] 서버의 userUUID 필드에 대응
+    //                 userUUID = LocalPlayerInfo.ID,
     //                 inputSeq = inputSeq,
     //                 dx = h,
     //                 dz = v

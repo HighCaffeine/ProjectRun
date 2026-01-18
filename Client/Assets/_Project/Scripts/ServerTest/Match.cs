@@ -8,6 +8,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     public static Match Instance;
     public Dictionary<long, Player> Players;
 
+    public Transform cameraDefaultPos;
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -223,21 +225,36 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         bool local = LocalPlayerInfo.ID == id;
         GameObject playerObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         playerObj.name = playerName;
+        // if (local)
+        // {
+        //     GameObject cameraObject = new GameObject($"Player Camera");
+        //     Camera playerCamera = cameraObject.AddComponent<Camera>();
+        //     cameraObject.AddComponent<MouseLook>();
+        //     playerCamera.transform.parent = playerObj.transform;
+
+        //     // test code
+        //     /*
+        //     float randomX = Random.Range(-25, 26);
+        //     float randomZ = Random.Range(-25, 26);
+        //     Vector3 pos = new Vector3(randomX, 0, randomZ);
+        //     playerObj.transform.position = pos;
+        //     //*/
+        // }
         if (local)
         {
-            GameObject cameraObject = new GameObject($"Player Camera");
+            GameObject cameraObject = new GameObject("Main Camera");
             Camera playerCamera = cameraObject.AddComponent<Camera>();
-            cameraObject.AddComponent<MouseLook>();
-            playerCamera.transform.parent = playerObj.transform;
 
-            // test code
-            /*
-            float randomX = Random.Range(-25, 26);
-            float randomZ = Random.Range(-25, 26);
-            Vector3 pos = new Vector3(randomX, 0, randomZ);
-            playerObj.transform.position = pos;
-            //*/
+            cameraObject.tag = "MainCamera";
+
+            CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
+
+            camFollow.target = playerObj.transform;
+
+            cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
+            cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
         }
+
         playerObj.transform.position.Set(5.0f, 2.0f, 5.0f);
         PlayerMovement playerMovement = playerObj.AddComponent<PlayerMovement>();
         playerMovement.Controller = playerObj.AddComponent<CharacterController>();

@@ -154,6 +154,19 @@ public:
 	{
 		const float currentSpeed = GetCurrentSpeed();;
 
+		for (auto it = mSpeedModifiers.begin(); it != mSpeedModifiers.end(); ) 
+		{
+			it->duration -= dt;
+			if (it->duration <= 0.0f)
+			{
+				it = mSpeedModifiers.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
 		if (isMoveMouse) 
 		{
 			if (!isMoving) return;

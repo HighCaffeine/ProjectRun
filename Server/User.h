@@ -1,6 +1,7 @@
 #pragma once
 
 #include <WinSock2.h>
+#include <mutex>
 
 #include "Actor.h"
 #include "unity.h"
@@ -33,6 +34,7 @@ public:
 	//TODO SetPacketData, GetPacket 함수를 멀티스레드에 호출하고 있다면 공유변수에 lock을 걸어야 한다
 	void SetPacketData(const UINT32 dataSize_, char* pData_)
 	{
+		std::lock_guard<std::mutex> guard(mLock);
 		if ((mPakcetDataBufferWPos + dataSize_) >= PACKET_DATA_BUFFER_SIZE)
 		{
 			auto remainDataSize = mPakcetDataBufferWPos - mPakcetDataBufferRPos;
@@ -56,6 +58,7 @@ public:
 
 	PacketInfo GetPacket()
 	{
+		std::lock_guard<std::mutex> guard(mLock);
 		const int PACKET_SIZE_LENGTH = 2;
 		const int PACKET_TYPE_LENGTH = 2;
 		short packetSize = 0;
@@ -111,7 +114,7 @@ public:
 	bool isUdpActive = false;
 private:
 	sockaddr_in udpAddr;
-
+	std::mutex mLock;
 
 	bool mIsConfirm = false;
 	std::string mAuthToken;
