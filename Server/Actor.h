@@ -32,8 +32,12 @@ public:
 	{
 		mIndex = index;
 		position.x = 5.0f;
-		position.y = 2.0f;
+		position.y = 0.0f;
 		position.z = 5.0f;
+
+		serverPos.x = 5.0f;
+		serverPos.y = 0.0f;
+		serverPos.z = 5.0f;
 	}
 
 	void Clear()
@@ -82,7 +86,7 @@ public:
 
 	const UINT32& GetLastInputSeq() const { return lastInputSeq; }
 	const bool& GetIsMoving() const { return isMoving; }
-	const Vector3& GetPosition() const { return position;	}
+	const Vector3& GetPosition() const { return serverPos;	}
 	const Quaternion& GetRotation() const { return rotation; }
 
 	//임시 테스트 함수
@@ -180,15 +184,19 @@ public:
 
 				return;
 			}
-
+			isMoving = true;
 			dir.x /= dist; dir.z /= dist;
 			serverPos.x += dir.x * currentSpeed * dt;
 			serverPos.z += dir.z * currentSpeed * dt;
 		}
 		else 
 		{
-			if (inputX == 0 && inputZ == 0) return;
-
+			if (inputX == 0 && inputZ == 0)
+			{
+				isMoving = false;
+				return;
+			}
+			isMoving = true;
 			float mag = sqrt(inputX * inputX + inputZ * inputZ);
 
 			if (mag > 0.01f) 

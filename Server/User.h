@@ -1,6 +1,7 @@
 #pragma once
 
 #include <WinSock2.h>
+#include <unordered_set>
 #include <mutex>
 
 #include "Actor.h"
@@ -112,7 +113,10 @@ public:
 	}
 
 	bool isUdpActive = false;
+	std::unordered_set<INT32> mVisibleList;
 private:
+
+
 	sockaddr_in udpAddr;
 	std::mutex mLock;
 
