@@ -10,6 +10,8 @@ int main()
 {
 	GameServer server;
 
+	//SetConsoleOutputCP(65001);
+
 	//소켓을 초기화
 	server.Init(MAX_IO_WORKER_THREAD);
 

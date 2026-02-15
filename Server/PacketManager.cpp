@@ -67,7 +67,7 @@ bool PacketManager::Run()
 		return false;
 	}
 
-	//if (UDPRun() == false) return false;
+	if (UDPRun() == false) return false;
 
 	//상점 업데이트용
 	int cmdValue = -1;
@@ -78,28 +78,6 @@ bool PacketManager::Run()
 	memcpy(task.pData, &cmdValue, sizeof(int));
 	mRedisMgr->PushTask(task);
 
-	//물리 처리 쓰레드
-	mLogicThread = std::thread([this]() 
-	{
-		auto nextTick = std::chrono::steady_clock::now();
-		while (mIsRunProcessThread) 
-		{
-			auto now = std::chrono::steady_clock::now();
-			if (now >= nextTick) 
-			{
-				// 모든 방 시뮬레이션 실행 (이동/시야/충돌)
-				mRoomManager->UpdateAllRooms(FIXED_DELTA_TIME);
-				nextTick += std::chrono::milliseconds(20);
-			}
-
-			std::this_thread::yield();
-		}
-	});
-
-
-	//이 부분을 패킷 처리 부분으로 이동 시킨다.
-	mIsRunProcessThread = true;
-	mProcessThread = std::thread([this]() { ProcessPacket(); });
 
 	return true;
 }
@@ -1034,18 +1012,18 @@ void PacketManager::UDPRecvThread()
 	sockaddr_in clientAddr;
 	int addrLen = sizeof(clientAddr);
 	char buf[2048];
-
+	printf("[System] UDP Recv Thread Started on Port 5025\n");
 	while (mIsRunLogicThread) 
 	{
 		int recvLen = recvfrom(mUdpSocket, buf, 2048, 0, (sockaddr*)&clientAddr, &addrLen);
 
 		if (recvLen > 0) {
 			auto pHeader = (PACKET_HEADER*)buf;
-
+			printf("[UDP] Packet Recv! ID:%d, Len:%d\n", pHeader->PacketId, recvLen);
 			if (pHeader->PacketId == (UINT16)PACKET_ID::PLAYER_MOVEMENT) 
 			{
 				auto pMovePkt = (PLAYER_MOVEMENT_PACKET*)buf;
-
+				printf("[UDP] Move Packet -> UserUUID: %lld\n", pMovePkt->userUUID);
 				if (pMovePkt->userUUID < 0 || pMovePkt->userUUID >= mUserManager->GetMaxUserCnt())
 				{;
 					continue; 
@@ -1055,14 +1033,24 @@ void PacketManager::UDPRecvThread()
 				auto pUser = mUserManager->GetUserByConnIdx(pMovePkt->userUUID);
 				if (pUser) 
 				{
+					printf("[UDP] User Found! Setting Input...\n");
 					// 유저의 UDP 주소가 처음 왔다면 등록 (응답 전송용)
-					if (!pUser->isUdpActive) 
+					if (!pUser->isUdpActive)
 					{
 						pUser->SetUDPAddr(clientAddr);
+						pUser->isUdpActive = true;
+						printf("[UDP] New User(%lld) UDP Address Registered!\n", pMovePkt->userUUID);
 					}
+
 					// 서버측 Actor에 목적지 좌표 설정
 					//pUser->SetTarget(pMovePkt->targetPos, pMovePkt->inputSeq);	미니맵 이동
 					pUser->SetInput(pMovePkt->dx, pMovePkt->dz, pMovePkt->inputSeq);
+				}
+				else
+				{
+					// [체크 5] 유저를 못 찾음 (여기가 범인일 확률 높음)
+					printf("[UDP Error] User Not Found! UUID: %lld / MaxUser: %d\n",
+						pMovePkt->userUUID, mUserManager->GetMaxUserCnt());
 				}
 			}
 		}
