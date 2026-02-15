@@ -56,14 +56,16 @@ public enum E_PACKET
     TRADE_CONFIRM_NTF = 320,
 }
 
+
+
 #region Login Packet
-[StructLayout(LayoutKind.Sequential, Size = 16)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_PlayerName
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
     public string userName;
 }
-[StructLayout(LayoutKind.Sequential, Size = 66)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_LoginReq
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
@@ -73,7 +75,7 @@ struct P_LoginReq
 }
 
 
-[StructLayout(LayoutKind.Sequential, Size = 2)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_LoginRes
 {
     // UInt16 Result;
@@ -84,7 +86,7 @@ struct P_LoginRes
 #endregion
 
 #region Room, PlayerJoin, CreateMatch
-[StructLayout(LayoutKind.Sequential, Size = 24)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_PlayerJoined
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -94,21 +96,21 @@ struct P_PlayerJoined
     public string userName;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 4)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomEnterRequest
 {
     [MarshalAs(UnmanagedType.I4)]
     public int roomNumber;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 2)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomEnterResponse
 {
     [MarshalAs(UnmanagedType.I2)]
     public short result;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 41)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomNewUserNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -118,7 +120,7 @@ struct P_RoomNewUserNotify
     public string userName;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 56)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_CreateMatchPlayer
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -134,7 +136,7 @@ struct P_CreateMatchPlayer
     public Quaternion rotation;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 69)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomUserInfoNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -144,13 +146,13 @@ struct P_RoomUserInfoNotify
     public string userName;
 
     [MarshalAs(UnmanagedType.Struct)]
-    public Vector3 position;
+    public P_PacketVector3 position;
 
     [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
+    public P_PacketQuaternion rotation;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 41)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomLeaveUserNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -216,7 +218,7 @@ public struct P_UpdatePlayerMovement
     [MarshalAs(UnmanagedType.I8)]
     public long userUUID;
     [MarshalAs(UnmanagedType.Struct)]
-    public Vector3 currentPos; // 서버 확정 좌표
+    public P_PacketVector3 currentPos;  //서버 확정 좌표
     [MarshalAs(UnmanagedType.R4)]
     public float currentSpeed; // 모디파이어 적용 속도
     [MarshalAs(UnmanagedType.I1)]
@@ -237,14 +239,14 @@ public struct P_PlayerStatusNtf
 #endregion
 
 #region Chat Packet
-[StructLayout(LayoutKind.Sequential, Size = 257)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomChatRequest
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 257)]
     public string message;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 290)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomChatNotify
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
@@ -256,7 +258,7 @@ struct P_RoomChatNotify
 
 #endregion
 #region Path Packet
-[StructLayout(LayoutKind.Sequential, Size = 32)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_MovePathRequest
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -269,7 +271,7 @@ struct P_MovePathRequest
     public Vector3 endPos;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 12)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PacketVector3
 {
     [MarshalAs(UnmanagedType.R4)]
@@ -285,9 +287,17 @@ public struct P_PacketVector3
     {
         x = v.x; y = v.y; z = v.z;
     }
+    public Vector3 ToVector3() => new Vector3(x, y, z);
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 130)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PacketQuaternion
+{
+    public float x, y, z, w;
+    public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_MovePathResponse
 {
     [MarshalAs(UnmanagedType.I8)]
