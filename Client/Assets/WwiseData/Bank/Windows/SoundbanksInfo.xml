@@ -9,7 +9,7 @@
 	</RootPaths>
 	<DialogueEvents/>
 	<SoundBanks>
-		<SoundBank Id="1355168291" Type="User" GUID="{701ECBBD-9C7B-4030-8CDB-749EE5D1C7B9}" Language="SFX" Hash="{12D0DF48-666A-3CD8-9281-2B054E6667CE}">
+		<SoundBank Id="1355168291" Type="User" GUID="{701ECBBD-9C7B-4030-8CDB-749EE5D1C7B9}" Language="SFX" Hash="{711ABE0F-AE62-2170-871F-0EF1DFFA0EB5}">
 			<ObjectPath>Init</ObjectPath>
 			<ShortName>Init</ShortName>
 			<Path>Init.bnk</Path>
@@ -30,6 +30,7 @@
 				<GameParameter Id="3002758120" Name="SS_Air_Freefall" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_Freefall" GUID="{2F2DFE37-4F9E-4D94-83D8-53CCA39781AD}"/>
 				<GameParameter Id="3074696722" Name="SS_Air_Size" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_Size" GUID="{1329EBEF-A193-472E-A38C-64668B494879}"/>
 				<GameParameter Id="3203397129" Name="SS_Air_TimeOfDay" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_TimeOfDay" GUID="{536FA72C-8C7E-4C8B-AE03-EF34FDADC314}"/>
+				<GameParameter Id="3354391535" Name="RTPC_Player_HP" ObjectPath="\Game Parameters\Default Work Unit\Player\RTPC_Player_HP" GUID="{706326C8-9EE3-4FBD-82A1-B79D858019E6}"/>
 				<GameParameter Id="3715662592" Name="SS_Air_Storm" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_Storm" GUID="{E93F8CDB-06D1-4737-ACAF-7CD44BBED783}"/>
 				<GameParameter Id="3847924954" Name="SS_Air_Presence" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_Presence" GUID="{E3B7811A-7B2F-490F-B44F-5FE51B468041}"/>
 				<GameParameter Id="4160247818" Name="SS_Air_Turbulence" ObjectPath="\Game Parameters\Factory Soundseed Air Game Syncs\SS_Air_Turbulence" GUID="{EDA87B19-73AA-40A0-9F19-2073606DB710}"/>
@@ -163,10 +164,10 @@
 				</AcousticTexture>
 			</AcousticTextures>
 		</SoundBank>
-		<SoundBank Id="3989171651" Type="User" GUID="{00EE62AE-AC21-4E99-8CA9-ECCEF644E4ED}" Language="SFX" Hash="{99AE7079-591D-6D34-4280-AE6B7DC65C32}">
-			<ObjectPath>\SoundBanks\Default Work Unit\Main_Bank</ObjectPath>
-			<ShortName>Main_Bank</ShortName>
-			<Path>Main_Bank.bnk</Path>
+		<SoundBank Id="3161908922" Type="User" GUID="{4F2B3228-B15E-48D8-9EB4-A7A0D48E7762}" Language="SFX" Hash="{F1883B64-09A5-97B9-C5B2-A36652FC0B39}">
+			<ObjectPath>\SoundBanks\Default Work Unit\Main</ObjectPath>
+			<ShortName>Main</ShortName>
+			<Path>Main.bnk</Path>
 			<Media>
 				<File Id="981878058" Language="SFX" Streaming="false" Location="Memory">
 					<ShortName>8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono.wav</ShortName>
@@ -174,13 +175,16 @@
 				</File>
 			</Media>
 			<Events>
-				<Event Id="3650566532" Name="Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono" ObjectPath="\Events\Default Work Unit\Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono" GUID="{EA781F26-6449-4A68-AFF3-CDE43561D3B5}" DurationType="OneShot" DurationMin="0.17621315" DurationMax="0.17621315">
+				<Event Id="3934013160" Name="Play_UI_Currency_Coin_Add_01" ObjectPath="\Events\Default Work Unit\Play_UI_Currency_Coin_Add_01" GUID="{969CFF7D-D62E-4D48-9480-66114225EB97}" DurationType="OneShot" DurationMin="0.17621315" DurationMax="0.17621315">
 					<MediaRefs>
 						<MediaRef Id="981878058"/>
 					</MediaRefs>
 				</Event>
 			</Events>
+			<GameParameters>
+				<GameParameter Id="3354391535" Name="RTPC_Player_HP" ObjectPath="\Game Parameters\Default Work Unit\Player\RTPC_Player_HP" GUID="{706326C8-9EE3-4FBD-82A1-B79D858019E6}"/>
+			</GameParameters>
 		</SoundBank>
 	</SoundBanks>
-	<FileHash>{B86A3D44-AD82-1B38-9D88-2F96C23833EC}</FileHash>
+	<FileHash>{7E6BEEFE-FA90-69DD-56CE-64136190E35B}</FileHash>
 </SoundBanksInfo>

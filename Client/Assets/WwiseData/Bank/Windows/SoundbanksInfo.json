@@ -18,7 +18,7 @@
     "Type": "User",
     "GUID": "{701ECBBD-9C7B-4030-8CDB-749EE5D1C7B9}",
     "Language": "SFX",
-    "Hash": "{12D0DF48-666A-3CD8-9281-2B054E6667CE}",
+    "Hash": "{711ABE0F-AE62-2170-871F-0EF1DFFA0EB5}",
     "ObjectPath": "Init",
     "ShortName": "Init",
     "Path": "Init.bnk",
@@ -92,6 +92,12 @@
       "Name": "SS_Air_TimeOfDay",
       "ObjectPath": "\\Game Parameters\\Factory Soundseed Air Game Syncs\\SS_Air_TimeOfDay",
       "GUID": "{536FA72C-8C7E-4C8B-AE03-EF34FDADC314}"
+     },
+     {
+      "Id": "3354391535",
+      "Name": "RTPC_Player_HP",
+      "ObjectPath": "\\Game Parameters\\Default Work Unit\\Player\\RTPC_Player_HP",
+      "GUID": "{706326C8-9EE3-4FBD-82A1-B79D858019E6}"
      },
      {
       "Id": "3715662592",
@@ -591,14 +597,14 @@
     ]
    },
    {
-    "Id": "3989171651",
+    "Id": "3161908922",
     "Type": "User",
-    "GUID": "{00EE62AE-AC21-4E99-8CA9-ECCEF644E4ED}",
+    "GUID": "{4F2B3228-B15E-48D8-9EB4-A7A0D48E7762}",
     "Language": "SFX",
-    "Hash": "{99AE7079-591D-6D34-4280-AE6B7DC65C32}",
-    "ObjectPath": "\\SoundBanks\\Default Work Unit\\Main_Bank",
-    "ShortName": "Main_Bank",
-    "Path": "Main_Bank.bnk",
+    "Hash": "{F1883B64-09A5-97B9-C5B2-A36652FC0B39}",
+    "ObjectPath": "\\SoundBanks\\Default Work Unit\\Main",
+    "ShortName": "Main",
+    "Path": "Main.bnk",
     "Media": [
      {
       "Id": "981878058",
@@ -611,10 +617,10 @@
     ],
     "Events": [
      {
-      "Id": "3650566532",
-      "Name": "Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono",
-      "ObjectPath": "\\Events\\Default Work Unit\\Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono",
-      "GUID": "{EA781F26-6449-4A68-AFF3-CDE43561D3B5}",
+      "Id": "3934013160",
+      "Name": "Play_UI_Currency_Coin_Add_01",
+      "ObjectPath": "\\Events\\Default Work Unit\\Play_UI_Currency_Coin_Add_01",
+      "GUID": "{969CFF7D-D62E-4D48-9480-66114225EB97}",
       "DurationType": "OneShot",
       "DurationMin": "0.17621315",
       "DurationMax": "0.17621315",
@@ -624,9 +630,17 @@
        }
       ]
      }
+    ],
+    "GameParameters": [
+     {
+      "Id": "3354391535",
+      "Name": "RTPC_Player_HP",
+      "ObjectPath": "\\Game Parameters\\Default Work Unit\\Player\\RTPC_Player_HP",
+      "GUID": "{706326C8-9EE3-4FBD-82A1-B79D858019E6}"
+     }
     ]
    }
   ],
-  "FileHash": "{53231665-ADCB-62FD-589C-C27A715F1FEE}"
+  "FileHash": "{0C3A1A95-7306-8B9C-8614-8475D8388C69}"
  }
 }
