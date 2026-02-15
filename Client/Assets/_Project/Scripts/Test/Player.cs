@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Player : MonoBehaviour
 {
@@ -8,36 +6,76 @@ public class Player : MonoBehaviour
     public string Name;
     public long ID;
     public bool IsLocal;
-    public uint lastProcessedSeq = 0; // 서버가 처리 완료한 마지막 번호
+
     public Vector3 serverPos;
-    public float lerpSpeed = 15f;
-    public float currentSpeed;       // 서버 확정 속도
+    public float currentSpeed = 5.0f;
     public bool isMoving;
+    public uint lastProcessedSeq = 0;
+
+    private float snapThreshold = 5.0f; // 2m는 너무 짧아서 핑 튀면 제자리로 당겨짐 -> 5m로 완화
+    private float catchUpThreshold = 0.5f;
+    private float deadZone = 0.05f; // 미세 떨림 방지용
+
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
     {
-        serverPos = pkt.currentPos;
+        if (pkt.lastInputSeq < lastProcessedSeq) return;
+        lastProcessedSeq = pkt.lastInputSeq;
+
+        serverPos = pkt.currentPos.ToVector3();
         currentSpeed = pkt.currentSpeed;
         isMoving = pkt.isMoving;
-        lastProcessedSeq = pkt.lastInputSeq; // 내가 보낸 입력이 어디까지 반영됐는지 확인
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        float dist = Vector3.Distance(transform.position, serverPos);
-
         if (IsLocal)
         {
-            // 오차 보정, 서버와 1m 이상 차이 나면 강제 순간이동, 아니면 부드럽게 Lerp
-            if (dist > 1.0f) transform.position = serverPos;
-            else transform.position = Vector3.Lerp(transform.position, serverPos, Time.deltaTime * lerpSpeed);
+            ProcessLocalCalibration();
         }
         else
         {
-            // 다른 플레이어 보간처리, AOI 범위 내 다른 유저는 서버 좌표로 부드럽게
-            transform.position = Vector3.Lerp(transform.position, serverPos, Time.deltaTime * lerpSpeed);
+            ProcessRemoteMovement();
+        }
+    }
+
+    // 내 캐릭터 보정 (텔레포트 방지)
+    void ProcessLocalCalibration()
+    {
+        float dist = Vector3.Distance(transform.position, serverPos);
+
+        // 오차가 5m 이내면 서버 위치 무시
+        if (dist < snapThreshold)
+        {
+            return;
         }
 
-        // 속도 기반 애니메이션 제어 예정
-        // animator.SetFloat("MoveSpeed", isMoving ? currentSpeed : 0);
+        //  벽 뚫거나 했을 때만 강제 위치 보정
+        transform.position = serverPos;
+    }
+
+    // 상대방 부드럽게 이동
+    void ProcessRemoteMovement()
+    {
+        float dist = Vector3.Distance(transform.position, serverPos);
+
+        if (dist < deadZone) return; // 떨림 방지
+
+        if (dist > snapThreshold)
+        {
+            transform.position = serverPos;
+            return;
+        }
+
+        float moveStep = currentSpeed * Time.deltaTime;
+        if (dist > catchUpThreshold) moveStep *= 1.2f;
+
+        transform.position = Vector3.MoveTowards(transform.position, serverPos, moveStep);
+
+        Vector3 dir = (serverPos - transform.position).normalized;
+        if (dir != Vector3.zero)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 15f);
+        }
     }
 }
