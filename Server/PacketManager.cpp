@@ -7,6 +7,7 @@
 #include "RoomManager.h"
 #include "PacketManager.h"
 #include "RedisManager.h"
+#include "LogManager.h"
 
 #include <strsafe.h>
 
@@ -136,6 +137,8 @@ void PacketManager::ClearConnectionInfo(INT32 clientIndex_)
 
 void PacketManager::ReceivePacketData(const UINT32 clientIndex_, const UINT32 size_, char* pData_)
 {
+	m_TotalRecvBytes += size_;
+
 	auto pUser = mUserManager->GetUserByConnIdx(clientIndex_);
 	pUser->SetPacketData(size_, pData_);
 
@@ -395,7 +398,12 @@ void PacketManager::ProcessEnterRoom(UINT32 clientIndex_, UINT16 packetSize_, ch
 
 	if (enterResult != (UINT16)ERROR_CODE::NONE)
 	{
+		spdlog::info("[Enter] User({}) Entered Room Number [{}]", clientIndex_, roomNumber);
 		return;
+	}
+	else
+	{
+		spdlog::warn("[Enter] User({}) Failed. Error: {}", clientIndex_, enterResult);
 	}
 
 	auto pRoom = mRoomManager->GetRoomByNumber(roomNumber);
@@ -452,6 +460,8 @@ void PacketManager::ProcessLeaveRoom(UINT32 clientIndex_, UINT16 packetSize_, ch
 				
 	roomLeaveResPacket.Result = mRoomManager->LeaveUser(roomNum, reqUser);
 	SendPacketFunc(clientIndex_, sizeof(ROOM_LEAVE_RESPONSE_PACKET), (char*)&roomLeaveResPacket);
+
+	spdlog::info("[Leave] User({}) Left Room", clientIndex_);
 }
 
 void PacketManager::ProcessPlayerMovement(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_)
@@ -987,7 +997,7 @@ void PacketManager::LogicThread()
 
 		if (now >= nextTick) 
 		{
-			// 1. 모든 방(Room)의 물리 및 로직 업데이트
+			// 모든 방(Room)의 물리 및 로직 업데이트
 			// mRoomManager 내의 모든 Room을 순회하며 Update(0.02f) 호출
 			for (int i = 0; i < mRoomManager->GetMaxRoomCount(); ++i) 
 			{
@@ -997,7 +1007,18 @@ void PacketManager::LogicThread()
 				}
 			}
 
-			// 2. 다음 틱 시간 예약
+			// Byte 단위를 KB 단위로 변환
+			double recvKB = m_TotalRecvBytes / 1024.0;
+			double sendKB = m_TotalSendBytes / 1024.0;
+
+			// 로그 출력 (파일에도 자동 저장됨)
+			spdlog::info("[Bandwidth] In: {:.2f} KB/s | Out: {:.2f} KB/s", recvKB, sendKB);
+
+			// 누적 변수 0으로 초기화 (다음 1초를 위해)
+			m_TotalRecvBytes = 0;
+			m_TotalSendBytes = 0;
+
+			// 다음 틱 시간 예약
 			nextTick += tickInterval;
 		}
 
@@ -1019,15 +1040,20 @@ void PacketManager::UDPRecvThread()
 
 		if (recvLen > 0) {
 			auto pHeader = (PACKET_HEADER*)buf;
+			m_TotalRecvBytes += recvLen;
+
 			printf("[UDP] Packet Recv! ID:%d, Len:%d\n", pHeader->PacketId, recvLen);
 			if (pHeader->PacketId == (UINT16)PACKET_ID::PLAYER_MOVEMENT) 
 			{
 				auto pMovePkt = (PLAYER_MOVEMENT_PACKET*)buf;
 				printf("[UDP] Move Packet -> UserUUID: %lld\n", pMovePkt->userUUID);
 				if (pMovePkt->userUUID < 0 || pMovePkt->userUUID >= mUserManager->GetMaxUserCnt())
-				{;
+				{
 					continue; 
 				}
+
+				spdlog::info("[RUDP] User : {} | Seq : {} Pos : {:.2f}, {:.2f}",
+					pMovePkt->userUUID, pMovePkt->inputSeq, pMovePkt->dx, pMovePkt->dz);
 
 				// 패킷 내의 userUUID나 clientAddr를 통해 유저 식별
 				auto pUser = mUserManager->GetUserByConnIdx(pMovePkt->userUUID);
@@ -1048,7 +1074,7 @@ void PacketManager::UDPRecvThread()
 				}
 				else
 				{
-					// [체크 5] 유저를 못 찾음 (여기가 범인일 확률 높음)
+					// 유저를 못 찾음
 					printf("[UDP Error] User Not Found! UUID: %lld / MaxUser: %d\n",
 						pMovePkt->userUUID, mUserManager->GetMaxUserCnt());
 				}
