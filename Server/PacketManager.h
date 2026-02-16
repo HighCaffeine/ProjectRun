@@ -11,6 +11,10 @@
 #include <map>
 
 
+//대역폭 확인용
+#include <atomic>
+
+
 class User;
 class Room;
 class UserManager;
@@ -35,6 +39,18 @@ public:
 	void PushSystemPacket(PacketInfo packet_);
 		
 	std::function<void(UINT32, UINT32, char*)> SendPacketFunc;
+
+	void RegisterSendFunction(std::function<void(UINT32, UINT32, char*)> sendFunc)
+	{
+		SendPacketFunc = [this, sendFunc](UINT32 clientIndex, UINT32 dataSize, char* pData)
+			{
+				// 보내는 양 누적
+				m_TotalSendBytes += dataSize;
+
+				// 실제 전송 함수 호출
+				if (sendFunc) sendFunc(clientIndex, dataSize, pData);
+			};
+	}
 
 private:
 	void CreateCompent(const UINT32 maxClient_);
@@ -99,6 +115,10 @@ private:
 	std::map<std::string, UINT32> mUdpAddrToUserIdx;
 
 	bool UDPRun();
+
+	//대역폭 확인
+	std::atomic<uint64_t> m_TotalSendBytes{ 0 };
+	std::atomic<uint64_t> m_TotalRecvBytes{ 0 };
 
 
 	UserManager* mUserManager;
