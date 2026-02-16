@@ -44,13 +44,16 @@ public:
 
 	void Run(const UINT32 maxClient)
 	{
-		auto sendPacketFunc = [&](UINT32 clientIndex_, UINT16 packetSize, char* pSendPacket)
+		/*auto sendPacketFunc = [&](UINT32 clientIndex_, UINT16 packetSize, char* pSendPacket)
 		{
 			SendMsg(clientIndex_, packetSize, pSendPacket);
-		};
+		};*/
+		//m_pPacketManager->SendPacketFunc = sendPacketFunc;
 
 		m_pPacketManager = std::make_unique<PacketManager>();
-		m_pPacketManager->SendPacketFunc = sendPacketFunc;
+		//기존거에 + 전송량 총합 검사
+		m_pPacketManager->RegisterSendFunction([&](UINT32 clientIndex_, UINT32 packetSize, char* pSendPacket) {
+			SendMsg(clientIndex_, packetSize, pSendPacket);});
 		m_pPacketManager->Init(maxClient);		
 		m_pPacketManager->Run();
 		
