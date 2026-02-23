@@ -1,7 +1,7 @@
 #pragma once
 
-#include "..\recastnavigation-main\Detour\Include\DetourNavMesh.h"
-#include "..\recastnavigation-main\Detour\\Include\\DetourNavMeshQuery.h"
+#include "..\Detour\Include\DetourNavMesh.h"
+#include "..\Detour\Include\DetourNavMeshQuery.h"
 #include "unity.h"
 
 #include <string>
@@ -19,7 +19,7 @@ private:
 	dtQueryFilter m_Filter;
 
 	//Å½»ö ¹üÀ§
-	const float m_Entents[3] = { 2.0f, 4.0f, 2.0f };
+	const float m_Extents[3] = { 2.0f, 4.0f, 2.0f };
 public:
 	static NavMeshManager* GetInstance()
 	{
