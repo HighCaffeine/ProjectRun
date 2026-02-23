@@ -195,6 +195,7 @@ public:
 
 				// 현재 시야 목록에 있는지 확인
 				bool wasVisible = (pViewer->mVisibleList.find(pTarget->GetNetConnIdx()) != pViewer->mVisibleList.end());
+				bool canSee = CanSee(pViewer, pTarget);
 
 				// 안 보이다가 -> 6.0m 안으로 들어옴 (Enter)
 				if (!wasVisible)
@@ -212,10 +213,10 @@ public:
 						SendPacketFunc(pViewer->GetNetConnIdx(), infoPkt.PacketLength, (char*)&infoPkt);
 					}
 				}
-				// 보이다가 -> 7.5m 밖으로 나감 (Leave)
+				// 보이다가 -> 7.5m 밖으로 나감 (Leave) / 부쉬에 들어가서 안보임
 				else
 				{
-					if (dist > LEAVE_RANGE)
+					if (dist > LEAVE_RANGE || !canSee)
 					{
 						pViewer->mVisibleList.erase(pTarget->GetNetConnIdx());
 
@@ -253,9 +254,18 @@ private:
 		float dist = Vector3_Distance2D(viewer->GetPosition(), target->GetPosition());
 
 		// 6.0m 이내면 진입(Enter) 가능
-		if (dist <= ENTER_RANGE) return true;
+		if (dist > ENTER_RANGE) return false;
 
-		return false;
+		bool isTargetInBush = NavMeshManager::GetInstance()->IsInBush(target->GetPosition());
+
+		if (isTargetInBush)
+		{
+			bool isViewerInBush = NavMeshManager::GetInstance()->IsInBush(viewer->GetPosition());
+
+			if (!isViewerInBush) return false;
+		}
+
+		return true;
 	}
 
 	std::recursive_mutex mLock;
