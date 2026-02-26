@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Packet.h"
+#include "NavMeshManager.h"
 
 #include <string>
 
@@ -32,8 +33,12 @@ public:
 	{
 		mIndex = index;
 		position.x = 5.0f;
-		position.y = 2.0f;
+		position.y = 0.0f;
 		position.z = 5.0f;
+
+		serverPos.x = 5.0f;
+		serverPos.y = 0.0f;
+		serverPos.z = 5.0f;
 	}
 
 	void Clear()
@@ -82,7 +87,7 @@ public:
 
 	const UINT32& GetLastInputSeq() const { return lastInputSeq; }
 	const bool& GetIsMoving() const { return isMoving; }
-	const Vector3& GetPosition() const { return position;	}
+	const Vector3& GetPosition() const { return serverPos;	}
 	const Quaternion& GetRotation() const { return rotation; }
 
 	//임시 테스트 함수
@@ -152,7 +157,11 @@ public:
 	// 20ms 틱마다 호출
 	void UpdateServerPhysics(float dt, bool isMoveMouse = false)
 	{
-		const float currentSpeed = GetCurrentSpeed();;
+		if (inputX == 0.0f && inputZ == 0.0f)
+		{
+			isMoving = false;
+			return;
+		}
 
 		for (auto it = mSpeedModifiers.begin(); it != mSpeedModifiers.end(); ) 
 		{
@@ -167,28 +176,37 @@ public:
 			}
 		}
 
+		const float currentSpeed = GetCurrentSpeed();
+
+		Vector3 currentPos = GetPosition();	//현재 서버 좌표
+		Vector3 nextPos = currentPos;		//목표 좌표
+
 		if (isMoveMouse) 
 		{
 			if (!isMoving) return;
-			Vector3 dir = { targetPos.x - serverPos.x, 0, targetPos.z - serverPos.z };
+			Vector3 dir = { targetPos.x - nextPos.x, 0, targetPos.z - nextPos.z };
 			float dist = sqrt(dir.x * dir.x + dir.z * dir.z);
 
 			if (dist < 0.1f) 
 			{
-				serverPos = targetPos;
+				nextPos = targetPos;
 				isMoving = false;
 
 				return;
 			}
-
+			isMoving = true;
 			dir.x /= dist; dir.z /= dist;
-			serverPos.x += dir.x * currentSpeed * dt;
-			serverPos.z += dir.z * currentSpeed * dt;
+			nextPos.x += dir.x * currentSpeed * dt;
+			nextPos.z += dir.z * currentSpeed * dt;
 		}
 		else 
 		{
-			if (inputX == 0 && inputZ == 0) return;
-
+			if (inputX == 0 && inputZ == 0)
+			{
+				isMoving = false;
+				return;
+			}
+			isMoving = true;
 			float mag = sqrt(inputX * inputX + inputZ * inputZ);
 
 			if (mag > 0.01f) 
@@ -198,6 +216,17 @@ public:
 				serverPos.x += dirX * currentSpeed * dt;
 				serverPos.z += dirZ * currentSpeed * dt;
 			}
+		}
+
+		Vector3 realPos;
+
+		if (NavMeshManager::GetInstance()->GetValidMovePosition(currentPos, nextPos, realPos))
+		{
+			serverPos = realPos;
+		}
+		else
+		{
+			serverPos = currentPos;
 		}
 	}
 

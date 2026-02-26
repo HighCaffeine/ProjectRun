@@ -3,7 +3,8 @@ using UnityEngine;
 
 public static unsafe class Client
 {
-    private const string IP = "127.0.0.1";
+    //private const string IP = "127.0.0.1";
+    private const string IP = "40.82.137.214";
     //public static NetworkClient TCP = new NetworkClient(IP, 5004, ProtocolType.Tcp);
     public static NetworkClient TCP = new NetworkClient(IP, 11021, ProtocolType.Tcp);
     public static NetworkClient UDP = new NetworkClient(IP, 5025, ProtocolType.Udp);

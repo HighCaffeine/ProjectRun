@@ -13,11 +13,12 @@ namespace AK
 {
     namespace EVENTS
     {
-        static const AkUniqueID PLAY_8BIT_RETRO_COIN_COLLECT_TWO_DUAL_NOTE_FAST_TWINKLE_MONO = 3650566532U;
+        static const AkUniqueID PLAY_UI_CURRENCY_COIN_ADD_01 = 3934013160U;
     } // namespace EVENTS
 
     namespace GAME_PARAMETERS
     {
+        static const AkUniqueID RTPC_PLAYER_HP = 3354391535U;
         static const AkUniqueID SS_AIR_FEAR = 1351367891U;
         static const AkUniqueID SS_AIR_FREEFALL = 3002758120U;
         static const AkUniqueID SS_AIR_FURY = 1029930033U;
@@ -33,7 +34,7 @@ namespace AK
     namespace BANKS
     {
         static const AkUniqueID INIT = 1355168291U;
-        static const AkUniqueID MAIN_BANK = 3989171651U;
+        static const AkUniqueID MAIN = 3161908922U;
     } // namespace BANKS
 
     namespace BUSSES
