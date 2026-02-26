@@ -38,8 +38,6 @@ public:
 
 	ERROR_CODE AddUser(char* userID_, int clientIndex_)
 	{
-		//TODO 최흥배 유저 중복 조사하기
-
 		auto user_idx = clientIndex_;
 
 		mUserObjPool[user_idx]->SetLogin(userID_);

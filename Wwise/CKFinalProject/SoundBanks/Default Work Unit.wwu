@@ -3,9 +3,9 @@
 	<SoundBanks>
 		<WorkUnit Name="Default Work Unit" ID="{4FF69ECE-894A-472A-98A8-238CB93177FB}" PersistMode="Standalone">
 			<ChildrenList>
-				<SoundBank Name="Main_Bank" ID="{00EE62AE-AC21-4E99-8CA9-ECCEF644E4ED}">
+				<SoundBank Name="Main" ID="{4F2B3228-B15E-48D8-9EB4-A7A0D48E7762}">
 					<ObjectInclusionList>
-						<ObjectRef Name="Play_8BIT_RETRO_Coin_Collect_Two_Dual_Note_Fast_Twinkle_mono" ID="{EA781F26-6449-4A68-AFF3-CDE43561D3B5}" WorkUnitID="{DF0AFA49-FE37-4452-9566-F6B4ABB85718}" Origin="Manual" Filter="7"/>
+						<ObjectRef Name="Play_UI_Currency_Coin_Add_01" ID="{969CFF7D-D62E-4D48-9480-66114225EB97}" WorkUnitID="{DF0AFA49-FE37-4452-9566-F6B4ABB85718}" Origin="Manual" Filter="7"/>
 					</ObjectInclusionList>
 					<ObjectExclusionList/>
 					<GameSyncExclusionList/>

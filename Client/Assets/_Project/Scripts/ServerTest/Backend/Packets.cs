@@ -17,20 +17,20 @@ public enum E_PACKET
     ROOM_LEAVE_RESPONSE = 216,
     ROOM_LEAVE_USER_NTF = 217, // PLAYER_LEFT
 
-
-    // Move
-    PLAYER_MOVEMENT,
-    UPDATE_PLAYER_MOVEMENT,
-
     // Chat
     ROOM_CHAT_REQUEST = 221, // SEND_CHAT_MESSAGE
     ROOM_CHAT_RESPONSE = 222,
     ROOM_CHAT_NOTIFY = 223, // RECEIVE_CHAT_MESSAGE
 
+    // Move
+    PLAYER_MOVEMENT = 231,
+    UPDATE_PLAYER_MOVEMENT = 232,
+    PLAYER_STATUS_NTF = 233,
+
     // Path
-    MOVE_PATH_REQUEST = 225,
-    MOVE_PATH_RESPONSE = 226,
-    MOVE_PATH_NOTIFY = 227,
+    MOVE_PATH_REQUEST = 241,
+    MOVE_PATH_RESPONSE = 242,
+    MOVE_PATH_NOTIFY = 243,
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -56,14 +56,16 @@ public enum E_PACKET
     TRADE_CONFIRM_NTF = 320,
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 16)]
+
+
+#region Login Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_PlayerName
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
     public string userName;
 }
-
-[StructLayout(LayoutKind.Sequential, Size = 66)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_LoginReq
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
@@ -73,7 +75,7 @@ struct P_LoginReq
 }
 
 
-[StructLayout(LayoutKind.Sequential, Size = 2)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_LoginRes
 {
     // UInt16 Result;
@@ -81,8 +83,10 @@ struct P_LoginRes
     public ushort result;
 
 }
+#endregion
 
-[StructLayout(LayoutKind.Sequential, Size = 24)]
+#region Room, PlayerJoin, CreateMatch
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_PlayerJoined
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -92,21 +96,21 @@ struct P_PlayerJoined
     public string userName;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 4)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomEnterRequest
 {
     [MarshalAs(UnmanagedType.I4)]
     public int roomNumber;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 2)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomEnterResponse
 {
     [MarshalAs(UnmanagedType.I2)]
     public short result;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 41)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomNewUserNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -116,7 +120,7 @@ struct P_RoomNewUserNotify
     public string userName;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 56)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_CreateMatchPlayer
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -132,7 +136,7 @@ struct P_CreateMatchPlayer
     public Quaternion rotation;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 69)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomUserInfoNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -142,13 +146,13 @@ struct P_RoomUserInfoNotify
     public string userName;
 
     [MarshalAs(UnmanagedType.Struct)]
-    public Vector3 position;
+    public P_PacketVector3 position;
 
     [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
+    public P_PacketQuaternion rotation;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 41)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomLeaveUserNotify
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -157,46 +161,92 @@ struct P_RoomLeaveUserNotify
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
     public string userName;
 }
+#endregion
 
-[StructLayout(LayoutKind.Sequential, Size = 32)]
-struct P_PlayerMovement
+#region Player Move Packet
+#region Old Version
+// [StructLayout(LayoutKind.Sequential, Size = 32)]
+// struct P_PlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long player_id;
+
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dx;
+
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dy;
+
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Quaternion rotation;
+// }
+
+// [StructLayout(LayoutKind.Sequential, Size = 36)]
+// struct P_UpdatePlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long userUUID;
+
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Quaternion rotation;
+
+//     [MarshalAs(UnmanagedType.Struct)]
+//     public Vector3 motion;
+
+// }
+#endregion
+
+#region Sync Modifier Move Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerMovement
 {
     [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
-
+    public long userUUID;
+    [MarshalAs(UnmanagedType.I4)]
+    public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
     [MarshalAs(UnmanagedType.R4)]
-    public float dx;
-
+    public float dx;         // Horizontal 입력 (-1 ~ 1)
     [MarshalAs(UnmanagedType.R4)]
-    public float dy;
-
-    [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
+    public float dz;         // Vertical 입력 (-1 ~ 1)
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 36)]
-struct P_UpdatePlayerMovement
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_UpdatePlayerMovement
+{
+    [MarshalAs(UnmanagedType.I4)]
+    public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
+    [MarshalAs(UnmanagedType.I8)]
+    public long userUUID;
+    [MarshalAs(UnmanagedType.Struct)]
+    public P_PacketVector3 currentPos;  //서버 확정 좌표
+    [MarshalAs(UnmanagedType.R4)]
+    public float currentSpeed; // 모디파이어 적용 속도
+    [MarshalAs(UnmanagedType.I1)]
+    public bool isMoving;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerStatusNtf
 {
     [MarshalAs(UnmanagedType.I8)]
-    public long player_id;
-
-    [MarshalAs(UnmanagedType.Struct)]
-    public Quaternion rotation;
-
-    [MarshalAs(UnmanagedType.Struct)]
-    public Vector3 motion;
-
+    public long userUUID;
+    [MarshalAs(UnmanagedType.R4)]
+    public float moveSpeed;    // 현재 이동 속도 수치
+    [MarshalAs(UnmanagedType.I4)]
+    public uint statusFlags;   // 상태 플래그 (0:정상, 1:슬로우, 2:스턴 등)
 }
+#endregion
+#endregion
 
-
-[StructLayout(LayoutKind.Sequential, Size = 257)]
+#region Chat Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomChatRequest
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 257)]
     public string message;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 290)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_RoomChatNotify
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
@@ -206,7 +256,9 @@ struct P_RoomChatNotify
     public string message;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 32)]
+#endregion
+#region Path Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_MovePathRequest
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -219,7 +271,7 @@ struct P_MovePathRequest
     public Vector3 endPos;
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 12)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PacketVector3
 {
     [MarshalAs(UnmanagedType.R4)]
@@ -235,9 +287,17 @@ public struct P_PacketVector3
     {
         x = v.x; y = v.y; z = v.z;
     }
+    public Vector3 ToVector3() => new Vector3(x, y, z);
 }
 
-[StructLayout(LayoutKind.Sequential, Size = 130)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PacketQuaternion
+{
+    public float x, y, z, w;
+    public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_MovePathResponse
 {
     [MarshalAs(UnmanagedType.I8)]
@@ -249,8 +309,9 @@ struct P_MovePathResponse
     [MarshalAs(UnmanagedType.I2)]
     public short path_count;
 }
+#endregion
 
-
+#region Inventory
 //인벤토리 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_InventoryInfo
@@ -261,7 +322,9 @@ public struct P_InventoryInfo
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
     public int[] itemIDs;
 }
+#endregion
 
+#region Trade Packet
 //상점 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_ShopInfo
@@ -287,7 +350,9 @@ public struct P_ShopBuyResponse
     [MarshalAs(UnmanagedType.I1)]
     public bool isSuccess;
 }
+#endregion
 
+#region Trade Packet
 //거래 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_TradeRequest
@@ -370,3 +435,4 @@ public struct P_TradeResult
     [MarshalAs(UnmanagedType.I1)]
     public bool isSuccess;
 }
+#endregion

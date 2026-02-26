@@ -10,18 +10,20 @@ void CopyUserID(char* userID, const Actor& user);
 void CopyUserID(char* userID, const std::string& userID_);
 void CopyUserID(char* userID, const char* userID_);
 
-class Room 
+class Room
 {
+	// [히스테리시스 상수]
+	// 들어올 때는 6m, 나갈 때는 7.5m (1.5m의 여유 버퍼)
+	const float ENTER_RANGE = 6.0f;
+	const float LEAVE_RANGE = 7.5f;
+
 public:
 	Room() = default;
 	~Room() = default;
 
 	INT32 GetMaxUserCount() { return mMaxUserCount; }
-
 	INT32 GetCurrentUserCount() { return mCurrentUserCount; }
-
 	INT32 GetRoomNumber() { return mRoomNum; }
-
 
 	void Init(const INT32 roomNum_, const INT32 maxUserCount_, const std::string& navMeshFileName)
 	{
@@ -31,6 +33,7 @@ public:
 
 	UINT16 EnterUser(User* user_)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		if (mCurrentUserCount >= mMaxUserCount)
 		{
 			return (UINT16)ERROR_CODE::ENTER_ROOM_FULL_USER;
@@ -41,13 +44,19 @@ public:
 
 		user_->EnterRoom(mRoomNum);
 
-		// 입장하는 유저에게, Zone 내 유저 수 만큼 정보 송신
+		// [입장 처리]
+		// 기존 유저들에 대해 CanSee(6.0m) 체크 후 시야 등록
 		for (auto pRoomUser : mUserList)
 		{
-			if (pRoomUser == nullptr || pRoomUser == user_) {
-				continue;
-			}
+			if (pRoomUser == nullptr || pRoomUser == user_) continue;
 
+			// 6.0m 이내에 있는가?
+			if (CanSee(user_, pRoomUser) == false) continue;
+
+			// 서로 시야 목록에 추가
+			user_->mVisibleList.insert(pRoomUser->GetNetConnIdx());
+
+			// 나에게 상대방 정보 보내기 (Create)
 			ROOM_USER_INFO_NTF_PACKET roomUserInfoNtf;
 			roomUserInfoNtf.userUUID = pRoomUser->GetNetConnIdx();
 			CopyUserID(roomUserInfoNtf.userID, *pRoomUser);
@@ -56,12 +65,12 @@ public:
 			SendPacketFunc(user_->GetNetConnIdx(), roomUserInfoNtf.PacketLength, (char*)&roomUserInfoNtf);
 		}
 
-		// 입장하는 유저에게, Zone 내 Npc 수 만큼 정보 송신
+		// NPC 처리
 		for (auto pRoomNpc : mNpcList)
 		{
-			if (pRoomNpc == nullptr) {
-				continue;
-			}
+			if (pRoomNpc == nullptr) continue;
+
+			if (CanSee(user_, pRoomNpc) == false) continue;
 
 			ROOM_USER_INFO_NTF_PACKET roomUserInfoNtf;
 			roomUserInfoNtf.userUUID = pRoomNpc->GetNetConnIdx();
@@ -71,59 +80,47 @@ public:
 			SendPacketFunc(user_->GetNetConnIdx(), roomUserInfoNtf.PacketLength, (char*)&roomUserInfoNtf);
 		}
 
-
 		return (UINT16)ERROR_CODE::NONE;
 	}
 
 	Npc* CreateNpc()
-
 	{
-
 		INT32 uuid = 10000 + mNpcList.size();
-
 		auto npmID = std::to_string(uuid);
-
 		Npc* npc = new Npc();
 
 		npc->Init(uuid);
-
 		npc->SetLogin(npmID.c_str());
-
-
 
 		mNpcList.push_back(npc);
 
 		return npc;
-
 	}
 
 	UINT16 EnterNpc()
 	{
 		Npc* newNpc = CreateNpc();
-
 		newNpc->EnterRoom(mRoomNum);
-
 		NotifyUserEnter(newNpc->GetNetConnIdx(), newNpc->GetUserId());
-
 		return (UINT16)ERROR_CODE::NONE;
 	}
 
-		
 	void LeaveUser(User* leaveUser_)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
 		mUserList.remove_if([leaveUserId = leaveUser_->GetUserId()](User* pUser) {
 			return leaveUserId == pUser->GetUserId();
-		});
+			});
 
 		--mCurrentUserCount;
 
 		ROOM_LEAVE_USER_NTF_PACKET notifyPkt;
 		notifyPkt.userUUID = leaveUser_->GetNetConnIdx();
 		CopyUserID(notifyPkt.userID, *leaveUser_);
-		bool EXCEPT_ME = true; // 퇴장하는 유저에겐 보내지 않음
+		bool EXCEPT_ME = true;
 		SendToAllUser(notifyPkt.PacketLength, (char*)&notifyPkt, notifyPkt.userUUID, EXCEPT_ME);
 	}
-						
+
 	void NotifyChat(INT32 clientIndex_, const char* userID_, const char* msg_)
 	{
 		ROOM_CHAT_NOTIFY_PACKET roomChatNtfyPkt;
@@ -137,24 +134,36 @@ public:
 		ROOM_NEW_USER_NTF_PACKET roomNewUserNtfPkt;
 		roomNewUserNtfPkt.userUUID = clientIndex_;
 		CopyUserID(roomNewUserNtfPkt.userID, userID);
-		bool EXCEPT_ME = false; // 입장하는 유저도 본 패킷이 로직에 필요함
+		bool EXCEPT_ME = false;
 		SendToAllUser(roomNewUserNtfPkt.PacketLength, (char*)&roomNewUserNtfPkt, clientIndex_, EXCEPT_ME);
 	}
 
-		
 	std::function<void(UINT32, UINT32, char*)> SendPacketFunc;
-
 
 	void SendToAllUser(const UINT16 dataSize_, char* data_, const INT32 passUserIndex_, bool exceptMe)
 	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
+
+		User* sender = nullptr;
+		if (passUserIndex_ != -1)
+		{
+			for (auto u : mUserList) { if (u->GetNetConnIdx() == passUserIndex_) { sender = u; break; } }
+		}
+
 		for (auto pUser : mUserList)
 		{
-			if (pUser == nullptr) {
-				continue;
-			}
+			if (pUser == nullptr) continue;
+			if (exceptMe && pUser->GetNetConnIdx() == passUserIndex_) continue;
 
-			if (exceptMe && pUser->GetNetConnIdx() == passUserIndex_) {
-				continue;
+			if (sender != nullptr)
+			{
+				if (pUser != sender)
+				{
+					if (pUser->mVisibleList.find(sender->GetNetConnIdx()) == pUser->mVisibleList.end())
+					{
+						continue;
+					}
+				}
 			}
 
 			SendPacketFunc((UINT32)pUser->GetNetConnIdx(), (UINT32)dataSize_, data_);
@@ -163,45 +172,109 @@ public:
 
 	void Update(float dt)
 	{
-		for (auto pUser : mUserList) 
+		std::lock_guard<std::recursive_mutex> guard(mLock);
+
+		// 물리 연산
+		for (auto pUser : mUserList)
 		{
 			if (pUser == nullptr) continue;
-
-			// 서버 물리 시뮬
 			pUser->UpdateServerPhysics(dt);
+		}
 
-			// 동기화 패킷 생성
+		// AOI 관리
+		for (auto pViewer : mUserList) // pViewer: 나
+		{
+			if (pViewer == nullptr) continue;
+
+			for (auto pTarget : mUserList) // pTarget: 상대방
+			{
+				if (pTarget == nullptr || pViewer == pTarget) continue;
+
+				// 실제 거리 계산
+				float dist = Vector3_Distance2D(pViewer->GetPosition(), pTarget->GetPosition());
+
+				// 현재 시야 목록에 있는지 확인
+				bool wasVisible = (pViewer->mVisibleList.find(pTarget->GetNetConnIdx()) != pViewer->mVisibleList.end());
+				bool canSee = CanSee(pViewer, pTarget);
+
+				// 안 보이다가 -> 6.0m 안으로 들어옴 (Enter)
+				if (!wasVisible)
+				{
+					if (CanSee(pViewer, pTarget))
+					{
+						pViewer->mVisibleList.insert(pTarget->GetNetConnIdx());
+
+						ROOM_USER_INFO_NTF_PACKET infoPkt;
+						infoPkt.userUUID = pTarget->GetNetConnIdx();
+						CopyUserID(infoPkt.userID, *pTarget);
+						infoPkt.position = pTarget->GetPosition();
+						infoPkt.rotation = pTarget->GetRotation();
+
+						SendPacketFunc(pViewer->GetNetConnIdx(), infoPkt.PacketLength, (char*)&infoPkt);
+					}
+				}
+				// 보이다가 -> 7.5m 밖으로 나감 (Leave) / 부쉬에 들어가서 안보임
+				else
+				{
+					if (dist > LEAVE_RANGE || !canSee)
+					{
+						pViewer->mVisibleList.erase(pTarget->GetNetConnIdx());
+
+						ROOM_LEAVE_USER_NTF_PACKET leavePkt;
+						leavePkt.userUUID = pTarget->GetNetConnIdx();
+						CopyUserID(leavePkt.userID, *pTarget);
+
+						SendPacketFunc(pViewer->GetNetConnIdx(), leavePkt.PacketLength, (char*)&leavePkt);
+					}
+				}
+			}
+		}
+
+		// 이동 동기화 패킷 전송
+		for (auto pUser : mUserList)
+		{
+			if (pUser == nullptr || !pUser->GetIsMoving()) continue;
+
 			UPDATE_PLAYER_MOVEMENT_PACKET syncPkt;
-			syncPkt.lastInputSeq = pUser->GetLastInputSeq(); // Actor에서 가져옴
+			syncPkt.lastInputSeq = pUser->GetLastInputSeq();
 			syncPkt.userUUID = pUser->GetNetConnIdx();
 			syncPkt.currentPos = pUser->GetPosition();
 			syncPkt.isMoving = pUser->GetIsMoving();
+			syncPkt.currentSpeed = pUser->GetCurrentSpeed();
 
-			// 브로드캐스팅 
-			SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, -1, false);
+			SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, pUser->GetNetConnIdx(), false);
 		}
 	}
 
 private:
-	bool CanSee(User* viewer, User* target) 
+	bool CanSee(User* viewer, Actor* target)
 	{
 		if (viewer == target) return true; // 자기 자신은 항상 보임
 
 		float dist = Vector3_Distance2D(viewer->GetPosition(), target->GetPosition());
-		if (dist > 15.0f) return false; // 일정 거리(예: 15m) 이상이면 안 보임
 
-		// 부쉬 로직 (기초)
-		// if (target->bInBush && viewer->bushID != target->bushID) return false;
+		// 6.0m 이내면 진입(Enter) 가능
+		if (dist > ENTER_RANGE) return false;
+
+		bool isTargetInBush = NavMeshManager::GetInstance()->IsInBush(target->GetPosition());
+
+		if (isTargetInBush)
+		{
+			bool isViewerInBush = NavMeshManager::GetInstance()->IsInBush(viewer->GetPosition());
+
+			if (!isViewerInBush) return false;
+		}
 
 		return true;
 	}
 
+	std::recursive_mutex mLock;
 	INT32 mRoomNum = -1;
 
 	std::list<User*> mUserList;
 	std::list<Npc*> mNpcList;
 
-		
+
 	INT32 mMaxUserCount = 0;
 
 	UINT16 mCurrentUserCount = 0;

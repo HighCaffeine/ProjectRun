@@ -11,6 +11,10 @@
 #include <map>
 
 
+//대역폭 확인용
+#include <atomic>
+
+
 class User;
 class Room;
 class UserManager;
@@ -35,6 +39,18 @@ public:
 	void PushSystemPacket(PacketInfo packet_);
 		
 	std::function<void(UINT32, UINT32, char*)> SendPacketFunc;
+
+	void RegisterSendFunction(std::function<void(UINT32, UINT32, char*)> sendFunc)
+	{
+		SendPacketFunc = [this, sendFunc](UINT32 clientIndex, UINT32 dataSize, char* pData)
+			{
+				// 보내는 양 누적
+				m_TotalSendBytes += dataSize;
+
+				// 실제 전송 함수 호출
+				if (sendFunc) sendFunc(clientIndex, dataSize, pData);
+			};
+	}
 
 private:
 	void CreateCompent(const UINT32 maxClient_);
@@ -84,6 +100,7 @@ private:
 	typedef void(PacketManager::* PROCESS_RECV_PACKET_FUNCTION)(UINT32, UINT16, char*);
 	std::unordered_map<int, PROCESS_RECV_PACKET_FUNCTION> mRecvFuntionDictionary;
 
+	//물리 처리
 	bool mIsRunLogicThread = false;
 	std::thread mLogicThread;
 	void LogicThread(); // 20ms 주기로 실행될 함수
@@ -99,25 +116,38 @@ private:
 
 	bool UDPRun();
 
+	//대역폭 확인
+	std::atomic<uint64_t> m_TotalSendBytes{ 0 };
+	std::atomic<uint64_t> m_TotalRecvBytes{ 0 };
+
+
 	UserManager* mUserManager;
 	RoomManager* mRoomManager;	
 	RedisManager* mRedisMgr;
 		
 	std::function<void(int, char*)> mSendMQDataFunc;
-
-	int mCurrentShopItemID = 101;
-	INT64 mNextShopUpdateTime = 0;
-
 	bool mIsRunProcessThread = false;
 	
 	std::thread mProcessThread;
-	
 	std::mutex mLock;
-	
 	std::deque<UINT32> mInComingPacketUserIndex;
-
 	std::deque<PacketInfo> mSystemPacketQueue;
 
+
+	//Shop
+	int mCurrentShopItemID = 101;
+	INT64 mNextShopUpdateTime = 0;
+
+#pragma region Trade session
+	struct TradeSession
+	{
+		int userA, userB;	//A B의 id
+		bool isLockA = false, isLockB = false;	//lock상태
+		bool isConfirmA = false, isConfirmB = false;	//confirm상태
+		std::vector<int> itemsA, itemsB;	//올린 아이템들
+		std::vector<int> itemsASlot, itemsBSlot;
+	};
 	TradeSession curTS;
+#pragma endregion
 };
 

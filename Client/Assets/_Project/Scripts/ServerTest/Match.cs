@@ -8,6 +8,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     public static Match Instance;
     public Dictionary<long, Player> Players;
 
+    public Transform cameraDefaultPos;
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -69,11 +71,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.ROOM_USER_INFO_NTF:
                 P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
                 Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName);
+
                 if (newPlayer != null)
                 {
-                    newPlayer.transform.position = roomUserInfoNotify.position;
-                    newPlayer.transform.rotation = roomUserInfoNotify.rotation;
+                    newPlayer.transform.position = roomUserInfoNotify.position.ToVector3();
+                    newPlayer.transform.rotation = roomUserInfoNotify.rotation.ToQuaternion();
+
+                    newPlayer.serverPos = roomUserInfoNotify.position.ToVector3();
                 }
+                Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
                 break;
 
             case E_PACKET.ROOM_LEAVE_USER_NTF:
@@ -88,12 +94,20 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //     player.Movement.Move(updateMovement.motion);
                 // }
 
-                P_UpdatePlayerMovement updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
-
-                if (Players.TryGetValue(updatePkt.player_id, out Player player))
+                var updatePkt = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
+                if (Players.TryGetValue(updatePkt.userUUID, out Player player))
                 {
-                    player.serverPos = updatePkt.currentPos;
-                    player.isMoving = updatePkt.isMoving;
+                    // 서버 확정 데이터 반영
+                    player.OnSyncMovement(updatePkt);
+                }
+                break;
+            case E_PACKET.PLAYER_STATUS_NTF:
+                var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
+                if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
+                {
+                    // 속도 및 상태 플래그 갱신
+                    targetPlayer.currentSpeed = statusPkt.moveSpeed;
+                    // UI나 이펙트 처리 로직 추가
                 }
                 break;
 
@@ -215,30 +229,38 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         bool local = LocalPlayerInfo.ID == id;
         GameObject playerObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         playerObj.name = playerName;
+
         if (local)
         {
-            GameObject cameraObject = new GameObject($"Player Camera");
+            GameObject cameraObject = new GameObject("Main Camera");
             Camera playerCamera = cameraObject.AddComponent<Camera>();
-            cameraObject.AddComponent<MouseLook>();
-            playerCamera.transform.parent = playerObj.transform;
-
-            // test code
-            /*
-            float randomX = Random.Range(-25, 26);
-            float randomZ = Random.Range(-25, 26);
-            Vector3 pos = new Vector3(randomX, 0, randomZ);
-            playerObj.transform.position = pos;
-            //*/
+            cameraObject.tag = "MainCamera";
+            CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
+            camFollow.target = playerObj.transform;
+            cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
+            cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
         }
-        playerObj.transform.position.Set(5.0f, 2.0f, 5.0f);
+
+        playerObj.transform.position = new Vector3(5.0f, 0.0f, 5.0f);
         PlayerMovement playerMovement = playerObj.AddComponent<PlayerMovement>();
         playerMovement.Controller = playerObj.AddComponent<CharacterController>();
+        playerMovement.IsLocal = local;
         Player player = playerObj.AddComponent<Player>();
         player.ID = id;
         player.Name = playerName;
         player.Movement = playerMovement;
+        player.serverPos = playerObj.transform.position;
         player.IsLocal = local;
         Players.Add(id, player);
+
+        // [수정] Collider Trigger 설정 및 Rigidbody 추가 (Trigger 작동 필수 조건)
+        SphereCollider sc = playerObj.GetComponent<SphereCollider>();
+        if (sc != null) sc.isTrigger = true;
+
+        Rigidbody rb = playerObj.AddComponent<Rigidbody>();
+        rb.useGravity = false; // 중력 끄기
+        rb.isKinematic = true; // 물리 연산 안 받기 (이동은 스크립트로 함)
+
         return player;
     }
 

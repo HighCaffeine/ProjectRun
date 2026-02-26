@@ -25,6 +25,8 @@ public class MouseLook : MonoBehaviour
             }
         }
 
+        return;
+
         if (Cursor.lockState == CursorLockMode.Locked)
         {
             float mx = Input.GetAxis("Mouse X") * 500 * Time.deltaTime;
