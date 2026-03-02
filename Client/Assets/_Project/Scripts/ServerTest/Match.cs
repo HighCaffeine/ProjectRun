@@ -10,6 +10,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     public Transform cameraDefaultPos;
 
+    [Header("Player Settings")]
+    public GameObject playerPrefab;
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -84,7 +87,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.ROOM_LEAVE_USER_NTF:
                 P_RoomLeaveUserNotify roomLeaveUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
-                RemovePlayer(roomLeaveUserNotify.userUUID);
+
+                //버그로 우선 주석처리
+                //RemovePlayer(roomLeaveUserNotify.userUUID);
                 break;
 
             case E_PACKET.UPDATE_PLAYER_MOVEMENT:
@@ -227,7 +232,18 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             return null;
 
         bool local = LocalPlayerInfo.ID == id;
-        GameObject playerObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
+        GameObject playerObj;
+        if (playerPrefab != null)
+        {
+            playerObj = Instantiate(playerPrefab, new Vector3(5.0f, 2.0f, 5.0f), Quaternion.identity);
+        }
+        else
+        {
+            playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            playerObj.transform.position = new Vector3(5.0f, 2.0f, 5.0f);
+        }
+
         playerObj.name = playerName;
 
         if (local)
@@ -241,25 +257,54 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
         }
 
-        playerObj.transform.position = new Vector3(5.0f, 0.0f, 5.0f);
-        PlayerMovement playerMovement = playerObj.AddComponent<PlayerMovement>();
-        playerMovement.Controller = playerObj.AddComponent<CharacterController>();
+        PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
+        if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
         playerMovement.IsLocal = local;
-        Player player = playerObj.AddComponent<Player>();
+
+        if (local)
+        {
+            CharacterController cc = playerObj.GetComponent<CharacterController>();
+            if (cc == null) cc = playerObj.AddComponent<CharacterController>();
+            cc.radius = 0.5f;
+            cc.height = 1.0f;
+            cc.center = Vector3.zero;
+            cc.stepOffset = 0.5f;
+            cc.slopeLimit = 60f;
+            playerMovement.Controller = cc;
+
+            // 충돌 꼬임 방지를 위해 콜라이더 제거
+            Collider[] cols = playerObj.GetComponents<Collider>();
+            foreach (Collider c in cols)
+            {
+                if (c.GetType() != typeof(CharacterController)) Destroy(c);
+            }
+
+            Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+            if (rb != null) Destroy(rb);
+        }
+        else
+        {
+            CharacterController cc = playerObj.GetComponent<CharacterController>();
+            if (cc != null) Destroy(cc);
+
+            Collider col = playerObj.GetComponent<Collider>();
+            if (col == null) col = playerObj.AddComponent<CapsuleCollider>();
+            col.isTrigger = true;
+
+            Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+            if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+        }
+
+        Player player = playerObj.GetComponent<Player>();
+        if (player == null) player = playerObj.AddComponent<Player>();
         player.ID = id;
         player.Name = playerName;
         player.Movement = playerMovement;
         player.serverPos = playerObj.transform.position;
         player.IsLocal = local;
         Players.Add(id, player);
-
-        // [수정] Collider Trigger 설정 및 Rigidbody 추가 (Trigger 작동 필수 조건)
-        SphereCollider sc = playerObj.GetComponent<SphereCollider>();
-        if (sc != null) sc.isTrigger = true;
-
-        Rigidbody rb = playerObj.AddComponent<Rigidbody>();
-        rb.useGravity = false; // 중력 끄기
-        rb.isKinematic = true; // 물리 연산 안 받기 (이동은 스크립트로 함)
 
         return player;
     }
