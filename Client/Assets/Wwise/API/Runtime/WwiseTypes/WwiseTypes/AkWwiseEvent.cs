@@ -12,11 +12,12 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
 
 using System.Collections;
-#if !(UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+using AK.Wwise.Unity.Logging;
+#if !(UNITY_QNX) // Disable under unsupported platforms.
 
 #if AK_WWISE_ADDRESSABLES && UNITY_ADDRESSABLES
 using AK.Wwise.Unity.WwiseAddressables;
@@ -48,7 +49,7 @@ namespace AK.Wwise
 #if UNITY_EDITOR
 			if (playingId == AkUnitySoundEngine.AK_INVALID_PLAYING_ID && AkUnitySoundEngine.IsInitialized())
 			{
-				UnityEngine.Debug.LogError("WwiseUnity: Could not post event (name: " + Name + ", ID: " + Id +
+				WwiseLogger.Error("Could not post event (name: " + Name + ", ID: " + Id +
 				                           "). Please make sure to load or rebuild the appropriate SoundBank by adding the AkBank Component if working with" +
 				                           " UserDefinedSoundbank or unchecking the IsInUserDefinedSoundbank checkbox from the Ak.Wwise.Event if working with AutoBanks.");
 			}
@@ -91,13 +92,13 @@ namespace AK.Wwise
 				m_playingId = AkUnitySoundEngine.PostEvent(Id, gameObject);
 				if (WwiseObjectReference.IsInUserDefinedSoundBank && m_playingId == 0)
 				{
-					UnityEngine.Debug.LogError("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
+					WwiseLogger.Error("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
 				}
 				VerifyPlayingID(m_playingId);
 			}
 			else
 			{
-				UnityEngine.Debug.LogWarning("WwiseUnity: Could not post event (name: " + Name + ", ID: " + Id +
+				WwiseLogger.Warning("Could not post event (name: " + Name + ", ID: " + Id +
 				                             "). The gameObject to post the event on has been deleted or is now invalid.");
 			}
 
@@ -132,14 +133,14 @@ namespace AK.Wwise
 				m_playingId = AkUnitySoundEngine.PostEvent(Id, gameObject, flags.value, callback, cookie);
 				if (WwiseObjectReference.IsInUserDefinedSoundBank && m_playingId == 0)
 				{
-					UnityEngine.Debug.LogError("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
+					WwiseLogger.Error("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
 				}
 				VerifyPlayingID(m_playingId);
 
 			}
 			else
 			{
-				UnityEngine.Debug.LogWarning("WwiseUnity: Could not post event (name: " + Name + ", ID: " + Id +
+				WwiseLogger.Warning("Could not post event (name: " + Name + ", ID: " + Id +
 				                             "). The gameObject to post the event on has been deleted or is now invalid.");
 			}
 			return m_playingId;
@@ -174,13 +175,13 @@ namespace AK.Wwise
 				m_playingId = AkUnitySoundEngine.PostEvent(Id, gameObject, flags, callback, cookie);
 				if (WwiseObjectReference.IsInUserDefinedSoundBank && m_playingId == 0)
 				{
-					UnityEngine.Debug.LogError("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
+					WwiseLogger.Error("Post Event failed. If working with Autobanks, make sure that the \"Is In User Defined SoundBank\" setting is properly unchecked. If working with User Defined Soundbanks, make sure to add an AkBank Component.");
 				}
 				VerifyPlayingID(m_playingId);
 			}
 			else
 			{
-				UnityEngine.Debug.LogWarning("WwiseUnity: Could not post event (name: " + Name + ", ID: " + Id +
+				WwiseLogger.Warning("Could not post event (name: " + Name + ", ID: " + Id +
 				                             "). The gameObject to post the event on has been deleted or is now invalid.");
 			}
 			return m_playingId;
@@ -232,7 +233,7 @@ namespace AK.Wwise
 #if AK_WWISE_ADDRESSABLES && UNITY_ADDRESSABLES
 				if (!gameObject)
 				{
-					UnityEngine.Debug.LogWarning($"Execute action is called on null gameobject. Returning");
+					WwiseLogger.Warning($"Execute action is called on null gameobject. Returning");
 					return;
 				}
 				var args = new object[] { gameObject, actionOnEventType, transitionDuration, curveInterpolation };
@@ -292,4 +293,4 @@ namespace AK.Wwise
 		}
 	}
 }
-#endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#endif // #if !(UNITY_QNX) // Disable under unsupported platforms.

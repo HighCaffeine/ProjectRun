@@ -1,4 +1,4 @@
-#if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#if !(UNITY_QNX) // Disable under unsupported platforms.
 /*******************************************************************************
 The content of this file includes portions of the proprietary AUDIOKINETIC Wwise
 Technology released in source code form as part of the game integration package.
@@ -13,8 +13,10 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
+
+using AK.Wwise.Unity.Logging;
 
 /// <summary>
 ///     Event callback information.
@@ -243,7 +245,7 @@ public class AkEvent : AkDragDropTriggerHandler
 		var count = oldCallbackData.callbackFlags.Count;
 		if (count != oldCallbackData.callbackFunc.Count || count != oldCallbackData.callbackGameObj.Count)
 		{
-			UnityEngine.Debug.LogWarning("WwiseUnity: Inconsistent callback data!");
+			WwiseLogger.Warning("Inconsistent callback data!");
 			return hasMigrated;
 		}
 
@@ -257,7 +259,7 @@ public class AkEvent : AkDragDropTriggerHandler
 			data.FindPropertyRelative("GameObject").objectReferenceValue = oldCallbackData.callbackGameObj[i];
 			data.FindPropertyRelative("FunctionName").stringValue = oldCallbackData.callbackFunc[i];
 			data.FindPropertyRelative("Flags.value").intValue = oldCallbackData.callbackFlags[i];
-			UnityEngine.Debug.Log("WwiseUnity: Migrated Callback for function \"" + oldCallbackData.callbackFunc[i] + "\" on <" + oldCallbackData.callbackGameObj[i] + "> with flags <" + (AkCallbackType)oldCallbackData.callbackFlags[i] + ">.");
+			WwiseLogger.Log("Migrated Callback for function \"" + oldCallbackData.callbackFunc[i] + "\" on <" + oldCallbackData.callbackGameObj[i] + "> with flags <" + (AkCallbackType)oldCallbackData.callbackFlags[i] + ">.");
 		}
 
 		return true;
@@ -265,4 +267,4 @@ public class AkEvent : AkDragDropTriggerHandler
 #endif
 	#endregion
 }
-#endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#endif // #if !(UNITY_QNX) // Disable under unsupported platforms.

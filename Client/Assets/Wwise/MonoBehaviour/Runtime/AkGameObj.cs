@@ -1,4 +1,4 @@
-#if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#if !(UNITY_QNX) // Disable under unsupported platforms.
 /*******************************************************************************
 The content of this file includes portions of the proprietary AUDIOKINETIC Wwise
 Technology released in source code form as part of the game integration package.
@@ -13,9 +13,10 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
 using UnityEngine;
+using AK.Wwise.Unity.Logging;
 
 [UnityEngine.AddComponentMenu("Wwise/AkGameObj")]
 [UnityEngine.DisallowMultipleComponent]
@@ -62,14 +63,14 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 			if (value > 0)
 			{
 				scalingFactor = value;
-				if (enabled)
+				if (gameObject.activeInHierarchy)
 				{
 					AkUnitySoundEngine.SetScalingFactor(gameObject, scalingFactor);
 				}
 			}
 			else
 			{
-				UnityEngine.Debug.LogError("Scaling Factor needs to be a positive value greater than 0.");
+				WwiseLogger.Error("Scaling Factor needs to be a positive value greater than 0.");
 			}
 		}
 	}
@@ -205,12 +206,9 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 			m_listeners.Init(this);
 			//The Listener will win for the scaling factor
-			if (gameObject.GetComponent<AkAudioListener>() == null)
+			if (gameObject.GetComponent<AkAudioListener>() == null && gameObject.activeInHierarchy)
 			{
-				if (enabled)
-				{
-					AkUnitySoundEngine.SetScalingFactor(gameObject, ScalingFactor);				
-				}
+				AkUnitySoundEngine.SetScalingFactor(gameObject, ScalingFactor);				
 			}
 		}
 	}
@@ -403,7 +401,7 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 #if UNITY_EDITOR
 	public void Migrate9()
 	{
-		UnityEngine.Debug.Log("WwiseUnity: AkGameObj.Migrate9 for " + gameObject.name);
+		WwiseLogger.Log("AkGameObj.Migrate9 for " + gameObject.name);
 
 		const int ALL_LISTENER_MASK = (1 << AK_NUM_LISTENERS) - 1;
 		if ((listenerMask & ALL_LISTENER_MASK) == ALL_LISTENER_MASK)
@@ -412,7 +410,7 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 	public void Migrate10()
 	{
-		UnityEngine.Debug.Log("WwiseUnity: AkGameObj.Migrate10 for " + gameObject.name);
+		WwiseLogger.Log("AkGameObj.Migrate10 for " + gameObject.name);
 
 		if (m_posOffsetData != null)
 		{
@@ -446,10 +444,10 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 					if (akGameObj)
 					{
 						akGameObj.isEnvironmentAware = false;
-						UnityEngine.Debug.Log("WwiseUnity: Added AkGameObj to <" + listener.gameObject.name + ">.");
+						WwiseLogger.Log("Added AkGameObj to <" + listener.gameObject.name + ">.");
 					}
 					else
-						UnityEngine.Debug.LogError("WwiseUnity: Failed to add AkGameObj to <" + listener.gameObject.name + ">.");
+						WwiseLogger.Error("Failed to add AkGameObj to <" + listener.gameObject.name + ">.");
 				}
 
 				var listenerId = listener.listenerId;
@@ -462,12 +460,12 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 					fullSceneListenerMask |= 1 << listenerId;
 				}
 				else
-					UnityEngine.Debug.LogError("WwiseUnity: Invalid listenerId <" + listenerId + "> found during migration.");
+					WwiseLogger.Error("Invalid listenerId <" + listenerId + "> found during migration.");
 			}
 
 			if (fullSceneListenerMask == 0)
 			{
-				UnityEngine.Debug.LogWarning("WwiseUnity: Listeners were not added via components within this Scene.");
+				WwiseLogger.Warning("Listeners were not added via components within this Scene.");
 				listeners = null;
 			}
 			else
@@ -476,14 +474,14 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 				{
 					if (listeners[ii] != null && listeners[ii].Count > 1)
 					{
-						UnityEngine.Debug.LogWarning("WwiseUnity: Multiple listeners <" + listeners[ii].Count +
+						WwiseLogger.Warning("Multiple listeners <" + listeners[ii].Count +
 						                             "> with same listenerId <" + ii + "> found during migration.");
 					}
 				}
 
 				if (fullSceneListenerMask == 1)
 				{
-					UnityEngine.Debug.Log("WwiseUnity: Default listeners will be used for this Scene.");
+					WwiseLogger.Log("Default listeners will be used for this Scene.");
 					listeners = null;
 				}
 			}
@@ -515,7 +513,7 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 	public void Migrate14()
 	{
-		UnityEngine.Debug.Log("WwiseUnity: AkGameObj.Migrate14 for " + gameObject.name);
+		WwiseLogger.Log("AkGameObj.Migrate14 for " + gameObject.name);
 
 		if (migration14data != null)
 			migration14data.Migrate(this);
@@ -530,4 +528,4 @@ public class AkGameObj : UnityEngine.MonoBehaviour
 
 	#endregion
 }
-#endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#endif // #if !(UNITY_QNX) // Disable under unsupported platforms.
