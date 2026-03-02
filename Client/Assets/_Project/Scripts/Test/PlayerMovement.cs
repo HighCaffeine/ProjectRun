@@ -34,7 +34,7 @@ public class PlayerMovement : MonoBehaviour
         if (isMoving)
         {
             inputSeq++;
-            SendMovePacket(h, v);
+            SendMovePacket(-h, v);
         }
         else if (wasMoving)
         {

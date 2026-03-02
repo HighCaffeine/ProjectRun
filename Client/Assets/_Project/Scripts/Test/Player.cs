@@ -7,21 +7,27 @@ public class Player : MonoBehaviour
     public long ID;
     public bool IsLocal;
 
-    public Vector3 serverPos;
+    public Vector3 serverPos; // 보정된 서버 좌표
     public float currentSpeed = 5.0f;
     public bool isMoving;
     public uint lastProcessedSeq = 0;
 
-    private float snapThreshold = 5.0f; // 2m는 너무 짧아서 핑 튀면 제자리로 당겨짐 -> 5m로 완화
-    private float catchUpThreshold = 0.5f;
-    private float deadZone = 0.05f; // 미세 떨림 방지용
+    private float snapThreshold = 1.5f;
+    private float deadZone = 0.05f;
+
+    private float heightOffset = 0.5f;
 
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
     {
-        if (pkt.lastInputSeq < lastProcessedSeq) return;
-        lastProcessedSeq = pkt.lastInputSeq;
+        if (IsLocal)
+        {
+            if (pkt.lastInputSeq < lastProcessedSeq) return;
+            lastProcessedSeq = pkt.lastInputSeq;
+        }
 
-        serverPos = pkt.currentPos.ToVector3();
+        Vector3 rawPos = pkt.currentPos.ToVector3();
+        serverPos = new Vector3(-rawPos.x, rawPos.y + heightOffset, rawPos.z);
+
         currentSpeed = pkt.currentSpeed;
         isMoving = pkt.isMoving;
     }
@@ -29,52 +35,53 @@ public class Player : MonoBehaviour
     void Update()
     {
         if (IsLocal)
-        {
             ProcessLocalCalibration();
-        }
         else
-        {
             ProcessRemoteMovement();
-        }
     }
 
-    // 내 캐릭터 보정 (텔레포트 방지)
     void ProcessLocalCalibration()
     {
-        float dist = Vector3.Distance(transform.position, serverPos);
+        Vector3 currentPos = transform.position;
+        float distXZ = Vector2.Distance(new Vector2(currentPos.x, currentPos.z), new Vector2(serverPos.x, serverPos.z));
+        float distY = Mathf.Abs(currentPos.y - serverPos.y);
 
-        // 오차가 5m 이내면 서버 위치 무시
-        if (dist < snapThreshold)
+        // 거리가 크게 벌어졌을 때 (밀치기 등) 바로 보정
+        if (distXZ > snapThreshold || distY > 2.0f)
         {
-            return;
+            if (Movement != null && Movement.Controller != null) Movement.Controller.enabled = false;
+            transform.position = serverPos;
+            if (Movement != null && Movement.Controller != null) Movement.Controller.enabled = true;
         }
+        // 경사로 보정
+        else if (distXZ > 0.05f || distY > 0.01f)
+        {
+            if (Movement != null && Movement.Controller != null) Movement.Controller.enabled = false;
 
-        //  벽 뚫거나 했을 때만 강제 위치 보정
-        transform.position = serverPos;
+            // 높이는 경사로를 타는 중이므로 수평 이동보다 더 빠르게 따라가도록 설정
+            float newY = Mathf.Lerp(currentPos.y, serverPos.y, Time.deltaTime * 15f);
+            float newX = Mathf.Lerp(currentPos.x, serverPos.x, Time.deltaTime * 10f);
+            float newZ = Mathf.Lerp(currentPos.z, serverPos.z, Time.deltaTime * 10f);
+
+            transform.position = new Vector3(newX, newY, newZ);
+
+            if (Movement != null && Movement.Controller != null) Movement.Controller.enabled = true;
+        }
     }
 
-    // 상대방 부드럽게 이동
     void ProcessRemoteMovement()
     {
         float dist = Vector3.Distance(transform.position, serverPos);
+        if (dist < deadZone) return;
 
-        if (dist < deadZone) return; // 떨림 방지
+        // 상대방과 큐브는 무조건 서버 위치 추적
+        transform.position = Vector3.Lerp(transform.position, serverPos, Time.deltaTime * 20f);
 
-        if (dist > snapThreshold)
+        Vector3 dir = (serverPos - transform.position);
+        dir.y = 0; // 회전 시에는 수평 방향만 고려
+        if (dir.sqrMagnitude > 0.001f)
         {
-            transform.position = serverPos;
-            return;
-        }
-
-        float moveStep = currentSpeed * Time.deltaTime;
-        if (dist > catchUpThreshold) moveStep *= 1.2f;
-
-        transform.position = Vector3.MoveTowards(transform.position, serverPos, moveStep);
-
-        Vector3 dir = (serverPos - transform.position).normalized;
-        if (dir != Vector3.zero)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(dir);
+            Quaternion targetRot = Quaternion.LookRotation(dir.normalized);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 15f);
         }
     }

@@ -12,7 +12,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
 
 #if UNITY_EDITOR
@@ -38,7 +38,7 @@ public class WwiseSetupWizard
 	};
 	
 	//Change this when an API change is introduced that would break older version of the addrerssables package
-	private static string WwiseAddressableAPIDefine = "ADDRESSABLES_API_2025_DEFAULT";
+	private static string WwiseAddressableAPIDefine = "ADDRESSABLES_API_BROWSER_TREE_VIEW";
 
 	public static void RunModify()
 	{
@@ -546,7 +546,6 @@ public class WwiseSetupWizard
 	{
 		UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.DefaultGameObjects);
 
-		AkPluginActivator.IsVerboseLogging = true;
 		UnityEngine.Debug.Log("WwiseUnity: Deactivating all plugins...");
 		AkPluginActivator.DeactivateAllPlugins();
 
@@ -635,9 +634,15 @@ public class WwiseSetupWizard
 
 		if (wwiseVersionAsInteger >= 2023)
 		{
-			foreach (var TargetGroup in AvailableBuildTargetGroups)
+			foreach (BuildTargetGroup targetGroup in GetNonObsoleteTargetGroups())
 			{
-				var namedTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(TargetGroup);
+#if UNITY_5_4_OR_NEWER
+				if (targetGroup == BuildTargetGroup.Unknown)
+				{
+					continue;
+				}
+#endif
+				var namedTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(targetGroup);
 				string defines = PlayerSettings.GetScriptingDefineSymbols(namedTarget);
 				for (int i = 2023; i <= minimalVersion; ++i)
 				{
@@ -821,11 +826,6 @@ public class WwiseSetupWizard
 	
 	private static void SetAddressableAdapterSymbol()
 	{
-		if (PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone).Contains(WwiseAddressableAPIDefine))
-		{
-			return;
-		}
-        
 		foreach (BuildTargetGroup targetGroup in GetNonObsoleteTargetGroups())
 		{
 #if UNITY_5_4_OR_NEWER
@@ -834,7 +834,13 @@ public class WwiseSetupWizard
 				continue;
 			}
 #endif
-			string currentDefines = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+			var namedTarget = UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(targetGroup);
+			if (PlayerSettings.GetScriptingDefineSymbols(namedTarget).Contains(WwiseAddressableAPIDefine))
+			{
+				continue;
+			}
+			
+			string currentDefines = PlayerSettings.GetScriptingDefineSymbols(namedTarget);
 			var currentDefineList = currentDefines.Split(';').ToList();
 
 			const string wwiseAddressablePrefix = "ADDRESSABLES_API";
@@ -843,7 +849,7 @@ public class WwiseSetupWizard
 			currentDefineList.Add(WwiseAddressableAPIDefine);
 
 			string newDefinesString = string.Join(";", currentDefineList.Distinct());
-			PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, newDefinesString);
+			PlayerSettings.SetScriptingDefineSymbols(namedTarget, newDefinesString);
 		}
 	}
 

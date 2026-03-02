@@ -52,6 +52,8 @@ void PacketManager::CreateCompent(const UINT32 maxClient_)
 {
 	mUserManager = new UserManager;
 	mUserManager->Init(maxClient_);
+
+	LogManager::Init();
 		
 	UINT32 startRoomNummber = 0;
 	UINT32 maxRoomCount = 10;
@@ -91,7 +93,7 @@ bool PacketManager::UDPRun()
 	udpServerAddr.sin_port = htons(5025);
 	udpServerAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	if (bind(mUdpSocket, (sockaddr*)&udpServerAddr, sizeof(udpServerAddr)) == SOCKET_ERROR) 
+	if (::bind(mUdpSocket, (sockaddr*)&udpServerAddr, sizeof(udpServerAddr)) == SOCKET_ERROR)
 	{
 		printf("[Error] UDP Bind Failed: %d\n", WSAGetLastError());
 		return false;
@@ -109,13 +111,32 @@ bool PacketManager::UDPRun()
 
 void PacketManager::End()
 {
+	double finalRecvMB = m_GrandTotalRecvBytes / (1024.0 * 1024.0);
+	double finalSendMB = m_GrandTotalSendBytes / (1024.0 * 1024.0);
+
+	spdlog::info("==================================================");
+	spdlog::info("[Server Closed] Final Total Bandwidth -> In: {:.2f} MB | Out: {:.2f} MB", finalRecvMB, finalSendMB);
+	spdlog::info("==================================================");
+
 	mRedisMgr->End();
 
 	mIsRunProcessThread = false;
+	mIsRunLogicThread = false;
 
 	if (mProcessThread.joinable())
 	{
 		mProcessThread.join();
+	}
+
+	if (mLogicThread.joinable())
+	{
+		mLogicThread.join();
+	}
+
+	if (mUdpRecvThread.joinable())
+	{
+		closesocket(mUdpSocket);
+		mUdpRecvThread.join();
 	}
 }
 
@@ -138,6 +159,7 @@ void PacketManager::ClearConnectionInfo(INT32 clientIndex_)
 void PacketManager::ReceivePacketData(const UINT32 clientIndex_, const UINT32 size_, char* pData_)
 {
 	m_TotalRecvBytes += size_;
+	m_GrandTotalRecvBytes += size_;
 
 	auto pUser = mUserManager->GetUserByConnIdx(clientIndex_);
 	pUser->SetPacketData(size_, pData_);
@@ -547,6 +569,76 @@ void PacketManager::ProcessRoomChatMessage(UINT32 clientIndex_, UINT16 packetSiz
 		// 앞에 "/n"로 시작하는 부분을 잘라낸다
 		const std::string noticeMsg = cmdMessage.substr(2);
 		RedisReqNotice(*reqUser, noticeMsg);
+		return;
+	}
+
+	// 큐브 소환 명령어
+	if (cmdMessage.find("/spawn cube") == 0)
+	{
+		float cx = 5.0f, cz = 5.0f;
+		sscanf_s(cmdMessage.c_str(), "/spawn cube %f %f", &cx, &cz);
+		pRoom->EnterCube(cx, cz);
+		return;
+	}
+
+	// 자력(밀치기/당기기) 명령어
+	if (cmdMessage.find("/push") == 0 || cmdMessage.find("/pull") == 0)
+	{
+		bool isPush = (cmdMessage.find("/push") == 0);
+		int targetId = 0;
+
+		if (isPush) sscanf_s(cmdMessage.c_str(), "/push %d", &targetId);
+		else        sscanf_s(cmdMessage.c_str(), "/pull %d", &targetId);
+
+		Actor* target = pRoom->GetActorByUUID(targetId);
+		if (target)
+		{
+			Vector3 myPos = reqUser->GetPosition();
+			Vector3 targetPos = target->GetPosition();
+
+			// 타겟 위치에서 내 위치를 바라보는 방향 벡터
+			Vector3 toMe = { myPos.x - targetPos.x, 0.0f, myPos.z - targetPos.z };
+			float dist = sqrt(toMe.x * toMe.x + toMe.z * toMe.z);
+			if (dist > 0) { toMe.x /= dist; toMe.z /= dist; }
+
+			// 타겟의 정면 벡터
+			Vector3 tForward = Quaternion_Multiply(target->GetRotation(), Vector3_forward());
+
+			// 내적 값이 0 이하면, 내가 타겟의 시야 반대편에 있음
+			float dot = (tForward.x * toMe.x) + (tForward.z * toMe.z);
+
+			if (dot <= 1.1f)
+			{
+				printf("[Skill] 뒤통수 판정 성공 \n");
+				Vector3 dir = { targetPos.x - myPos.x, 0.0f, targetPos.z - myPos.z };
+				float dist = sqrt(dir.x * dir.x + dir.z * dir.z);
+
+				if (dist > 0.0f) { dir.x /= dist; dir.z /= dist; }
+
+				if (isPush)
+				{
+					// N극-N극 밀어내기 (30의 힘으로 넉백)
+					target->ApplyForce(dir, 30.0f, 0.5f);
+				}
+				else
+				{
+					// N극-S극 당겨오기 (딱 내 앞까지만 오도록 거리 계산)
+					Vector3 pullDir = { -dir.x, 1.0f, -dir.z };
+
+					// 내 위치 기준 1.5m 앞까지만 당김 (나랑 완벽히 겹치는 것 방지)
+					float pullDist = (dist > 1.5f) ? (dist - 1.5f) : 0.0f;
+
+					// 0.5초 동안 당김 속도 = 거리 / 시간
+					float pullSpeed = pullDist / 0.5f;
+
+					target->ApplyForce(pullDir, pullSpeed, 0.5f);
+				}
+			}
+			else
+			{
+				printf("[Skill] 실패: 타겟과 마주보고 있음\n");
+			}
+		}
 		return;
 	}
 
@@ -991,6 +1083,7 @@ void PacketManager::LogicThread()
 	auto nextTick = std::chrono::steady_clock::now();
 	const auto tickInterval = std::chrono::milliseconds(20); // 50Hz (0.02s)
 
+	auto lastBandwidthCheckTime = std::chrono::steady_clock::now();
 	while (mIsRunLogicThread) 
 	{
 		auto now = std::chrono::steady_clock::now();
@@ -1004,22 +1097,34 @@ void PacketManager::LogicThread()
 				if (auto pRoom = mRoomManager->GetRoomByNumber(i)) 
 				{
 					pRoom->Update(FIXED_DELTA_TIME);
+					NavMeshManager::GetInstance()->UpdateTileCache(FIXED_DELTA_TIME);
 				}
 			}
 
-			// Byte 단위를 KB 단위로 변환
-			double recvKB = m_TotalRecvBytes / 1024.0;
-			double sendKB = m_TotalSendBytes / 1024.0;
+			nextTick += tickInterval;
+		}
 
-			// 로그 출력 (파일에도 자동 저장됨)
-			spdlog::info("[Bandwidth] In: {:.2f} KB/s | Out: {:.2f} KB/s", recvKB, sendKB);
+		if (std::chrono::duration_cast<std::chrono::seconds>(now - lastBandwidthCheckTime).count() >= 1)
+		{
+			// 1초 동안 모인 데이터를 KB 단위로 변환 (현재 속도)
+			double recvKBps = m_TotalRecvBytes / 1024.0;
+			double sendKBps = m_TotalSendBytes / 1024.0;
 
-			// 누적 변수 0으로 초기화 (다음 1초를 위해)
+			// 누적 총 데이터를 MB 단위로 변환 (총 대역폭)
+			double totalRecvMB = m_GrandTotalRecvBytes / (1024.0 * 1024.0);
+			double totalSendMB = m_GrandTotalSendBytes / (1024.0 * 1024.0);
+
+			if (m_TotalRecvBytes > 0 || m_TotalSendBytes > 0)
+			{
+				spdlog::info("[Bandwidth] Speed - In: {:.2f} KB/s | Out: {:.2f} KB/s  ||  Total - In: {:.2f} MB | Out: {:.2f} MB",
+					recvKBps, sendKBps, totalRecvMB, totalSendMB);
+			}
+
 			m_TotalRecvBytes = 0;
 			m_TotalSendBytes = 0;
 
-			// 다음 틱 시간 예약
-			nextTick += tickInterval;
+			// 타이머 갱신
+			lastBandwidthCheckTime = now;
 		}
 
 		// CPU 과점유 방지
@@ -1041,6 +1146,7 @@ void PacketManager::UDPRecvThread()
 		if (recvLen > 0) {
 			auto pHeader = (PACKET_HEADER*)buf;
 			m_TotalRecvBytes += recvLen;
+			m_GrandTotalSendBytes += m_TotalRecvBytes;
 
 			printf("[UDP] Packet Recv! ID:%d, Len:%d\n", pHeader->PacketId, recvLen);
 			if (pHeader->PacketId == (UINT16)PACKET_ID::PLAYER_MOVEMENT) 
@@ -1052,8 +1158,8 @@ void PacketManager::UDPRecvThread()
 					continue; 
 				}
 
-				spdlog::info("[RUDP] User : {} | Seq : {} Pos : {:.2f}, {:.2f}",
-					pMovePkt->userUUID, pMovePkt->inputSeq, pMovePkt->dx, pMovePkt->dz);
+				/*spdlog::info("[RUDP] User : {} | Seq : {} Pos : {:.2f}, {:.2f}",
+					pMovePkt->userUUID, pMovePkt->inputSeq, pMovePkt->dx, pMovePkt->dz);*/
 
 				// 패킷 내의 userUUID나 clientAddr를 통해 유저 식별
 				auto pUser = mUserManager->GetUserByConnIdx(pMovePkt->userUUID);
