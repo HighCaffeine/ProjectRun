@@ -120,6 +120,9 @@ private:
 	std::atomic<uint64_t> m_TotalSendBytes{ 0 };
 	std::atomic<uint64_t> m_TotalRecvBytes{ 0 };
 
+	std::atomic<uint64_t> m_GrandTotalRecvBytes{ 0 };
+	std::atomic<uint64_t> m_GrandTotalSendBytes{ 0 };
+
 
 	UserManager* mUserManager;
 	RoomManager* mRoomManager;	
