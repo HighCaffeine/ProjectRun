@@ -18,7 +18,9 @@ jobs:
 
     - name: Configure CMake
       # -S Server: CMakeLists.txt 파일이 Server 폴더 안에 있음을 명시
-      run: cmake -B build -S Server -DCMAKE_BUILD_TYPE=Release -A x64
+      # run: cmake -B build -S Server -DCMAKE_BUILD_TYPE=Release -A x64
+      # - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -A x64
 
     - name: Build Server
       # 생성된 build 폴더를 기준으로 빌드
