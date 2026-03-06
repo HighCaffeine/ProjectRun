@@ -2,7 +2,7 @@ name: Server CI/CD Build
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "feature/Server" ]
   pull_request:
     branches: [ "main" ]
 
@@ -14,20 +14,16 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
-        submodules: recursive # Sentry
+        submodules: recursive # Sentry 소스 코드를 가져오기 위해 필수
 
     - name: Configure CMake
-      # -S Server: CMakeLists.txt 파일이 Server 폴더 안에 있음을 명시
-      # run: cmake -B build -S Server -DCMAKE_BUILD_TYPE=Release -A x64
-      # - name: Configure CMake
+      # 최상위 CMakeLists.txt를 읽어 build 폴더에 설정 생성
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -A x64
 
     - name: Build Server
-      # 생성된 build 폴더를 기준으로 빌드
       run: cmake --build build --config Release
 
     - name: Upload Build Artifacts
-      # 빌드 결과물(.exe, .dll) 저장
       uses: actions/upload-artifact@v4
       with:
         name: Final-Server-Build

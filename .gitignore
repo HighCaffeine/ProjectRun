@@ -31,3 +31,5 @@ WwiseUnityIntegration_*_Src.zip
 
 # sound engine dll만 예외로 추가
 !Client/Assets/Wwise/API/Runtime/Plugins/Windows/x86_64/Release/AkUnitySoundEngine.dll
+
+/[Bb]uild/
