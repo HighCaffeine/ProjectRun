@@ -2,7 +2,7 @@ name: Server CI/CD Build
 
 on:
   push:
-    branches: [ "main", "develop", "feature/Server" ] # 모든 작업 브랜치 포함
+    branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main" ]
 
