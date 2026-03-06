@@ -7,7 +7,7 @@ WORKDIR /app
 COPY build/Release/FinalProjectServer.exe .
 COPY build/Release/sentry.dll .
 COPY build/Release/crashpad_handler.exe .
-COPY build/Release/all_tiles_tilecache.bin .
+COPY Shared/MapData/all_tiles_tilecache.bin .
 
 RUN mkdir .sentry-native
 
