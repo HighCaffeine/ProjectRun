@@ -7,29 +7,27 @@
 *.log
 .backup/
 
-# 유니티 내부의 Wwise 생성 파일 (SoundBanks 등은 공유가 필요할 수 있음)
-# 환경에 따라 GeneratedSoundBanks 폴더 전체를 제외하거나 포함할 수 있습니다.
-# 팀원들이 Wwise 없이도 소리를 들어야 한다면 아래 줄을 주석 처리하세요.
-# /[Aa]ssets/StreamingAssets/Audio/GeneratedSoundBanks/
-
 # Wwise 에디터 개인 설정
 *.p_eb
 *.user
 *.log
 .backup/
 
-Wwise/CKFinalProject/.cache/
-Wwise/CKFinalProject/Originals/Cache/
-Wwise/CKFinalProject/ConversionSettings/
-Wwise/CKFinalProject/Operations/
+Wwise/CK_ProjectRun/.cache/
+Wwise/CK_ProjectRun/Originals/Cache/
+Wwise/CK_ProjectRun/ConversionSettings/
+Wwise/CK_ProjectRun/Operations/
 
-Wwise/CKFinalProject/*.user
-Wwise/CKFinalProject/*.p_eb
+Wwise/CK_ProjectRun/*.user
+Wwise/CK_ProjectRun/*.p_eb
 
-# 유니티 임시 및 로컬 설정 파일 [cite: 3]
+# 유니티 임시 및 로컬 설정 파일
 Client/[Aa]ssets/WwiseSettings.xml.meta
 Client/[Aa]ssets/WwiseSettings.xml
 
 # 유니티 내 Wwise 자동 생성 로그 및 임시 파일
 logRunSetup.txt
 WwiseUnityIntegration_*_Src.zip
+
+# sound engine dll만 예외로 추가
+!Client/Assets/Wwise/API/Runtime/Plugins/Windows/x86_64/Release/AkUnitySoundEngine.dll
