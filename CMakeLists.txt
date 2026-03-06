@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SENTRY_DIR "${CMAKE_SOURCE_DIR}/thirdparty/sentry-native")
 set(TP_DIR "${CMAKE_SOURCE_DIR}/thirdparty")
 set(HIREDIS_DIR "${TP_DIR}/hiredis")
+set(SPDLOG_DIR "${TP_DIR}/spdlog-1.x/include)
 
 # 3. 모든 소스 파일 수집 (서버 + 내비게이션 소스코드)
 # 서버 소스
@@ -50,6 +51,17 @@ target_include_directories(FinalProjectServer PRIVATE
     "${TP_DIR}/recastnavigation/DetourTileCache/Source"
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz"
     "${HIREDIS_DIR}"
+    "${SPDLOG_DIR}" # spdlog 헤더 경로 추가
+)
+
+if(MSVC)
+    # 한글(UTF-8) 인코딩 강제 설정 및 경고 무시
+    target_compile_options(FinalProjectServer PRIVATE "/utf-8")
+endif()
+
+target_compile_definitions(FinalProjectServer PRIVATE 
+    _WINSOCK_DEPRECATED_NO_WARNINGS
+    _CRT_SECURE_NO_WARNINGS
 )
 
 # 6. Sentry 라이브러리 연결 (Sentry는 이미 빌드된 .lib 사용)
