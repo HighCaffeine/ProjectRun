@@ -14,10 +14,10 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
-        submodules: recursive # Sentry 소스 코드를 가져오기 위해 필수
+        fetch-depth: 0 # 전체 이력을 가져와 파일 누락 방지
 
     - name: Configure CMake
-      # 최상위 CMakeLists.txt를 읽어 build 폴더에 설정 생성
+      # 최상위 CMakeLists.txt를 사용하므로 -S . 으로 설정
       run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -A x64
 
     - name: Build Server
