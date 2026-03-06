@@ -1,16 +1,16 @@
 cmake_minimum_required(VERSION 3.10)
 
 # 1. 프로젝트 설정
-project(CK_ProjectRun_Server LANGUAGES CXX C) # fastlz가 .c 파일일 수 있어 C 언어도 추가
+project(CK_ProjectRun_Server LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 2. 경로 설정
-set(SENTRY_DIR "${CMAKE_SOURCE_DIR}/thirdparty/sentry-native")
+# 2. 모든 경로 변수 설정 (따옴표와 경로 정확히 수정)
 set(TP_DIR "${CMAKE_SOURCE_DIR}/thirdparty")
+set(SENTRY_DIR "${TP_DIR}/sentry-native")
 set(HIREDIS_DIR "${TP_DIR}/hiredis")
-set(SPDLOG_DIR "${TP_DIR}/spdlog-1.x/include)
+set(SPDLOG_DIR "${TP_DIR}/spdlog-1.x/include") # 닫는 따옴표 수정 완료
 
 # 3. 모든 소스 파일 수집 (서버 + 내비게이션 소스코드)
 # 서버 소스
@@ -34,7 +34,7 @@ file(GLOB_RECURSE FASTLZ_SOURCES
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz/*.h"
 )
 
-# 4. 실행 파일 생성 (모든 소스를 때려넣습니다)
+# 4. 실행 파일 생성 (모든 소스 통합)
 add_executable(FinalProjectServer 
     ${SERVER_SOURCES} 
     ${DETOUR_SOURCES} 
@@ -42,7 +42,7 @@ add_executable(FinalProjectServer
     ${FASTLZ_SOURCES}
 )
 
-# 5. 헤더 파일 경로 설정 (컴파일러가 .h 파일을 찾을 수 있게)
+# 5. 헤더 파일 경로 설정 (컴파일러 Include 경로)
 target_include_directories(FinalProjectServer PRIVATE 
     "Server"
     "${SENTRY_DIR}"
@@ -51,41 +51,39 @@ target_include_directories(FinalProjectServer PRIVATE
     "${TP_DIR}/recastnavigation/DetourTileCache/Source"
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz"
     "${HIREDIS_DIR}"
-    "${SPDLOG_DIR}" # spdlog 헤더 경로 추가
+    "${SPDLOG_DIR}"
 )
 
+# 6. 컴파일러 설정 및 전처리기 정의
 if(MSVC)
     # 한글(UTF-8) 인코딩 강제 설정 및 경고 무시
     target_compile_options(FinalProjectServer PRIVATE "/utf-8")
+    target_compile_definitions(FinalProjectServer PRIVATE 
+        _WINSOCK_DEPRECATED_NO_WARNINGS
+        _CRT_SECURE_NO_WARNINGS
+    )
 endif()
 
-target_compile_definitions(FinalProjectServer PRIVATE 
-    _WINSOCK_DEPRECATED_NO_WARNINGS
-    _CRT_SECURE_NO_WARNINGS
-)
-
-# 6. Sentry 라이브러리 연결 (Sentry는 이미 빌드된 .lib 사용)
+# 7. 라이브러리 연결 (이미 빌드된 .lib 사용)
 target_link_libraries(FinalProjectServer PRIVATE 
     "${SENTRY_DIR}/sentry.lib"
-    "${HIREDIS_DIR}/VS-IDE/Release/hiredis.lib" # hiredis 라이브러리 파일 경로
-    "Winmm.lib" # Redis나 서버에서 시간 관련 함수를 쓴다면 필요할 수 있음
+    "${HIREDIS_DIR}/VS-IDE/Release/hiredis.lib" # 요청하신 상세 경로 반영
+    "Winmm.lib" # 시간 및 멀티미디어 함수용
 )
 
-# 7. 전처리기 설정 (경고 및 에러 방지)
-target_compile_definitions(FinalProjectServer PRIVATE 
-    _WINSOCK_DEPRECATED_NO_WARNINGS
-    _CRT_SECURE_NO_WARNINGS # 구형 C 함수 사용 시 발생하는 경고 방지
-)
-
-# 8. 빌드 후 종속성 파일 자동 복사 (Windows)
+# 8. 빌드 후 종속성 파일 자동 복사 (Windows 전용)
 if(WIN32)
     add_custom_command(TARGET FinalProjectServer POST_BUILD
+        # sentry.dll 복사
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${SENTRY_DIR}/sentry.dll"
-            $<TARGET_FILE_DIR:FinalProjectServer>
+            "$<TARGET_FILE_DIR:FinalProjectServer>"
+        
+        # crashpad_handler.exe 복사 (Sentry 작동 필수)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${SENTRY_DIR}/crashpad_handler.exe"
-            $<TARGET_FILE_DIR:FinalProjectServer>
-        COMMENT "Sentry binaries copying..."
+            "$<TARGET_FILE_DIR:FinalProjectServer>"
+            
+        COMMENT "Sentry binaries copying to output directory..."
     )
 endif()
