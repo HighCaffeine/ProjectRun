@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "RedisTaskDefine.h"
 //#include "ErrorCode.h"
@@ -24,7 +24,7 @@ public:
 	{
 		if (Connect(ip_, port_) == false)
 		{
-			printf("RedisManager::Run() Redis Á¢¼Ó ½ÇÆĞ\n");
+			printf("RedisManager::Run() Redis ì ‘ì† ì‹¤íŒ¨\n");
 			return false;
 		}
 
@@ -35,10 +35,10 @@ public:
 			mTaskThreads.emplace_back([this]() { TaskProcessThread(); });
 		}
 
-		// Redis Sub ¿ë Thread
+		// Redis Sub ìš© Thread
 		mTaskThreads.emplace_back([this]() { SubscribeThread(); });
 
-		printf("RedisManager::Run() Redis µ¿ÀÛ Áß...\n");
+		printf("RedisManager::Run() Redis ë™ì‘ ì¤‘...\n");
 		return true;
 	}
 
@@ -107,7 +107,7 @@ private:
 
 	void TaskProcessThread()
 	{
-		printf("RedisManager::TaskProcessThread() Redis ½º·¹µå ½ÃÀÛ...\n");
+		printf("RedisManager::TaskProcessThread() Redis ìŠ¤ë ˆë“œ ì‹œì‘...\n");
 
 		while (mIsTaskRun)
 		{
@@ -141,7 +141,7 @@ private:
 					}
 					else
 					{
-						// °èÁ¤ÀÌ ¾ø´Â °æ¿ì (ÇÊ¿äÇÏ¸é ¿©±â¼­ ÀÚµ¿ °¡ÀÔ ·ÎÁ÷ Ãß°¡)
+						// ê³„ì •ì´ ì—†ëŠ” ê²½ìš° (í•„ìš”í•˜ë©´ ì—¬ê¸°ì„œ ìë™ ê°€ì… ë¡œì§ ì¶”ê°€)
 						printf("[Redis] User Not Found: %s\n", pRequest->UserID);
 					}
 
@@ -169,53 +169,53 @@ private:
 					resData.UserIndex = pRequest->UserIndex;
 					memset(resData.ItemSlots, 0, sizeof(resData.ItemSlots));
 
-					//·¹µğ½º ÇØ½¬ Å°°ª
+					//ë ˆë””ìŠ¤ í•´ì‰¬ í‚¤ê°’
 					std::string id = "u:" + std::string(pRequest->UserID) + ":inven";
 					std::cout << id << std::endl;
 					std::map<std::string, std::string> inven;
 
-					//getall·Î °¡Á®¿À°í, ¾È¿¡ ¾Èºñ¾úÀ¸¸é ³»ºÎ Ã³¸®
+					//getallë¡œ ê°€ì ¸ì˜¤ê³ , ì•ˆì— ì•ˆë¹„ì—ˆìœ¼ë©´ ë‚´ë¶€ ì²˜ë¦¬
 					if (mConn.hgetall(id, inven) && !inven.empty())
 					{	
-						//Æä¾î·Î °ª °¡Á®¿È
-						//³»ºÎ¿¡ 0 100 1 200 2 300 °°ÀÌ ÀúÀåÇÒ°Å (Å°¸¦ ÀÎµ¦½º·Î ¹Ù·Î ¾µ ¼ö ÀÖµµ·Ï)
+						//í˜ì–´ë¡œ ê°’ ê°€ì ¸ì˜´
+						//ë‚´ë¶€ì— 0 100 1 200 2 300 ê°™ì´ ì €ì¥í• ê±° (í‚¤ë¥¼ ì¸ë±ìŠ¤ë¡œ ë°”ë¡œ ì“¸ ìˆ˜ ìˆë„ë¡)
 						for (auto const& [key, value] : inven)
 						{
 							int index = std::stoi(key);
 							if (index >= 0 && index < INVENTORY_SIZE)
 							{
-								//¾ÆÀÌÅÛ ÇÏ³ª¾¿ ¼¼ÆÃ (ºóÄ­Àº 0)
+								//ì•„ì´í…œ í•˜ë‚˜ì”© ì„¸íŒ… (ë¹ˆì¹¸ì€ 0)
 								resData.ItemSlots[index] = std::stoi(value);
 							}
 						}
 
 					}
-					else //ÀÎº¥ÀÌ ¾ø´Ù¸é (½Å±Ô À¯Àú¶ó¸é)
+					else //ì¸ë²¤ì´ ì—†ë‹¤ë©´ (ì‹ ê·œ ìœ ì €ë¼ë©´)
 					{
-						//·£´ı ¾ÆÀÌÅÛ ID °ª °¡Á®¿È
+						//ëœë¤ ì•„ì´í…œ ID ê°’ ê°€ì ¸ì˜´
 						int item1 = 101 + (rand() % 5);
 						int item2 = 101 + (rand() % 5);
 						uint32_t ret;
 
-						//·£´ı ÀÎµ¦½º ¾ò±â
+						//ëœë¤ ì¸ë±ìŠ¤ ì–»ê¸°
 						static std::random_device rd;
 						static std::mt19937 gen(rd());
 						int nums[] = {0, 1, 2, 3, 4};
 						int first = -1, firstIndex = -1;
 						int sec = -1, secIndex = -1;
 						
-						//·£´ı ÀÎµ¦½º 1
+						//ëœë¤ ì¸ë±ìŠ¤ 1
 						std::uniform_int_distribution<int> dis1(0, 4); firstIndex = dis1(gen);
 						first = nums[firstIndex];
 
-						//¸Ç µÚ¶û ±³Ã¼
+						//ë§¨ ë’¤ë‘ êµì²´
 						std::swap(nums[firstIndex], nums[4]);
 
-						//·£´ı ÀÎµ¦½º 2
+						//ëœë¤ ì¸ë±ìŠ¤ 2
 						std::uniform_int_distribution<int> dis2(0, 3); secIndex = dis2(gen);
 						sec = nums[secIndex];
 
-						//´Ù 0À¸·Î ¼¼ÆÃ
+						//ë‹¤ 0ìœ¼ë¡œ ì„¸íŒ…
 						for (int i = 0; i < INVENTORY_SIZE; i++)
 						{
 							mConn.hset(id, std::to_string(i), "0", ret);
@@ -228,7 +228,7 @@ private:
 						resData.ItemSlots[sec] = item2;
 					}
 				
-					//°á°ú ¹İÈ¯ÇØÁÜ
+					//ê²°ê³¼ ë°˜í™˜í•´ì¤Œ
 					RedisTask resTask;
 					resTask.TaskID = RedisTaskID::RESPONSE_LOAD_INVENTORY;
 					resTask.UserIndex = task.UserIndex;
@@ -246,7 +246,7 @@ private:
 				//{
 				//	auto pRequest = (RedisTradeReq*)task.pData;
 				//	RedisTradeRes resData;
-				//	//À¯Àú Å°(ÇØ½¬ Å°)
+				//	//ìœ ì € í‚¤(í•´ì‰¬ í‚¤)
 				//	std::string Aid = "u:" + std::string(pRequest->UserAID) + ":inven";
 				//	std::string Bid = "u:" + std::string(pRequest->UserBID) + ":inven";
 				//	std::map<std::string, std::string> invenA;
@@ -257,19 +257,19 @@ private:
 				//	uint32_t ret;
 				//	if (mConn.hgetall(Aid, invenA) && mConn.hgetall(Bid, invenB))
 				//	{
-				//		int arrayA[INVENTORY_SIZE]; // ÇöÀç °¡Áö°íÀÖ´Â ÀÎº¥Åä¸® µ¥ÀÌÅÍ
+				//		int arrayA[INVENTORY_SIZE]; // í˜„ì¬ ê°€ì§€ê³ ìˆëŠ” ì¸ë²¤í† ë¦¬ ë°ì´í„°
 				//		int arrayB[INVENTORY_SIZE];
 
 				//		std::fill(arrayA, arrayA + INVENTORY_SIZE, EMPTYITEM);
 				//		std::fill(arrayB, arrayB + INVENTORY_SIZE, EMPTYITEM);
 
-				//		for (int i = 0; i < INVENTORY_SIZE; i++) // ±³È¯Ã¢¿¡ÀÖ´Â ¾ÆÀÌÅÛµéÀ» Queue¿¡ ´ãÀ½
+				//		for (int i = 0; i < INVENTORY_SIZE; i++) // êµí™˜ì°½ì—ìˆëŠ” ì•„ì´í…œë“¤ì„ Queueì— ë‹´ìŒ
 				//		{
 				//			if (pRequest->ItemsAID[i] != EMPTYITEM) exchangeQueueA.push_back(pRequest->ItemsAID[i]); 
 				//			if (pRequest->ItemsBID[i] != EMPTYITEM) exchangeQueueB.push_back(pRequest->ItemsBID[i]);
 				//		}
 
-				//		// ÇöÀç °¡Áö°íÀÖ´Â ¾ÆÀÌÅÛµéÀ» DB¿¡¼­ °¡Á®¿À±â
+				//		// í˜„ì¬ ê°€ì§€ê³ ìˆëŠ” ì•„ì´í…œë“¤ì„ DBì—ì„œ ê°€ì ¸ì˜¤ê¸°
 				//		for (auto& [key, value] : invenA)
 				//		{
 
@@ -322,7 +322,7 @@ private:
 				//			}
 				//		}
 
-				//		if (!exchangeQueueA.empty() || !exchangeQueueB.empty()) // ½½·ÔÀÌ ²Ë Â÷ ±³È¯ÇÒ ¼ö ¾øÀ½
+				//		if (!exchangeQueueA.empty() || !exchangeQueueB.empty()) // ìŠ¬ë¡¯ì´ ê½‰ ì°¨ êµí™˜í•  ìˆ˜ ì—†ìŒ
 				//		{
 				//			resData.IsSuccess = false;
 				//			RedisTask resTaskA;
@@ -341,7 +341,7 @@ private:
 				//			memcpy(resTaskB.pData, &resData, resTaskB.DataSize);
 				//			PushResponse(resTaskB);
 				//		}
-				//		else // ½ÇÁ¦ DBÀû¿ë
+				//		else // ì‹¤ì œ DBì ìš©
 				//		{
 				//			redisReply* reply = mConn.redisCmd("MULTI");
 				//			freeReplyObject(reply);
@@ -378,7 +378,7 @@ private:
 #pragma endregion
 				else if (task.TaskID == RedisTaskID::REQUEST_SHOP_UPDATE)
 				{
-					int commandValue = 0; // 0ÀÌ¸é ¹Ù·Î ÃÊ±âÈ­, 1ÀÌ»óÀÌ¸é ½Ã°£ Ãß°¡ ¹× Ã¼Å©, -1Àº processpacket¿¡¼­ 1ÃÊ¸¶´Ù Ã¼Å©¿ë
+					int commandValue = 0; // 0ì´ë©´ ë°”ë¡œ ì´ˆê¸°í™”, 1ì´ìƒì´ë©´ ì‹œê°„ ì¶”ê°€ ë° ì²´í¬, -1ì€ processpacketì—ì„œ 1ì´ˆë§ˆë‹¤ ì²´í¬ìš©
 					if (task.DataSize == sizeof(int) && task.pData != nullptr)
 					{
 						commandValue = *(int*)task.pData;
@@ -396,29 +396,29 @@ private:
 					if (!dbTime.empty()) storedNextTime = std::stoull(dbTime);
 					if (!dbItem.empty()) currentItemID = std::stoi(dbItem);
 
-					// ÀÚÁ¤ ÃÊ±âÈ­¸¦ À§ÇØ ³¯Â¥ °è»ê
+					// ìì • ì´ˆê¸°í™”ë¥¼ ìœ„í•´ ë‚ ì§œ ê³„ì‚°
 					auto GetNextMidnight = [&](time_t baseTime)->UINT64 
 						{
 						struct tm timeInfo;
-						localtime_s(&timeInfo, &baseTime); // ÇöÀç ½Ã°£ ±¸Á¶Ã¼·Î º¯È¯
+						localtime_s(&timeInfo, &baseTime); // í˜„ì¬ ì‹œê°„ êµ¬ì¡°ì²´ë¡œ ë³€í™˜
 
 						timeInfo.tm_hour = 0;
 						timeInfo.tm_min = 0;
 						timeInfo.tm_sec = 0;
-						timeInfo.tm_mday += 1; // ³¯Â¥ ÇÏ·ç ´õÇÔ (ÀÚµ¿À¸·Î ¿ù/³â ³Ñ¾î°¨)
+						timeInfo.tm_mday += 1; // ë‚ ì§œ í•˜ë£¨ ë”í•¨ (ìë™ìœ¼ë¡œ ì›”/ë…„ ë„˜ì–´ê°)
 
-						return (UINT64)mktime(&timeInfo); // ´Ù½Ã Å¸ÀÓ½ºÅÆÇÁ·Î º¯È¯
+						return (UINT64)mktime(&timeInfo); // ë‹¤ì‹œ íƒ€ì„ìŠ¤íƒ¬í”„ë¡œ ë³€í™˜
 						};
 
 					bool needDBUpdate = false;
 					UINT64 finalNextTime = storedNextTime;
 
 					
-					// /shop_reset ±×³É ÃÊ±âÈ­
+					// /shop_reset ê·¸ëƒ¥ ì´ˆê¸°í™”
 					if (commandValue == 0)
 					{
 						currentItemID = 101 + (rand() % 5);
-						finalNextTime = GetNextMidnight(now); // Áö±İ ±âÁØÀ¸·Î ³»ÀÏ ÀÚÁ¤ °è»ê
+						finalNextTime = GetNextMidnight(now); // ì§€ê¸ˆ ê¸°ì¤€ìœ¼ë¡œ ë‚´ì¼ ìì • ê³„ì‚°
 						needDBUpdate = true;
 						printf("[Shop] Reset\n");
 					}
@@ -438,7 +438,7 @@ private:
 						needDBUpdate = true;
 						printf("[Shop] Time Fast Forward: %d mins (Next Update: %lld)\n", commandValue, finalNextTime);
 					}
-					else if (commandValue == -1)	//½Ã°£ Ã¼Å© processpacket¿¡¼­ ¿äÃ»
+					else if (commandValue == -1)	//ì‹œê°„ ì²´í¬ processpacketì—ì„œ ìš”ì²­
 					{
 						if (isBuying)
 						{
@@ -447,19 +447,19 @@ private:
 						}
 						if (storedNextTime == 0 || (UINT64)now >= storedNextTime)
 						{
-							currentItemID = 101 + (rand() % 5); // ¾ÆÀÌÅÛ º¯°æ
-							finalNextTime = GetNextMidnight(now); // ³»ÀÏ ÀÚÁ¤À¸·Î ´Ù½Ã °»½ÅÇÔ
+							currentItemID = 101 + (rand() % 5); // ì•„ì´í…œ ë³€ê²½
+							finalNextTime = GetNextMidnight(now); // ë‚´ì¼ ìì •ìœ¼ë¡œ ë‹¤ì‹œ ê°±ì‹ í•¨
 
 							needDBUpdate = true;
 							printf("[Shop] Daily Reset\n");
 						}
 					}
-					else if (commandValue == -2)	//¹«Á¶°Ç ¾÷µ¥ÀÌÆ®
+					else if (commandValue == -2)	//ë¬´ì¡°ê±´ ì—…ë°ì´íŠ¸
 					{
 						needDBUpdate = true;
 					}
 
-					// º¯°æ»çÇ× ÀúÀå, ºê·ÎµåÄ³½ºÆ®
+					// ë³€ê²½ì‚¬í•­ ì €ì¥, ë¸Œë¡œë“œìºìŠ¤íŠ¸
 					if (needDBUpdate)
 					{
 						uint32_t ret;
@@ -489,13 +489,13 @@ private:
 					RedisShopBuyRes resData;
 					resData.isSuccess = false;
 
-					// À¯Àú ÀÎº¥Åä¸® Á¶È¸
+					// ìœ ì € ì¸ë²¤í† ë¦¬ ì¡°íšŒ
 					std::string invenKey = "u:" + std::string(pRequest->UserID) + ":inven";
 					std::map<std::string, std::string> inven;
 
 					mConn.hgetall(invenKey, inven);
 
-					// ºó ½½·Ô Ã£±â
+					// ë¹ˆ ìŠ¬ë¡¯ ì°¾ê¸°
 					int emptySlotIndex = -1;
 					int tempInven[INVENTORY_SIZE] = { 0, };
 
@@ -530,20 +530,20 @@ private:
 					}
 					else
 					{
-						// ÀÎº¥Åä¸® ²Ë Âü
+						// ì¸ë²¤í† ë¦¬ ê½‰ ì°¸
 						resData.isSuccess = false;
 						printf("[Shop] User(%s) Buy Failed (Inventory Full)\n", pRequest->UserID);
 					}
 
 					RedisTask resTask;
 					resTask.TaskID = RedisTaskID::RESPONSE_SHOP_BUY;
-					resTask.UserIndex = task.UserIndex; // ¿äÃ»ÇÑ À¯Àú¿¡°Ô¸¸ Àü¼Û
+					resTask.UserIndex = task.UserIndex; // ìš”ì²­í•œ ìœ ì €ì—ê²Œë§Œ ì „ì†¡
 					resTask.DataSize = sizeof(RedisShopBuyRes);
 					resTask.pData = new char[resTask.DataSize];
 					memcpy(resTask.pData, &resData, resTask.DataSize);
 					PushResponse(resTask);
 
-					// ¼º°ø ½Ã ÀÎº¥Åä¸® ÀÚµ¿ °»½Å ¿äÃ»
+					// ì„±ê³µ ì‹œ ì¸ë²¤í† ë¦¬ ìë™ ê°±ì‹  ìš”ì²­
 					if (resData.isSuccess)
 					{
 						RedisInvenReq invenReq;
@@ -571,12 +571,12 @@ private:
 			}
 		}
 
-		printf("Redis ½º·¹µå Á¾·á\n");
+		printf("Redis ìŠ¤ë ˆë“œ ì¢…ë£Œ\n");
 	}
 
 	void SubscribeThread()
 	{
-		printf("RedisManager::SubscribeThread() Redis(Sub) ½º·¹µå ½ÃÀÛ...\n");
+		printf("RedisManager::SubscribeThread() Redis(Sub) ìŠ¤ë ˆë“œ ì‹œì‘...\n");
 
 		auto result = mConnSub.initSubscribe("ch_notice");
 
@@ -627,7 +627,7 @@ private:
 	private:
 
 	RedisCpp::CRedisConnEx mConn;
-	RedisCpp::CRedisConnEx mConnSub; // Redis Subscribe¿ë
+	RedisCpp::CRedisConnEx mConnSub; // Redis Subscribeìš©
 
 	bool		mIsTaskRun = false;
 	std::vector<std::thread> mTaskThreads;

@@ -1,4 +1,6 @@
-#if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+using AK.Wwise.Unity.Logging;
+
+#if !(UNITY_QNX) // Disable under unsupported platforms.
 /*******************************************************************************
 The content of this file includes portions of the proprietary AUDIOKINETIC Wwise
 Technology released in source code form as part of the game integration package.
@@ -13,7 +15,7 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
 
 /// @brief Maintains the list of loaded SoundBanks loaded. This is currently used only with AkAmbient objects.
@@ -84,7 +86,7 @@ public static class AkBankManager
 		var result = AkUnitySoundEngine.LoadBank("Init.bnk", out BankID);
 		if (result != AKRESULT.AK_Success)
 		{
-			UnityEngine.Debug.LogError("WwiseUnity: Failed load Init.bnk with result: " + result);
+			WwiseLogger.Error("Failed load Init.bnk with result: " + result);
 		}
 	}
 
@@ -108,7 +110,7 @@ public static class AkBankManager
 
 			if (decodeBank && bankType != AkBankTypeEnum.AkBankType_User)
 			{
-				UnityEngine.Debug.LogError("Decoding Auto-generated SoundBanks is not supported.");
+				WwiseLogger.Error("Decoding Auto-generated SoundBanks is not supported.");
 				decodeBank = false;
 			}
 
@@ -223,7 +225,7 @@ public static class AkBankManager
 		protected void LogLoadResult(AKRESULT result)
 		{
 			if (result != AKRESULT.AK_Success && AkUnitySoundEngine.IsInitialized())
-				UnityEngine.Debug.LogWarning("WwiseUnity: Bank " + bankName + " failed to load (" + result + ")");
+				WwiseLogger.Warning("Bank " + bankName + " failed to load (" + result + ")");
 		}
 	}
 
@@ -338,4 +340,4 @@ public static class AkBankManager
 		}
 	}
 }
-#endif // #if ! (UNITY_DASHBOARD_WIDGET || UNITY_WEBPLAYER || UNITY_WII || UNITY_WIIU || UNITY_NACL || UNITY_FLASH || UNITY_BLACKBERRY) // Disable under unsupported platforms.
+#endif // #if !(UNITY_QNX) // Disable under unsupported platforms.

@@ -12,11 +12,11 @@ void CopyUserID(char* userID, const char* userID_);
 
 class Room
 {
-	// [히스테리시스 상수]
 	// 들어올 때는 6m, 나갈 때는 7.5m (1.5m의 여유 버퍼)
-	const float ENTER_RANGE = 6.0f;
-	const float LEAVE_RANGE = 7.5f;
-
+	//const float ENTER_RANGE = 6.0f;
+	//const float LEAVE_RANGE = 7.5f;
+	const float ENTER_RANGE = 99999.0f;
+	const float LEAVE_RANGE = 99999.0f;
 public:
 	Room() = default;
 	~Room() = default;
@@ -29,6 +29,7 @@ public:
 	{
 		mRoomNum = roomNum_;
 		mMaxUserCount = maxUserCount_;
+		//NavMeshManager::GetInstance()->Init(navMeshFileName);
 	}
 
 	UINT16 EnterUser(User* user_)
@@ -55,6 +56,7 @@ public:
 
 			// 서로 시야 목록에 추가
 			user_->mVisibleList.insert(pRoomUser->GetNetConnIdx());
+			pRoomUser->mVisibleList.insert(user_->GetNetConnIdx());
 
 			// 나에게 상대방 정보 보내기 (Create)
 			ROOM_USER_INFO_NTF_PACKET roomUserInfoNtf;
@@ -140,6 +142,32 @@ public:
 
 	std::function<void(UINT32, UINT32, char*)> SendPacketFunc;
 
+	// 타겟팅용 UUID로 액터 찾기
+	Actor* GetActorByUUID(INT32 uuid)
+	{
+		for (auto u : mUserList) { if (u->GetNetConnIdx() == uuid) return u; }
+		for (auto n : mNpcList) { if (n->GetNetConnIdx() == uuid) return n; }
+		return nullptr;
+	}
+
+	// 큐브 소환 함수
+	UINT16 EnterCube(float x, float z)
+	{
+		std::lock_guard<std::recursive_mutex> guard(mLock);
+		Npc* newNpc = CreateNpc();
+		newNpc->EnterRoom(mRoomNum);
+
+		// 큐브 속성 부여 및 좌표 설정
+		newNpc->mIsCube = true;
+		newNpc->SetPosition({ x, 0.0f, z });
+
+		// TileCache에 동적 장애물 구역으로 등록
+		newNpc->mObstacleRef = NavMeshManager::GetInstance()->AddObstacle(newNpc->GetPosition(), 1.0f, 2.0f);
+
+		NotifyUserEnter(newNpc->GetNetConnIdx(), newNpc->GetUserId());
+		return (UINT16)ERROR_CODE::NONE;
+	}
+
 	void SendToAllUser(const UINT16 dataSize_, char* data_, const INT32 passUserIndex_, bool exceptMe)
 	{
 		std::lock_guard<std::recursive_mutex> guard(mLock);
@@ -154,7 +182,7 @@ public:
 		{
 			if (pUser == nullptr) continue;
 			if (exceptMe && pUser->GetNetConnIdx() == passUserIndex_) continue;
-
+			
 			if (sender != nullptr)
 			{
 				if (pUser != sender)
@@ -181,6 +209,12 @@ public:
 			pUser->UpdateServerPhysics(dt);
 		}
 
+		for (auto pNpc : mNpcList)
+		{
+			if (pNpc == nullptr) continue;
+			pNpc->UpdateServerPhysics(dt);
+		}
+
 		// AOI 관리
 		for (auto pViewer : mUserList) // pViewer: 나
 		{
@@ -200,7 +234,7 @@ public:
 				// 안 보이다가 -> 6.0m 안으로 들어옴 (Enter)
 				if (!wasVisible)
 				{
-					if (CanSee(pViewer, pTarget))
+					if (dist <= ENTER_RANGE && CanSee(pViewer, pTarget))
 					{
 						pViewer->mVisibleList.insert(pTarget->GetNetConnIdx());
 
@@ -242,7 +276,35 @@ public:
 			syncPkt.isMoving = pUser->GetIsMoving();
 			syncPkt.currentSpeed = pUser->GetCurrentSpeed();
 
-			SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, pUser->GetNetConnIdx(), false);
+			//SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, pUser->GetNetConnIdx(), false);
+			for (auto pTarget : mUserList) 
+			{
+				if (pTarget) 
+				{
+					SendPacketFunc((UINT32)pTarget->GetNetConnIdx(), syncPkt.PacketLength, (char*)&syncPkt);
+				}
+			}
+		}
+
+		for (auto pNpc : mNpcList)
+		{
+			if (pNpc == nullptr || !pNpc->GetIsMoving()) continue;
+
+			UPDATE_PLAYER_MOVEMENT_PACKET syncPkt;
+			syncPkt.lastInputSeq = pNpc->GetLastInputSeq();
+			syncPkt.userUUID = pNpc->GetNetConnIdx();
+			syncPkt.currentPos = pNpc->GetPosition();
+			syncPkt.isMoving = pNpc->GetIsMoving();
+			syncPkt.currentSpeed = pNpc->GetCurrentSpeed();
+
+			//SendToAllUser(syncPkt.PacketLength, (char*)&syncPkt, pNpc->GetNetConnIdx(), false);
+			for (auto pTarget : mUserList)
+			{
+				if (pTarget)
+				{
+					SendPacketFunc((UINT32)pTarget->GetNetConnIdx(), syncPkt.PacketLength, (char*)&syncPkt);
+				}
+			}
 		}
 	}
 
@@ -252,9 +314,6 @@ private:
 		if (viewer == target) return true; // 자기 자신은 항상 보임
 
 		float dist = Vector3_Distance2D(viewer->GetPosition(), target->GetPosition());
-
-		// 6.0m 이내면 진입(Enter) 가능
-		if (dist > ENTER_RANGE) return false;
 
 		bool isTargetInBush = NavMeshManager::GetInstance()->IsInBush(target->GetPosition());
 

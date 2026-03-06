@@ -13,8 +13,14 @@ Licensees holding valid licenses to the AUDIOKINETIC Wwise Technology may use
 this file in accordance with the end user license agreement provided with the
 software or, alternatively, in accordance with the terms contained
 in a written agreement between you and Audiokinetic Inc.
-Copyright (c) 2025 Audiokinetic Inc.
+Copyright (c) 2026 Audiokinetic Inc.
 *******************************************************************************/
+
+#if UNITY_6000_2_OR_NEWER
+using WwiseTreeViewState = UnityEditor.IMGUI.Controls.TreeViewState<int>;
+#else
+using WwiseTreeViewState = UnityEditor.IMGUI.Controls.TreeViewState;
+#endif
 
 public class AkWwiseComponentPicker : UnityEditor.EditorWindow
 {
@@ -191,7 +197,7 @@ public class AkWwiseComponentPicker : UnityEditor.EditorWindow
 			s_componentPicker.m_PickedSourceEditorWindow = pickedSourceEditorWindow;
 			s_componentPicker.m_ObjectSelectorId = pickedSourceControlId;
 
-			UnityEditor.IMGUI.Controls.TreeViewState treeViewState = new UnityEditor.IMGUI.Controls.TreeViewState();
+			WwiseTreeViewState treeViewState = new WwiseTreeViewState();
 			s_componentPicker.m_treeView = new AkWwiseTreeView(treeViewState, AkWwiseProjectInfo.GetCurrentTreeData(), objectType);
 			s_componentPicker.m_treeView.DragDropEnabled = false;
 			s_componentPicker.m_treeView.SetDoubleClickFunction(s_componentPicker.SetGuid);
