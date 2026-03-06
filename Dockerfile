@@ -1,12 +1,14 @@
-# 런타임이 포함된 서버 코어 이미지로 변경
+# nanoserver 대신 C++ 런타임이 포함된 servercore 사용
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
 WORKDIR /app
 
-# 빌드 결과물 복사
-COPY build/Release/ .
+# 빌드 결과물, Sentry DLL, 그리고 맵 데이터 복사
+COPY build/Release/FinalProjectServer.exe .
+COPY build/Release/sentry.dll .
+COPY build/Release/crashpad_handler.exe .
+COPY build/Release/all_tiles_tilecache.bin .
 
-# Sentry용 폴더 생성
 RUN mkdir .sentry-native
 
 EXPOSE 5025/udp
