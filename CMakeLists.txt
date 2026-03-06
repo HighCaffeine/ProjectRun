@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 2. 경로 설정
 set(SENTRY_DIR "${CMAKE_SOURCE_DIR}/thirdparty/sentry-native")
 set(TP_DIR "${CMAKE_SOURCE_DIR}/thirdparty")
+set(HIREDIS_DIR "${TP_DIR}/hiredis")
 
 # 3. 모든 소스 파일 수집 (서버 + 내비게이션 소스코드)
 # 서버 소스
@@ -48,10 +49,15 @@ target_include_directories(FinalProjectServer PRIVATE
     "${TP_DIR}/recastnavigation/DetourTileCache/Include"
     "${TP_DIR}/recastnavigation/DetourTileCache/Source"
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz"
+    "${HIREDIS_DIR}"
 )
 
 # 6. Sentry 라이브러리 연결 (Sentry는 이미 빌드된 .lib 사용)
-target_link_libraries(FinalProjectServer PRIVATE "${SENTRY_DIR}/sentry.lib")
+target_link_libraries(FinalProjectServer PRIVATE 
+    "${SENTRY_DIR}/sentry.lib"
+    "${HIREDIS_DIR}/VS-IDE/Release/hiredis.lib" # hiredis 라이브러리 파일 경로
+    "Winmm.lib" # Redis나 서버에서 시간 관련 함수를 쓴다면 필요할 수 있음
+)
 
 # 7. 전처리기 설정 (경고 및 에러 방지)
 target_compile_definitions(FinalProjectServer PRIVATE 
