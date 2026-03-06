@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 
-# 1. 프로젝트 설정
+# 프로젝트 설정
 project(CK_ProjectRun_Server LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 2. 모든 경로 변수 설정 (따옴표와 경로 정확히 수정)
+# 모든 경로 변수 설정
 set(TP_DIR "${CMAKE_SOURCE_DIR}/thirdparty")
 set(SENTRY_DIR "${TP_DIR}/sentry-native")
 set(HIREDIS_DIR "${TP_DIR}/hiredis")
-set(SPDLOG_DIR "${TP_DIR}/spdlog-1.x/include") # 닫는 따옴표 수정 완료
+set(SPDLOG_DIR "${TP_DIR}/spdlog-1.x/include")
 
-# 3. 모든 소스 파일 수집 (서버 + 내비게이션 소스코드)
+# 모든 소스 파일 (서버 + 내비게이션 소스코드)
 # 서버 소스
 file(GLOB_RECURSE SERVER_SOURCES "Server/*.cpp" "Server/*.h")
 
@@ -28,13 +28,13 @@ file(GLOB_RECURSE TILECACHE_SOURCES
     "${TP_DIR}/recastnavigation/DetourTileCache/*.h"
 )
 
-# FastLZ 소스 (.c 파일 포함)
+# FastLZ 소스
 file(GLOB_RECURSE FASTLZ_SOURCES 
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz/*.c" 
     "${TP_DIR}/recastnavigation/RecastDemo/Contrib/fastlz/*.h"
 )
 
-# 4. 실행 파일 생성 (모든 소스 통합)
+# 실행 파일 생성
 add_executable(FinalProjectServer 
     ${SERVER_SOURCES} 
     ${DETOUR_SOURCES} 
@@ -42,7 +42,7 @@ add_executable(FinalProjectServer
     ${FASTLZ_SOURCES}
 )
 
-# 5. 헤더 파일 경로 설정 (컴파일러 Include 경로)
+# 헤더 파일 경로 설정
 target_include_directories(FinalProjectServer PRIVATE 
     "Server"
     "${SENTRY_DIR}"
@@ -54,7 +54,7 @@ target_include_directories(FinalProjectServer PRIVATE
     "${SPDLOG_DIR}"
 )
 
-# 6. 컴파일러 설정 및 전처리기 정의
+# 컴파일러 설정 및 전처리기 정의
 if(MSVC)
     # 한글(UTF-8) 인코딩 강제 설정 및 경고 무시
     target_compile_options(FinalProjectServer PRIVATE "/utf-8")
@@ -64,14 +64,14 @@ if(MSVC)
     )
 endif()
 
-# 7. 라이브러리 연결 (이미 빌드된 .lib 사용)
+# 라이브러리 연결
 target_link_libraries(FinalProjectServer PRIVATE 
     "${SENTRY_DIR}/sentry.lib"
-    "${HIREDIS_DIR}/VS-IDE/Release/hiredis.lib" # 요청하신 상세 경로 반영
+    "${HIREDIS_DIR}/VS-IDE/Release/hiredis.lib"
     "Winmm.lib" # 시간 및 멀티미디어 함수용
 )
 
-# 8. 빌드 후 종속성 파일 자동 복사 (Windows 전용)
+# 빌드 후 종속성 파일 자동 복사 (Windows 전용)
 if(WIN32)
     add_custom_command(TARGET FinalProjectServer POST_BUILD
         # sentry.dll 복사
@@ -79,7 +79,7 @@ if(WIN32)
             "${SENTRY_DIR}/sentry.dll"
             "$<TARGET_FILE_DIR:FinalProjectServer>"
         
-        # crashpad_handler.exe 복사 (Sentry 작동 필수)
+        # crashpad_handler.exe 복사
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${SENTRY_DIR}/crashpad_handler.exe"
             "$<TARGET_FILE_DIR:FinalProjectServer>"
