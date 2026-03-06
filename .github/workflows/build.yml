@@ -2,33 +2,30 @@ name: Server CI/CD Build
 
 on:
   push:
-    branches: [ "main", "develop" ] # 메인이나 개발 브랜치에 푸시할 때 실행
+    branches: [ "main", "develop", "feature/Server" ] # 모든 작업 브랜치 포함
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build-windows:
-    runs-on: windows-latest  # 윈도우 가상 환경에서 실행 (C++ 서버 빌드용)
+    runs-on: windows-latest
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
-        submodules: recursive # 센트리용 Crashpad 소스까지 다 가져옴
-
-    - name: Set up CMake
-      uses: jwlawrence/cmake-action@v1.4.1 # CMake 설치
+        submodules: recursive # Sentry
 
     - name: Configure CMake
-      # 빌드 폴더를 만들고 설정
-      run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -A x64
+      # -S Server: CMakeLists.txt 파일이 Server 폴더 안에 있음을 명시
+      run: cmake -B build -S Server -DCMAKE_BUILD_TYPE=Release -A x64
 
     - name: Build Server
-      # 실제 빌드
+      # 생성된 build 폴더를 기준으로 빌드
       run: cmake --build build --config Release
 
     - name: Upload Build Artifacts
-      # 빌드 결과물(.exe, .dll)을 깃허브 서버에 저장
+      # 빌드 결과물(.exe, .dll) 저장
       uses: actions/upload-artifact@v4
       with:
         name: Final-Server-Build
@@ -36,3 +33,4 @@ jobs:
           build/Release/*.exe
           build/Release/*.dll
           build/Release/*.pdb
+          build/Release/crashpad_handler.exe
