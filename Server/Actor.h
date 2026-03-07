@@ -32,13 +32,22 @@ public:
 	void Init(const INT32 index)
 	{
 		mIndex = index;
-		position.x = -25.0f;
-		position.y = 15.5f;
-		position.z = -6.0f;
+		position.x = 0.0f;
+		position.y = -2.0f;
+		position.z = 0.0f;
 
-		serverPos.x = -25.0f;
-		serverPos.y = 15.5f;
-		serverPos.z = -6.0f;
+		serverPos.x = 0.0f;
+		serverPos.y = -2.0f;
+		serverPos.z = 0.0f;
+
+		targetPos = serverPos;
+		inputX = 0.0f;
+		inputZ = 0.0f;
+		isMoving = false;
+
+		mForceDuration = 0.0f;
+		mForceVelocity = { 0.0f, 0.0f, 0.0f };
+		mSpeedModifiers.clear();
 	}
 
 	void Clear()

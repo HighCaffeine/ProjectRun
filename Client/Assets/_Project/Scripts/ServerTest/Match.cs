@@ -84,6 +84,24 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 }
                 Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
                 break;
+            // case E_PACKET.ROOM_USER_INFO_NTF:
+            //     P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
+            //     Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName);
+            //     Debug.Log($"[Packet Raw] Server Sent X: {roomUserInfoNotify.position.x}");
+            //     if (newPlayer != null)
+            //     {
+            //         Vector3 spawnPos = roomUserInfoNotify.position.ToVector3();
+            //         CharacterController cc = newPlayer.GetComponent<CharacterController>();
+
+            //         if (cc != null) cc.enabled = false;
+
+            //         newPlayer.transform.position = spawnPos;
+            //         newPlayer.serverPos = spawnPos;
+            //         newPlayer.transform.rotation = roomUserInfoNotify.rotation.ToQuaternion();
+
+            //         if (cc != null) cc.enabled = true;
+            //     }
+            //     break;
 
             case E_PACKET.ROOM_LEAVE_USER_NTF:
                 P_RoomLeaveUserNotify roomLeaveUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
@@ -236,12 +254,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         GameObject playerObj;
         if (playerPrefab != null)
         {
-            playerObj = Instantiate(playerPrefab, new Vector3(5.0f, 2.0f, 5.0f), Quaternion.identity);
+            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
         }
         else
         {
             playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            playerObj.transform.position = new Vector3(5.0f, 2.0f, 5.0f);
+            playerObj.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
         }
 
         playerObj.name = playerName;
