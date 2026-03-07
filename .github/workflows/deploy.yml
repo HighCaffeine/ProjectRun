@@ -1,4 +1,4 @@
-name: Server CI/CD & Docker Push
+name: Server CI/CD
 
 on:
   push:
@@ -32,3 +32,25 @@ jobs:
         $imageName = "${{ secrets.DOCKER_USERNAME }}/project-run-server:latest"
         docker build -t $imageName .
         docker push $imageName
+
+    # 슬랙 알림 보내기 
+    - name: Send Slack Notification
+      if: success()
+      run: |
+        $body = @{ text = "*[빌드 완료]* Docker Hub 업로드 성공" } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "https://hooks.slack.com/services/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" -Method Post -Body $body -ContentType "application/json"
+      if: failure()
+      run: |
+        $body = @{ text = "*[빌드 실패]* Docker Hub 업로드 실패" } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "https://hooks.slack.com/services/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" -Method Post -Body $body -ContentType "application/json"
+
+    # 디스코드 알림 보내기
+    - name: Send Discord Notification
+      if: success()
+      run: |
+        $body = @{ content = "*[빌드 완료]* Docker Hub 업로드 성공" } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "https://discord.com/api/webhooks/1479537435149865091/SqBKLD1QumoKBD8Sc12Fll6z8iTSHt_0abalKzD2Vnb_xBN6RBC4C-KLtKo57qIwd1Ov" -Method Post -Body $body -ContentType "application/json"
+      if: failure()
+      run: |
+        $body = @{ text = "*[빌드 실패]* Docker Hub 업로드 실패" } | ConvertTo-Json -Compress
+        Invoke-RestMethod -Uri "https://discord.com/api/webhooks/1479537435149865091/SqBKLD1QumoKBD8Sc12Fll6z8iTSHt_0abalKzD2Vnb_xBN6RBC4C-KLtKo57qIwd1Ov" -Method Post -Body $body -ContentType "application/json"
