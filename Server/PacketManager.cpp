@@ -1128,7 +1128,11 @@ void PacketManager::LogicThread()
 		}
 
 		// CPU 과점유 방지
-		std::this_thread::sleep_for(std::chrono::microseconds(100));
+		now = std::chrono::steady_clock::now();
+		if (now < nextTick)
+		{
+			std::this_thread::sleep_for(nextTick - now);
+		}
 	}
 }
 

@@ -60,11 +60,13 @@ public unsafe class NetworkClient
         socket.Connect(endPoint);
         if (socketProtocol == ProtocolType.Tcp)
         {
-            new Thread(ReadTcpDataThread).Start();
+            Thread t = new Thread(ReadTcpDataThread);
+            t.IsBackground = true; t.Start();
         }
         else if (socketProtocol == ProtocolType.Udp)
         {
-            new Thread(ReadUdpDataThread).Start();
+            Thread t = new Thread(ReadUdpDataThread);
+            t.IsBackground = true; t.Start();
         }
     }
 

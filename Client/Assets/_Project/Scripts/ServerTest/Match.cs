@@ -12,6 +12,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     [Header("Player Settings")]
     public GameObject playerPrefab;
+    public Camera mainCamera;
+    public Transform cameraPivot;
 
     void Awake()
     {
@@ -32,21 +34,21 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, request);
     }
 
-    private void OnGUI()
-    {
-        foreach (Player player in Players.Values)
-        {
-            if (player.ID != LocalPlayerInfo.ID)
-            {
-                Vector3 scpos = GameObject.Find("Player Camera").GetComponent<Camera>().WorldToScreenPoint(player.transform.position);
-                if (scpos.z > 0)
-                {
-                    GUI.contentColor = Color.cyan;
-                    GUI.Label(new Rect(scpos.x, Screen.height - scpos.y, 100, 25), player.Name);
-                }
-            }
-        }
-    }
+    // private void OnGUI()
+    // {
+    //     foreach (Player player in Players.Values)
+    //     {
+    //         if (player.ID != LocalPlayerInfo.ID)
+    //         {
+    //             Vector3 scpos = GameObject.Find("Player Camera").GetComponent<Camera>().WorldToScreenPoint(player.transform.position);
+    //             if (scpos.z > 0)
+    //             {
+    //                 GUI.contentColor = Color.cyan;
+    //                 GUI.Label(new Rect(scpos.x, Screen.height - scpos.y, 100, 25), player.Name);
+    //             }
+    //         }
+    //     }
+    // }
 
     void OnDestroy()
     {
@@ -80,7 +82,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     newPlayer.transform.position = roomUserInfoNotify.position.ToVector3();
                     newPlayer.transform.rotation = roomUserInfoNotify.rotation.ToQuaternion();
 
-                    newPlayer.serverPos = roomUserInfoNotify.position.ToVector3();
+                    newPlayer.SetPos(roomUserInfoNotify.position.ToVector3());
                 }
                 Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
                 break;
@@ -129,7 +131,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
                 {
                     // 속도 및 상태 플래그 갱신
-                    targetPlayer.currentSpeed = statusPkt.moveSpeed;
+                    targetPlayer.SetSpeed(statusPkt.moveSpeed);
                     // UI나 이펙트 처리 로직 추가
                 }
                 break;
@@ -254,26 +256,26 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         GameObject playerObj;
         if (playerPrefab != null)
         {
-            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, 0.0f, 0.0f), Quaternion.identity);
+            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.identity);
         }
         else
         {
             playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            playerObj.transform.position = new Vector3(0.0f, 0.0f, 0.0f);
+            playerObj.transform.position = new Vector3(0.0f, -1.0f, 0.0f);
         }
 
         playerObj.name = playerName;
 
-        if (local)
-        {
-            GameObject cameraObject = new GameObject("Main Camera");
-            Camera playerCamera = cameraObject.AddComponent<Camera>();
-            cameraObject.tag = "MainCamera";
-            CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
-            camFollow.target = playerObj.transform;
-            cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
-            cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
-        }
+        // if (local)
+        // {
+        //     //GameObject cameraObject = new GameObject("Main Camera");
+        //     //Camera playerCamera = cameraObject.AddComponent<Camera>();
+        //     //cameraObject.tag = "MainCamera";
+        //     //CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
+        //     //camFollow.target = playerObj.transform;
+        //     //cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
+        //     //cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
+        // }
 
         PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
         if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
@@ -289,6 +291,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             cc.stepOffset = 0.5f;
             cc.slopeLimit = 60f;
             playerMovement.Controller = cc;
+
+            playerMovement.playerPivot = playerObj.transform.GetChild(0);
+
+            //카메라 세팅
+            cameraPivot.SetParent(playerObj.transform);
+            cameraPivot.localPosition = Vector3.zero;
 
             // 충돌 꼬임 방지를 위해 콜라이더 제거
             Collider[] cols = playerObj.GetComponents<Collider>();
@@ -317,11 +325,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
         Player player = playerObj.GetComponent<Player>();
         if (player == null) player = playerObj.AddComponent<Player>();
-        player.ID = id;
-        player.Name = playerName;
-        player.Movement = playerMovement;
-        player.serverPos = playerObj.transform.position;
-        player.IsLocal = local;
+        player.Init(playerMovement, playerName, id, local, playerObj.transform.position);
         Players.Add(id, player);
 
         return player;

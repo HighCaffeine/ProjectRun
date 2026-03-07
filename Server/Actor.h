@@ -33,11 +33,11 @@ public:
 	{
 		mIndex = index;
 		position.x = 0.0f;
-		position.y = -2.0f;
+		position.y = -1.0f;
 		position.z = 0.0f;
 
 		serverPos.x = 0.0f;
-		serverPos.y = -2.0f;
+		serverPos.y = -1.0f;
 		serverPos.z = 0.0f;
 
 		targetPos = serverPos;
@@ -262,7 +262,7 @@ public:
 
 		bool hasInputMove = false;
 
-		// 1. 키보드/마우스 입력 이동
+		// 키보드/마우스 입력 이동
 		if (isMoveMouse)
 		{
 			Vector3 dir = { targetPos.x - nextPos.x, 0, targetPos.z - nextPos.z };
@@ -291,7 +291,7 @@ public:
 			}
 		}
 
-		// 2. 외부 물리력 (밀치기/당기기) 강제 이동
+		// 외부 물리력 (밀치기/당기기) 강제 이동
 		bool hasForceMove = false;
 		if (mForceDuration > 0.0f)
 		{

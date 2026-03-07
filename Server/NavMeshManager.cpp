@@ -127,8 +127,8 @@ bool NavMeshManager::GetValidMovePosition(const Vector3& startPos, const Vector3
 {
     if (!m_NavQuery) return false;
 
-    float start[3] = { startPos.x, startPos.y, startPos.z };
-    float target[3] = { targetPos.x, targetPos.y, targetPos.z };
+    float start[3] = { -startPos.x, startPos.y, startPos.z };
+    float target[3] = { -targetPos.x, targetPos.y, targetPos.z };
     float result[3];
 
     dtPolyRef startRef;
@@ -156,7 +156,7 @@ bool NavMeshManager::GetValidMovePosition(const Vector3& startPos, const Vector3
     }
 
 
-    realPos = { result[0], result[1], result[2] };
+    realPos = { -result[0], result[1], result[2] };
 
     return true;
 }

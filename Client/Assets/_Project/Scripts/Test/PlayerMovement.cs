@@ -9,6 +9,11 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5.0f;
     private bool wasMoving = false;
 
+    public Transform playerPivot;
+
+    private float sendTimer = 0f;
+    private float sendInterval = 0.02f; // 초당 20회 전송 (서버 50Hz 처리에 최적화)
+
     void Start()
     {
         if (IsLocal)
@@ -17,31 +22,40 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!IsLocal) return;
 
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-        Vector3 dir = (Vector3.forward * v + Vector3.right * h).normalized;
+
+        Vector3 isometricForward = new Vector3(1f, 0f, 1f).normalized;
+        Vector3 isometricRight = new Vector3(1f, 0f, -1f).normalized;
+        Vector3 dir = (isometricForward * v + isometricRight * h).normalized;
+
         if (Controller != null)
         {
-            Controller.Move(dir * moveSpeed * Time.fixedDeltaTime);
+            Controller.Move(dir * moveSpeed * Time.deltaTime);
         }
+
         bool isMoving = (h != 0 || v != 0);
 
-        // 움직이는 중이면 계속 전송
+        sendTimer += Time.deltaTime;
+
         if (isMoving)
         {
-            inputSeq++;
-            SendMovePacket(-h, v);
+            if (sendTimer >= sendInterval)
+            {
+                inputSeq++;
+                SendMovePacket(dir.x, dir.z);
+                sendTimer = 0f;
+            }
         }
         else if (wasMoving)
         {
             inputSeq++;
             SendMovePacket(0, 0);
-            SendMovePacket(0, 0);
-            SendMovePacket(0, 0);
+            sendTimer = 0f;
         }
 
         wasMoving = isMoving;
