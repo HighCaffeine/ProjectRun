@@ -32,13 +32,13 @@ public:
 	void Init(const INT32 index)
 	{
 		mIndex = index;
-		position.x = 5.0f;
-		position.y = 1.0f;
-		position.z = 5.0f;
+		position.x = -25.0f;
+		position.y = 15.0f;
+		position.z = -6.0f;
 
-		serverPos.x = 5.0f;
-		serverPos.y = 1.0f;
-		serverPos.z = 5.0f;
+		serverPos.x = -25.0f;
+		serverPos.y = 15.0f;
+		serverPos.z = -6.0f;
 	}
 
 	void Clear()
