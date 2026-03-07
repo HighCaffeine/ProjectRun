@@ -33,11 +33,11 @@ public:
 	{
 		mIndex = index;
 		position.x = -25.0f;
-		position.y = 15.0f;
+		position.y = 15.5f;
 		position.z = -6.0f;
 
 		serverPos.x = -25.0f;
-		serverPos.y = 15.0f;
+		serverPos.y = 15.5f;
 		serverPos.z = -6.0f;
 	}
 
