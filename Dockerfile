@@ -1,5 +1,5 @@
-# nanoserver 대신 C++ 런타임이 포함된 servercore 사용
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+#FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
 
 WORKDIR /app
 
