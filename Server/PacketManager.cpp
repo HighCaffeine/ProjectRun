@@ -8,7 +8,6 @@
 #include "PacketManager.h"
 #include "RedisManager.h"
 #include "LogManager.h"
-#include "ServerInfo.h"
 
 #include <strsafe.h>
 
@@ -66,7 +65,7 @@ void PacketManager::CreateCompent(const UINT32 maxClient_)
 
 bool PacketManager::Run()
 {	
-	if (mRedisMgr->Run(SERVER_IP, 6379, 1) == false)
+	if (mRedisMgr->Run("40.82.137.214", 6379, 1) == false)
 	{
 		return false;
 	}

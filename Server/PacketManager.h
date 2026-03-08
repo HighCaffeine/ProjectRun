@@ -23,7 +23,7 @@ class RedisManager;
 
 Vector3 stringToVector3(const std::string& s);
 
-const std::string SERVER_IP("40.82.137.214");
+
 
 class PacketManager {
 public:
