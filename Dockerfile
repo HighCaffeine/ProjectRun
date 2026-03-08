@@ -9,8 +9,8 @@ COPY build/Release/sentry.dll .
 COPY build/Release/crashpad_handler.exe .
 COPY Shared/MapData/all_tiles_tilecache.bin .
 
-COPY build/Release/vcruntime140.dll .
-COPY build/Release/msvcp140.dll .
+COPY Server/x64/Release/vcruntime140.dll .
+COPY Server/x64/Release/msvcp140.dll .
 
 RUN mkdir .sentry-native
 
