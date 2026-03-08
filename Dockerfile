@@ -9,6 +9,7 @@ COPY build/Release/sentry.dll .
 COPY build/Release/crashpad_handler.exe .
 COPY Shared/MapData/all_tiles_tilecache.bin .
 
+COPY Server/x64/Release/vcruntime140_1.dll .
 COPY Server/x64/Release/vcruntime140.dll .
 COPY Server/x64/Release/msvcp140.dll .
 
