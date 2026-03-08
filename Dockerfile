@@ -1,5 +1,5 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
-#FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
+#FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
 
 WORKDIR /app
 
@@ -8,6 +8,9 @@ COPY build/Release/FinalProjectServer.exe .
 COPY build/Release/sentry.dll .
 COPY build/Release/crashpad_handler.exe .
 COPY Shared/MapData/all_tiles_tilecache.bin .
+
+COPY build/Release/vcruntime140.dll .
+COPY build/Release/msvcp140.dll .
 
 RUN mkdir .sentry-native
 
