@@ -2,7 +2,7 @@ name: Server CI/CD & Docker Push
 
 on:
   push:
-    #branches: [ "devmain/dev-server" ]
+    branches: [ "dev_main/dev-server" ] #devmain
 
 jobs:
   build-and-push:
