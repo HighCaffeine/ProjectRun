@@ -32,6 +32,8 @@ public enum E_PACKET
     MOVE_PATH_RESPONSE = 242,
     MOVE_PATH_NOTIFY = 243,
 
+    PLAYER_ACTION_REQUEST = 251,
+
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
     SHOP_INFO = 302,            // 상점 정보 - 현재 판매 아이템, 다음 갱신 시간
@@ -236,6 +238,17 @@ public struct P_PlayerStatusNtf
     public uint statusFlags;   // 상태 플래그 (0:정상, 1:슬로우, 2:스턴 등)
 }
 #endregion
+#endregion
+
+#region Physics Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct p_PlayerActionRequest
+{
+    [MarshalAs(UnmanagedType.I1)]
+    public byte actionType;
+    [MarshalAs(UnmanagedType.I4)]
+    public int targetUUID;
+}
 #endregion
 
 #region Chat Packet

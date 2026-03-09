@@ -27,6 +27,7 @@ void PacketManager::Init(const UINT32 maxClient_)
 	mRecvFuntionDictionary[(int)PACKET_ID::ROOM_LEAVE_REQUEST] = &PacketManager::ProcessLeaveRoom;
 	mRecvFuntionDictionary[(int)PACKET_ID::ROOM_CHAT_REQUEST] = &PacketManager::ProcessRoomChatMessage;
 	mRecvFuntionDictionary[(int)PACKET_ID::PLAYER_MOVEMENT] = &PacketManager::ProcessPlayerMovement;
+	mRecvFuntionDictionary[(int)PACKET_ID::PLAYER_ACTION_REQUEST] = &PacketManager::ProcessPlayerAction;
 	
 	//레디스 응답 패킷
 	mRecvFuntionDictionary[(int)RedisTaskID::RESPONSE_LOAD_INVENTORY] = &PacketManager::ProcessInventoryDBResult;
@@ -555,6 +556,66 @@ void PacketManager::ProcessPlayerMovement(UINT32 clientIndex_, UINT16 packetSize
 	}
 }
 
+void PacketManager::ProcessPlayerAction(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_)
+{
+	auto pReq = (PLAYER_ACTION_REQUEST_PACKET*)pPacket_;
+	auto reqUser = mUserManager->GetUserByConnIdx(clientIndex_);
+	if (!reqUser) return;
+
+	auto pRoom = mRoomManager->GetRoomByNumber(reqUser->GetCurrentRoom());
+	if (!pRoom) return;
+
+	Actor* target = pRoom->GetActorByUUID(pReq->targetUUID);
+	if (target)
+	{
+		bool isPush = (pReq->actionType == ACTION_TYPE::PUSH);
+
+		Vector3 myPos = reqUser->GetPosition();
+		Vector3 targetPos = target->GetPosition();
+
+		// 타겟 위치에서 내 위치를 바라보는 방향 벡터
+		Vector3 toMe = { myPos.x - targetPos.x, 0.0f, myPos.z - targetPos.z };
+		float dist = sqrt(toMe.x * toMe.x + toMe.z * toMe.z);
+		if (dist > 0) { toMe.x /= dist; toMe.z /= dist; }
+
+		// 타겟의 정면 벡터
+		Vector3 tForward = Quaternion_Multiply(target->GetRotation(), Vector3_forward());
+
+		// 내적 값이 0 이하면, 내가 타겟의 시야 반대편에 있음
+		float dot = (tForward.x * toMe.x) + (tForward.z * toMe.z);
+
+		if (dot <= 1.1f)
+		{
+			printf("[Skill] 뒤통수 판정 성공 \n");
+			Vector3 dir = { targetPos.x - myPos.x, 0.0f, targetPos.z - myPos.z };
+			float dist = sqrt(dir.x * dir.x + dir.z * dir.z);
+
+			if (dist > 0.0f) { dir.x /= dist; dir.z /= dist; }
+
+			if (isPush)
+			{
+				// N극-N극 밀어내기 (30의 힘으로 넉백)
+				target->ApplyForce(dir, 30.0f, 0.5f);
+				printf("[Physics] User %d Push User %d\n", clientIndex_, pReq->targetUUID);
+			}
+			else
+			{
+				// N극-S극 당겨오기 (딱 내 앞까지만 오도록 거리 계산)
+				Vector3 pullDir = { -dir.x, 1.0f, -dir.z };
+
+				// 내 위치 기준 1.5m 앞까지만 당김 (나랑 완벽히 겹치는 것 방지)
+				float pullDist = (dist > 1.5f) ? (dist - 1.5f) : 0.0f;
+
+				// 0.5초 동안 당김 속도 = 거리 / 시간
+				float pullSpeed = pullDist / 0.5f;
+
+				target->ApplyForce(pullDir, pullSpeed, 0.5f);
+
+				printf("[Physics] User %d Pull User %d\n", clientIndex_, pReq->targetUUID);
+			}
+		}
+	}
+}
 
 void PacketManager::ProcessRoomChatMessage(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_)
 {
@@ -603,68 +664,6 @@ void PacketManager::ProcessRoomChatMessage(UINT32 clientIndex_, UINT16 packetSiz
 		pRoom->EnterCube(cx, cz);
 		return;
 	}
-
-	// 자력(밀치기/당기기) 명령어
-	if (cmdMessage.find("/push") == 0 || cmdMessage.find("/pull") == 0)
-	{
-		bool isPush = (cmdMessage.find("/push") == 0);
-		int targetId = 0;
-
-		if (isPush) sscanf_s(cmdMessage.c_str(), "/push %d", &targetId);
-		else        sscanf_s(cmdMessage.c_str(), "/pull %d", &targetId);
-
-		Actor* target = pRoom->GetActorByUUID(targetId);
-		if (target)
-		{
-			Vector3 myPos = reqUser->GetPosition();
-			Vector3 targetPos = target->GetPosition();
-
-			// 타겟 위치에서 내 위치를 바라보는 방향 벡터
-			Vector3 toMe = { myPos.x - targetPos.x, 0.0f, myPos.z - targetPos.z };
-			float dist = sqrt(toMe.x * toMe.x + toMe.z * toMe.z);
-			if (dist > 0) { toMe.x /= dist; toMe.z /= dist; }
-
-			// 타겟의 정면 벡터
-			Vector3 tForward = Quaternion_Multiply(target->GetRotation(), Vector3_forward());
-
-			// 내적 값이 0 이하면, 내가 타겟의 시야 반대편에 있음
-			float dot = (tForward.x * toMe.x) + (tForward.z * toMe.z);
-
-			if (dot <= 1.1f)
-			{
-				printf("[Skill] 뒤통수 판정 성공 \n");
-				Vector3 dir = { targetPos.x - myPos.x, 0.0f, targetPos.z - myPos.z };
-				float dist = sqrt(dir.x * dir.x + dir.z * dir.z);
-
-				if (dist > 0.0f) { dir.x /= dist; dir.z /= dist; }
-
-				if (isPush)
-				{
-					// N극-N극 밀어내기 (30의 힘으로 넉백)
-					target->ApplyForce(dir, 30.0f, 0.5f);
-				}
-				else
-				{
-					// N극-S극 당겨오기 (딱 내 앞까지만 오도록 거리 계산)
-					Vector3 pullDir = { -dir.x, 1.0f, -dir.z };
-
-					// 내 위치 기준 1.5m 앞까지만 당김 (나랑 완벽히 겹치는 것 방지)
-					float pullDist = (dist > 1.5f) ? (dist - 1.5f) : 0.0f;
-
-					// 0.5초 동안 당김 속도 = 거리 / 시간
-					float pullSpeed = pullDist / 0.5f;
-
-					target->ApplyForce(pullDir, pullSpeed, 0.5f);
-				}
-			}
-			else
-			{
-				printf("[Skill] 실패: 타겟과 마주보고 있음\n");
-			}
-		}
-		return;
-	}
-
 	
 	//shop 업데이트
 	if (cmdMessage.find("/shop_reset", 0) == 0)
