@@ -64,10 +64,33 @@ void PacketManager::CreateCompent(const UINT32 maxClient_)
 }
 
 bool PacketManager::Run()
-{	
-	if (mRedisMgr->Run("40.82.137.214", 6379, 1) == false)
+{
+	/*const char* redisIp = std::getenv("REDIS_IP");
+	if (mRedisMgr->Run(redisIp ? redisIp : "host.docker.internal", 6379, 1) == false)
 	{
 		return false;
+	}*/
+
+	int retryCount = 0;
+	const char* redisIp = std::getenv("REDIS_IP");
+	while (true)
+	{
+		if (mRedisMgr->Run(redisIp ? redisIp : "host.docker.internal", 6379, 2))
+		{
+			printf("[SUCCESS] Redis Connected!\n");
+			break;
+		}
+
+		retryCount++;
+		printf("[RETRY %d] Redis connection failed. Retrying in 1s...\n", retryCount);
+
+		if (retryCount > 10)
+		{
+			printf("[FATAL] Redis connection failed after 10 attempts.\n");
+			return false;
+		}
+
+		Sleep(1000); // 1초 대기 후 다시 시도
 	}
 
 	if (UDPRun() == false) return false;

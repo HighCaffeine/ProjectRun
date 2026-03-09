@@ -26,7 +26,7 @@ int main()
 		/*  logger */ "custom",
 		/* message */ "It works2!"
 	));
-
+	SetConsoleOutputCP(CP_UTF8);
 	//SetConsoleOutputCP(65001);
 
 	//소켓을 초기화
