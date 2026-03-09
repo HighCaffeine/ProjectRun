@@ -584,7 +584,7 @@ void PacketManager::ProcessPlayerAction(UINT32 clientIndex_, UINT16 packetSize_,
 		// 내적 값이 0 이하면, 내가 타겟의 시야 반대편에 있음
 		float dot = (tForward.x * toMe.x) + (tForward.z * toMe.z);
 
-		if (dot <= 1.1f)
+		if (dot >= 0.5f)
 		{
 			printf("[Skill] 뒤통수 판정 성공 \n");
 			Vector3 dir = { targetPos.x - myPos.x, 0.0f, targetPos.z - myPos.z };
@@ -602,13 +602,10 @@ void PacketManager::ProcessPlayerAction(UINT32 clientIndex_, UINT16 packetSize_,
 			{
 				// N극-S극 당겨오기 (딱 내 앞까지만 오도록 거리 계산)
 				Vector3 pullDir = { -dir.x, 1.0f, -dir.z };
-
 				// 내 위치 기준 1.5m 앞까지만 당김 (나랑 완벽히 겹치는 것 방지)
 				float pullDist = (dist > 1.5f) ? (dist - 1.5f) : 0.0f;
-
 				// 0.5초 동안 당김 속도 = 거리 / 시간
 				float pullSpeed = pullDist / 0.5f;
-
 				target->ApplyForce(pullDir, pullSpeed, 0.5f);
 
 				printf("[Physics] User %d Pull User %d\n", clientIndex_, pReq->targetUUID);
