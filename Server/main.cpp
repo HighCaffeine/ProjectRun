@@ -26,7 +26,7 @@ int main()
 		/*  logger */ "custom",
 		/* message */ "It works2!"
 	));
-
+	SetConsoleOutputCP(CP_UTF8);
 	//SetConsoleOutputCP(65001);
 
 	//소켓을 초기화
@@ -42,7 +42,12 @@ int main()
 	{
 		std::string inputCmd;
 		std::getline(std::cin, inputCmd);
-
+		if (std::cin.eof() || std::cin.fail())
+		{
+			std::cin.clear();
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			continue;
+		}
 		if (inputCmd == "quit")
 		{
 			break;

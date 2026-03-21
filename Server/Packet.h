@@ -84,6 +84,9 @@ enum class  PACKET_ID : UINT16
 	MOVE_PATH_RESPONSE = 242,
 	MOVE_PATH_NOTIFY = 243,
 
+	// Physics
+	PLAYER_ACTION_REQUEST = 251,
+
 	//인벤 / 상점용
 	INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
 	SHOP_INFO = 302,            // 상점 정보 - 현재 판매 아이템, 다음 갱신 시간
@@ -323,6 +326,17 @@ struct PLAYER_STATUS_NTF_PACKET : public PACKET_HEADER
 };
 #pragma endregion
 
+#pragma region Player Physics
+enum class ACTION_TYPE : UINT8 { PUSH = 0, PULL = 1 };
+
+struct PLAYER_ACTION_REQUEST_PACKET : public PACKET_HEADER
+{
+	ACTION_TYPE actionType;
+	INT32 targetUUID;
+
+	PLAYER_ACTION_REQUEST_PACKET() : PACKET_HEADER(sizeof(*this), PACKET_ID::PLAYER_ACTION_REQUEST) {}
+};
+#pragma endregion
 
 #pragma region Shop Packet
 //SHOP_INFO

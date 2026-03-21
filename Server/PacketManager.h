@@ -23,6 +23,8 @@ class RedisManager;
 
 Vector3 stringToVector3(const std::string& s);
 
+
+
 class PacketManager {
 public:
 	PacketManager() = default;
@@ -79,6 +81,7 @@ private:
 	void ProcessEnterRoom(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_);
 	void ProcessLeaveRoom(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_);
 	void ProcessPlayerMovement(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_);
+	void ProcessPlayerAction(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_);
 	void ProcessRoomChatMessage(UINT32 clientIndex_, UINT16 packetSize_, char* pPacket_);
 
 	//인벤처리

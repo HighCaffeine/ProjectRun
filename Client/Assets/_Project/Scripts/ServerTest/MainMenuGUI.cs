@@ -6,6 +6,8 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 {
     void Awake()
     {
+        Application.targetFrameRate = 60;
+
         Client.Start();
     }
 

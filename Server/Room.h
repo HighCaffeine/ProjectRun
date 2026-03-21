@@ -45,6 +45,12 @@ public:
 
 		user_->EnterRoom(mRoomNum);
 
+		Vector3 snappedPos;
+		if (NavMeshManager::GetInstance()->GetValidMovePosition(user_->GetPosition(), user_->GetPosition(), snappedPos))
+		{
+			user_->SetPosition(snappedPos);
+		}
+
 		// [입장 처리]
 		// 기존 유저들에 대해 CanSee(6.0m) 체크 후 시야 등록
 		for (auto pRoomUser : mUserList)

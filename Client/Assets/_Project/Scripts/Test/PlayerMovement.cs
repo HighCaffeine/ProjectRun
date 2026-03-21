@@ -9,6 +9,19 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5.0f;
     private bool wasMoving = false;
 
+    public Transform playerPivot;
+
+    private float sendTimer = 0f;
+    private float sendInterval = 0.02f; // 초당 20회 전송 (서버 50Hz 처리에 최적화)
+
+
+    [Header("Action State")]
+    public bool isActionCasting = false;
+    private float castTimer = 0.0f;
+    private const float CAST_DURATION = 0.5f;
+
+    private enum ActionType : byte { PUSH = 0, PULL = 1, }
+
     void Start()
     {
         if (IsLocal)
@@ -17,31 +30,89 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!IsLocal) return;
 
+        PhysicsAction();
+        Move();
+    }
+
+    private void PhysicsAction()
+    {
+        if (isActionCasting)
+        {
+            castTimer -= Time.deltaTime;
+            if (castTimer <= 0.0f)
+            {
+                isActionCasting = false;
+            }
+
+            return;
+        }
+
+        if (Input.GetMouseButtonDown(0)) TryAction(ActionType.PUSH);
+        else if (Input.GetMouseButtonDown(1)) TryAction(ActionType.PULL);
+    }
+
+    private void TryAction(ActionType type)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            Player target = hit.collider.GetComponent<Player>();
+
+            if (target != null && target.ID != LocalPlayerInfo.ID)
+            {
+                p_PlayerActionRequest pkt = new p_PlayerActionRequest
+                {
+                    actionType = (byte)type,
+                    targetUUID = (int)target.ID
+                };
+
+                Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, pkt);
+                isActionCasting = true;
+                castTimer = CAST_DURATION;
+
+                SendMovePacket(0, 0);//밀 때 안미끄러지게 정지 패킷 전송
+                Debug.Log($"[Physics] Type : {type}, Target : {target.Name}({target.ID})");
+            }
+        }
+    }
+
+    private void Move()
+    {
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-        Vector3 dir = (Vector3.forward * v + Vector3.right * h).normalized;
+
+        Vector3 isometricForward = new Vector3(1f, 0f, 1f).normalized;
+        Vector3 isometricRight = new Vector3(1f, 0f, -1f).normalized;
+        Vector3 dir = (isometricForward * v + isometricRight * h).normalized;
+
         if (Controller != null)
         {
-            Controller.Move(dir * moveSpeed * Time.fixedDeltaTime);
+            Controller.Move(dir * moveSpeed * Time.deltaTime);
         }
+
         bool isMoving = (h != 0 || v != 0);
 
-        // 움직이는 중이면 계속 전송
+        sendTimer += Time.deltaTime;
+
         if (isMoving)
         {
-            inputSeq++;
-            SendMovePacket(-h, v);
+            if (sendTimer >= sendInterval)
+            {
+                inputSeq++;
+                SendMovePacket(dir.x, dir.z);
+                sendTimer = 0f;
+            }
         }
         else if (wasMoving)
         {
             inputSeq++;
             SendMovePacket(0, 0);
-            SendMovePacket(0, 0);
-            SendMovePacket(0, 0);
+            sendTimer = 0f;
         }
 
         wasMoving = isMoving;

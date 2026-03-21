@@ -2,7 +2,7 @@ name: Server CI/CD & Docker Push
 
 on:
   push:
-    branches: [ "dev-server" ]
+    branches: [ "dev_main/dev-server" ] #devmain
 
 jobs:
   build-and-push:
@@ -33,30 +33,28 @@ jobs:
         docker build -t $imageName .
         docker push $imageName
 
-    # 빌드 성공
-    # 슬랙 알림 보내기 
+    # 슬랙 알림 보내기 (성공)
     - name: Send Slack Notification
       if: success()
       run: |
         $body = @{ text = "*[빌드 완료]* Docker Hub 업로드 성공" } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "https://hooks.slack.com/services/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" -Method Post -Body $body -ContentType "application/json"
 
-    # 디스코드 알림 보내기
+    # 디스코드 알림 보내기 (성공)
     - name: Send Discord Notification
       if: success()
       run: |
         $body = @{ content = "*[빌드 완료]* Docker Hub 업로드 성공" } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "https://discord.com/api/webhooks/1479537435149865091/SqBKLD1QumoKBD8Sc12Fll6z8iTSHt_0abalKzD2Vnb_xBN6RBC4C-KLtKo57qIwd1Ov" -Method Post -Body $body -ContentType "application/json"
 
-    # 빌드 실패
-    # 슬랙 알림 보내기
+    # 슬랙 알림 보내기 (실패)
     - name: Send Slack Notification (Failed)
       if: failure()
       run: |
         $body = @{ text = "*[빌드 실패]* Docker Hub 업로드 실패" } | ConvertTo-Json -Compress
         Invoke-RestMethod -Uri "https://hooks.slack.com/services/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" -Method Post -Body $body -ContentType "application/json"
 
-    # 디스코드 알림 보내기
+    # 디스코드 알림 보내기 (실패)
     - name: Send Discord Notification (Failed)
       if: failure()
       run: |

@@ -127,14 +127,14 @@ bool NavMeshManager::GetValidMovePosition(const Vector3& startPos, const Vector3
 {
     if (!m_NavQuery) return false;
 
-    float start[3] = { startPos.x, startPos.y, startPos.z };
-    float target[3] = { targetPos.x, targetPos.y, targetPos.z };
+    float start[3] = { -startPos.x, startPos.y, startPos.z };
+    float target[3] = { -targetPos.x, targetPos.y, targetPos.z };
     float result[3];
 
     dtPolyRef startRef;
     float nearStart[3];
 
-    float searchExtents[3] = { 0.3f, 10.0f, 0.3f };
+    float searchExtents[3] = { 0.5f, 10.5f, 0.5f };
 
     m_NavQuery->findNearestPoly(start, searchExtents, &m_Filter, &startRef, nearStart);
 
@@ -155,10 +155,43 @@ bool NavMeshManager::GetValidMovePosition(const Vector3& startPos, const Vector3
         result[1] = nearEnd[1]; // 정확한 경사로 바닥 높이 적용
     }
 
-    realPos = { result[0], result[1], result[2] };
+
+    realPos = { -result[0], result[1], result[2] };
 
     return true;
 }
+
+//bool NavMeshManager::GetValidMovePosition(const Vector3& startPos, const Vector3& targetPos, Vector3& realPos)
+//{
+//    if (!m_NavQuery) return false;
+//
+//    // X는 그대로, Z축만 반전 (유니티 +Z <-> 서버 -Z)
+//    float start[3] = { startPos.x, startPos.y, -startPos.z };
+//    float target[3] = { targetPos.x, targetPos.y, -targetPos.z };
+//    float result[3];
+//
+//    dtPolyRef startRef;
+//    float nearStart[3];
+//    float searchExtents[3] = { 1.0f, 2.0f, 1.0f }; // 탐색 범위 넉넉히
+//
+//    m_NavQuery->findNearestPoly(start, searchExtents, &m_Filter, &startRef, nearStart);
+//    if (!startRef) return false;
+//
+//    dtPolyRef visited[16];
+//    int visitedCount = 0;
+//    m_NavQuery->moveAlongSurface(startRef, nearStart, target, &m_Filter, result, visited, &visitedCount, 16);
+//
+//    dtPolyRef endRef;
+//    float nearEnd[3];
+//    m_NavQuery->findNearestPoly(result, searchExtents, &m_Filter, &endRef, nearEnd);
+//    if (endRef) result[1] = nearEnd[1];
+//
+//    // 결과값 복원 시에도 Z만 다시 반전
+//    realPos = { result[0], result[1], -result[2] };
+//
+//    return true;
+//}
+
 
 bool NavMeshManager::IsInBush(const Vector3& pos)
 {
