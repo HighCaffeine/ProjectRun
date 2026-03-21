@@ -67,14 +67,55 @@ public class MapDataExporter : Editor
         exportData.meta = new MapMeta { map_id = 101, map_name = selectedObj.name, version = "1.0.0" };
 
         // NavMesh 데이터
-        NavMeshTriangulation navTriangulation = NavMesh.CalculateTriangulation();
         exportData.nav = new NavMeshData();
-        foreach (Vector3 v in navTriangulation.vertices)
+        if (grid.includeNavMesh)
         {
-            exportData.nav.vertices.Add(new _Vector3(v));
-        }
+            NavMeshTriangulation navTriangulation = NavMesh.CalculateTriangulation();
 
-        exportData.nav.indices = new List<int>(navTriangulation.indices);
+
+            // 모듈의 영역(Bounds) 설정 (Y축 높이는 무시하고 X, Z 넓이만 검사하기 위해 넉넉하게 잡음)
+            Bounds moduleBounds = new Bounds(grid.transform.position, grid.areaSize);
+            //moduleBounds.Expand(new Vector3(0, 1000f, 0)); // 위아래 높이는 무제한으로 판정
+
+            // 중복 정점을 방지
+            Dictionary<int, int> vertexMap = new Dictionary<int, int>();
+            List<Vector3> localVertices = new List<Vector3>();
+            List<int> localIndices = new List<int>();
+
+            // 유니티 NavMesh는 삼각형(정점 3개) 단위로 이루어져 있으므로 3개씩 건너뛰며 검사
+            for (int i = 0; i < navTriangulation.indices.Length; i += 3)
+            {
+                int i1 = navTriangulation.indices[i];
+                int i2 = navTriangulation.indices[i + 1];
+                int i3 = navTriangulation.indices[i + 2];
+
+                Vector3 v1 = navTriangulation.vertices[i1];
+                Vector3 v2 = navTriangulation.vertices[i2];
+                Vector3 v3 = navTriangulation.vertices[i3];
+
+                // 삼각형의 중심점을 구해서 그 중심이 녹색 박스 안에 있는지 검사
+                Vector3 centroid = (v1 + v2 + v3) / 3f;
+
+                if (moduleBounds.Contains(centroid))
+                {
+                    // 박스 안에 있는 삼각형이라면 새로운 로컬 정점 리스트에 추가
+                    if (!vertexMap.ContainsKey(i1)) { vertexMap[i1] = localVertices.Count; localVertices.Add(v1); }
+                    if (!vertexMap.ContainsKey(i2)) { vertexMap[i2] = localVertices.Count; localVertices.Add(v2); }
+                    if (!vertexMap.ContainsKey(i3)) { vertexMap[i3] = localVertices.Count; localVertices.Add(v3); }
+
+                    localIndices.Add(vertexMap[i1]);
+                    localIndices.Add(vertexMap[i2]);
+                    localIndices.Add(vertexMap[i3]);
+                }
+            }
+
+            // 필터링된 최종 데이터를 exportData에 넣기
+            foreach (Vector3 v in localVertices)
+            {
+                exportData.nav.vertices.Add(new _Vector3(v));
+            }
+            exportData.nav.indices = localIndices;
+        }
 
         // 기믹 데이터 추출
         int autoGimmickId = 1000;
