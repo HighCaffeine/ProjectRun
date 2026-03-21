@@ -55,6 +55,13 @@ public class AkWwiseBrowser : UnityEditor.EditorWindow
 			window = GetWindow<AkWwiseBrowser>("Wwise Browser", true,typeof(EditorWindow).Assembly.GetType("UnityEditor.ConsoleWindow"));
 		}
 
+		LoadWindowTexture(window);
+
+		window.Show();
+	}
+
+	private static void LoadWindowTexture(AkWwiseBrowser window)
+	{
 		Texture2D originalIcon = EditorGUIUtility.Load("Assets/Wwise/API/Editor/WwiseWindows/BrowserIcon.png") as Texture2D;
 
 		if (originalIcon != null)
@@ -70,10 +77,9 @@ public class AkWwiseBrowser : UnityEditor.EditorWindow
 		{
 			window.titleContent = new GUIContent("Wwise Browser");
 		}
-    
-		window.Show();
 	}
-	
+
+
 	private static Texture2D ScaleTexture(Texture2D source, int targetWidth, int targetHeight)
 	{
 		RenderTexture rt = RenderTexture.GetTemporary(targetWidth, targetHeight);
@@ -92,6 +98,12 @@ public class AkWwiseBrowser : UnityEditor.EditorWindow
 		if (m_treeViewState == null)
 		{
 			m_treeViewState = new WwiseTreeViewState();
+		}
+		
+		AkWwiseBrowser window = (AkWwiseBrowser)EditorWindow.GetWindow(typeof(AkWwiseBrowser));
+		if (window != null)
+		{
+			LoadWindowTexture(window);
 		}
 
 		var multiColumnHeaderState = AkWwiseTreeView.CreateDefaultMultiColumnHeaderState();

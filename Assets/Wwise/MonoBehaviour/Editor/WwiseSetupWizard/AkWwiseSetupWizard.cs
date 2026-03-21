@@ -805,7 +805,7 @@ public class WwiseSetupWizard
 
 		if (logWarning)
 		{
-			UnityEngine.Debug.LogWarning("Automatically added AkAudioListener to Main Camera. Go to \"Edit > Wwise Settings...\" to disable this functionality.");
+			UnityEngine.Debug.Log("Automatically added AkAudioListener to Main Camera. Go to \"Edit > Wwise Settings...\" to disable this functionality.");
 		}
 	}
 	

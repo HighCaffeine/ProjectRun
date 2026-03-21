@@ -327,8 +327,8 @@ public class WwiseEventReference : WwiseObjectReference
 			AkBankManager.UnloadBank(DisplayName);
 #endif
 			m_BankID = AkUnitySoundEngine.AK_INVALID_UNIQUE_ID;
+			WwiseEventReferencesManager.Instance.RemoveReference(this);
 		}
-		WwiseEventReferencesManager.Instance.RemoveReference(this);
 		IsAutoBankLoaded = false;
 		yield return null;
 	}

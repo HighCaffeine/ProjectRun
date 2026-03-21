@@ -1,10 +1,10 @@
 {
-    "originalSdkFolder": "E:\\Program\\Wwise Launcher\\Wwise\\Wwise2025.1.5.9095\\SDK",
+    "originalSdkFolder": "E:\\Program\\Wwise Launcher\\Wwise\\Wwise2025.1.6.9117\\SDK",
     "currentVersion": {
         "nickname": "",
-        "build": 4090,
+        "build": 4128,
         "major": 1,
-        "minor": 5,
+        "minor": 6,
         "year": 2025
     },
     "installedBundleGroups": [

@@ -312,6 +312,13 @@ public partial class AkUtilities
 					return;
 				}
 			}
+			
+			var lastWriteTime = System.IO.File.GetLastWriteTime(WwiseProjectPath);
+			if (s_ProjectBankPaths.Count > 0 && lastWriteTime <= s_LastBankPathUpdate)
+			{
+				return;
+			}
+			s_LastBankPathUpdate = lastWriteTime;
 
 			s_ProjectBankPaths.Clear();
 			var doc = new System.Xml.XmlDocument();
