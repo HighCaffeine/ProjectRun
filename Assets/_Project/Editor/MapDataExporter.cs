@@ -38,7 +38,16 @@ public class GimmickData
     public string type;
     public _Vector3 position;
     public float rotation_y;
-    public Dictionary<GimmickKey, float> properties = new Dictionary<GimmickKey, float>();
+    public Dictionary<string, float> properties = new Dictionary<string, float>();
+}
+
+[Serializable]
+public class StructureData
+{
+    public string type;
+    public _Vector3 position;
+    public _Vector3 scale;
+    public float rotation_y;
 }
 
 [Serializable]
@@ -125,23 +134,32 @@ public class MapDataExporter : Editor
             //기믹 태그들 다 가져옴
             if (child.CompareTag("Gimmick"))
             {
-                GimmickData gimmickData = new GimmickData();
-                gimmickData.position = new _Vector3(child.position);
-                gimmickData.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
+                GimmickData gd = new GimmickData();
+                gd.position = new _Vector3(child.position);
+                gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
                 GimmickInfo info = child.GetComponent<GimmickInfo>();
-
                 if (info != null)
                 {
-                    gimmickData.gimmick_id = info.gimmick_id != 0 ? info.gimmick_id : ++autoGimmickId;
-                    gimmickData.type = info.gimmick_type;
+                    gd.gimmick_id = info.gimmick_id != 0 ? info.gimmick_id : ++autoGimmickId;
+                    gd.type = info.gimmick_type;
                     foreach (var prop in info.properties)
                     {
-                        if (!gimmickData.properties.ContainsKey(prop.key)) gimmickData.properties.Add(prop.key, prop.value);
+                        string keyStr = prop.key.ToString();
+                        if (!gd.properties.ContainsKey(keyStr)) gd.properties.Add(keyStr, prop.value);
                     }
                 }
-
-                exportData.gimmicks.Add(gimmickData);
+                exportData.gimmicks.Add(gd);
+            }
+            // 일반 지형 처리
+            else if (child.CompareTag("Structure"))
+            {
+                StructureData sd = new StructureData();
+                sd.type = child.name.Replace("(Clone)", "").Trim();
+                sd.position = new _Vector3(child.position);
+                sd.scale = new _Vector3(child.localScale);
+                sd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
+                exportData.structures.Add(sd);
             }
         }
 
