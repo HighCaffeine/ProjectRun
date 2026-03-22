@@ -55,6 +55,7 @@ public class MapExportData
 {
     public MapMeta meta;
     public NavMeshData nav;
+    public List<StructureData> structures = new List<StructureData>();
     public List<GimmickData> gimmicks = new List<GimmickData>();
 }
 #endregion
@@ -81,17 +82,15 @@ public class MapDataExporter : Editor
         {
             NavMeshTriangulation navTriangulation = NavMesh.CalculateTriangulation();
 
-
-            // 모듈의 영역(Bounds) 설정 (Y축 높이는 무시하고 X, Z 넓이만 검사하기 위해 넉넉하게 잡음)
+            // 모듈의 영역
             Bounds moduleBounds = new Bounds(grid.transform.position, grid.areaSize);
-            //moduleBounds.Expand(new Vector3(0, 1000f, 0)); // 위아래 높이는 무제한으로 판정
 
             // 중복 정점을 방지
             Dictionary<int, int> vertexMap = new Dictionary<int, int>();
             List<Vector3> localVertices = new List<Vector3>();
             List<int> localIndices = new List<int>();
 
-            // 유니티 NavMesh는 삼각형(정점 3개) 단위로 이루어져 있으므로 3개씩 건너뛰며 검사
+            // 삼각형(정점 3개) 단위로 이루어져 있으므로 3개씩 건너뛰며 검사
             for (int i = 0; i < navTriangulation.indices.Length; i += 3)
             {
                 int i1 = navTriangulation.indices[i];
