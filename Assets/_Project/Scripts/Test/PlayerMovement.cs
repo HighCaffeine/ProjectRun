@@ -118,14 +118,27 @@ public class PlayerMovement : MonoBehaviour
         wasMoving = isMoving;
     }
 
-    void SendMovePacket(float h, float v)
+    //기존 axis Move 기능
+    // void SendMovePacket(float h, float v)
+    // {
+    //     P_PlayerMovement pkt = new P_PlayerMovement
+    //     {
+    //         userUUID = LocalPlayerInfo.ID,
+    //         inputSeq = inputSeq,
+    //         dx = h,
+    //         dz = v
+    //     };
+    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+    // }
+
+    // 현재 위치 전송
+    void SendMovePacket(P_PacketVector3 v)
     {
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,
             inputSeq = inputSeq,
-            dx = h,
-            dz = v
+            targetPos = v
         };
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
     }

@@ -199,19 +199,33 @@ struct P_RoomLeaveUserNotify
 #endregion
 
 #region Sync Modifier Move Packet
+//Axis 입력 버전
+// [StructLayout(LayoutKind.Sequential, Pack = 1)]
+// public struct P_PlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long userUUID;
+//     [MarshalAs(UnmanagedType.I4)]
+//     public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dx;         // Horizontal 입력 (-1 ~ 1)
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dz;         // Vertical 입력 (-1 ~ 1)
+// }
+
+// 확정 좌표 버전
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerMovement
 {
     [MarshalAs(UnmanagedType.I8)]
     public long userUUID;
     [MarshalAs(UnmanagedType.I4)]
-    public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
-    [MarshalAs(UnmanagedType.R4)]
-    public float dx;         // Horizontal 입력 (-1 ~ 1)
-    [MarshalAs(UnmanagedType.R4)]
-    public float dz;         // Vertical 입력 (-1 ~ 1)
+    public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
+    [MarshalAs(UnmanagedType.Struct)]
+    public P_PacketVector3 targetPos;
 }
 
+//최종 회전값도 전송 해야할 듯
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_UpdatePlayerMovement
 {
