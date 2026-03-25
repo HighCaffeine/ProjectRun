@@ -213,32 +213,30 @@ struct P_RoomLeaveUserNotify
 //     public float dz;         // Vertical 입력 (-1 ~ 1)
 // }
 
-// 확정 좌표 버전
+// client to server 이동 패키
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerMovement
 {
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.I4)]
-    public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
-    [MarshalAs(UnmanagedType.Struct)]
-    public P_PacketVector3 targetPos;
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.I4)] public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
+    [MarshalAs(UnmanagedType.R4)] public float axisH;
+    [MarshalAs(UnmanagedType.R4)] public float axisV;
 }
 
-//최종 회전값도 전송 해야할 듯
+// server to client 이동 동기화 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_UpdatePlayerMovement
 {
-    [MarshalAs(UnmanagedType.I4)]
-    public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.Struct)]
-    public P_PacketVector3 currentPos;  //서버 확정 좌표
-    [MarshalAs(UnmanagedType.R4)]
-    public float currentSpeed; // 모디파이어 적용 속도
-    [MarshalAs(UnmanagedType.I1)]
-    public bool isMoving;
+    [MarshalAs(UnmanagedType.I4)] public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;  //서버 확정 좌표
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;   //서버 확정 회전치
+    [MarshalAs(UnmanagedType.R4)] public float currentSpeed; // 모디파이어 적용 속도
+    [MarshalAs(UnmanagedType.R4)] public float axisH;
+    [MarshalAs(UnmanagedType.R4)] public float axisV;
+    [MarshalAs(UnmanagedType.I1)] public bool isMoving;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -322,6 +320,10 @@ public struct P_PacketQuaternion
 {
     public float x, y, z, w;
     public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
+    public void Set(Quaternion q)
+    {
+        x = q.x; y = q.y; z = q.z; w = q.w;
+    }
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
