@@ -2,7 +2,7 @@ using System;
 
 public enum State {};
 
-public class Character
+public class ActorData
 {
     public float speed {get; private set;}
     public int hp {get; private set;}

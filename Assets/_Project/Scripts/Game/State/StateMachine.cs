@@ -8,7 +8,7 @@ public interface IState
     public void Exit();         //state 해제 (함수 해제)
 }
 
-public class StateMachine : MonoBehaviour
+public class StateMachine
 {
     public IState currentState { get; private set; }
 
@@ -18,4 +18,6 @@ public class StateMachine : MonoBehaviour
         currentState = state;
         currentState.Enter();
     }
+
+    public void Update() => currentState.Execute();
 }
