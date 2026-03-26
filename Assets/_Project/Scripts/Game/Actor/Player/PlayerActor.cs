@@ -43,7 +43,9 @@ public class PlayerActor : Actor
         Vector3 dir = (isometricForward * v + isometricRight * h).normalized;
 
         transform.Translate(dir * moveSpeed * Time.deltaTime);
-
+        curPos.Set(transform.position);
+        curRot.Set(transform.rotation);
+        
         bool isMoving = (h != 0 || v != 0);
 
         sendTimer += Time.deltaTime;
@@ -53,8 +55,6 @@ public class PlayerActor : Actor
             if (sendTimer >= sendInterval)
             {
                 inputSeq++;
-                curPos.Set(transform.position);
-                curRot.Set(transform.rotation);
                 SendMovePacket(curPos, curRot, h, v);
                 sendTimer = 0f;
             }

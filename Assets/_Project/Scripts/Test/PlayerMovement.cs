@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+//이제 사용 X
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController Controller;

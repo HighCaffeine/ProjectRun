@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+//보정 클래스
 public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerMovement movement;
