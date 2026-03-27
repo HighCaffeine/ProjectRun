@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerActor : Actor
 {
+    [SerializeField] private Transform playerPivot;
+
     public float moveSpeed = 5.0f;
     public LayerMask targetLayer;
     public CharacterController controller;
@@ -16,8 +18,8 @@ public class PlayerActor : Actor
     private P_PacketQuaternion curRot;
 
     // 상태머신 값
-    public float h;
-    public float v;
+    public float h { private set; get; }
+    public float v { private set; get; }
 
 
     private enum ActionType : byte { PUSH = 0, PULL = 1, }
@@ -33,12 +35,12 @@ public class PlayerActor : Actor
 
     void Update()
     {
+        sm.Update(); // State 머신 실행
         if (!IsLocal) return;
 
         h = Input.GetAxisRaw("Horizontal");
         v = Input.GetAxisRaw("Vertical");
 
-        sm.Update(); // State 머신 실행
     }
 
     //마우스 방향 보기
@@ -62,13 +64,17 @@ public class PlayerActor : Actor
 
     public void LookAtDirection(Vector3 dir)
     {
-        if (dir.sqrMagnitude > 0.01f)
+        if (playerPivot != null)
+        {
+            playerPivot.rotation = Quaternion.LookRotation(dir);
+        }
+        else
         {
             transform.rotation = Quaternion.LookRotation(dir);
         }
     }
 
-    public CollisionFlags DoMovePhysics(Vector3 moveDir, float speed)
+    public CollisionFlags Move(Vector3 moveDir, float speed)
     {
         if (controller != null) return controller.Move(moveDir * speed * Time.deltaTime);
         return CollisionFlags.None;

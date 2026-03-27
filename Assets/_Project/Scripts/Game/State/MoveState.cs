@@ -32,7 +32,7 @@ public class MoveState : IState
         actor.LookAtDirection(moveDir);
 
         // 이동 및 패킷 전송
-        actor.DoMovePhysics(moveDir, actor.moveSpeed);
+        actor.Move(moveDir, actor.moveSpeed);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
@@ -41,5 +41,5 @@ public class MoveState : IState
             actor.sendTimer = 0f;
         }
     }
-    public void Exit() { }
+    public void Exit() { actor.SendMovePacket(0f, 0f); }
 }

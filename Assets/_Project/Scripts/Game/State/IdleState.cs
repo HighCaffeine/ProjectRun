@@ -26,12 +26,14 @@ public class IdleState : IState
 
     public void Execute()
     {
+        if (!actor.IsLocal) return;
+
         // 공격 입력 체크 (좌/우클릭)
         if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, 0)); return; } // 밀기
         if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, 1)); return; } // 당기기
 
         // 이동 입력 체크
-        if (actor.dir.x != 0 || actor.dir.y != 0)
+        if (actor.h != 0 || actor.v != 0)
         {
             actor.sm.ChangeState(new MoveState(actor));
         }

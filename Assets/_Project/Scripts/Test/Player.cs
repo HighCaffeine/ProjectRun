@@ -126,16 +126,18 @@ public class Player : MonoBehaviour
     {
         PlayerActor pActor = GetComponent<PlayerActor>();
 
-        // 내 캐릭터일 때만 물리적으로 밀려남
         if (pActor != null && pActor.IsLocal)
         {
             Vector3 pushDir = (transform.position - attackerPos).normalized;
             pushDir.y = 0; // 수평으로만 밀리게
 
-            if (actionType == 1) pushDir = -pushDir; // 당기기면 방향 반전
+            bool isPull = (actionType == 1);
+            if (isPull)
+            {
+                pushDir = -pushDir; // 당기기면 방향 반전
+            }
 
-            // 상태머신을 넉백 상태로 강제 전환
-            pActor.sm.ChangeState(new KnockbackState(pActor, pushDir, 15.0f));
+            pActor.sm.ChangeState(new KnockbackState(pActor, pushDir, 15.0f, isPull, attackerPos));
         }
         else
         {
