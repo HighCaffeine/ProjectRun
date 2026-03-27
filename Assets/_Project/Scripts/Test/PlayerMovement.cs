@@ -71,10 +71,10 @@ public class PlayerMovement : MonoBehaviour
 
             if (target != null && target.ID != LocalPlayerInfo.ID)
             {
-                p_PlayerActionRequest pkt = new p_PlayerActionRequest
+                P_PlayerActionRequest pkt = new P_PlayerActionRequest
                 {
                     actionType = (byte)type,
-                    targetUUID = (int)target.ID
+                    userUUID = (int)target.ID
                 };
 
                 Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, pkt);

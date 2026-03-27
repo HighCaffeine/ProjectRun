@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public enum AniState {Idle, Move, Dead, Count};
+public enum AniState { Idle, Move, Dead, Count };
 
 public class Actor : MonoBehaviour
 {
@@ -10,7 +10,7 @@ public class Actor : MonoBehaviour
 
     protected virtual void Start()
     {
-        sm.ChangeState(new IdleState(this, () => { Move(); }));
+
     }
 
     protected virtual void Move()
@@ -23,12 +23,12 @@ public class Actor : MonoBehaviour
     {
         switch (aniState)
         {
-            case AniState.Idle: 
-            break;
+            case AniState.Idle:
+                break;
             case AniState.Move:
-            break;
+                break;
             case AniState.Dead:
-            break;
+                break;
         }
     }
 }

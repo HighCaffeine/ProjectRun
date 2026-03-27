@@ -4,81 +4,90 @@ using UnityEngine;
 public class PlayerActor : Actor
 {
     public float moveSpeed = 5.0f;
-    public Transform playerPivot;       //카메라 기준 계산용 피벗
+    public LayerMask targetLayer;
+    public CharacterController controller;
 
-    //서버 전송용
-    private uint inputSeq = 0;          //전송 순서
-    public bool IsLocal = false;        // 로컬 플레이어 구분
-    private bool wasMoving = false;     // 이동했는데 씹힌거 검사용
-    private P_PacketVector3 curPos;     
-    private P_PacketQuaternion curRot;  
-    private float sendTimer = 0f;       // 전송 시간 계산
-    private float sendInterval = 0.02f; // 초당 20회 전송 (서버 50Hz 처리에 최적화)
+    //동기화
+    public uint inputSeq = 0;
+    public bool IsLocal = false;
+    public float sendTimer = 0f;
+    public const float sendInterval = 0.02f;
+    private P_PacketVector3 curPos;
+    private P_PacketQuaternion curRot;
 
-    [Header("Action State")] //물리 처리
-    public bool isActionCasting = false;
-    private float castTimer = 0.0f;
-    private const float CAST_DURATION = 0.5f;
+    // 상태머신 값
+    public float h;
+    public float v;
+
 
     private enum ActionType : byte { PUSH = 0, PULL = 1, }
 
     protected override void Start()
     {
-        base.Start();
+        controller = GetComponent<CharacterController>();
+        if (IsLocal)
+        {
+            sm.ChangeState(new IdleState(this));
+        }
     }
 
     void Update()
     {
-        dir.x = Input.GetAxis("Horizontal");
-        dir.y = Input.GetAxis("Vertical");
+        if (!IsLocal) return;
+
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+
+        sm.Update(); // State 머신 실행
     }
 
-    protected override void Move()
+    //마우스 방향 보기
+    public void LookAtMouse()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Plane ground = new Plane(Vector3.up, transform.position);
 
-        Vector3 isometricForward = new Vector3(1f, 0f, 1f).normalized;
-        Vector3 isometricRight = new Vector3(1f, 0f, -1f).normalized;
-        Vector3 dir = (isometricForward * v + isometricRight * h).normalized;
-
-        transform.Translate(dir * moveSpeed * Time.deltaTime);
-        curPos.Set(transform.position);
-        curRot.Set(transform.rotation);
-        
-        bool isMoving = (h != 0 || v != 0);
-
-        sendTimer += Time.deltaTime;
-
-        if (isMoving)
+        if (ground.Raycast(ray, out float enter))
         {
-            if (sendTimer >= sendInterval)
+            Vector3 hit = ray.GetPoint(enter);
+            Vector3 dir = hit - transform.position;
+            dir.y = 0; // 수평 회전만
+
+            if (dir.sqrMagnitude > 0.1f)
             {
-                inputSeq++;
-                SendMovePacket(curPos, curRot, h, v);
-                sendTimer = 0f;
+                transform.rotation = Quaternion.LookRotation(dir);
             }
         }
-        else if (wasMoving)
-        {
-            inputSeq++;
-            SendMovePacket(curPos, curRot, 0, 0);
-            sendTimer = 0f;
-        }
-
-        wasMoving = isMoving;
     }
 
-    void SendMovePacket(P_PacketVector3 p, P_PacketQuaternion q, float h, float v)
+    public void LookAtDirection(Vector3 dir)
     {
+        if (dir.sqrMagnitude > 0.01f)
+        {
+            transform.rotation = Quaternion.LookRotation(dir);
+        }
+    }
+
+    public CollisionFlags DoMovePhysics(Vector3 moveDir, float speed)
+    {
+        if (controller != null) return controller.Move(moveDir * speed * Time.deltaTime);
+        return CollisionFlags.None;
+    }
+
+    // 상태 머신이 호출, 확정 좌표 패킷 전송
+    public void SendMovePacket(float axisH, float axisV)
+    {
+        curPos.Set(transform.position);
+        curRot.Set(transform.rotation);
+
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,
-            inputSeq = inputSeq,
-            currentPos = p,
-            currentRot = q,
-            axisH = h,
-            axisV = v
+            inputSeq = ++inputSeq,
+            currentPos = curPos,
+            currentRot = curRot,
+            axisH = axisH,
+            axisV = axisV
         };
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
     }

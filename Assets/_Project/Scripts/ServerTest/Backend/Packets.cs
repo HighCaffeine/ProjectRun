@@ -32,7 +32,11 @@ public enum E_PACKET
     MOVE_PATH_RESPONSE = 242,
     MOVE_PATH_NOTIFY = 243,
 
+    //물리 처리용
     PLAYER_ACTION_REQUEST = 251,
+    PLAYER_ACTION_NTF = 252,
+    GIMMICK_INTERACT_REQ = 261,
+    GIMMICK_INTERACT_NTF = 262,
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -254,12 +258,41 @@ public struct P_PlayerStatusNtf
 
 #region Physics Packet
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct p_PlayerActionRequest
+public struct P_PlayerActionRequest
 {
+    [MarshalAs(UnmanagedType.I8)]
+    public long userUUID;
     [MarshalAs(UnmanagedType.I1)]
     public byte actionType;
-    [MarshalAs(UnmanagedType.I4)]
-    public int targetUUID;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerActionNtf
+{
+    [MarshalAs(UnmanagedType.I8)]
+    public long attackerUUID;
+    [MarshalAs(UnmanagedType.I8)]
+    public long targetUUID;
+    [MarshalAs(UnmanagedType.I1)]
+    public byte actionType;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GimmickInteractReq
+{
+    [MarshalAs(UnmanagedType.I4)] public int gimmickID;
+    [MarshalAs(UnmanagedType.I1)] public byte state;                    // 0:Off, 1:On 등 상태값
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos; // 이동할 목표 좌표 or 밀려날 방향
+    [MarshalAs(UnmanagedType.R4)] public float param;                   // 추가 데이터 (속도, 밀어내는 힘 등)
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GimmickInteractNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int gimmickID;
+    [MarshalAs(UnmanagedType.I1)] public byte state;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
+    [MarshalAs(UnmanagedType.R4)] public float param;
 }
 #endregion
 
