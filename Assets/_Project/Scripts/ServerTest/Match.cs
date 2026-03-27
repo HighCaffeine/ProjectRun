@@ -133,10 +133,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     // 맞은 유저 찾기
                     if (Players.TryGetValue(actionNtf.targetUUID, out Player targetPlayer))
                     {
-                        // 공격자 유저 찾기 (방향 계산용)
+                        // attacker 찾기
                         if (Players.TryGetValue(actionNtf.attackerUUID, out Player attackerPlayer))
                         {
-                            // 넉백 적용!
+                            // 넉백 적용
                             targetPlayer.ApplyKnockback(attackerPlayer.transform.position, actionNtf.actionType);
                         }
                     }
