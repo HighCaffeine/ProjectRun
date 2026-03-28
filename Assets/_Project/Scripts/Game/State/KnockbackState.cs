@@ -15,6 +15,8 @@ public class KnockbackState : IState
     private Vector3 casterPos;
     private const float STOP_DISTANCE = 0.5f;
 
+    private const float K = 10f;
+
     public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
         this.actor = actor;
@@ -33,13 +35,36 @@ public class KnockbackState : IState
 
     public void Execute()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            actor.sm.ChangeState(new IdleState(actor));
+            return;
+        }
         timer += Time.deltaTime;
 
-        // 시간에 따른 선형 감쇠
-        float t = timer / DURATION;
-        currentPower = Mathf.Lerp(initialPower, 0f, t);
+        float t = Mathf.Clamp01(timer / DURATION);
 
-        // 당길 때 시전자 위치 넘어가지 않게 조절
+        if (isPull)
+        {
+            float kValue = K * 0.5f;
+
+            float logValue = Mathf.Log(1 + kValue * t) / Mathf.Log(1 + kValue);
+
+            float reversed = 1f - logValue;
+            float smooth = reversed * reversed;
+
+            currentPower = initialPower * smooth;
+
+            Vector3 dir = casterPos - actor.transform.position;
+            dir.y = 0f;
+            knockbackDir = dir.normalized;
+        }
+        else
+        {
+            float decayFactor = 1f - (Mathf.Log(1 + K * t) / Mathf.Log(1 + K));
+            currentPower = initialPower * decayFactor;
+        }
+
         if (isPull)
         {
             Vector3 myPos = new Vector3(actor.transform.position.x, 0, actor.transform.position.z);
@@ -61,6 +86,7 @@ public class KnockbackState : IState
             actor.sm.ChangeState(new IdleState(actor));
         }
     }
+
 
     public void Exit()
     {
