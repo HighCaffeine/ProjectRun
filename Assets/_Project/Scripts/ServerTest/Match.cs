@@ -293,8 +293,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     private Player AddPlayer(long id, string playerName)
     {
-        if (Players == null || Players.ContainsKey(id))
-            return null;
+        if (Players == null || Players.ContainsKey(id)) return null;
 
         bool local = LocalPlayerInfo.ID == id;
 
@@ -322,9 +321,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         //     //cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
         // }
 
-        PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
-        if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
-        playerMovement.IsLocal = local;
+        // PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
+        // if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
+        // playerMovement.IsLocal = local;
+
+        PlayerActor pActor = playerObj.GetComponent<PlayerActor>();
+        if (pActor != null)
+        {
+            pActor.IsLocal = local;
+        }
 
         if (local)
         {
@@ -335,9 +340,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             cc.center = Vector3.zero;
             cc.stepOffset = 0.5f;
             cc.slopeLimit = 60f;
-            playerMovement.Controller = cc;
+            pActor.SetController(cc);
 
-            playerMovement.playerPivot = playerObj.transform.GetChild(0);
+            pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
             //카메라 세팅
             cameraPivot.SetParent(playerObj.transform);
@@ -370,7 +375,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
         Player player = playerObj.GetComponent<Player>();
         if (player == null) player = playerObj.AddComponent<Player>();
-        player.Init(playerMovement, playerName, id, local, playerObj.transform.position);
+        player.Init(pActor, playerName, id, local, playerObj.transform.position);
         Players.Add(id, player);
 
         return player;

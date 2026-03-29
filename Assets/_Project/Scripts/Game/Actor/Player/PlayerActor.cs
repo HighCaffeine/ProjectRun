@@ -4,11 +4,11 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
-    [SerializeField] private Transform playerPivot;
 
     public float moveSpeed = 5.0f;
     public LayerMask targetLayer;
-    public CharacterController controller;
+    private Transform playerPivot;
+    private CharacterController controller;
 
     //동기화
     public uint inputSeq = 0;
@@ -36,6 +36,9 @@ public class PlayerActor : Actor
     private enum ActionType : byte { PUSH = 0, PULL = 1, }
 
     public Vector3 GetForward() { return playerPivot.forward; }
+    public void SetController(CharacterController cc) => this.controller = cc;
+    public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
+    public void SetPlayerPivot(Transform pivot) => this.playerPivot = pivot;
 
     protected override void Start()
     {
@@ -48,8 +51,8 @@ public class PlayerActor : Actor
 
     void Update()
     {
-        sm.Update(); // State 머신 실행
         ApplyGravity();
+        sm.Update(); // State 머신 실행
         if (!IsLocal) return;
 
         h = Input.GetAxisRaw("Horizontal");

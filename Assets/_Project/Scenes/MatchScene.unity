@@ -1542,7 +1542,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraDefaultPos: {fileID: 0}
-  playerPrefab: {fileID: 7377691265647987223, guid: 713476d1a511a214aab94cb096a14d3c, type: 3}
+  playerPrefab: {fileID: 4357290154265975706, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
   mainCamera: {fileID: 1633807549}
   cameraPivot: {fileID: 1109147885}
 --- !u!4 &423868194

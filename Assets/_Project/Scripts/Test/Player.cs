@@ -4,7 +4,7 @@ using System.Collections;
 //보정 클래스
 public class Player : MonoBehaviour
 {
-    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private PlayerActor actor;
     [SerializeField] private string name;
     [SerializeField] private long id;
     [SerializeField] private bool isLocal;
@@ -23,9 +23,9 @@ public class Player : MonoBehaviour
     public long ID => this.id;
     public bool IsLocal => this.isLocal;
 
-    public void Init(PlayerMovement movement, string name, long id, bool isLocal, Vector3 serverPos)
+    public void Init(PlayerActor actor, string name, long id, bool isLocal, Vector3 serverPos)
     {
-        this.movement = movement;
+        this.actor = actor;
         this.name = name;
         this.id = id;
         this.isLocal = isLocal;
@@ -77,9 +77,9 @@ public class Player : MonoBehaviour
         // 오차가 클 경우 텔포시킴
         if (distXZ > snapThreshold)
         {
-            if (movement?.Controller != null) movement.Controller.enabled = false;
+            actor.SetControllerActive(false);
             transform.position = serverPos;
-            if (movement?.Controller != null) movement.Controller.enabled = true;
+            actor.SetControllerActive(true);
             return;
         }
 
@@ -91,7 +91,7 @@ public class Player : MonoBehaviour
 
             // 이동 중일 때는 더 약하게, 멈췄을 때는 조금 더 강하게 보정
             float strength = isMoving ? 1.5f : 3.0f;
-            movement.Controller.Move(pullDir * Time.deltaTime * strength);
+            actor.Move(pullDir.normalized, strength);
         }
 
         // Y축 높이 보정은 실시간 Lerp 유지
@@ -125,24 +125,18 @@ public class Player : MonoBehaviour
 
     public void ApplyKnockback(Vector3 attackerPos, byte actionType)
     {
-        PlayerActor pActor = GetComponent<PlayerActor>();
-
-        if (pActor != null && pActor.IsLocal)
+        if (actor != null && actor.IsLocal)
         {
             Vector3 pushDir = (transform.position - attackerPos).normalized;
-            pushDir.y = 0; // 수평으로만 밀리게
+            pushDir.y = 0;
 
             bool isPull = (actionType == 1);
-            if (isPull)
-            {
-                pushDir = -pushDir; // 당기기면 방향 반전
-            }
+            if (isPull) pushDir = -pushDir;
 
-            pActor.sm.ChangeState(new KnockbackState(pActor, pushDir, 15.0f, isPull, attackerPos));
+            actor.sm.ChangeState(new KnockbackState(actor, pushDir, 15.0f, isPull, attackerPos));
         }
         else
         {
-            // GetComponent<Animator>().SetTrigger("Hit");
             StartCoroutine(RemoteVisualRoutine());
         }
     }
