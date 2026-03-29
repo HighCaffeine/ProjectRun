@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 //보정 클래스
 public class Player : MonoBehaviour
@@ -142,6 +143,25 @@ public class Player : MonoBehaviour
         else
         {
             // GetComponent<Animator>().SetTrigger("Hit");
+            StartCoroutine(RemoteVisualRoutine());
+        }
+    }
+
+    private IEnumerator RemoteVisualRoutine()
+    {
+        PlayerActor pActor = GetComponent<PlayerActor>();
+        if (pActor != null)
+        {
+            if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = true;
+            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Play();
+        }
+
+        yield return new WaitForSeconds(0.25f); // 넉백 지속시간
+
+        if (pActor != null)
+        {
+            if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = false;
+            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Stop();
         }
     }
 }

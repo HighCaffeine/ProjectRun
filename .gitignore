@@ -9,6 +9,7 @@
 # 리소스 파일들 (팀 드라이브에서 다운해서 적용 MB단위 이상의 FBX나 OBJ등 큰 애들은 드라이브에서 관리)
 /Assets/_Project/GraphicResources/TestResource
 /Assets/_Project/Prefabs/TestPrefabs
+/Assets/ExternalFiles
 
 .utmp/
 /[Ll]ibrary/

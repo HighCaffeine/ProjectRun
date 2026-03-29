@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Cinemachine;
 
 public class KnockbackState : IState
 {
@@ -30,13 +31,29 @@ public class KnockbackState : IState
     public void Enter()
     {
         timer = 0f;
+
+        actor.StartCoroutine(actor.HitStopRoutine());
+
         // actor.SetAni(AniState.Hit); // 피격 애니메이션 재생
+        var impulseSource = actor.GetComponent<CinemachineImpulseSource>();
+        if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 2.0f);
+
+        // 연출
+        if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
+        if (actor.travelSparkParticle != null) actor.travelSparkParticle.Play();
     }
 
     public void Execute()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            if (actor.brakeParticle != null)
+            {
+                foreach (var p in actor.brakeParticle)
+                {
+                    p?.Play();
+                }
+            }
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
@@ -90,6 +107,9 @@ public class KnockbackState : IState
 
     public void Exit()
     {
+        if (actor.trailRenderer != null) actor.trailRenderer.emitting = false;
+        if (actor.travelSparkParticle != null) actor.travelSparkParticle.Stop();
+
         actor.SendMovePacket(0f, 0f);
     }
 }

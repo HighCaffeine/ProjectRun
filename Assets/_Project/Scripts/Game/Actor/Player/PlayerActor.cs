@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections;
 
 public class PlayerActor : Actor
 {
@@ -16,6 +17,11 @@ public class PlayerActor : Actor
     public const float sendInterval = 0.02f;
     private P_PacketVector3 curPos;
     private P_PacketQuaternion curRot;
+
+    [Header("Visual Effects")]
+    public TrailRenderer trailRenderer;
+    public ParticleSystem travelSparkParticle;
+    public ParticleSystem[] brakeParticle;
 
     // 상태머신 값
     public float h { private set; get; }
@@ -78,6 +84,13 @@ public class PlayerActor : Actor
     {
         if (controller != null) return controller.Move(moveDir * speed * Time.deltaTime);
         return CollisionFlags.None;
+    }
+
+    public IEnumerator HitStopRoutine(float duration = 0.05f)
+    {
+        Time.timeScale = 0.05f;
+        yield return new WaitForSecondsRealtime(duration);
+        Time.timeScale = 1.0f;
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
