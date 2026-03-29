@@ -32,7 +32,7 @@ public class ActionState : IState
     public void Enter()
     {
         timer = 0f;
-
+        Vector3 searchForward = actor.GetForward();
         // 1. 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
         PlayerActor closestTarget = null;
@@ -48,7 +48,7 @@ public class ActionState : IState
             {
                 Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
                 float distance = dirToTarget.magnitude;
-                float angleToTarget = Vector3.Angle(actor.transform.forward, dirToTarget);
+                float angleToTarget = Vector3.Angle(searchForward, dirToTarget);
 
                 // 정면 각도 내에 있고, 제일 가까운 놈 찾기
                 if (angleToTarget <= maxAngle && distance < minDistance)
@@ -63,7 +63,7 @@ public class ActionState : IState
         if (closestTarget != null)
         {
             Vector3 pushDir = closestTarget.transform.position - actor.transform.position;
-            if (minDistance == 0f) pushDir = actor.transform.forward;
+            if (minDistance <= 0.1f) pushDir = searchForward;
 
             pushDir.y = 0;
             pushDir.Normalize();

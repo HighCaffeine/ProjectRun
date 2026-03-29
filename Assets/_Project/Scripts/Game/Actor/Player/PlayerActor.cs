@@ -23,12 +23,19 @@ public class PlayerActor : Actor
     public ParticleSystem travelSparkParticle;
     public ParticleSystem[] brakeParticle;
 
+    [Header("Gravity Settings")]
+    public float gravity = -20f;       // 기본 중력 값
+    private float verticalVelocity;     // 현재 수직 속도
+    private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
+
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
 
 
     private enum ActionType : byte { PUSH = 0, PULL = 1, }
+
+    public Vector3 GetForward() { return playerPivot.forward; }
 
     protected override void Start()
     {
@@ -42,6 +49,7 @@ public class PlayerActor : Actor
     void Update()
     {
         sm.Update(); // State 머신 실행
+        ApplyGravity();
         if (!IsLocal) return;
 
         h = Input.GetAxisRaw("Horizontal");
@@ -80,11 +88,32 @@ public class PlayerActor : Actor
         }
     }
 
-    public CollisionFlags Move(Vector3 moveDir, float speed)
+    private void ApplyGravity()
     {
-        if (controller != null) return controller.Move(moveDir * speed * Time.deltaTime);
-        return CollisionFlags.None;
+        if (controller.isGrounded && verticalVelocity < 0)
+        {
+            verticalVelocity = -2f;
+        }
+        else
+        {
+            // 중력 가속도 적용
+            verticalVelocity += gravity * Time.deltaTime;
+
+            // 최대 낙하 속도 제한
+            if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
+        }
     }
+
+    public CollisionFlags Move(Vector3 horizontalDir, float speed)
+    {
+        if (controller == null) return CollisionFlags.None;
+
+        Vector3 finalMove = (horizontalDir * speed) + (Vector3.up * verticalVelocity);
+
+        return controller.Move(finalMove * Time.deltaTime);
+    }
+
+    public void SetVerticalVelocity(float velocity) => verticalVelocity = velocity;
 
     public IEnumerator HitStopRoutine(float duration = 0.05f)
     {
