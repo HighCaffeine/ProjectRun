@@ -98,6 +98,44 @@ public class KnockbackState : IState
         // 이동
         actor.Move(knockbackDir, currentPower);
 
+        actor.sendTimer += Time.deltaTime;
+        if (actor.sendTimer >= PlayerActor.sendInterval)
+        {
+            actor.SendMovePacket(0f, 0f);
+            actor.sendTimer = 0f;
+        }
+
+        //충돌감지
+        Collider[] hitWalls = Physics.OverlapSphere(actor.transform.position, 0.6f);
+        foreach (var wall in hitWalls)
+        {
+            if (wall.CompareTag("BreakableCube"))
+            {
+                GimmickInfo gInfo = wall.GetComponent<GimmickInfo>();
+                if (gInfo != null)
+                {
+                    P_GimmickInteractReq req = new P_GimmickInteractReq
+                    {
+                        gimmickID = gInfo.gimmick_id,
+                        state = 0,
+                        targetPos = new P_PacketVector3(),
+                        param = 0f
+                    };
+                    Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+                }
+
+                // 벽에 부딪혀 멈출 때도 파티클 터뜨림
+                if (actor.brakeParticle != null)
+                {
+                    foreach (var p in actor.brakeParticle) { p?.Play(); }
+                }
+
+                actor.sm.ChangeState(new IdleState(actor));
+
+                return;
+            }
+        }
+
         if (timer >= DURATION)
         {
             actor.sm.ChangeState(new IdleState(actor));
