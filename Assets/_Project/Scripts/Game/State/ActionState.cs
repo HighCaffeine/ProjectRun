@@ -33,8 +33,6 @@ public class ActionState : IState
     {
         timer = 0f;
 
-        actor.PlayTravelSpark((PlayerActor.ActionType)actionType);
-
         Vector3 searchForward = actor.GetForward();
         // 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
@@ -105,6 +103,5 @@ public class ActionState : IState
 
     public void Exit()
     {
-        actor.StopTravelSpark();
     }
 }

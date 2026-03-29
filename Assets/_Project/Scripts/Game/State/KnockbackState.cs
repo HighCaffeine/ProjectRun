@@ -42,7 +42,9 @@ public class KnockbackState : IState
 
         // 연출
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
-        if (actor.travelSparkParticle != null) actor.travelSparkParticle.Play();
+
+        PlayerActor.ActionType actionType = isPull ? PlayerActor.ActionType.PULL : PlayerActor.ActionType.PUSH;
+        actor.PlayTravelSpark(actionType);
     }
 
     public void Execute()
@@ -113,12 +115,7 @@ public class KnockbackState : IState
                     };
                     Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
                 }
-
-                // 벽에 부딪혀 멈출 때도 파티클 터뜨림
-                if (actor.brakeParticle != null)
-                {
-                    foreach (var p in actor.brakeParticle) { p?.Play(); }
-                }
+                actor.PlayBrakeParticles();
 
                 actor.sm.ChangeState(new IdleState(actor));
 
@@ -128,15 +125,16 @@ public class KnockbackState : IState
 
         if (timer >= DURATION)
         {
+            actor.PlayBrakeParticles();
             actor.sm.ChangeState(new IdleState(actor));
         }
     }
 
-
     public void Exit()
     {
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = false;
-        if (actor.travelSparkParticle != null) actor.travelSparkParticle.Stop();
+
+        actor.StopTravelSpark();
 
         actor.SendMovePacket(0f, 0f);
     }

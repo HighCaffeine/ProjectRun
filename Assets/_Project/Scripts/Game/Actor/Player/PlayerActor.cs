@@ -67,15 +67,6 @@ public class PlayerActor : Actor
             sm.Update();
         }
 
-        bool isMoving = horizontalMove.sqrMagnitude > 0.001f;
-
-        if (wasMoving && !isMoving)
-        {
-            PlayBrakeParticles();
-        }
-
-        // 현재 상태를 다음 프레임을 위해 저장
-        wasMoving = isMoving;
         if (controller != null && controller.enabled)
         {
             Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);

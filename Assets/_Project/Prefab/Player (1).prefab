@@ -14972,7 +14972,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
@@ -20003,7 +20003,7 @@ MonoBehaviour:
   IsLocal: 1
   sendTimer: 0
   trailRenderer: {fileID: 6192372689007377230}
-  travelSparkParticle: {fileID: 1681339941517861998}
+  travelSparkParticle: {fileID: 1164518266217080629}
   brakeParticle:
   - {fileID: 4533014364786938918}
   - {fileID: 8762293997828228805}
@@ -29878,7 +29878,7 @@ ParticleSystem:
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
   emitterVelocityMode: 1
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 0
   useUnscaledTime: 0
