@@ -38,7 +38,7 @@ public class KnockbackState : IState
 
         // actor.SetAni(AniState.Hit); // 피격 애니메이션 재생
         var impulseSource = actor.GetComponent<CinemachineImpulseSource>();
-        if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 2.0f);
+        if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 1.0f);
 
         // 연출
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
@@ -47,18 +47,6 @@ public class KnockbackState : IState
 
     public void Execute()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (actor.brakeParticle != null)
-            {
-                foreach (var p in actor.brakeParticle)
-                {
-                    p?.Play();
-                }
-            }
-            actor.sm.ChangeState(new IdleState(actor));
-            return;
-        }
         timer += Time.deltaTime;
 
         float t = Mathf.Clamp01(timer / DURATION);

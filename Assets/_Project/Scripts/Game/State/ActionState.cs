@@ -32,8 +32,11 @@ public class ActionState : IState
     public void Enter()
     {
         timer = 0f;
+
+        actor.PlayTravelSpark((PlayerActor.ActionType)actionType);
+
         Vector3 searchForward = actor.GetForward();
-        // 1. 타겟 탐색
+        // 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
         PlayerActor closestTarget = null;
         float minDistance = float.MaxValue;
@@ -92,7 +95,6 @@ public class ActionState : IState
 
     public void Execute()
     {
-        // 내 캐릭터는 스킬 후딜레이 시간 동안 대기
         timer += Time.deltaTime;
 
         if (timer >= CAST_TIME)
@@ -101,5 +103,8 @@ public class ActionState : IState
         }
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        actor.StopTravelSpark();
+    }
 }

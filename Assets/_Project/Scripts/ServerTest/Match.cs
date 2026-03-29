@@ -300,12 +300,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         GameObject playerObj;
         if (playerPrefab != null)
         {
-            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.identity);
+            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, 1.0f, 0.0f), Quaternion.identity);
         }
         else
         {
             playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            playerObj.transform.position = new Vector3(0.0f, -1.0f, 0.0f);
+            playerObj.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
         }
 
         playerObj.name = playerName;
@@ -335,10 +335,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         {
             CharacterController cc = playerObj.GetComponent<CharacterController>();
             if (cc == null) cc = playerObj.AddComponent<CharacterController>();
-            cc.radius = 0.5f;
-            cc.height = 1.0f;
+            cc.radius = 1f;
+            cc.height = 5.5f;
             cc.center = Vector3.zero;
             cc.stepOffset = 0.5f;
+            cc.center = new Vector3(0.0f, 2.75f, 0.0f);
             cc.slopeLimit = 60f;
             pActor.SetController(cc);
 
@@ -361,7 +362,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         else
         {
             CharacterController cc = playerObj.GetComponent<CharacterController>();
-            if (cc != null) Destroy(cc);
+            if (Client.IS_SERVER_PLAY) if (cc != null) Destroy(cc);
 
             Collider col = playerObj.GetComponent<Collider>();
             if (col == null) col = playerObj.AddComponent<CapsuleCollider>();

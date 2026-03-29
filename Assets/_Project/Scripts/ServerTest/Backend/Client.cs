@@ -9,6 +9,8 @@ public static unsafe class Client
     public static NetworkClient TCP = new NetworkClient(IP, 11021, ProtocolType.Tcp);
     public static NetworkClient UDP = new NetworkClient(IP, 5025, ProtocolType.Udp);
 
+    public static bool IS_SERVER_PLAY = false;
+
 
     public static void Start()
     {

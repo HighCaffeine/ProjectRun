@@ -6,9 +6,11 @@ public class PlayerActor : Actor
 {
 
     public float moveSpeed = 5.0f;
+    private bool wasMoving = false;
     public LayerMask targetLayer;
-    private Transform playerPivot;
+    [SerializeField] private Transform playerPivot;
     private CharacterController controller;
+    private Vector3 horizontalMove;
 
     //동기화
     public uint inputSeq = 0;
@@ -33,7 +35,7 @@ public class PlayerActor : Actor
     public float v { private set; get; }
 
 
-    private enum ActionType : byte { PUSH = 0, PULL = 1, }
+    public enum ActionType : byte { PUSH = 0, PULL = 1, }
 
     public Vector3 GetForward() { return playerPivot.forward; }
     public void SetController(CharacterController cc) => this.controller = cc;
@@ -51,13 +53,51 @@ public class PlayerActor : Actor
 
     void Update()
     {
+        if (IsLocal)
+        {
+            h = Input.GetAxisRaw("Horizontal");
+            v = Input.GetAxisRaw("Vertical");
+        }
+
         ApplyGravity();
-        sm.Update(); // State 머신 실행
-        if (!IsLocal) return;
+        horizontalMove = Vector3.zero;
 
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
+        if (sm != null)
+        {
+            sm.Update();
+        }
 
+        bool isMoving = horizontalMove.sqrMagnitude > 0.001f;
+
+        if (wasMoving && !isMoving)
+        {
+            PlayBrakeParticles();
+        }
+
+        // 현재 상태를 다음 프레임을 위해 저장
+        wasMoving = isMoving;
+        if (controller != null && controller.enabled)
+        {
+            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+            controller.Move(finalMove * Time.deltaTime);
+        }
+    }
+
+    public void Move(Vector3 dir, float speed)
+    {
+        horizontalMove += dir * speed;
+    }
+
+    private void ApplyGravity()
+    {
+        if (controller.isGrounded && verticalVelocity < 0)
+        {
+            verticalVelocity = -2f;
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+        }
     }
 
     //마우스 방향 보기
@@ -72,7 +112,11 @@ public class PlayerActor : Actor
             Vector3 dir = hit - transform.position;
             dir.y = 0; // 수평 회전만
 
-            if (dir.sqrMagnitude > 0.1f)
+            if (playerPivot != null)
+            {
+                playerPivot.rotation = Quaternion.LookRotation(dir);
+            }
+            else
             {
                 transform.rotation = Quaternion.LookRotation(dir);
             }
@@ -90,32 +134,14 @@ public class PlayerActor : Actor
             transform.rotation = Quaternion.LookRotation(dir);
         }
     }
-
-    private void ApplyGravity()
+    public void PlayBrakeParticles()
     {
-        if (controller.isGrounded && verticalVelocity < 0)
+        if (brakeParticle == null) return;
+        foreach (ParticleSystem p in brakeParticle)
         {
-            verticalVelocity = -2f;
-        }
-        else
-        {
-            // 중력 가속도 적용
-            verticalVelocity += gravity * Time.deltaTime;
-
-            // 최대 낙하 속도 제한
-            if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
+            if (p != null) p.Play();
         }
     }
-
-    public CollisionFlags Move(Vector3 horizontalDir, float speed)
-    {
-        if (controller == null) return CollisionFlags.None;
-
-        Vector3 finalMove = (horizontalDir * speed) + (Vector3.up * verticalVelocity);
-
-        return controller.Move(finalMove * Time.deltaTime);
-    }
-
     public void SetVerticalVelocity(float velocity) => verticalVelocity = velocity;
 
     public IEnumerator HitStopRoutine(float duration = 0.05f)
@@ -123,6 +149,32 @@ public class PlayerActor : Actor
         Time.timeScale = 0.05f;
         yield return new WaitForSecondsRealtime(duration);
         Time.timeScale = 1.0f;
+    }
+
+    public void PlayTravelSpark(ActionType actionType)
+    {
+        if (travelSparkParticle == null) return;
+
+        Transform sparkTransform = travelSparkParticle.transform;
+
+        if (actionType == ActionType.PULL)
+        {
+            sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
+        }
+        else
+        {
+            sparkTransform.localRotation = Quaternion.identity;
+        }
+
+        travelSparkParticle.Play();
+    }
+
+    public void StopTravelSpark()
+    {
+        if (travelSparkParticle != null && travelSparkParticle.isPlaying)
+        {
+            travelSparkParticle.Stop();
+        }
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
