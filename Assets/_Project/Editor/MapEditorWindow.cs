@@ -40,7 +40,7 @@ public class MapEditorWindow : EditorWindow
         Event currentEvent = Event.current;
         if (currentEvent.type == EventType.KeyDown && currentEvent.keyCode == KeyCode.LeftAlt)
         {
-            RotateSelectedObjectY(90f);
+            RotateSelectedObjectY(45f);
             currentEvent.Use();
         }
     }
@@ -50,7 +50,7 @@ public class MapEditorWindow : EditorWindow
         Event currentEvent = Event.current;
         if (currentEvent.type == EventType.KeyDown && currentEvent.keyCode == KeyCode.LeftAlt)
         {
-            RotateSelectedObjectY(90f);
+            RotateSelectedObjectY(45f);
             currentEvent.Use();
         }
 
