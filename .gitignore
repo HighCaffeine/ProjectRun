@@ -7,7 +7,7 @@
 # !!추가로 Azure 인증 json이나 xml 예외 추가 필요!!
 
 # 리소스 파일들 (팀 드라이브에서 다운해서 적용 MB단위 이상의 FBX나 OBJ등 큰 애들은 드라이브에서 관리)
-/Assets/_Project/_WorkingSpace
+# /Assets/_Project/_WorkingSpace
 /Assets/ExternalFiles
 
 .utmp/
