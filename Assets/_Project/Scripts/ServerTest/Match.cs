@@ -126,16 +126,61 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     player.OnSyncMovement(updatePkt);
                 }
                 break;
-            case E_PACKET.PLAYER_STATUS_NTF:
-                var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
-                if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
+            case E_PACKET.PLAYER_ACTION_NTF:
                 {
-                    // 속도 및 상태 플래그 갱신
-                    targetPlayer.SetSpeed(statusPkt.moveSpeed);
-                    // UI나 이펙트 처리 로직 추가
-                }
-                break;
+                    var actionNtf = UnsafeCode.ByteArrayToStructure<P_PlayerActionNtf>(packet.data);
 
+                    // 맞은 유저 찾기
+                    if (Players.TryGetValue(actionNtf.targetUUID, out Player targetPlayer))
+                    {
+                        // attacker 찾기
+                        if (Players.TryGetValue(actionNtf.attackerUUID, out Player attackerPlayer))
+                        {
+                            // 넉백 적용
+                            targetPlayer.ApplyKnockback(attackerPlayer.transform.position, actionNtf.actionType);
+                        }
+                    }
+                    break;
+                }
+            case E_PACKET.GIMMICK_INTERACT_NTF:
+                {
+                    var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
+
+                    // 맵에 있는 모든 GimmickInfo를 뒤져서 ID가 일치하는 녀석을 찾음
+                    GimmickInfo[] allGimmicks = FindObjectsOfType<GimmickInfo>();
+                    foreach (GimmickInfo gimmick in allGimmicks)
+                    {
+                        if (gimmick.gimmick_id == ntf.gimmickID)
+                        {
+                            // 기믹 종류별 동작
+                            if (gimmick.gimmick_type == "breakable_wall" && ntf.state == 0)
+                            {
+                                Destroy(gimmick.gameObject);
+                            }
+                            else if (gimmick.gimmick_type == "moving_platform" && ntf.state == 1)
+                            {
+                                // 플랫폼 이동 (도착 좌표 = ntf.targetPos.ToVector3(), 속도 = ntf.param)
+                                // StartCoroutine(MovePlatform(gimmick.transform, ntf.targetPos.ToVector3(), ntf.param));
+                            }
+                            else if (gimmick.gimmick_type == "magnetic_force" && ntf.state == 1)
+                            {
+                                // 특정 범위 내 유저 자력으로 당기기 등
+                            }
+                        }
+                    }
+                    break;
+                }
+            case E_PACKET.PLAYER_STATUS_NTF:
+                {
+                    var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
+                    if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
+                    {
+                        // 속도 및 상태 플래그 갱신
+                        targetPlayer.SetSpeed(statusPkt.moveSpeed);
+                        // UI나 이펙트 처리 로직 추가
+                    }
+                    break;
+                }
             case E_PACKET.MOVE_PATH_RESPONSE:
                 P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
 
@@ -248,20 +293,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     private Player AddPlayer(long id, string playerName)
     {
-        if (Players == null || Players.ContainsKey(id))
-            return null;
+        if (Players == null || Players.ContainsKey(id)) return null;
 
         bool local = LocalPlayerInfo.ID == id;
 
         GameObject playerObj;
         if (playerPrefab != null)
         {
-            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, -1.0f, 0.0f), Quaternion.identity);
+            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, 1.0f, 0.0f), Quaternion.identity);
         }
         else
         {
             playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            playerObj.transform.position = new Vector3(0.0f, -1.0f, 0.0f);
+            playerObj.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
         }
 
         playerObj.name = playerName;
@@ -277,22 +321,29 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         //     //cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
         // }
 
-        PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
-        if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
-        playerMovement.IsLocal = local;
+        // PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
+        // if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
+        // playerMovement.IsLocal = local;
+
+        PlayerActor pActor = playerObj.GetComponent<PlayerActor>();
+        if (pActor != null)
+        {
+            pActor.IsLocal = local;
+        }
 
         if (local)
         {
             CharacterController cc = playerObj.GetComponent<CharacterController>();
             if (cc == null) cc = playerObj.AddComponent<CharacterController>();
-            cc.radius = 0.5f;
-            cc.height = 1.0f;
+            cc.radius = 1f;
+            cc.height = 5.5f;
             cc.center = Vector3.zero;
             cc.stepOffset = 0.5f;
+            cc.center = new Vector3(0.0f, 2.75f, 0.0f);
             cc.slopeLimit = 60f;
-            playerMovement.Controller = cc;
+            pActor.SetController(cc);
 
-            playerMovement.playerPivot = playerObj.transform.GetChild(0);
+            pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
             //카메라 세팅
             cameraPivot.SetParent(playerObj.transform);
@@ -311,7 +362,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         else
         {
             CharacterController cc = playerObj.GetComponent<CharacterController>();
-            if (cc != null) Destroy(cc);
+            if (Client.IS_SERVER_PLAY) if (cc != null) Destroy(cc);
 
             Collider col = playerObj.GetComponent<Collider>();
             if (col == null) col = playerObj.AddComponent<CapsuleCollider>();
@@ -325,7 +376,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
         Player player = playerObj.GetComponent<Player>();
         if (player == null) player = playerObj.AddComponent<Player>();
-        player.Init(playerMovement, playerName, id, local, playerObj.transform.position);
+        player.Init(pActor, playerName, id, local, playerObj.transform.position);
         Players.Add(id, player);
 
         return player;

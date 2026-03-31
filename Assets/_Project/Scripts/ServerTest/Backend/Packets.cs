@@ -32,7 +32,11 @@ public enum E_PACKET
     MOVE_PATH_RESPONSE = 242,
     MOVE_PATH_NOTIFY = 243,
 
+    //물리 처리용
     PLAYER_ACTION_REQUEST = 251,
+    PLAYER_ACTION_NTF = 252,
+    GIMMICK_INTERACT_REQ = 261,
+    GIMMICK_INTERACT_NTF = 262,
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -199,32 +203,44 @@ struct P_RoomLeaveUserNotify
 #endregion
 
 #region Sync Modifier Move Packet
+//Axis 입력 버전
+// [StructLayout(LayoutKind.Sequential, Pack = 1)]
+// public struct P_PlayerMovement
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long userUUID;
+//     [MarshalAs(UnmanagedType.I4)]
+//     public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dx;         // Horizontal 입력 (-1 ~ 1)
+//     [MarshalAs(UnmanagedType.R4)]
+//     public float dz;         // Vertical 입력 (-1 ~ 1)
+// }
+
+// client to server 이동 패키
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerMovement
 {
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.I4)]
-    public uint inputSeq;    // 클라이언트 입력 번호 (보정용)
-    [MarshalAs(UnmanagedType.R4)]
-    public float dx;         // Horizontal 입력 (-1 ~ 1)
-    [MarshalAs(UnmanagedType.R4)]
-    public float dz;         // Vertical 입력 (-1 ~ 1)
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.I4)] public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
+    [MarshalAs(UnmanagedType.R4)] public float axisH;
+    [MarshalAs(UnmanagedType.R4)] public float axisV;
 }
 
+// server to client 이동 동기화 패킷
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_UpdatePlayerMovement
 {
-    [MarshalAs(UnmanagedType.I4)]
-    public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.Struct)]
-    public P_PacketVector3 currentPos;  //서버 확정 좌표
-    [MarshalAs(UnmanagedType.R4)]
-    public float currentSpeed; // 모디파이어 적용 속도
-    [MarshalAs(UnmanagedType.I1)]
-    public bool isMoving;
+    [MarshalAs(UnmanagedType.I4)] public uint lastInputSeq; // 서버가 처리한 마지막 입력 번호
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;  //서버 확정 좌표
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;   //서버 확정 회전치
+    [MarshalAs(UnmanagedType.R4)] public float currentSpeed; // 모디파이어 적용 속도
+    [MarshalAs(UnmanagedType.R4)] public float axisH;
+    [MarshalAs(UnmanagedType.R4)] public float axisV;
+    [MarshalAs(UnmanagedType.I1)] public bool isMoving;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -242,12 +258,41 @@ public struct P_PlayerStatusNtf
 
 #region Physics Packet
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct p_PlayerActionRequest
+public struct P_PlayerActionRequest
 {
+    [MarshalAs(UnmanagedType.I8)]
+    public long userUUID;
     [MarshalAs(UnmanagedType.I1)]
     public byte actionType;
-    [MarshalAs(UnmanagedType.I4)]
-    public int targetUUID;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerActionNtf
+{
+    [MarshalAs(UnmanagedType.I8)]
+    public long attackerUUID;
+    [MarshalAs(UnmanagedType.I8)]
+    public long targetUUID;
+    [MarshalAs(UnmanagedType.I1)]
+    public byte actionType;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GimmickInteractReq
+{
+    [MarshalAs(UnmanagedType.I4)] public int gimmickID;
+    [MarshalAs(UnmanagedType.I1)] public byte state;                    // 0:Off, 1:On 등 상태값
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos; // 이동할 목표 좌표 or 밀려날 방향
+    [MarshalAs(UnmanagedType.R4)] public float param;                   // 추가 데이터 (속도, 밀어내는 힘 등)
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GimmickInteractNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int gimmickID;
+    [MarshalAs(UnmanagedType.I1)] public byte state;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
+    [MarshalAs(UnmanagedType.R4)] public float param;
 }
 #endregion
 
@@ -308,6 +353,10 @@ public struct P_PacketQuaternion
 {
     public float x, y, z, w;
     public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
+    public void Set(Quaternion q)
+    {
+        x = q.x; y = q.y; z = q.z; w = q.w;
+    }
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

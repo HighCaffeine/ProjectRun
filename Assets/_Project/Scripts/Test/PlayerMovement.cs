@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
+//이제 사용 X
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController Controller;
@@ -10,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     private bool wasMoving = false;
 
     public Transform playerPivot;
+    private P_PacketVector3 curPos;
+    private P_PacketQuaternion curRot;
 
     private float sendTimer = 0f;
     private float sendInterval = 0.02f; // 초당 20회 전송 (서버 50Hz 처리에 최적화)
@@ -26,7 +30,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (IsLocal)
         {
-            SendMovePacket(0, 0);
+            curPos.Set(transform.position);
+            curRot.Set(transform.rotation);
+            SendMovePacket(curPos, curRot, 0.0f, 0.0f);
         }
     }
 
@@ -65,17 +71,20 @@ public class PlayerMovement : MonoBehaviour
 
             if (target != null && target.ID != LocalPlayerInfo.ID)
             {
-                p_PlayerActionRequest pkt = new p_PlayerActionRequest
+                P_PlayerActionRequest pkt = new P_PlayerActionRequest
                 {
                     actionType = (byte)type,
-                    targetUUID = (int)target.ID
+                    userUUID = (int)target.ID
                 };
 
                 Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, pkt);
                 isActionCasting = true;
                 castTimer = CAST_DURATION;
 
-                SendMovePacket(0, 0);//밀 때 안미끄러지게 정지 패킷 전송
+                curPos.Set(transform.position);
+                curRot.Set(transform.rotation);
+
+                SendMovePacket(curPos, curRot, 0.0f, 0.0f); //밀 때 안미끄러지게 정지 패킷 전송
                 Debug.Log($"[Physics] Type : {type}, Target : {target.Name}({target.ID})");
             }
         }
@@ -104,28 +113,46 @@ public class PlayerMovement : MonoBehaviour
             if (sendTimer >= sendInterval)
             {
                 inputSeq++;
-                SendMovePacket(dir.x, dir.z);
+                curPos.Set(transform.position);
+                curRot.Set(transform.rotation);
+                SendMovePacket(curPos, curRot, h, v);
                 sendTimer = 0f;
             }
         }
         else if (wasMoving)
         {
             inputSeq++;
-            SendMovePacket(0, 0);
+            SendMovePacket(curPos, curRot, 0, 0);
             sendTimer = 0f;
         }
 
         wasMoving = isMoving;
     }
 
-    void SendMovePacket(float h, float v)
+    //기존 axis Move 기능
+    // void SendMovePacket(float h, float v)
+    // {
+    //     P_PlayerMovement pkt = new P_PlayerMovement
+    //     {
+    //         userUUID = LocalPlayerInfo.ID,
+    //         inputSeq = inputSeq,
+    //         dx = h,
+    //         dz = v
+    //     };
+    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+    // }
+
+    // 현재 위치 전송
+    void SendMovePacket(P_PacketVector3 p, P_PacketQuaternion q, float h, float v)
     {
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,
             inputSeq = inputSeq,
-            dx = h,
-            dz = v
+            currentPos = p,
+            currentRot = q,
+            axisH = h,
+            axisV = v
         };
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
     }
@@ -147,8 +174,8 @@ public class PlayerMovement : MonoBehaviour
     //         }
 
     //         // client-sided
-    //         //Vector3 motion = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * 5f;
-    //         //Move(motion);
+    //         Vector3 motion = (transform.right * Input.GetAxis("Horizontal") + transform.forward * Input.GetAxis("Vertical")) * 5f;
+    //         Move(motion);
     //     }
     // }
 

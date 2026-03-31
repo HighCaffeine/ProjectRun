@@ -38,7 +38,16 @@ public class GimmickData
     public string type;
     public _Vector3 position;
     public float rotation_y;
-    public Dictionary<GimmickKey, float> properties = new Dictionary<GimmickKey, float>();
+    public Dictionary<string, float> properties = new Dictionary<string, float>();
+}
+
+[Serializable]
+public class StructureData
+{
+    public string type;
+    public _Vector3 position;
+    public _Vector3 scale;
+    public float rotation_y;
 }
 
 [Serializable]
@@ -46,6 +55,7 @@ public class MapExportData
 {
     public MapMeta meta;
     public NavMeshData nav;
+    public List<StructureData> structures = new List<StructureData>();
     public List<GimmickData> gimmicks = new List<GimmickData>();
 }
 #endregion
@@ -72,17 +82,15 @@ public class MapDataExporter : Editor
         {
             NavMeshTriangulation navTriangulation = NavMesh.CalculateTriangulation();
 
-
-            // 모듈의 영역(Bounds) 설정 (Y축 높이는 무시하고 X, Z 넓이만 검사하기 위해 넉넉하게 잡음)
+            // 모듈의 영역
             Bounds moduleBounds = new Bounds(grid.transform.position, grid.areaSize);
-            //moduleBounds.Expand(new Vector3(0, 1000f, 0)); // 위아래 높이는 무제한으로 판정
 
             // 중복 정점을 방지
             Dictionary<int, int> vertexMap = new Dictionary<int, int>();
             List<Vector3> localVertices = new List<Vector3>();
             List<int> localIndices = new List<int>();
 
-            // 유니티 NavMesh는 삼각형(정점 3개) 단위로 이루어져 있으므로 3개씩 건너뛰며 검사
+            // 삼각형(정점 3개) 단위로 이루어져 있으므로 3개씩 건너뛰며 검사
             for (int i = 0; i < navTriangulation.indices.Length; i += 3)
             {
                 int i1 = navTriangulation.indices[i];
@@ -125,23 +133,32 @@ public class MapDataExporter : Editor
             //기믹 태그들 다 가져옴
             if (child.CompareTag("Gimmick"))
             {
-                GimmickData gimmickData = new GimmickData();
-                gimmickData.position = new _Vector3(child.position);
-                gimmickData.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
+                GimmickData gd = new GimmickData();
+                gd.position = new _Vector3(child.position);
+                gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
                 GimmickInfo info = child.GetComponent<GimmickInfo>();
-
                 if (info != null)
                 {
-                    gimmickData.gimmick_id = info.gimmick_id != 0 ? info.gimmick_id : ++autoGimmickId;
-                    gimmickData.type = info.gimmick_type;
+                    gd.gimmick_id = info.gimmick_id != 0 ? info.gimmick_id : ++autoGimmickId;
+                    gd.type = info.gimmick_type;
                     foreach (var prop in info.properties)
                     {
-                        if (!gimmickData.properties.ContainsKey(prop.key)) gimmickData.properties.Add(prop.key, prop.value);
+                        string keyStr = prop.key.ToString();
+                        if (!gd.properties.ContainsKey(keyStr)) gd.properties.Add(keyStr, prop.value);
                     }
                 }
-
-                exportData.gimmicks.Add(gimmickData);
+                exportData.gimmicks.Add(gd);
+            }
+            // 일반 지형 처리
+            else if (child.CompareTag("Structure"))
+            {
+                StructureData sd = new StructureData();
+                sd.type = child.name.Replace("(Clone)", "").Trim();
+                sd.position = new _Vector3(child.position);
+                sd.scale = new _Vector3(child.localScale);
+                sd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
+                exportData.structures.Add(sd);
             }
         }
 
