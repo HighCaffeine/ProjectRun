@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.4501347, g: 0.4395183, b: 0.42890188, a: 1}
+  m_FogColor: {r: 0.47446245, g: 0.5082245, b: 0.5309972, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.005
   m_LinearFogStart: 0
@@ -25,7 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 0
-  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SubtractiveShadowColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -523,6 +523,14 @@ PrefabInstance:
     - target: {fileID: 5062342084786677446, guid: 5d551b6d21837bb41b83b33f296fd6d2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5540124195300629416, guid: 5d551b6d21837bb41b83b33f296fd6d2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 5540124195300629416, guid: 5d551b6d21837bb41b83b33f296fd6d2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -62.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
