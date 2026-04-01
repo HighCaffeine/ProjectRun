@@ -280,7 +280,8 @@ public struct P_PlayerActionNtf
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_GimmickInteractReq
 {
-    [MarshalAs(UnmanagedType.I4)] public int gimmickID;
+    [MarshalAs(UnmanagedType.I8)] public long activeUUID;               //활성화 시킨 유저 ID
+    [MarshalAs(UnmanagedType.I4)] public int gimmickID;                 //활성화된 기믹 ID
     [MarshalAs(UnmanagedType.I1)] public byte state;                    // 0:Off, 1:On 등 상태값
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos; // 이동할 목표 좌표 or 밀려날 방향
     [MarshalAs(UnmanagedType.R4)] public float param;                   // 추가 데이터 (속도, 밀어내는 힘 등)
@@ -289,6 +290,7 @@ public struct P_GimmickInteractReq
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_GimmickInteractNtf
 {
+    [MarshalAs(UnmanagedType.I8)] public long activeUUID; 
     [MarshalAs(UnmanagedType.I4)] public int gimmickID;
     [MarshalAs(UnmanagedType.I1)] public byte state;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
