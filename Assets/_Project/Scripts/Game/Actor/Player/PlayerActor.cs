@@ -4,6 +4,10 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
+    const float CAMERA_SHAKE = 1.0f;
+
+    [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
+    public float PushMulti => pushMulti;
 
     public float moveSpeed = 5.0f;
     private bool wasMoving = false;
@@ -11,6 +15,8 @@ public class PlayerActor : Actor
     [SerializeField] private Transform playerPivot;
     private CharacterController controller;
     private Vector3 horizontalMove;
+
+    [SerializeField] private CameraShake cameraShake;
 
     //동기화
     public uint inputSeq = 0;
@@ -167,6 +173,9 @@ public class PlayerActor : Actor
             travelSparkParticle.Stop();
         }
     }
+
+    public void ShakeCamera() { cameraShake.ShakeCamera(CAMERA_SHAKE, CAMERA_SHAKE); }
+    public void CameraShakeOff() { cameraShake.ShakeOff(); }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     public void SendMovePacket(float axisH, float axisV)
