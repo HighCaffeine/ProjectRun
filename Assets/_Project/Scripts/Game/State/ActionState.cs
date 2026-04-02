@@ -106,7 +106,5 @@ public class ActionState : IState
 
     public void Exit()
     {
-        //카메라 연출 끄기
-        actor.CameraShakeOff();
     }
 }

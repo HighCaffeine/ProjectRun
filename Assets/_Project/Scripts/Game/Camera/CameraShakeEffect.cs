@@ -48,7 +48,6 @@ public class CameraShakeEffect : ICameraEffect
         }
         else
         {
-            // 시간이 지남에 따라 진동 세기를 0으로 서서히 줄임 (부드러운 감쇠 효과)
             float progress = timer / duration;
             perlin.AmplitudeGain = Mathf.Lerp(0f, startingAmplitude, progress);
         }
@@ -56,7 +55,6 @@ public class CameraShakeEffect : ICameraEffect
 
     public void Exit()
     {
-        // 쉐이크가 완전히 끝나면 잔진동이 남지 않도록 0으로 확실히 초기화
         if (perlin != null)
         {
             perlin.AmplitudeGain = 0f;
