@@ -1202,6 +1202,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 548585a0cca82b249a00d044ca982883, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
+  vCam: {fileID: 0}
 --- !u!114 &215745401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5263,7 +5264,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4357290154265975706, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7974487431584254853, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: cameraShake
@@ -5271,15 +5272,15 @@ PrefabInstance:
       objectReference: {fileID: 83856856}
     - target: {fileID: 9011008408201578654, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 3.55
       objectReference: {fileID: 0}
     - target: {fileID: 9011008408201578654, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1
+      value: -3.35
       objectReference: {fileID: 0}
     - target: {fileID: 9011008408201578654, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -11.87
       objectReference: {fileID: 0}
     - target: {fileID: 9011008408201578654, guid: d177058f5c8aab4439d63ca652e97d83, type: 3}
       propertyPath: m_LocalRotation.w
