@@ -32,6 +32,9 @@ public class ActionState : IState
     public void Enter()
     {
         timer = 0f;
+        
+        //카메라 연출
+        actor.ShakeCamera();
 
         Vector3 searchForward = actor.GetForward();
         // 타겟 탐색
@@ -74,7 +77,7 @@ public class ActionState : IState
             float falloffMultiplier = 1f - Mathf.Pow(x, pow);
 
             // 최종 넉백 파워 계산
-            float finalPower = pushForce * falloffMultiplier;
+            float finalPower = pushForce * falloffMultiplier * actor.PushMulti;
 
             // 당기기 방향을 반대로
             bool isPull = (actionType == 1);
@@ -103,5 +106,7 @@ public class ActionState : IState
 
     public void Exit()
     {
+        //카메라 연출 끄기
+        actor.CameraShakeOff();
     }
 }

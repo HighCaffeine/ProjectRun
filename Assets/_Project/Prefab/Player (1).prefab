@@ -19838,7 +19838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &9011008408201578654
 Transform:
   m_ObjectHideFlags: 0
@@ -19904,7 +19904,7 @@ MonoBehaviour:
       DecayTime: 0.7
       ScaleWithImpact: 1
       HoldForever: 0
-    ImpactRadius: 100
+    ImpactRadius: 50
     DirectionMode: 0
     DissipationMode: 2
     DissipationDistance: 100
@@ -19994,6 +19994,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee347bada7f984046ac9d46a29ed4571, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerActor
+  pushMulti: 3
   moveSpeed: 5
   targetLayer:
     serializedVersion: 2

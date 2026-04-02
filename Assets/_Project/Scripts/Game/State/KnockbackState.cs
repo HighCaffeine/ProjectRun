@@ -37,8 +37,8 @@ public class KnockbackState : IState
         actor.SetVerticalVelocity(3.0f);
 
         // actor.SetAni(AniState.Hit); // 피격 애니메이션 재생
-        var impulseSource = actor.GetComponent<CinemachineImpulseSource>();
-        if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 1.0f);
+        // var impulseSource = actor.GetComponent<CinemachineImpulseSource>();
+        // if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 1.0f);
 
         // 연출
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
