@@ -16,7 +16,7 @@ public class PlayerActor : Actor
     private CharacterController controller;
     private Vector3 horizontalMove;
 
-    [SerializeField] private CameraShake cameraShake;
+    [SerializeField] private CameraShakeEffect cameraShake;
 
     //동기화
     public uint inputSeq = 0;
@@ -174,8 +174,7 @@ public class PlayerActor : Actor
         }
     }
 
-    public void ShakeCamera() { cameraShake.ShakeCamera(CAMERA_SHAKE, CAMERA_SHAKE); }
-    public void CameraShakeOff() { cameraShake.ShakeOff(); }
+    public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     public void SendMovePacket(float axisH, float axisV)
