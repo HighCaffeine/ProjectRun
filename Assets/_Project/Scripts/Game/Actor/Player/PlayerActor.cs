@@ -174,7 +174,7 @@ public class PlayerActor : Actor
         }
     }
 
-    public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
+    public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }//카메라 쉐이크 값/값/지속시간
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     public void SendMovePacket(float axisH, float axisV)
@@ -193,4 +193,5 @@ public class PlayerActor : Actor
         };
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
     }
+
 }

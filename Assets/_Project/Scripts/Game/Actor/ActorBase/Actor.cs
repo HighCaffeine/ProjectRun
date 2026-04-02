@@ -13,12 +13,6 @@ public class Actor : MonoBehaviour
 
     }
 
-    protected virtual void Move()
-    {
-        //실제 이동
-        //플레이어는 dir에 axis넣고, 몬스터는 타겟위치 방향 넣고
-    }
-
     public void SetAni(AniState aniState)
     {
         switch (aniState)
