@@ -48,6 +48,9 @@ public class PlayerActor : Actor
     public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
     public void SetPlayerPivot(Transform pivot) => this.playerPivot = pivot;
 
+    [SerializeField]
+    public DashCameraEffect dashCameraEffect;
+
     protected override void Start()
     {
         controller = GetComponent<CharacterController>();

@@ -5,6 +5,7 @@ public class DashState : IState
     private PlayerActor actor;
     public DashState(PlayerActor actor) { this.actor = actor; }
 
+    private DashCameraEffect dashCameraEffect; // 대시 카메라 효과 참조
     [SerializeField]
     const float dashSpeedMultiplier = 3f; // 대시 속도 배율
     [SerializeField]
@@ -14,6 +15,8 @@ public class DashState : IState
     {
         timer = 0f;
         //actor.SetAni(AniState.Dash); 
+        dashCameraEffect = actor.dashCameraEffect;
+        dashCameraEffect?.OnDash();
     }
 
     public void Execute()
@@ -27,7 +30,7 @@ public class DashState : IState
         }
 
         Vector3 moveDir = actor.GetForward().normalized; // 대시는 현재 바라보는 방향으로 이동
-
+     
 
         // 이동 및 패킷 전송
         actor.Move(moveDir, actor.moveSpeed * dashSpeedMultiplier);
