@@ -45,6 +45,9 @@ public enum E_PACKET
     GAME_READY_CANCEL_NTF = 274,
     GAME_START_NTF = 275,
 
+    DUNGEON_ESCAPE_REQ = 281,   // 클라 -> 서버: 탈출 구역 진입
+    DUNGEON_CLEAR_NTF = 282,    // 서버 -> 클라: 탈출 (결과창 띄우고 탈출)
+
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
     SHOP_INFO = 302,            // 상점 정보 - 현재 판매 아이템, 다음 갱신 시간

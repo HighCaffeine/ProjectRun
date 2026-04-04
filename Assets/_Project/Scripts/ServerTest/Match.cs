@@ -261,6 +261,16 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     break;
                 }
+
+            case E_PACKET.DUNGEON_CLEAR_NTF:
+                {
+                    Debug.Log("<color=cyan>[System] 던전 클리어</color>");
+
+                    // 결과 UI 창 띄우기 (몇 초간 대기)
+                    // 비동기 마을 씬 로딩 호출
+                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
+                    break;
+                }
             case E_PACKET.MOVE_PATH_RESPONSE:
                 P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
 
