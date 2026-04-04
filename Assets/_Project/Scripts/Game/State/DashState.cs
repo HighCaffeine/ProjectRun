@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Sentry.MeasurementUnit;
 
 public class DashState : IState
 {
@@ -7,7 +8,7 @@ public class DashState : IState
 
     private DashCameraEffect dashCameraEffect; // 대시 카메라 효과 참조
     [SerializeField]
-    const float dashSpeedMultiplier = 3f; // 대시 속도 배율
+    const float dashSpeedMultiplier = 30; // 대시 속도 배율
     [SerializeField]
     const float dashDuration = 0.5f; // 대시 지속 시간
     private float timer = 0f;
@@ -30,10 +31,16 @@ public class DashState : IState
         }
 
         Vector3 moveDir = actor.GetForward().normalized; // 대시는 현재 바라보는 방향으로 이동
-     
 
-        // 이동 및 패킷 전송
-        actor.Move(moveDir, actor.moveSpeed * dashSpeedMultiplier);
+
+
+        float t = Mathf.Clamp01(timer / dashDuration);
+
+        float logValue = Mathf.Log(1 + 3 * t) / Mathf.Log(1 + 3);
+        float smooth = logValue * logValue;
+       
+
+        actor.Move(moveDir,  smooth * dashSpeedMultiplier);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
