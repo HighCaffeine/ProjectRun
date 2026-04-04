@@ -10,6 +10,10 @@ public class GameManager : GenericSingleton<GameManager>
     [Header("세션 정보")]
     public bool isHost = false;
 
+
+    [Header("Test")]
+    public Transform playerDashAnchor;
+
     protected override void Awake()
     {
         base.Awake();

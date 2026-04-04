@@ -37,12 +37,13 @@ public class DashCameraEffect : MonoBehaviour
     void Start()
     {
         camfov = cam.Lens.FieldOfView;
+        dashAnchor = GameManager.Instance.playerDashAnchor;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(isDashing)
+        if (isDashing)
         {
             camPivot.transform.position = originalCamPos;
         }
