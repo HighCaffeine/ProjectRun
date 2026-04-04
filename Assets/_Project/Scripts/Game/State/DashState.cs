@@ -1,15 +1,16 @@
 using UnityEngine;
+using static Sentry.MeasurementUnit;
 
 public class DashState : IState
 {
     private PlayerActor actor;
     public DashState(PlayerActor actor) { this.actor = actor; }
 
-    private DashCameraEffect dashCameraEffect; // ´ë½Ã Ä«¸Þ¶ó È¿°ú ÂüÁ¶
+    private DashCameraEffect dashCameraEffect; // ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    const float dashSpeedMultiplier = 3f; // ´ë½Ã ¼Óµµ ¹èÀ²
+    const float dashSpeedMultiplier = 30; // ï¿½ï¿½ï¿½ ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    const float dashDuration = 0.5f; // ´ë½Ã Áö¼Ó ½Ã°£
+    const float dashDuration = 0.5f; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½
     private float timer = 0f;
     public void Enter()
     {
@@ -29,11 +30,17 @@ public class DashState : IState
             return;
         }
 
-        Vector3 moveDir = actor.GetForward().normalized; // ´ë½Ã´Â ÇöÀç ¹Ù¶óº¸´Â ¹æÇâÀ¸·Î ÀÌµ¿
-     
+        Vector3 moveDir = actor.GetForward().normalized; // ï¿½ï¿½Ã´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¶óº¸´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
 
-        // ÀÌµ¿ ¹× ÆÐÅ¶ Àü¼Û
-        actor.Move(moveDir, actor.moveSpeed * dashSpeedMultiplier);
+
+
+        float t = Mathf.Clamp01(timer / dashDuration);
+
+        float logValue = Mathf.Log(1 + 3 * t) / Mathf.Log(1 + 3);
+        float smooth = logValue * logValue;
+       
+
+        actor.Move(moveDir,  smooth * dashSpeedMultiplier);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
