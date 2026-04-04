@@ -250,18 +250,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     break;
                 }
-            case E_PACKET.PLAYER_STATUS_NTF:
-                {
-                    var statusPkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
-                    if (Players.TryGetValue(statusPkt.userUUID, out Player targetPlayer))
-                    {
-                        // 속도 및 상태 플래그 갱신
-                        targetPlayer.SetSpeed(statusPkt.moveSpeed);
-                        // UI나 이펙트 처리 로직 추가
-                    }
-                    break;
-                }
-
             case E_PACKET.DUNGEON_CLEAR_NTF:
                 {
                     Debug.Log("<color=cyan>[System] 던전 클리어</color>");
