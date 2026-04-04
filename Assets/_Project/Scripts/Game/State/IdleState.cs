@@ -21,6 +21,7 @@ public class IdleState : IState
 
         //actor.SetAni(AniState::Idle); 
         actor.SendMovePacket(0f, 0f);
+        actor.SendStateChange(eState.Idle);
     }
 
     public void Execute()

@@ -1,6 +1,11 @@
 using System;
 using UnityEngine;
 
+public enum eState
+{
+    Idle, Move, Push, Pull, Dash, Knockback, Count
+}
+
 public interface IState
 {
     public void Enter();        //state 시작 (함수 등록)

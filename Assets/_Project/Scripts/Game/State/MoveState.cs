@@ -8,6 +8,7 @@ public class MoveState : IState
     public void Enter()
     {
         //actor.SetAni(AniState.Move); 
+        actor.SendStateChange(eState.Move);
     }
 
     public void Execute()
@@ -16,7 +17,7 @@ public class MoveState : IState
         if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, 0)); return; }
         if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, 1)); return; }
         //대쉬 체크
-        if(Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 
         // 멈춤 체크
         if (actor.h == 0 && actor.v == 0)

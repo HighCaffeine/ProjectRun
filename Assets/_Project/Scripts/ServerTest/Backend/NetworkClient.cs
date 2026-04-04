@@ -251,19 +251,21 @@ public unsafe class NetworkClient
         }
     }
 
-    public void SendPacket(E_PACKET packetId, object packet)
-    {
-        int size = Marshal.SizeOf(packet);
-        byte* ptr = stackalloc byte[size];
-        IntPtr ptr2 = (IntPtr)ptr;
-        Marshal.StructureToPtr(packet, ptr2, true);
-        byte[] data = new byte[size];
-        Marshal.Copy(ptr2, data, 0, size);
-        SendData(packetId, data);
-    }
+    // public void SendPacket(E_PACKET packetId, object packet)
+    // {
+    //     int size = Marshal.SizeOf(packet);
+    //     byte* ptr = stackalloc byte[size];
+    //     IntPtr ptr2 = (IntPtr)ptr;
+    //     Marshal.StructureToPtr(packet, ptr2, true);
+    //     byte[] data = new byte[size];
+    //     Marshal.Copy(ptr2, data, 0, size);
+    //     SendData(packetId, data);
+    // }
 
     public void SendPacket2(E_PACKET packetId, object packet)
     {
+        if (!Client.IS_SERVER_PLAY) return;
+
         int size = Marshal.SizeOf(packet);
         byte* ptr = stackalloc byte[size];
         IntPtr ptr2 = (IntPtr)ptr;

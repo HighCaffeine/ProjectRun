@@ -14,6 +14,7 @@ public class DashState : IState
     public void Enter()
     {
         timer = 0f;
+        actor.SendStateChange(eState.Dash, actor.GetForward().normalized, 0.5f);
         //actor.SetAni(AniState.Dash); 
         dashCameraEffect = actor.dashCameraEffect;
         dashCameraEffect?.OnDash();
@@ -23,14 +24,14 @@ public class DashState : IState
     {
         timer += Time.deltaTime;
 
-        if (timer >=dashDuration)
+        if (timer >= dashDuration)
         {
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
 
         Vector3 moveDir = actor.GetForward().normalized; // 대시는 현재 바라보는 방향으로 이동
-     
+
 
         // 이동 및 패킷 전송
         actor.Move(moveDir, actor.moveSpeed * dashSpeedMultiplier);
@@ -38,7 +39,7 @@ public class DashState : IState
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
         {
-            actor.SendMovePacket(1f,1f);
+            actor.SendMovePacket(1f, 1f);
             actor.sendTimer = 0f;
         }
     }

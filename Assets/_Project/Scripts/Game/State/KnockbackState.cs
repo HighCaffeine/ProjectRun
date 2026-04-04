@@ -31,7 +31,7 @@ public class KnockbackState : IState
     public void Enter()
     {
         timer = 0f;
-
+        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower);
         actor.StartCoroutine(actor.HitStopRoutine());
 
         actor.SetVerticalVelocity(3.0f);

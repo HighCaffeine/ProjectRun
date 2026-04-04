@@ -27,11 +27,22 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     void Start()
     {
         AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name);
-        P_RoomEnterRequest request = new P_RoomEnterRequest()
+
+        if (!Client.IS_SERVER_PLAY)
         {
-            roomNumber = 0
-        };
-        Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, request);
+            //오프라인용 더미
+            Player dummy = AddPlayer(9999, "Dummy_Sandbag");
+
+            if (dummy != null) dummy.transform.position = new Vector3(3, 1, 3);
+        }
+        else
+        {
+            P_RoomEnterRequest request = new P_RoomEnterRequest()
+            {
+                roomNumber = 0
+            };
+            Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, request);
+        }
     }
 
     // private void OnGUI()
@@ -112,6 +123,51 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //RemovePlayer(roomLeaveUserNotify.userUUID);
                 break;
 
+            case E_PACKET.ROOM_HOST_NTF:
+                {
+                    var hostPkt = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
+
+                    // 서버가 지정한 방장 UUID가 내 UUID와 같다면 나는 방장!
+                    GameManager.Instance.isHost = (hostPkt.hostUUID == LocalPlayerInfo.ID);
+
+                    if (GameManager.Instance.isHost)
+                    {
+                        Debug.Log("<color=green>[System] 내가 이 방의 호스트(방장)가 되었습니다!</color>");
+                        // TODO: UI 매니저 호출해서 [게임 시작] 버튼 활성화
+                    }
+                    else
+                    {
+                        Debug.Log($"<color=yellow>[System] 현재 방장은 {hostPkt.hostUUID} 입니다.</color>");
+                        // TODO: [게임 시작] 버튼 비활성화 (대기 상태)
+                    }
+                    break;
+                }
+
+            case E_PACKET.GAME_START_COUNTDOWN_NTF:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
+                    Debug.Log($"<color=orange>[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다!</color>");
+                    // TODO: 화면 중앙에 숫자 텍스트 표시
+                    break;
+                }
+
+            case E_PACKET.GAME_READY_CANCEL_NTF:
+                {
+                    Debug.Log("<color=red>[System] 누군가 이탈하여 출발이 취소되었습니다.</color>");
+                    // TODO: 카운트다운 UI 숨기기
+                    break;
+                }
+
+            case E_PACKET.GAME_START_NTF:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartNtf>(packet.data);
+                    Debug.Log("<color=green>[System] 던전 입장!</color>");
+
+                    // 비동기 씬 로딩 시작 (던전 씬 이름이 Dungeon_1 구조임)
+                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
+                    break;
+                }
+
             case E_PACKET.UPDATE_PLAYER_MOVEMENT:
                 // P_UpdatePlayerMovement updateMovement = UnsafeCode.ByteArrayToStructure<P_UpdatePlayerMovement>(packet.data);
                 // if (Players.TryGetValue(updateMovement.player_id, out Player player) && player != null)
@@ -126,6 +182,30 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     player.OnSyncMovement(updatePkt);
                 }
                 break;
+            case E_PACKET.PLAYER_STATUS_NTF:
+                {
+                    var statePkt = UnsafeCode.ByteArrayToStructure<P_PlayerStatusNtf>(packet.data);
+
+                    if (Players.TryGetValue(statePkt.userUUID, out Player targetPlayer))
+                    {
+                        PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
+                        if (pActor == null || pActor.IsLocal) break;
+
+                        // 리모트 플레이어의 상태를 강제로 전환 (애니메이션, 이펙트 동기화)
+                        switch (statePkt.newState)
+                        {
+                            case 0: pActor.sm.ChangeState(new IdleState(pActor)); break;
+                            case 1: pActor.sm.ChangeState(new MoveState(pActor)); break;
+                            case 2: pActor.sm.ChangeState(new ActionState(pActor, 0)); break; // 밀기
+                            case 3: pActor.sm.ChangeState(new ActionState(pActor, 1)); break; // 당기기
+                            case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
+                            case 5:
+                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.powerOrTime, false, Vector3.zero));
+                                break;
+                        }
+                    }
+                    break;
+                }
             case E_PACKET.PLAYER_ACTION_NTF:
                 {
                     var actionNtf = UnsafeCode.ByteArrayToStructure<P_PlayerActionNtf>(packet.data);

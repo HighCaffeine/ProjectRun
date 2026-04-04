@@ -197,4 +197,18 @@ public class PlayerActor : Actor
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
     }
 
+    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f)
+    {
+        if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+
+        P_PlayerStatusNtf pkt = new P_PlayerStatusNtf
+        {
+            userUUID = LocalPlayerInfo.ID,
+            newState = (byte)stateCode,
+            targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
+            powerOrTime = param
+        };
+
+        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
+    }
 }
