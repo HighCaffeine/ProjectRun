@@ -6,16 +6,29 @@ public class DashCameraEffect : MonoBehaviour
 {
     [SerializeField]
     private CinemachineCamera cam;
-    float camfov; //±âÁ¸ Ä«¸Þ¶ó FOV
-    float dashFov = 60; // ´ë½Ã ½Ã Ä«¸Þ¶ó FOV    
-    float transitionDuration = 0.2f; // FOV ÀüÈ¯ ½Ã°£
+    [SerializeField]
+    float camfov; //ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ FOV
+    [SerializeField]
+    float dashFov = 20; // ï¿½ï¿½ï¿½ ï¿½ï¿½ Ä«ï¿½Þ¶ï¿½ FOV    
+    float transitionDuration = 0.2f; // FOV ï¿½ï¿½È¯ ï¿½Ã°ï¿½
 
     [SerializeField]
-    Transform playerTransform; // ÇÃ·¹ÀÌ¾î À§Ä¡ ÂüÁ¶
+    Transform playerTransform; // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
-    Transform dashAnchor; // Ä«¸Þ¶ó À§Ä¡ ÂüÁ¶
+    Transform dashAnchor; // Ä«ï¿½Þ¶ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
     [SerializeField]
     float holdTime = 0.3f;
+
+    Vector3 originalCamPos;
+
+    [SerializeField]
+    GameObject camPivot;
+    bool isDashing = false;
+
+
+    float camDistance;
+    float beforeDistance;
+    float curDistance;
     void Awake()
     {
         cam = GetComponent<CinemachineCamera>();
@@ -29,25 +42,33 @@ public class DashCameraEffect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
+        if(isDashing)
+        {
+            camPivot.transform.position = originalCamPos;
+        }
     }
 
     public void OnDash()
     {
-        Debug.Log("DashCameraEffect OnDash called");
+        originalCamPos = camPivot.transform.position; // Ä«ï¿½Þ¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+        isDashing = true;
         StartCoroutine(DashCameraRoutine());
 
     }
 
     IEnumerator DashCameraRoutine()
     {
-        dashAnchor.position = playerTransform.position; // ´ë½Ã ½ÃÀÛ ½Ã ÇÃ·¹ÀÌ¾î À§Ä¡·Î ¾ÞÄ¿ ÀÌµ¿
-        cam.Follow = dashAnchor; // Ä«¸Þ¶ó°¡ ¾ÞÄ¿¸¦ µû¶ó°¡µµ·Ï ¼³Á¤
+        dashAnchor.position = playerTransform.position; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½Ä¿ ï¿½Ìµï¿½
+
+        yield return StartCoroutine(ChangeFOV(camfov, dashFov, transitionDuration)); // È®ï¿½ï¿½
+
         yield return new WaitForSeconds(holdTime);
-        cam.Follow = playerTransform; // ´ë½Ã Á¾·á ÈÄ Ä«¸Þ¶ó°¡ ÇÃ·¹ÀÌ¾î¸¦ µû¶ó°¡µµ·Ï ¼³Á¤
-        StartCoroutine(ChangeFOV(camfov, dashFov, transitionDuration)); // È®´ë
-        yield return StartCoroutine(ChangeFOV(dashFov, camfov, transitionDuration)); // º¹±¸
+
+        StartCoroutine(CamReset());
+
+        yield return StartCoroutine(ChangeFOV(dashFov, camfov, transitionDuration)); // ï¿½ï¿½ï¿½ï¿½
+
+
     }
     IEnumerator ChangeFOV(float from, float to, float duration)
     {
@@ -65,4 +86,39 @@ public class DashCameraEffect : MonoBehaviour
 
         cam.Lens.FieldOfView = to;
     }
+    [SerializeField]
+    float fff = 40f;
+    IEnumerator CamReset()
+    {
+        isDashing = false;
+        Vector3 startPos = camPivot.transform.localPosition;
+        Vector3 targetPos = Vector3.zero;
+
+        float time = 0f;
+        float duration = 0.3f;
+        float k = 3f;
+        beforeDistance = float.MaxValue;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = Mathf.Clamp01(time / duration);
+            float logValue = Mathf.Log(1 + k * t) / Mathf.Log(1 + k);
+            float smooth = logValue * logValue; // ï¿½Î±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½   
+            float power = fff * smooth;
+
+
+            camDistance = Vector3.Distance(camPivot.transform.localPosition, targetPos);
+            camPivot.transform.localPosition = Vector3.Lerp(startPos, targetPos, power);
+
+            if (beforeDistance <= camDistance)
+            {
+                break;
+            }
+            beforeDistance = camDistance;
+            yield return null;
+        }
+        camPivot.transform.localPosition = Vector3.zero;
+    }
+
 }
