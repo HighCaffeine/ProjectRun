@@ -146,14 +146,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_COUNTDOWN_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
-                    Debug.Log($"<color=orange>[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다!</color>");
+                    Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     // TODO: 화면 중앙에 숫자 텍스트 표시
                     break;
                 }
 
             case E_PACKET.GAME_READY_CANCEL_NTF:
                 {
-                    Debug.Log("<color=red>[System] 누군가 이탈하여 출발이 취소되었습니다.</color>");
+                    Debug.Log("[System] 누군가 이탈하여 출발이 취소되었습니다.");
                     // TODO: 카운트다운 UI 숨기기
                     break;
                 }
@@ -161,7 +161,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartNtf>(packet.data);
-                    Debug.Log("<color=green>[System] 던전 입장!</color>");
+                    Debug.Log("<color=green>[System] 던전 입장</color>");
 
                     // 비동기 씬 로딩 시작 (던전 씬 이름이 Dungeon_1 구조임)
                     UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
@@ -200,7 +200,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 3: pActor.sm.ChangeState(new ActionState(pActor, 1)); break; // 당기기
                             case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
-                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.powerOrTime, false, Vector3.zero));
+                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, false, Vector3.zero));
                                 break;
                         }
                     }

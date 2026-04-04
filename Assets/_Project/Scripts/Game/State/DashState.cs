@@ -6,11 +6,11 @@ public class DashState : IState
     private PlayerActor actor;
     public DashState(PlayerActor actor) { this.actor = actor; }
 
-    private DashCameraEffect dashCameraEffect; // ��� ī�޶� ȿ�� ����
+    private DashCameraEffect dashCameraEffect; // ���? ī�޶� ȿ�� ����
     [SerializeField]
-    const float dashSpeedMultiplier = 30; // ��� �ӵ� ����
+    const float dashSpeedMultiplier = 30; // ���? �ӵ� ����
     [SerializeField]
-    const float dashDuration = 0.5f; // ��� ���� �ð�
+    const float dashDuration = 0.5f; // ���? ���� �ð�
     private float timer = 0f;
     public void Enter()
     {
@@ -24,13 +24,13 @@ public class DashState : IState
     {
         timer += Time.deltaTime;
 
-        if (timer >=dashDuration)
+        if (timer >= dashDuration)
         {
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
 
-        Vector3 moveDir = actor.GetForward().normalized; // ��ô� ���� �ٶ󺸴� �������� �̵�
+        Vector3 moveDir = actor.GetForward().normalized; // ��ô�? ���� �ٶ󺸴� �������� �̵�
 
 
 
@@ -38,14 +38,14 @@ public class DashState : IState
 
         float logValue = Mathf.Log(1 + 3 * t) / Mathf.Log(1 + 3);
         float smooth = logValue * logValue;
-       
 
-        actor.Move(moveDir,  smooth * dashSpeedMultiplier);
+
+        actor.Move(moveDir, smooth * dashSpeedMultiplier);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
         {
-            actor.SendMovePacket(1f,1f);
+            actor.SendMovePacket(1f, 1f);
             actor.sendTimer = 0f;
         }
     }

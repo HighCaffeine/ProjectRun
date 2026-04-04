@@ -16,7 +16,7 @@ public class PlayerActor : Actor
     private CharacterController controller;
     private Vector3 horizontalMove;
 
-    [SerializeField] private CameraShakeEffect cameraShake;
+    public DashCameraEffect dashCameraEffect;
 
     //동기화
     public uint inputSeq = 0;
@@ -175,6 +175,22 @@ public class PlayerActor : Actor
     }
 
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
+
+    // 상태 변경 패킷 전송용 함수
+    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f)
+    {
+        if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+
+        P_PlayerStateNtf pkt = new P_PlayerStateNtf
+        {
+            userUUID = LocalPlayerInfo.ID,
+            newState = (byte)stateCode,
+            targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
+            powerOrTime = param
+        };
+
+        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATE_NTF, pkt);
+    }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     public void SendMovePacket(float axisH, float axisV)

@@ -38,6 +38,16 @@ public enum E_PACKET
     GIMMICK_INTERACT_REQ = 261,
     GIMMICK_INTERACT_NTF = 262,
 
+    ROOM_HOST_NTF = 218,             // 방장 알림
+    PLAYER_STATE_NTF = 234,   // 상태 변경 알림
+    PLAYER_READY_REQUEST = 271,      // 준비 구역 진입
+    ROOM_READY_STATUS_NTF = 272,
+    GAME_START_COUNTDOWN_NTF = 273,  // 5, 4, 3 카운트다운
+    GAME_READY_CANCEL_NTF = 274,     // 카운트 취소
+    GAME_START_NTF = 275,            // 씬 전환 시작
+    DUNGEON_ESCAPE_REQ = 281,        // 탈출 구역 진입
+    DUNGEON_CLEAR_NTF = 282,         // 던전 클리어 알림
+
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
     SHOP_INFO = 302,            // 상점 정보 - 현재 판매 아이템, 다음 갱신 시간
@@ -246,12 +256,10 @@ public struct P_UpdatePlayerMovement
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerStatusNtf
 {
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.R4)]
-    public float moveSpeed;    // 현재 이동 속도 수치
-    [MarshalAs(UnmanagedType.I4)]
-    public uint statusFlags;   // 상태 플래그 (0:정상, 1:슬로우, 2:스턴 등)
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.I1)] public byte newState;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
+    [MarshalAs(UnmanagedType.R4)] public float param;
 }
 #endregion
 #endregion
@@ -290,11 +298,44 @@ public struct P_GimmickInteractReq
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_GimmickInteractNtf
 {
-    [MarshalAs(UnmanagedType.I8)] public long activeUUID; 
+    [MarshalAs(UnmanagedType.I8)] public long activeUUID;
     [MarshalAs(UnmanagedType.I4)] public int gimmickID;
     [MarshalAs(UnmanagedType.I1)] public byte state;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
     [MarshalAs(UnmanagedType.R4)] public float param;
+}
+#endregion
+
+#region Game Status
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_RoomHostNtf { [MarshalAs(UnmanagedType.I8)] public long hostUUID; }
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerStateNtf
+{
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.I1)] public byte newState;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
+    [MarshalAs(UnmanagedType.R4)] public float powerOrTime;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerReadyRequest
+{
+    [MarshalAs(UnmanagedType.I1)] public bool isReady;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GameStartCountdownNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int remainSeconds;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GameStartNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int mapId;
 }
 #endregion
 
