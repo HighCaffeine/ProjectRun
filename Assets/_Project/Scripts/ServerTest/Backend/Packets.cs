@@ -16,7 +16,6 @@ public enum E_PACKET
     ROOM_LEAVE_REQUEST = 215,
     ROOM_LEAVE_RESPONSE = 216,
     ROOM_LEAVE_USER_NTF = 217, // PLAYER_LEFT
-    ROOM_HOST_NTF = 218,
 
     // Chat
     ROOM_CHAT_REQUEST = 221, // SEND_CHAT_MESSAGE
@@ -38,15 +37,6 @@ public enum E_PACKET
     PLAYER_ACTION_NTF = 252,
     GIMMICK_INTERACT_REQ = 261,
     GIMMICK_INTERACT_NTF = 262,
-
-    PLAYER_READY_REQUEST = 271,
-    ROOM_READY_STATUS_NTF = 272,
-    GAME_START_COUNTDOWN_NTF = 273,
-    GAME_READY_CANCEL_NTF = 274,
-    GAME_START_NTF = 275,
-
-    DUNGEON_ESCAPE_REQ = 281,   // 클라 -> 서버: 탈출 구역 진입
-    DUNGEON_CLEAR_NTF = 282,    // 서버 -> 클라: 탈출 (결과창 띄우고 탈출)
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -177,12 +167,6 @@ struct P_RoomLeaveUserNotify
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
     public string userName;
 }
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_RoomHostNtf
-{
-    [MarshalAs(UnmanagedType.I8)]
-    public long hostUUID;
-}
 #endregion
 
 #region Player Move Packet
@@ -262,10 +246,12 @@ public struct P_UpdatePlayerMovement
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerStatusNtf
 {
-    [MarshalAs(UnmanagedType.I8)] public long userUUID;
-    [MarshalAs(UnmanagedType.I1)] public byte newState;
-    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
-    [MarshalAs(UnmanagedType.R4)] public float powerOrTime;
+    [MarshalAs(UnmanagedType.I8)]
+    public long userUUID;
+    [MarshalAs(UnmanagedType.R4)]
+    public float moveSpeed;    // 현재 이동 속도 수치
+    [MarshalAs(UnmanagedType.I4)]
+    public uint statusFlags;   // 상태 플래그 (0:정상, 1:슬로우, 2:스턴 등)
 }
 #endregion
 #endregion
@@ -304,31 +290,11 @@ public struct P_GimmickInteractReq
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_GimmickInteractNtf
 {
-    [MarshalAs(UnmanagedType.I8)] public long activeUUID;
+    [MarshalAs(UnmanagedType.I8)] public long activeUUID; 
     [MarshalAs(UnmanagedType.I4)] public int gimmickID;
     [MarshalAs(UnmanagedType.I1)] public byte state;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
     [MarshalAs(UnmanagedType.R4)] public float param;
-}
-#endregion
-
-#region Ready
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PlayerReadyRequest
-{
-    [MarshalAs(UnmanagedType.I1)] public bool isReady;
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_GameStartCountdownNtf
-{
-    public int remainSeconds;
-}
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_GameStartNtf
-{
-    public int mapId;
 }
 #endregion
 

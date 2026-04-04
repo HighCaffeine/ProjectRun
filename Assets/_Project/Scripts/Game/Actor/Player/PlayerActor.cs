@@ -48,9 +48,6 @@ public class PlayerActor : Actor
     public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
     public void SetPlayerPivot(Transform pivot) => this.playerPivot = pivot;
 
-    [SerializeField]
-    public DashCameraEffect dashCameraEffect;
-
     protected override void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -177,7 +174,7 @@ public class PlayerActor : Actor
         }
     }
 
-    public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }//카메라 쉐이크 값/값/지속시간
+    public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     public void SendMovePacket(float axisH, float axisV)
@@ -195,20 +192,5 @@ public class PlayerActor : Actor
             axisV = axisV
         };
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
-    }
-
-    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f)
-    {
-        if (!Client.IS_SERVER_PLAY || !IsLocal) return;
-
-        P_PlayerStatusNtf pkt = new P_PlayerStatusNtf
-        {
-            userUUID = LocalPlayerInfo.ID,
-            newState = (byte)stateCode,
-            targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
-            powerOrTime = param
-        };
-
-        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }
 }

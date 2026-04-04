@@ -12,7 +12,6 @@ public class ActionState : IState
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
     private float pow = 3f;  // 계수
 
-
     public ActionState(PlayerActor actor, byte type)
     {
         this.actor = actor;
@@ -33,11 +32,9 @@ public class ActionState : IState
     public void Enter()
     {
         timer = 0f;
-        actor.SendStateChange(actionType == 0 ? eState.Push : eState.Pull);
-
+        
         //카메라 연출
         actor.ShakeCamera();
-
 
         Vector3 searchForward = actor.GetForward();
         // 타겟 탐색
