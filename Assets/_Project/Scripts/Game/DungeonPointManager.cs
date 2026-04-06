@@ -11,11 +11,25 @@ public struct DungeonSector
     // public int requiredGimmickID; 
 }
 
-public class DungeonPointManager : GenericSingleton<DungeonPointManager>
+public class DungeonPointManager : MonoBehaviour
 {
+    public static DungeonPointManager Instance => instance;
+    private static DungeonPointManager instance;
     [Header("던전 구역(Sector) 데이터")]
     [Tooltip("0번: 던전 시작 구역 / 1~N번: 다음 기믹 구역")]
     public DungeonSector[] sectors;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     // 특정 구역의 스폰 좌표를 반환하는 함수
     public Vector3 GetSpawnPosition(int sectorIndex)

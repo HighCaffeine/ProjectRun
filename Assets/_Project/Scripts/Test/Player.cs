@@ -11,6 +11,7 @@ public class Player : MonoBehaviour
 
     [Header("Sync Data")]
     [SerializeField] private Vector3 serverPos;
+    [SerializeField] private Quaternion serverRot;
     [SerializeField] private float currentSpeed = 5.0f;
     [SerializeField] private bool isMoving;
     [SerializeField] private uint lastProcessedSeq = 0;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour
         }
 
         serverPos = pkt.currentPos.ToVector3();
+        serverRot = pkt.currentRot.ToQuaternion();
         currentSpeed = pkt.currentSpeed;
         isMoving = pkt.isMoving;
 
@@ -52,6 +54,7 @@ public class Player : MonoBehaviour
         {
             hasReceivedFirstSync = true;
             transform.position = serverPos;
+            transform.rotation = serverRot;
         }
     }
 
@@ -193,6 +196,7 @@ public class Player : MonoBehaviour
         if (dist > snapThreshold * 2.0f)
         {
             transform.position = new Vector3(serverPos.x, serverPos.y, serverPos.z);
+            transform.rotation = serverRot;
             return;
         }
 
@@ -201,13 +205,7 @@ public class Player : MonoBehaviour
         Vector3 targetPos = new Vector3(serverPos.x, serverPos.y, serverPos.z);
         transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * adaptiveSpeed);
 
-        Vector3 dir = (serverPos - transform.position);
-        dir.y = 0;
-        if (dir.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(dir.normalized);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * lerpSpeed);
-        }
+        transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
     }
 
     private IEnumerator RemoteVisualRoutine()
