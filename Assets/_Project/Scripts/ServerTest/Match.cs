@@ -503,6 +503,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //카메라 세팅
                 cameraPivot.SetParent(playerObj.transform);
                 cameraPivot.localPosition = Vector3.zero;
+                cameraPivot.gameObject.SetActive(true);
+                if (DashCameraEffect.Instance != null)
+                {
+                    DashCameraEffect.Instance.InitSetup(pActor.transform);
+                }
 
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
                 Collider[] cols = playerObj.GetComponents<Collider>();
@@ -520,7 +525,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 foreach (var c in existingCols) DestroyImmediate(c);
 
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
-                //if (cc != null) DestroyImmediate(cc);
+                if (cc != null) DestroyImmediate(cc);
+
+                CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
+                col.isTrigger = true;
+                col.radius = 0.5f;
+                col.height = 2f;
+                col.center = new Vector3(0, 1f, 0);
 
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb == null) rb = playerObj.AddComponent<Rigidbody>();

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
 using UnityEngine.AdaptivePerformance;
-public class DashCameraEffect : MonoBehaviour
+public class DashCameraEffect : GenericSingleton<DashCameraEffect>
 {
     [SerializeField]
     private CinemachineCamera cam;
@@ -29,8 +29,9 @@ public class DashCameraEffect : MonoBehaviour
     float camDistance;
     float beforeDistance;
     float curDistance;
-    void Awake()
+    private new void Awake()
     {
+        base.Awake();
         cam = GetComponent<CinemachineCamera>();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -47,6 +48,11 @@ public class DashCameraEffect : MonoBehaviour
         {
             camPivot.transform.position = originalCamPos;
         }
+    }
+
+    public void InitSetup(Transform player)
+    {
+        playerTransform = player;
     }
 
     public void OnDash()
