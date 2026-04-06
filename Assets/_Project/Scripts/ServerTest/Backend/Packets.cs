@@ -45,6 +45,8 @@ public enum E_PACKET
     GAME_START_COUNTDOWN_NTF = 273,  // 5, 4, 3 카운트다운
     GAME_READY_CANCEL_NTF = 274,     // 카운트 취소
     GAME_START_NTF = 275,            // 씬 전환 시작
+    SCENE_SYNC_REQ = 276,           //씬 로딩 후 동기화
+
     DUNGEON_ESCAPE_REQ = 281,        // 탈출 구역 진입
     DUNGEON_CLEAR_NTF = 282,         // 던전 클리어 알림
 
@@ -232,7 +234,7 @@ struct P_RoomLeaveUserNotify
 public struct P_PlayerMovement
 {
     [MarshalAs(UnmanagedType.I8)] public long userUUID;
-    [MarshalAs(UnmanagedType.I4)] public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
+    [MarshalAs(UnmanagedType.U4)] public uint inputSeq;       // 클라이언트 입력 번호 (보정용)
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
     [MarshalAs(UnmanagedType.R4)] public float axisH;
@@ -337,6 +339,9 @@ public struct P_GameStartNtf
 {
     [MarshalAs(UnmanagedType.I4)] public int mapId;
 }
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_SceneSyncReq { }
 #endregion
 
 #region Chat Packet
@@ -373,35 +378,27 @@ struct P_MovePathRequest
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PacketVector3
+public struct P_PacketQuaternion
 {
-    [MarshalAs(UnmanagedType.R4)]
-    public float x;
+    [MarshalAs(UnmanagedType.R4)] public float x;
+    [MarshalAs(UnmanagedType.R4)] public float y;
+    [MarshalAs(UnmanagedType.R4)] public float z;
+    [MarshalAs(UnmanagedType.R4)] public float w;
 
-    [MarshalAs(UnmanagedType.R4)]
-    public float y;
-
-    [MarshalAs(UnmanagedType.R4)]
-    public float z;
-
-    public void Set(Vector3 v)
-    {
-        x = v.x; y = v.y; z = v.z;
-    }
-    public Vector3 ToVector3() => new Vector3(x, y, z);
+    public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
+    public void Set(Quaternion q) { x = q.x; y = q.y; z = q.z; w = q.w; }
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PacketQuaternion
+public struct P_PacketVector3
 {
-    public float x, y, z, w;
-    public Quaternion ToQuaternion() => new Quaternion(x, y, z, w);
-    public void Set(Quaternion q)
-    {
-        x = q.x; y = q.y; z = q.z; w = q.w;
-    }
-}
+    [MarshalAs(UnmanagedType.R4)] public float x;
+    [MarshalAs(UnmanagedType.R4)] public float y;
+    [MarshalAs(UnmanagedType.R4)] public float z;
 
+    public void Set(Vector3 v) { x = v.x; y = v.y; z = v.z; }
+    public Vector3 ToVector3() => new Vector3(x, y, z);
+}
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 struct P_MovePathResponse
 {

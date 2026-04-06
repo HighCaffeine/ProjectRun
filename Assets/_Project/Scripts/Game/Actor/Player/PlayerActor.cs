@@ -51,32 +51,33 @@ public class PlayerActor : Actor
     protected override void Start()
     {
         controller = GetComponent<CharacterController>();
-        if (IsLocal)
+        sm.ChangeState(new IdleState(this));
+    }
+    void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
         {
-            sm.ChangeState(new IdleState(this));
+            sendTimer = 0f;
         }
     }
-
     void Update()
     {
-        if (IsLocal)
-        {
-            h = Input.GetAxisRaw("Horizontal");
-            v = Input.GetAxisRaw("Vertical");
-        }
-
-        ApplyGravity();
+        if (sm.currentState == null) return;
         horizontalMove = Vector3.zero;
+        sm.Update();
 
-        if (sm != null)
-        {
-            sm.Update();
-        }
+        if (!IsLocal) return;
 
-        if (controller != null && controller.enabled)
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+
+        if (IsLocal && controller != null && controller.enabled)
         {
+            ApplyGravity();
             Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
-            controller.Move(finalMove * Time.deltaTime);
+
+            float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
+            controller.Move(finalMove * safeDelta);
         }
     }
 
@@ -93,10 +94,17 @@ public class PlayerActor : Actor
         }
         else
         {
-            verticalVelocity += gravity * Time.deltaTime;
+            // [해결 1] 백그라운드 전환 시 deltaTime이 10초, 20초로 튀는 것을 최대 0.1초로 제한
+            float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
+            verticalVelocity += gravity * safeDelta;
+
+            // [해결 2] 바닥을 뚫고 무한 낙하하는 속도 제한 (CharacterController 고장 방지)
+            if (verticalVelocity < maxVerticalVelocity)
+            {
+                verticalVelocity = maxVerticalVelocity;
+            }
         }
     }
-
     //마우스 방향 보기
     public void LookAtMouse()
     {
@@ -193,20 +201,115 @@ public class PlayerActor : Actor
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
+    // public void SendMovePacket(float axisH, float axisV)
+    // {
+    //     curPos.Set(transform.position);
+    //     curRot.Set(transform.rotation);
+
+    //     P_PlayerMovement pkt = new P_PlayerMovement
+    //     {
+    //         userUUID = LocalPlayerInfo.ID,
+    //         inputSeq = ++inputSeq,
+    //         currentPos = curPos,
+    //         currentRot = curRot,
+    //         axisH = axisH,
+    //         axisV = axisV
+    //     };
+    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+    // }
+
+    // public void SendMovePacket(float axisH, float axisV)
+    // {
+    //     P_PacketVector3 sendPos = new P_PacketVector3();
+    //     sendPos.Set(transform.position);
+
+    //     P_PacketQuaternion sendRot = new P_PacketQuaternion();
+    //     sendRot.Set(transform.rotation);
+
+    //     P_PlayerMovement pkt = new P_PlayerMovement
+    //     {
+    //         userUUID = LocalPlayerInfo.ID,
+    //         inputSeq = ++inputSeq,
+    //         currentPos = sendPos,
+    //         currentRot = sendRot,
+    //         axisH = axisH,
+    //         axisV = axisV
+    //     };
+
+    //     // 직접 직렬화해서 바이트 값 비교
+    //     byte[] dataOld = SerializePlayerMovement(pkt); // 됐던 함수
+    //     byte[] dataNew = PacketSerializer.Serialize(pkt); // 새 함수
+
+    //     Debug.Log($"[비교] Old: {dataOld.Length}bytes [{string.Join(",", dataOld)}]");
+    //     Debug.Log($"[비교] New: {dataNew.Length}bytes [{string.Join(",", dataNew)}]");
+    // }
+
+
+
+    // public void SendMovePacket(float axisH, float axisV)
+    // {
+    //     P_PacketVector3 sendPos = new P_PacketVector3();
+    //     sendPos.Set(transform.position);
+
+    //     P_PacketQuaternion sendRot = new P_PacketQuaternion();
+    //     sendRot.Set(transform.rotation);
+
+    //     P_PlayerMovement pkt = new P_PlayerMovement
+    //     {
+    //         userUUID = LocalPlayerInfo.ID,
+    //         inputSeq = ++inputSeq,
+    //         currentPos = sendPos,
+    //         currentRot = sendRot,
+    //         axisH = axisH,
+    //         axisV = axisV
+    //     };
+
+    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt); // byte[] 말고 pkt 직접
+    // }
+
+
     public void SendMovePacket(float axisH, float axisV)
     {
-        curPos.Set(transform.position);
-        curRot.Set(transform.rotation);
-
+        if (!IsLocal) return;
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,
             inputSeq = ++inputSeq,
-            currentPos = curPos,
-            currentRot = curRot,
+            currentPos = new P_PacketVector3(),
+            currentRot = new P_PacketQuaternion(),
             axisH = axisH,
             axisV = axisV
         };
+        pkt.currentPos.Set(transform.position);
+        pkt.currentRot.Set(transform.rotation);
+
+        //byte[] data = SerializePlayerMovement(pkt);
+        //byte[] data = PacketSerializer.Serialize(pkt);
         Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+    }
+    public static byte[] SerializePlayerMovement(P_PlayerMovement pkt)
+    {
+        byte[] buf = new byte[48]; // 헤더 제외 데이터만
+        int offset = 0;
+
+        // long userUUID (8)
+        Array.Copy(BitConverter.GetBytes(pkt.userUUID), 0, buf, offset, 8); offset += 8;
+        // uint inputSeq (4)
+        Array.Copy(BitConverter.GetBytes(pkt.inputSeq), 0, buf, offset, 4); offset += 4;
+        // Vector3 currentPos (12)
+        Array.Copy(BitConverter.GetBytes(pkt.currentPos.x), 0, buf, offset, 4); offset += 4;
+        Array.Copy(BitConverter.GetBytes(pkt.currentPos.y), 0, buf, offset, 4); offset += 4;
+        Array.Copy(BitConverter.GetBytes(pkt.currentPos.z), 0, buf, offset, 4); offset += 4;
+        // Quaternion currentRot (16)
+        Array.Copy(BitConverter.GetBytes(pkt.currentRot.x), 0, buf, offset, 4); offset += 4;
+        Array.Copy(BitConverter.GetBytes(pkt.currentRot.y), 0, buf, offset, 4); offset += 4;
+        Array.Copy(BitConverter.GetBytes(pkt.currentRot.z), 0, buf, offset, 4); offset += 4;
+        Array.Copy(BitConverter.GetBytes(pkt.currentRot.w), 0, buf, offset, 4); offset += 4;
+        // float axisH (4)
+        Array.Copy(BitConverter.GetBytes(pkt.axisH), 0, buf, offset, 4); offset += 4;
+        // float axisV (4)
+        Array.Copy(BitConverter.GetBytes(pkt.axisV), 0, buf, offset, 4); offset += 4;
+
+        return buf;
     }
 }

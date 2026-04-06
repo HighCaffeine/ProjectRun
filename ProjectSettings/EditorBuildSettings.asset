@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Project/Scenes/Game/Game_Lobby.unity
     guid: 381131d8368cb0641a0ef40fbecba48a
+  - enabled: 1
+    path: Assets/_Project/Scenes/Game/parktaeyun/Dungeon_1.unity
+    guid: 1948ae547d287b64ca6ef4e6f6696435
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
+using TMPro;
+using System;
 
 public unsafe class Match : MonoBehaviour, IPacketReceiver
 {
+    [Header("UI Settings")]
+    public TextMeshProUGUI countdownText;
+    [Header("Debug Settings")]
+    public bool isDebugMode = false;
+
     public static Match Instance;
     public Dictionary<long, Player> Players;
 
@@ -12,7 +19,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     [Header("Player Settings")]
     public GameObject playerPrefab;
-    public Camera mainCamera;
     public Transform cameraPivot;
 
     void Awake()
@@ -26,23 +32,42 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     void Start()
     {
-        AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name);
-
-        if (!Client.IS_SERVER_PLAY)
+        if (!Client.IS_SERVER_PLAY || isDebugMode)
         {
-            //오프라인용 더미
-            Player dummy = AddPlayer(9999, "Dummy_Sandbag");
+            Debug.Log("[Debug] 서버 연결 없이 로컬 테스트 모드로 시작합니다.");
 
-            if (dummy != null) dummy.transform.position = new Vector3(3, 1, 3);
-        }
-        else
-        {
-            P_RoomEnterRequest request = new P_RoomEnterRequest()
+            // 던전 씬이라면 0번 위치에 즉시 스폰
+            if (DungeonPointManager.Instance != null)
             {
-                roomNumber = 0
-            };
-            Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, request);
+                SpawnLocalPlayer(0);
+            }
+            else
+            {
+                AddPlayer(LocalPlayerInfo.ID, "a", Vector3.zero);
+            }
+            return; // 서버 입장 요청 패킷을 보내지 않고 여기서 종료
         }
+
+        // [핵심] 좆같은 Instance 널 체크 버리고, 진짜 씬 이름으로만 판단합니다.
+        string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+
+        // 던전 씬 이름이 "Dungeon_1", "Dungeon_2" 식으로 되어있다면
+        if (currentSceneName.StartsWith("Dungeon"))
+        {
+            Debug.Log("[Match] 던전 씬 컷씬 종료 대기");
+        }
+        else // 그 외 (Game_Lobby 등)
+        {
+            Debug.Log("[Match] 마을 씬 감지. 기본 위치에서 스폰합니다.");
+            AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
+
+            if (Client.IS_SERVER_PLAY)
+            {
+                P_RoomEnterRequest request = new P_RoomEnterRequest { roomNumber = 0 };
+                Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, request);
+            }
+        }
+
     }
 
     // private void OnGUI()
@@ -79,24 +104,29 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 break;
 
             case E_PACKET.ROOM_NEW_USER_NTF:
-                P_RoomNewUserNotify roomNewUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-                AddPlayer(roomNewUserNotify.userUUID, roomNewUserNotify.userName);
-                Debug.Log($"Player {roomNewUserNotify.userName} has joined");
-                break;
-
-            case E_PACKET.ROOM_USER_INFO_NTF:
-                P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
-                Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName);
-
-                if (newPlayer != null)
                 {
-                    newPlayer.transform.position = roomUserInfoNotify.position.ToVector3();
-                    newPlayer.transform.rotation = roomUserInfoNotify.rotation.ToQuaternion();
-
-                    newPlayer.SetPos(roomUserInfoNotify.position.ToVector3());
+                    P_RoomNewUserNotify roomNewUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
+                    Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(0) : Vector3.zero;
+                    AddPlayer(roomNewUserNotify.userUUID, roomNewUserNotify.userName, pos);
+                    Debug.Log($"Player {roomNewUserNotify.userName} has joined");
+                    break;
                 }
-                Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
-                break;
+            case E_PACKET.ROOM_USER_INFO_NTF:
+                {
+                    P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
+                    Vector3 pos = roomUserInfoNotify.position.ToVector3();
+                    Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName, pos);
+
+                    if (newPlayer != null)
+                    {
+                        newPlayer.transform.position = roomUserInfoNotify.position.ToVector3();
+                        newPlayer.transform.rotation = roomUserInfoNotify.rotation.ToQuaternion();
+
+                        newPlayer.SetPos(roomUserInfoNotify.position.ToVector3());
+                    }
+                    Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
+                    break;
+                }
             // case E_PACKET.ROOM_USER_INFO_NTF:
             //     P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
             //     Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName);
@@ -125,9 +155,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.ROOM_HOST_NTF:
                 {
+                    if (GameManager.Instance == null) break;
                     var hostPkt = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
 
-                    // 서버가 지정한 방장 UUID가 내 UUID와 같다면 나는 방장!
+                    // 서버가 지정한 방장 UUID가 내 UUID와 같다면 나는 방장
                     GameManager.Instance.isHost = (hostPkt.hostUUID == LocalPlayerInfo.ID);
 
                     if (GameManager.Instance.isHost)
@@ -148,23 +179,38 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
                     Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     // TODO: 화면 중앙에 숫자 텍스트 표시
+                    if (countdownText != null)
+                    {
+                        countdownText.gameObject.SetActive(true);
+                        countdownText.text = pkt.remainSeconds.ToString();
+                    }
                     break;
                 }
 
             case E_PACKET.GAME_READY_CANCEL_NTF:
                 {
-                    Debug.Log("[System] 누군가 이탈하여 출발이 취소되었습니다.");
+                    Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
                     // TODO: 카운트다운 UI 숨기기
+                    if (countdownText != null)
+                    {
+                        countdownText.gameObject.SetActive(false);
+                    }
                     break;
                 }
 
             case E_PACKET.GAME_START_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartNtf>(packet.data);
-                    Debug.Log("<color=green>[System] 던전 입장</color>");
+                    Debug.Log("[System] 던전 입장");
+                    if (countdownText != null)
+                    {
+                        countdownText.gameObject.SetActive(false);
+                    }
+                    if (pkt.mapId == 0) UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
 
                     // 비동기 씬 로딩 시작 (던전 씬 이름이 Dungeon_1 구조임)
-                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
+                    //UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
+                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_1");
                     break;
                 }
 
@@ -226,25 +272,45 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    // 맵에 있는 모든 GimmickInfo를 뒤져서 ID가 일치하는 녀석을 찾음
-                    GimmickInfo[] allGimmicks = FindObjectsOfType<GimmickInfo>();
-                    foreach (GimmickInfo gimmick in allGimmicks)
+                    // Next 구역 텔레포트 처리
+                    if (ntf.state == 2)
                     {
-                        if (gimmick.gimmick_id == ntf.gimmickID)
+                        if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            // 기믹 종류별 동작
-                            if (gimmick.gimmick_type == "breakable_wall" && ntf.state == 0)
+                            // 보간(Lerp) 로직을 무시하고 즉시 순간이동 처리
+                            Vector3 destPos = ntf.targetPos.ToVector3();
+                            targetPlayer.transform.position = destPos;
+                            targetPlayer.SetPos(destPos); // Player.cs의 서버 동기화 좌표
+
+                            if (targetPlayer.IsLocal)
                             {
-                                Destroy(gimmick.gameObject);
+                                Debug.Log($"[System] 다음 기믹 구역으로 이동 완료");
                             }
-                            else if (gimmick.gimmick_type == "moving_platform" && ntf.state == 1)
+                        }
+                    }
+                    // 2. 기존 맵 기믹 처리 (벽 부수기, 플랫폼 이동 등)
+                    else
+                    {
+                        // 최신 유니티 경고(노란 줄) 방지를 위해 FindObjectsByType 사용
+                        GimmickInfo[] allGimmicks = FindObjectsByType<GimmickInfo>(FindObjectsSortMode.None);
+                        foreach (GimmickInfo gimmick in allGimmicks)
+                        {
+                            if (gimmick.gimmick_id == ntf.gimmickID)
                             {
-                                // 플랫폼 이동 (도착 좌표 = ntf.targetPos.ToVector3(), 속도 = ntf.param)
-                                // StartCoroutine(MovePlatform(gimmick.transform, ntf.targetPos.ToVector3(), ntf.param));
-                            }
-                            else if (gimmick.gimmick_type == "magnetic_force" && ntf.state == 1)
-                            {
-                                // 특정 범위 내 유저 자력으로 당기기 등
+                                // 기믹 종류별 동작
+                                if (gimmick.gimmick_type == "breakable_wall" && ntf.state == 0)
+                                {
+                                    Destroy(gimmick.gameObject);
+                                }
+                                else if (gimmick.gimmick_type == "moving_platform" && ntf.state == 1)
+                                {
+                                    // 플랫폼 이동 (도착 좌표 = ntf.targetPos.ToVector3(), 속도 = ntf.param)
+                                    // StartCoroutine(MovePlatform(gimmick.transform, ntf.targetPos.ToVector3(), ntf.param));
+                                }
+                                else if (gimmick.gimmick_type == "magnetic_force" && ntf.state == 1)
+                                {
+                                    // 특정 범위 내 유저 자력으로 당기기 등
+                                }
                             }
                         }
                     }
@@ -279,6 +345,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 Debug.Log("[Inventory] Update");
                 break;
             case E_PACKET.SHOP_INFO:
+                if (GameManager.Instance == null) break;
+                if (ShopManager.Instance == null)
+                {
+                    Debug.LogWarning("ShopManager가 없어서 패킷을 무시합니다.");
+                    break;
+                }
                 var shopInfo = UnsafeCode.ByteArrayToStructure<P_ShopInfo>(packet.data);
                 ShopManager.Instance.SetTargetShopTime(shopInfo.nextUpdateTime, shopInfo.itemID);
 
@@ -369,95 +441,123 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
     }
 
-    private Player AddPlayer(long id, string playerName)
+    private Player AddPlayer(long id, string playerName, Vector3 spawnPos)
     {
         if (Players == null || Players.ContainsKey(id)) return null;
 
         bool local = LocalPlayerInfo.ID == id;
 
         GameObject playerObj;
-        if (playerPrefab != null)
+
+        try
         {
-            playerObj = Instantiate(playerPrefab, new Vector3(0.0f, 1.0f, 0.0f), Quaternion.identity);
-        }
-        else
-        {
-            playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            playerObj.transform.position = new Vector3(0.0f, 1.0f, 0.0f);
-        }
 
-        playerObj.name = playerName;
 
-        // if (local)
-        // {
-        //     //GameObject cameraObject = new GameObject("Main Camera");
-        //     //Camera playerCamera = cameraObject.AddComponent<Camera>();
-        //     //cameraObject.tag = "MainCamera";
-        //     //CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
-        //     //camFollow.target = playerObj.transform;
-        //     //cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
-        //     //cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
-        // }
-
-        // PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
-        // if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
-        // playerMovement.IsLocal = local;
-
-        PlayerActor pActor = playerObj.GetComponent<PlayerActor>();
-        if (pActor != null)
-        {
-            pActor.IsLocal = local;
-        }
-
-        if (local)
-        {
-            CharacterController cc = playerObj.GetComponent<CharacterController>();
-            if (cc == null) cc = playerObj.AddComponent<CharacterController>();
-            cc.radius = 1f;
-            cc.height = 5.5f;
-            cc.center = Vector3.zero;
-            cc.stepOffset = 0.5f;
-            cc.center = new Vector3(0.0f, 2.75f, 0.0f);
-            cc.slopeLimit = 60f;
-            pActor.SetController(cc);
-
-            pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
-
-            //카메라 세팅
-            cameraPivot.SetParent(playerObj.transform);
-            cameraPivot.localPosition = Vector3.zero;
-
-            // 충돌 꼬임 방지를 위해 콜라이더 제거
-            Collider[] cols = playerObj.GetComponents<Collider>();
-            foreach (Collider c in cols)
+            if (playerPrefab != null)
             {
-                if (c.GetType() != typeof(CharacterController)) Destroy(c);
+                playerObj = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+            }
+            else
+            {
+                playerObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                playerObj.transform.position = spawnPos;
             }
 
-            Rigidbody rb = playerObj.GetComponent<Rigidbody>();
-            if (rb != null) Destroy(rb);
+            playerObj.name = playerName;
+
+            // if (local)
+            // {
+            //     //GameObject cameraObject = new GameObject("Main Camera");
+            //     //Camera playerCamera = cameraObject.AddComponent<Camera>();
+            //     //cameraObject.tag = "MainCamera";
+            //     //CameraFollow camFollow = cameraObject.AddComponent<CameraFollow>();
+            //     //camFollow.target = playerObj.transform;
+            //     //cameraObject.transform.position = playerObj.transform.position + camFollow.offset;
+            //     //cameraObject.transform.rotation = Quaternion.Euler(camFollow.lookAngle, 0, 0);
+            // }
+
+            // PlayerMovement playerMovement = playerObj.GetComponent<PlayerMovement>();
+            // if (playerMovement == null) playerMovement = playerObj.AddComponent<PlayerMovement>();
+            // playerMovement.IsLocal = local;
+
+            PlayerActor pActor = playerObj.GetComponent<PlayerActor>();
+            if (pActor != null)
+            {
+                pActor.IsLocal = local;
+            }
+
+            if (local)
+            {
+                CharacterController cc = playerObj.GetComponent<CharacterController>();
+                if (cc == null) cc = playerObj.AddComponent<CharacterController>();
+                cc.radius = 1f;
+                cc.height = 5.5f;
+                cc.center = Vector3.zero;
+                cc.stepOffset = 0.5f;
+                cc.center = new Vector3(0.0f, 2.75f, 0.0f);
+                cc.slopeLimit = 60f;
+                pActor.SetController(cc);
+
+                pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
+
+                //카메라 세팅
+                cameraPivot.SetParent(playerObj.transform);
+                cameraPivot.localPosition = Vector3.zero;
+
+                // 충돌 꼬임 방지를 위해 콜라이더 제거
+                Collider[] cols = playerObj.GetComponents<Collider>();
+                foreach (Collider c in cols)
+                {
+                    if (c.GetType() != typeof(CharacterController)) Destroy(c);
+                }
+
+                Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+                if (rb != null) Destroy(rb);
+            }
+            else // 리모트 플레이어
+            {
+                Collider[] existingCols = playerObj.GetComponents<Collider>();
+                foreach (var c in existingCols) DestroyImmediate(c);
+
+                CharacterController cc = playerObj.GetComponent<CharacterController>();
+                if (cc != null) DestroyImmediate(cc);
+
+                CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
+                col.isTrigger = true;
+
+                Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+                if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
+
+            Player player = playerObj.GetComponent<Player>();
+            if (player == null) player = playerObj.AddComponent<Player>();
+            player.Init(pActor, playerName, id, local, spawnPos);
+            Players.Add(id, player);
+
+            return player;
         }
-        else
+        catch (Exception e)
         {
-            CharacterController cc = playerObj.GetComponent<CharacterController>();
-            if (Client.IS_SERVER_PLAY) if (cc != null) Destroy(cc);
-
-            Collider col = playerObj.GetComponent<Collider>();
-            if (col == null) col = playerObj.AddComponent<CapsuleCollider>();
-            col.isTrigger = true;
-
-            Rigidbody rb = playerObj.GetComponent<Rigidbody>();
-            if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.isKinematic = true;
+            Debug.LogError($"[AddPlayer CRASH] {e.Message}");
+            return null;
         }
+    }
 
-        Player player = playerObj.GetComponent<Player>();
-        if (player == null) player = playerObj.AddComponent<Player>();
-        player.Init(pActor, playerName, id, local, playerObj.transform.position);
-        Players.Add(id, player);
+    public void SpawnLocalPlayer(int sectorIndex)
+    {
+        if (DungeonPointManager.Instance == null) return;
 
-        return player;
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
+        AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+
+        // 내 캐릭터를 스폰한 직후, 서버에 "리모트 플레이어 정보 줘!" 라고 요청
+        if (Client.IS_SERVER_PLAY)
+        {
+            P_SceneSyncReq syncReq = new P_SceneSyncReq();
+            Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
+        }
     }
 
     private void RemovePlayer(long id)

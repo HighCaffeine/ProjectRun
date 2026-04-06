@@ -13,6 +13,7 @@ public class MoveState : IState
 
     public void Execute()
     {
+        if (!actor.IsLocal) return;
         //밀당 체크
         if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, 0)); return; }
         if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, 1)); return; }

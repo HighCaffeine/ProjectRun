@@ -34,22 +34,25 @@ public class Player : MonoBehaviour
 
     public void SetSpeed(float speed) { this.currentSpeed = speed; }
     public void SetPos(Vector3 pos) { this.serverPos = pos; }
-
+    private bool hasReceivedFirstSync = false;
 
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
     {
-        // if (isLocal)
-        // {
-        //     if (pkt.lastInputSeq < lastProcessedSeq) return;
-        //     lastProcessedSeq = pkt.lastInputSeq;
-        // }
-
-        if (pkt.lastInputSeq < lastProcessedSeq) return;
-        lastProcessedSeq = pkt.lastInputSeq;
+        if (isLocal)
+        {
+            if (pkt.lastInputSeq < lastProcessedSeq) return;
+            lastProcessedSeq = pkt.lastInputSeq;
+        }
 
         serverPos = pkt.currentPos.ToVector3();
         currentSpeed = pkt.currentSpeed;
         isMoving = pkt.isMoving;
+
+        if (!hasReceivedFirstSync)
+        {
+            hasReceivedFirstSync = true;
+            transform.position = serverPos;
+        }
     }
 
     void Update()
@@ -63,10 +66,10 @@ public class Player : MonoBehaviour
             ProcessRemoteMovement();
         }
 
-        if (isLocal && Time.frameCount % 60 == 0) // 1초에 한 번씩 출력
-        {
-            Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
-        }
+        // if (isLocal && Time.frameCount % 60 == 0) // 1초에 한 번씩 출력
+        // {
+        //     Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
+        // }
     }
 
     // private void ProcessLocalCalibration()
@@ -132,18 +135,21 @@ public class Player : MonoBehaviour
 
     public void ApplyKnockback(Vector3 attackerPos, byte actionType)
     {
-        if (actor != null && actor.IsLocal)
+        if (actor == null) return;
+
+        bool isPull = (actionType == 1);
+        Vector3 pushDir = (transform.position - attackerPos).normalized;
+        pushDir.y = 0;
+        if (isPull) pushDir = -pushDir;
+
+        if (actor.IsLocal)
         {
-            Vector3 pushDir = (transform.position - attackerPos).normalized;
-            pushDir.y = 0;
-
-            bool isPull = (actionType == 1);
-            if (isPull) pushDir = -pushDir;
-
+            // 로컬: 실제 물리 넉백 적용
             actor.sm.ChangeState(new KnockbackState(actor, pushDir, 15.0f, isPull, attackerPos));
         }
         else
         {
+            // 리모트: 이펙트만 (위치는 서버에서 UPDATE_PLAYER_MOVEMENT로 옴)
             StartCoroutine(RemoteVisualRoutine());
         }
     }

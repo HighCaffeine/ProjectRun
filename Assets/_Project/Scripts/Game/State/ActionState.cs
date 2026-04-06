@@ -32,7 +32,7 @@ public class ActionState : IState
     public void Enter()
     {
         timer = 0f;
-        
+
         //카메라 연출
         actor.ShakeCamera();
 
@@ -66,31 +66,16 @@ public class ActionState : IState
         // 타겟을 찾았다면 타격 공식 및 넉백 상태 부여
         if (closestTarget != null)
         {
-            Vector3 pushDir = closestTarget.transform.position - actor.transform.position;
-            if (minDistance <= 0.1f) pushDir = searchForward;
-
-            pushDir.y = 0;
-            pushDir.Normalize();
-
-            //거리 비례 감쇄
-            float x = Mathf.Clamp01(minDistance / maxDistance);
-            float falloffMultiplier = 1f - Mathf.Pow(x, pow);
-
-            // 최종 넉백 파워 계산
-            float finalPower = pushForce * falloffMultiplier * actor.PushMulti;
-
-            // 당기기 방향을 반대로
-            bool isPull = (actionType == 1);
-
-            if (isPull)
+            Player targetPlayer = closestTarget.GetComponent<Player>();
+            if (targetPlayer != null)
             {
-                pushDir = -pushDir;
+                P_PlayerActionRequest req = new P_PlayerActionRequest
+                {
+                    userUUID = targetPlayer.ID,
+                    actionType = actionType
+                };
+                Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, req);
             }
-
-            //테스트 (나중에 서버로 보냄)
-            closestTarget.sm.ChangeState(new KnockbackState(closestTarget, pushDir, finalPower, isPull, actor.transform.position));
-
-            Debug.Log($"[{closestTarget.gameObject.name}] 적중 거리:{minDistance:F1}m 파워:{finalPower:F1}");
         }
     }
 
