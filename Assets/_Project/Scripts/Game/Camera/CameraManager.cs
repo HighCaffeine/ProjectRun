@@ -13,7 +13,7 @@ public interface ICameraEffect
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager Instance;
-    
+
     public CinemachineCamera vCam;
     public CinemachineBasicMultiChannelPerlin camPerlin { get; private set; }
 
@@ -25,6 +25,7 @@ public class CameraManager : MonoBehaviour
         if (vCam != null)
         {
             camPerlin = vCam.GetComponent<CinemachineBasicMultiChannelPerlin>();
+            DontDestroyOnLoad(gameObject);
         }
     }
 
@@ -37,7 +38,7 @@ public class CameraManager : MonoBehaviour
         }
         else
         {
-            effect.Exit(); 
+            effect.Exit();
         }
     }
 
