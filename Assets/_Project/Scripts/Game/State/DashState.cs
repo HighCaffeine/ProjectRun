@@ -36,10 +36,10 @@ public class DashState : IState
 
         float t = Mathf.Clamp01(timer / dashDuration);
 
-        float logValue = Mathf.Log(1 + 3 * t) / Mathf.Log(1 + 3);
-        float smooth = logValue * logValue;
+        //  float logValue = Mathf.Log(1 + 3 * t) / Mathf.Log(1 + 3); 1차 대쉬 초반 빠름 후반 느림
+        //  float smooth = logValue * logValue;
 
-
+        float smooth = 1 - (t * t);
         actor.Move(moveDir, smooth * dashSpeedMultiplier);
 
         actor.sendTimer += Time.deltaTime;
