@@ -271,6 +271,7 @@ public class PlayerActor : Actor
     public void SendMovePacket(float axisH, float axisV)
     {
         if (!IsLocal) return;
+        
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,
