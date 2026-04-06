@@ -192,14 +192,13 @@ public class Player : MonoBehaviour
 
         if (dist > snapThreshold * 2.0f)
         {
-            // X, Z만 맞추고 Y는 중력에 맡김
-            transform.position = new Vector3(serverPos.x, transform.position.y, serverPos.z);
+            transform.position = new Vector3(serverPos.x, serverPos.y, serverPos.z);
             return;
         }
 
         float adaptiveSpeed = dist > 1.0f ? lerpSpeed * 1.5f : lerpSpeed;
 
-        Vector3 targetPos = new Vector3(serverPos.x, transform.position.y, serverPos.z);
+        Vector3 targetPos = new Vector3(serverPos.x, serverPos.y, serverPos.z);
         transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * adaptiveSpeed);
 
         Vector3 dir = (serverPos - transform.position);
