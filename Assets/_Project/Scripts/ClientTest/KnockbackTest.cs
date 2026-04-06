@@ -12,6 +12,7 @@ public class KnockbackTest : MonoBehaviour
     [SerializeField]
     private float yVelocity;
 
+    [SerializeField] private Transform pivot;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -44,11 +45,13 @@ public class KnockbackTest : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
-        Vector3 dir = new Vector3(h, 0, v).normalized;
+        Vector3 isoForward = new Vector3(1f, 0f, 1f).normalized;
+        Vector3 isoRight = new Vector3(1f, 0f, -1f).normalized;
 
+        Vector3 dir = (isoForward * v + isoRight * h).normalized;
         if (dir.magnitude > 0.1f)
         {
-            transform.forward = dir; 
+            pivot.rotation = Quaternion.LookRotation(dir);
         }
 
         Vector3 move = dir * moveSpeed;

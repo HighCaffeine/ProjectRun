@@ -36,6 +36,9 @@ public class PlayerActor : Actor
     private float verticalVelocity;     // 현재 수직 속도
     private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
+
+    private Vector3 platformDelta;
+
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
@@ -74,10 +77,13 @@ public class PlayerActor : Actor
         if (IsLocal && controller != null && controller.enabled)
         {
             ApplyGravity();
-            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+            Vector3 finalMove = horizontalMove + platformDelta + (Vector3.up * verticalVelocity);
+            controller.Move(platformDelta);
 
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
+
+            platformDelta = Vector3.zero;
         }
     }
 
@@ -85,7 +91,10 @@ public class PlayerActor : Actor
     {
         horizontalMove += dir * speed;
     }
-
+    public void SetPlatformDelta(Vector3 delta)
+    {
+        platformDelta = delta;
+    }
     private void ApplyGravity()
     {
         if (controller.isGrounded && verticalVelocity < 0)
