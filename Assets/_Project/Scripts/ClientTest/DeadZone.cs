@@ -6,6 +6,7 @@ public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     { 
+        Debug.Log($"[DeadZone] {other.name}이(가) 사망 구역에 진입했습니다.");
         ActorManager.Instance.OnPlayerDead(other.name);
     }
 

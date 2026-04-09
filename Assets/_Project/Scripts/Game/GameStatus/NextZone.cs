@@ -13,6 +13,11 @@ public class NextZone : MonoBehaviour
         {
             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetSectorIndex);
 
+            if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+            {
+                actor.OnUpdatePoint?.Invoke(actor.name, targetSectorIndex);
+                return; // 오프라인 테스트 모드에서는 텔레포트 비활성화
+            }
             // [추가] 서버 연결이 없으면 즉시 순간이동 시킴
             if (!Client.IS_SERVER_PLAY || Match.Instance.isDebugMode)
             {

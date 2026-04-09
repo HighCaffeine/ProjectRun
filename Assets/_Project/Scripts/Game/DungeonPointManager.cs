@@ -19,6 +19,8 @@ public class DungeonPointManager : MonoBehaviour
     [Tooltip("0번: 던전 시작 구역 / 1~N번: 다음 기믹 구역")]
     public DungeonSector[] sectors;
 
+    public int mapID;
+
     void Awake()
     {
         if (instance == null)

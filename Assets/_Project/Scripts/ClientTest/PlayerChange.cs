@@ -1,4 +1,5 @@
 using NUnit.Framework.Internal.Commands;
+using System;
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class PlayerChange : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        DashCameraEffect.Instance.InitSetup(players[currentIndex].transform);
         players[1].SetLocal(false);
     }
 
@@ -33,12 +35,15 @@ public class PlayerChange : MonoBehaviour
         currentIndex = (currentIndex + 1) % players.Count;
 
         SetLocalPlayer(currentIndex);
+
+        ActorManager.Instance.localID = players[currentIndex].name;
     }
 
     void SetLocalPlayer(int index)
     {
         camPivot.SetParent(players[index].transform);
         camPivot.localPosition = Vector3.zero;
+        DashCameraEffect.Instance.InitSetup(players[index].transform);
         players[index].SetLocal(true);
 
     }

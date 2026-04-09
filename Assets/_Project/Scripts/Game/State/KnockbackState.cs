@@ -104,7 +104,7 @@ public class KnockbackState : IState
         Collider[] hitWalls = Physics.OverlapSphere(actor.transform.position, 0.6f);
         foreach (var wall in hitWalls)
         {
-            if (wall.CompareTag("BreakableCube"))
+            if (wall.CompareTag("Breakable"))
             {
                 GimmickInfo gInfo = wall.GetComponent<GimmickInfo>();
                 if (gInfo != null)

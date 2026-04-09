@@ -4,18 +4,29 @@ using UnityEngine;
 public class ActorManager : GenericSingleton<ActorManager>
 {
 
-    public Dictionary<string, Actor> actors = new Dictionary<string, Actor>();
+    public Dictionary<string, PlayerActor> actors = new Dictionary<string, PlayerActor>();
     public Dictionary<string, string> spawnPoints = new Dictionary<string, string>();
 
     public string localID;
 
-    public float spawnDelay;
+    public float spawnDelay = 5f;
+
+    [SerializeField]
+    private GameObject deadUIPrefab;
+
+    private void Start()
+    {
+        foreach (var actor in actors)
+        {
+            actor.Value.OnUpdatePoint += UpdateSpwanPoint;
+        }
+    }
 
     public void OnPlayerDead(string name)
     {
         bool isLocal = (name == localID);
 
-        Actor actor = actors[name];
+        PlayerActor actor = actors[name];
 
         string spawnInfo = spawnPoints[name];
         string[] split = spawnInfo.Split('_');
@@ -23,9 +34,11 @@ public class ActorManager : GenericSingleton<ActorManager>
 
         int mapLevel = int.Parse(split[0]);
         int spawnIndex = int.Parse(split[1]);
-        //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapLevel, spawnIndex);
+        //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapID, spawnIndex);
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
         SendPlayerDeadPacket(name);
 
+        actor.PlayerDead(spawnPos, spawnDelay);
 
         if (isLocal)
         {
@@ -34,19 +47,27 @@ public class ActorManager : GenericSingleton<ActorManager>
 
 
     }
-    void UpdateSpwanPoint(string name, int index)
+
+    public void AddPlayer(PlayerActor actor)
+    {
+        spawnPoints.Add(actor.gameObject.name, "1_0");
+        actors.Add(actor.gameObject.name, actor);
+    }
+
+    void UpdateSpwanPoint(string id, int index)
     {
 
-        // int currentMapLevel = MapManager.Instance.CurrentLevel;
+        //int currentMapID = MapManager.Instance.currentMapID;
+        int currentMapID = DungeonPointManager.Instance.mapID;
 
 
-        // spawnPoints[name] = $"{currentMapLevel}_{index}";
+        spawnPoints[name] = $"{currentMapID}_{index}";
     }
 
 
     void ShowDeadUI(float delay)
     {
-        // UI 코드 추가
+        deadUIPrefab.SetActive(true);
     }
 
     void SendPlayerDeadPacket(string id)
@@ -54,5 +75,12 @@ public class ActorManager : GenericSingleton<ActorManager>
         // 서버 패킷 전송 코드 추가
     }
 
-
+    public Actor GetActor(string name)
+    {
+        if (actors.TryGetValue(name, out PlayerActor actor))
+        {
+            return actor;
+        }
+        return null;
+    }
 }

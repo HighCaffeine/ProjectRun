@@ -10,7 +10,7 @@ public class ActionState : IState
     private float maxDistance;
     private float maxAngle = 30f;
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
-    private float pow = 3f;  // 계수
+    private float pow = 1.5f;  // 계수
 
     public ActionState(PlayerActor actor, byte type)
     {
@@ -20,12 +20,12 @@ public class ActionState : IState
         if (actionType == 0) // 밀기
         {
             maxDistance = 3f;
-            pushForce = 100f;
+            pushForce = 100;
         }
         else if (actionType == 1) // 당기기
         {
             maxDistance = 10f;
-            pushForce = 120f;
+            pushForce = 120;
         }
     }
 
@@ -43,16 +43,15 @@ public class ActionState : IState
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
         PlayerActor closestTarget = null;
         float minDistance = float.MaxValue;
-
+        Vector3 dirToTarget = Vector3.zero;
         foreach (Collider hit in colliders)
         {
-            if (hit.transform.root == actor.transform.root) continue;
+            if (hit.transform == actor.transform) continue;
 
             PlayerActor targetActor = hit.GetComponentInParent<PlayerActor>();
-
             if (targetActor != null)
             {
-                Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
+                dirToTarget = targetActor.transform.position - actor.transform.position;
                 float distance = dirToTarget.magnitude;
                 float angleToTarget = Vector3.Angle(searchForward, dirToTarget);
 
@@ -68,21 +67,31 @@ public class ActionState : IState
         // 타겟을 찾았다면 타격 공식 및 넉백 상태 부여
         if (closestTarget != null)
         {
-            Player targetPlayer = closestTarget.GetComponent<Player>();
-            if (targetPlayer != null)
+            if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
-                P_PlayerActionRequest req = new P_PlayerActionRequest
+                Player targetPlayer = closestTarget.GetComponent<Player>();
+                if (targetPlayer != null)
                 {
-                    userUUID = targetPlayer.ID,
-                    actionType = actionType
-                };
-                Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, req);
+                    P_PlayerActionRequest req = new P_PlayerActionRequest
+                    {
+                        userUUID = targetPlayer.ID,
+                        actionType = actionType
+                    };
+                    Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, req);
+                }
+            }
+            else
+            {
+                PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
+                var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
+                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, pushForce * pow, actionType == 1, actor.transform.position));
             }
         }
     }
 
     public void Execute()
     {
+
         timer += Time.deltaTime;
 
         if (timer >= CAST_TIME)
@@ -117,4 +126,7 @@ public class ActionState : IState
 
         return worldDir.normalized;
     }
+
+
+
 }

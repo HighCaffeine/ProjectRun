@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using Unity.Cinemachine;
 
 public class PlayerActor : Actor
 {
@@ -18,7 +17,6 @@ public class PlayerActor : Actor
     private Vector3 horizontalMove;
 
     public DashCameraEffect dashCameraEffect;
-    public Transform camPivot;
 
     //동기화
     public uint inputSeq = 0;
@@ -38,6 +36,7 @@ public class PlayerActor : Actor
     private float verticalVelocity;     // 현재 수직 속도
     private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
+    private int spawninDex = 0; 
 
     private Vector3 platformDelta;
 
@@ -55,6 +54,8 @@ public class PlayerActor : Actor
 
     protected override void Start()
     {
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test) ActorManager.Instance.AddPlayer(this);
+
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));
     }
@@ -71,6 +72,27 @@ public class PlayerActor : Actor
         horizontalMove = Vector3.zero;
         sm.Update();
 
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+        {
+            h = Input.GetAxisRaw("Horizontal");
+            v = Input.GetAxisRaw("Vertical");
+
+            if (controller != null && controller.enabled)
+            {
+
+                ApplyGravity();
+                Vector3 finalMove = horizontalMove + platformDelta + (Vector3.up * verticalVelocity);
+                controller.Move(platformDelta);
+
+                float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
+                controller.Move(finalMove * safeDelta);
+
+                platformDelta = Vector3.zero;
+            }
+
+            return;
+        }
+
         if (!IsLocal) return;
 
         h = Input.GetAxisRaw("Horizontal");
@@ -86,9 +108,10 @@ public class PlayerActor : Actor
             controller.Move(finalMove * safeDelta);
 
             platformDelta = Vector3.zero;
-
         }
     }
+
+    public Action<string, int> OnUpdatePoint;
 
     public void Move(Vector3 dir, float speed)
     {
@@ -100,6 +123,7 @@ public class PlayerActor : Actor
     }
     private void ApplyGravity()
     {
+        if(sm.currentState is KnockbackState) return; // 넉백 상태에서는 중력 적용 안 함
         if (controller.isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f;
@@ -216,12 +240,25 @@ public class PlayerActor : Actor
     {
         IsLocal = value;
     }
-
     public void PlayerDead(Vector3 pos, float spawnDelay)
     {
-       
-        transform.position = pos;   
-        
+        if(!controller)
+        {
+            return;
+        }
+        else
+        {
+            controller.enabled = false;
+            transform.position = pos;
+            playerPivot.gameObject.SetActive(false);
+            StartCoroutine(RespawnAfterDelay(spawnDelay));
+        }
+    }
+    IEnumerator RespawnAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        controller.enabled = true;
+        playerPivot.gameObject.SetActive(true);
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
