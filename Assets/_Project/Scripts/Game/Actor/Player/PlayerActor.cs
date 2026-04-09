@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class PlayerActor : Actor
 {
@@ -17,6 +18,7 @@ public class PlayerActor : Actor
     private Vector3 horizontalMove;
 
     public DashCameraEffect dashCameraEffect;
+    public Transform camPivot;
 
     //동기화
     public uint inputSeq = 0;
@@ -84,6 +86,7 @@ public class PlayerActor : Actor
             controller.Move(finalMove * safeDelta);
 
             platformDelta = Vector3.zero;
+
         }
     }
 
@@ -207,6 +210,18 @@ public class PlayerActor : Actor
         };
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATE_NTF, pkt);
+    }
+
+    public void SetLocal(bool value)
+    {
+        IsLocal = value;
+    }
+
+    public void PlayerDead(Vector3 pos, float spawnDelay)
+    {
+       
+        transform.position = pos;   
+        
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송

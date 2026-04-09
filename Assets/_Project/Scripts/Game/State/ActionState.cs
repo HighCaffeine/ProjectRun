@@ -36,7 +36,9 @@ public class ActionState : IState
         //카메라 연출
         actor.ShakeCamera();
 
-        Vector3 searchForward = actor.GetForward();
+        //Vector3 searchForward = actor.GetForward();
+        Vector3 searchForward = GetMouseDirection();
+        actor.LookAtDirection(searchForward);
         // 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
         PlayerActor closestTarget = null;
@@ -91,5 +93,28 @@ public class ActionState : IState
 
     public void Exit()
     {
+    }
+
+    Vector3 GetMouseDirection()
+    {
+        Camera cam = Camera.main;
+
+        Vector3 playerScreen = cam.WorldToScreenPoint(actor.transform.position);
+        Vector3 mouse = Input.mousePosition;
+
+        Vector3 screenDir = mouse - playerScreen;
+
+        Vector3 forward = cam.transform.forward;
+        Vector3 right = cam.transform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 worldDir = right * screenDir.x + forward * screenDir.y;
+
+        return worldDir.normalized;
     }
 }

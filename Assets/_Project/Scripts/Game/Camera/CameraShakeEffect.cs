@@ -52,7 +52,25 @@ public class CameraShakeEffect : ICameraEffect
             perlin.AmplitudeGain = Mathf.Lerp(0f, startingAmplitude, progress);
         }
     }
+    /*public void Execute()
+{
+    if (perlin == null) return;
 
+    timer -= Time.deltaTime;
+
+    float t = Mathf.Clamp01(timer / duration);
+
+    // 🔹 흔들림 점점 줄이기
+    perlin.AmplitudeGain = Mathf.Lerp(0f, startingAmplitude, t);
+
+    // 🔹 위치도 같이 원래 위치로 복귀
+    perlin.transform.localPosition = Vector3.Lerp(originPos, perlin.transform.localPosition, t);
+
+    if (timer <= 0f)
+    {
+        IsFinished = true;
+    }
+}*/
     public void Exit()
     {
         if (perlin != null)

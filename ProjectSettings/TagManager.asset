@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Gimmick
   - Structure
+  - Local
   layers:
   - Default
   - TransparentFX

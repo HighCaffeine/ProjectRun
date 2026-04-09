@@ -45,6 +45,9 @@ public class KnockbackState : IState
 
         PlayerActor.ActionType actionType = isPull ? PlayerActor.ActionType.PULL : PlayerActor.ActionType.PUSH;
         actor.PlayTravelSpark(actionType);
+
+
+
     }
 
     public void Execute()
