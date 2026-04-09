@@ -32,7 +32,7 @@ public class DashCameraEffect : GenericSingleton<DashCameraEffect>
     private new void Awake()
     {
         base.Awake();
-        cam = GetComponent<CinemachineCamera>();
+        //cam = GetComponent<CinemachineCamera>();
     }
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -57,6 +57,7 @@ public class DashCameraEffect : GenericSingleton<DashCameraEffect>
 
     public void OnDash()
     {
+        Debug.Log(camPivot.transform.position);
         originalCamPos = camPivot.transform.position; // ī�޶��� ���� ��ġ ����
         isDashing = true;
         StartCoroutine(DashCameraRoutine());

@@ -17,6 +17,8 @@ public class CameraManager : MonoBehaviour
     public CinemachineCamera vCam;
     public CinemachineBasicMultiChannelPerlin camPerlin { get; private set; }
 
+    public DashCameraEffect dashCameraEffect;
+
     private List<ICameraEffect> activeEffects = new List<ICameraEffect>();
 
     void Awake()
@@ -40,6 +42,11 @@ public class CameraManager : MonoBehaviour
         {
             effect.Exit();
         }
+    }
+
+    public void SetupDashEffectComp(PlayerActor localPlayer)
+    {
+        localPlayer.dashCameraEffect = dashCameraEffect;
     }
 
     void Update()

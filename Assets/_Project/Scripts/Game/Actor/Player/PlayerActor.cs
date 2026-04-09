@@ -44,7 +44,7 @@ public class PlayerActor : Actor
     public float v { private set; get; }
 
 
-    public enum ActionType : byte { PUSH = 0, PULL = 1, }
+    public enum ActionType : byte { PUSH = 0, PULL = 1, KNOCKBACK, }
 
     public Vector3 GetForward() { return playerPivot.forward; }
     public void SetController(CharacterController cc) => this.controller = cc;
