@@ -25,6 +25,7 @@ public class NextZone : MonoBehaviour
             // 서버로 기믹 이동 패킷 전송
             P_GimmickInteractReq req = new P_GimmickInteractReq
             {
+                activeUUID = LocalPlayerInfo.ID,
                 gimmickID = 999, // 포탈 공통 ID
                 state = 2,       // 2 = Next 텔레포트
                 targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },

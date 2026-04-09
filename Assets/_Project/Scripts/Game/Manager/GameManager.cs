@@ -26,5 +26,7 @@ public class GameManager : GenericSingleton<GameManager>
         {
             Client.IS_SERVER_PLAY = true;
         }
+
+        DontDestroyOnLoad(gameObject);
     }
 }
