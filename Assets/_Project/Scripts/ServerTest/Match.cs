@@ -490,11 +490,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
                 if (cc == null) cc = playerObj.AddComponent<CharacterController>();
-                cc.radius = 1f;
-                cc.height = 5.5f;
+                cc.radius = 0.5f;
+                cc.height = 2.0f;
                 cc.center = Vector3.zero;
                 cc.stepOffset = 0.5f;
-                cc.center = new Vector3(0.0f, 2.75f, 0.0f);
+                cc.center = new Vector3(0.0f, 1.0f, 0.0f);
                 cc.slopeLimit = 60f;
                 pActor.SetController(cc);
 
@@ -520,10 +520,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 foreach (var c in existingCols) DestroyImmediate(c);
 
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
-                if (cc != null) DestroyImmediate(cc);
-
-                CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
-                col.isTrigger = true;
+                //if (cc != null) DestroyImmediate(cc);
 
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
