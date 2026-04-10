@@ -39,7 +39,9 @@ public class PlayerActor : Actor
     private int spawninDex = 0; 
 
     private Vector3 platformDelta;
-
+    private Vector3 windDir;
+    private float windPower;
+    private bool isInWind;
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
@@ -80,9 +82,33 @@ public class PlayerActor : Actor
 
             if (controller != null && controller.enabled)
             {
+                if (isInWind)
+                {
+                    Vector3 inputDir = new Vector3(h, 0f, v).normalized;
 
+                    if (inputDir.magnitude > 0.01f)
+                    {
+                        float dot = Vector3.Dot(inputDir, windDir);
+
+    
+                        if (dot > 0)
+                        {
+                            horizontalMove += windDir * windPower * dot;
+                        }
+    
+                        else
+                        {
+                            horizontalMove += windDir * windPower * dot;
+                            // dot이 음수라 자동으로 반대 힘 됨
+                        }
+                    }
+                    else
+                    {
+                        horizontalMove += windDir * windPower;
+                    }
+                }
                 ApplyGravity();
-                Vector3 finalMove = horizontalMove + platformDelta + (Vector3.up * verticalVelocity);
+                Vector3 finalMove = horizontalMove +(windDir * windPower)+ platformDelta + (Vector3.up * verticalVelocity);
                 controller.Move(platformDelta);
 
                 float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
@@ -262,6 +288,17 @@ public class PlayerActor : Actor
         playerPivot.gameObject.SetActive(true);
     }
 
+    public void SetWind(Vector3 dir, float power)
+    {
+        windDir = dir.normalized;
+        windPower = power;
+        isInWind = true;
+    }
+
+    public void ClearWind()
+    {
+        isInWind = false;
+    }
     // 상태 머신이 호출, 확정 좌표 패킷 전송
     // public void SendMovePacket(float axisH, float axisV)
     // {
