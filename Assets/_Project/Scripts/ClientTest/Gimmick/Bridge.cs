@@ -1,13 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
-public class DrawBridge : MonoBehaviour
+public class Bridge : MonoBehaviour
 {
     [Header("회전 대상 (Pivot)")]
     [SerializeField] private Transform pivot;
 
     [Header("각도 설정")]
-    [SerializeField] private float closeAngle = -45f;  // 올라간 상태
+    [SerializeField] private float closeAngle = 0f;
 
     [Header("속도")]
     [SerializeField] private float speed = 2f;
