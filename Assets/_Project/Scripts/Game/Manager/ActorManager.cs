@@ -67,6 +67,7 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     void ShowDeadUI(float delay)
     {
+        deadUIPrefab.GetComponent<ReSpawnTimer>().respawnTime = delay;
         deadUIPrefab.SetActive(true);
     }
 

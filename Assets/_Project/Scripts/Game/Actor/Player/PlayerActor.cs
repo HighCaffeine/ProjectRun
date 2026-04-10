@@ -54,7 +54,8 @@ public class PlayerActor : Actor
 
     protected override void Start()
     {
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test) ActorManager.Instance.AddPlayer(this);
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+        { ActorManager.Instance.AddPlayer(this); }
 
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));

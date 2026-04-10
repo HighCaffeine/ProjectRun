@@ -5,24 +5,15 @@ public class PressurePlate : MonoBehaviour
     [SerializeField]
     private GameObject wall; // 벽 오브젝트를 연결할 변수
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
+    [SerializeField]
+    DrawBridge drawBridge;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.GetComponent<PlayerActor>())
         {
             Debug.Log("플레이어가 압력판에 들어왔습니다.");
-            OpenWall(); 
+            drawBridge.OpenBridge();
+            // OpenWall(); 
         }
     }
 
