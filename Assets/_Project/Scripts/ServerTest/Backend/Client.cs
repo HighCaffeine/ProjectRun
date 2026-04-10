@@ -3,9 +3,9 @@ using UnityEngine;
 
 public static unsafe class Client
 {
-    //private const string IP = "127.0.0.1";
+    private const string IP = "127.0.0.1";
     /// <summary>
-    private const string IP = "20.196.66.227";
+    //private const string IP = "20.196.66.227";
     /// </summary>
     //public static NetworkClient TCP = new NetworkClient(IP, 5004, ProtocolType.Tcp);
     public static NetworkClient TCP = new NetworkClient(IP, 11021, ProtocolType.Tcp);

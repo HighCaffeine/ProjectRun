@@ -13,7 +13,6 @@ public static class PacketSerializer
             case P_PlayerMovement p: return SerializePlayerMovement(p);
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_PlayerStateNtf p: return SerializePlayerStateNtf(p);
-            case P_PlayerActionRequest p: return SerializePlayerActionRequest(p);
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
             case P_PlayerReadyRequest p: return SerializePlayerReadyRequest(p);
             case P_GameStartNtf p: return SerializeGameStartNtf(p);
@@ -83,15 +82,6 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetDir.y);
         Write(buf, ref o, p.targetDir.z);
         Write(buf, ref o, p.powerOrTime);
-        return buf;
-    }
-
-    static byte[] SerializePlayerActionRequest(P_PlayerActionRequest p)
-    {
-        var buf = new byte[9]; // 8+1
-        int o = 0;
-        Write(buf, ref o, p.userUUID);
-        buf[o++] = p.actionType;
         return buf;
     }
 

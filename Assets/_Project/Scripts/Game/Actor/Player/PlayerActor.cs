@@ -36,7 +36,7 @@ public class PlayerActor : Actor
     private float verticalVelocity;     // 현재 수직 속도
     private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
-    private int spawninDex = 0; 
+    private int spawninDex = 0;
 
     private Vector3 platformDelta;
 
@@ -45,7 +45,7 @@ public class PlayerActor : Actor
     public float v { private set; get; }
 
 
-    public enum ActionType : byte { PUSH = 0, PULL = 1, KNOCKBACK, }
+
 
     public Vector3 GetForward() { return playerPivot.forward; }
     public void SetController(CharacterController cc) => this.controller = cc;
@@ -70,44 +70,28 @@ public class PlayerActor : Actor
     {
         if (sm.currentState == null) return;
         horizontalMove = Vector3.zero;
-        sm.Update();
 
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+        if (IsLocal)
         {
             h = Input.GetAxisRaw("Horizontal");
             v = Input.GetAxisRaw("Vertical");
+        }
 
-            if (controller != null && controller.enabled)
+        sm.Update();
+
+        if (controller != null && controller.enabled)
+        {
+            ApplyGravity();
+            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+
+            if (platformDelta != Vector3.zero)
             {
-
-                ApplyGravity();
-                Vector3 finalMove = horizontalMove + platformDelta + (Vector3.up * verticalVelocity);
                 controller.Move(platformDelta);
-
-                float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
-                controller.Move(finalMove * safeDelta);
-
                 platformDelta = Vector3.zero;
             }
 
-            return;
-        }
-
-        if (!IsLocal) return;
-
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
-
-        if (IsLocal && controller != null && controller.enabled)
-        {
-            ApplyGravity();
-            Vector3 finalMove = horizontalMove + platformDelta + (Vector3.up * verticalVelocity);
-            controller.Move(platformDelta);
-
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
-
-            platformDelta = Vector3.zero;
         }
     }
 
@@ -123,18 +107,16 @@ public class PlayerActor : Actor
     }
     private void ApplyGravity()
     {
-        if(sm.currentState is KnockbackState) return; // 넉백 상태에서는 중력 적용 안 함
+        if (sm.currentState is KnockbackState) return; // 넉백 상태에서는 중력 적용 안 함
         if (controller.isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f;
         }
         else
         {
-            // [해결 1] 백그라운드 전환 시 deltaTime이 10초, 20초로 튀는 것을 최대 0.1초로 제한
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             verticalVelocity += gravity * safeDelta;
 
-            // [해결 2] 바닥을 뚫고 무한 낙하하는 속도 제한 (CharacterController 고장 방지)
             if (verticalVelocity < maxVerticalVelocity)
             {
                 verticalVelocity = maxVerticalVelocity;
@@ -192,13 +174,13 @@ public class PlayerActor : Actor
         Time.timeScale = 1.0f;
     }
 
-    public void PlayTravelSpark(ActionType actionType)
+    public void PlayTravelSpark(eState actionType)
     {
         if (travelSparkParticle == null) return;
 
         Transform sparkTransform = travelSparkParticle.transform;
 
-        if (actionType == ActionType.PULL)
+        if (actionType == eState.Pull)
         {
             sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
         }
@@ -221,13 +203,16 @@ public class PlayerActor : Actor
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 변경 패킷 전송용 함수
-    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f)
+    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0)
     {
+        // 로컬이 쏘는거 아니면 리턴
         if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+
+        long finalUUID = (targetUUID == 0) ? LocalPlayerInfo.ID : targetUUID;
 
         P_PlayerStateNtf pkt = new P_PlayerStateNtf
         {
-            userUUID = LocalPlayerInfo.ID,
+            userUUID = finalUUID,
             newState = (byte)stateCode,
             targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
             powerOrTime = param
@@ -235,14 +220,23 @@ public class PlayerActor : Actor
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATE_NTF, pkt);
     }
-
     public void SetLocal(bool value)
     {
         IsLocal = value;
+        if (!IsLocal)
+        {
+            h = 0f;
+            v = 0f;
+            horizontalMove = Vector3.zero;
+            if (sm != null && !(sm.currentState is IdleState))
+            {
+                sm.ChangeState(new IdleState(this));
+            }
+        }
     }
     public void PlayerDead(Vector3 pos, float spawnDelay)
     {
-        if(!controller)
+        if (!controller)
         {
             return;
         }
@@ -332,7 +326,7 @@ public class PlayerActor : Actor
     public void SendMovePacket(float axisH, float axisV)
     {
         if (!IsLocal) return;
-        
+
         P_PlayerMovement pkt = new P_PlayerMovement
         {
             userUUID = LocalPlayerInfo.ID,

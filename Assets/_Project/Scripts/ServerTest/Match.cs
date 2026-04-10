@@ -163,12 +163,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (GameManager.Instance.isHost)
                     {
-                        Debug.Log("<color=green>[System] 내가 이 방의 호스트(방장)가 되었습니다!</color>");
+                        Debug.Log("[System] 호스트가 되었습니다");
                         // TODO: UI 매니저 호출해서 [게임 시작] 버튼 활성화
                     }
                     else
                     {
-                        Debug.Log($"<color=yellow>[System] 현재 방장은 {hostPkt.hostUUID} 입니다.</color>");
+                        Debug.Log($"[System]현재 방장 {hostPkt.hostUUID} ");
                         // TODO: [게임 시작] 버튼 비활성화 (대기 상태)
                     }
                     break;
@@ -235,9 +235,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     if (Players.TryGetValue(statePkt.userUUID, out Player targetPlayer))
                     {
                         PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
-                        if (pActor == null || pActor.IsLocal) break;
+                        if (pActor == null) break;
 
-                        // 리모트 플레이어의 상태를 강제로 전환 (애니메이션, 이펙트 동기화)
+                        //5번의 경우 스킵 X
+                        if (pActor.IsLocal && statePkt.newState != 5) break;
+
                         switch (statePkt.newState)
                         {
                             case 0: pActor.sm.ChangeState(new IdleState(pActor)); break;
@@ -501,13 +503,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
                 //카메라 세팅
-                cameraPivot.SetParent(playerObj.transform);
-                cameraPivot.localPosition = Vector3.zero;
+                //cameraPivot.SetParent(playerObj.transform);
+                cameraPivot.position = pActor.transform.position;
                 cameraPivot.gameObject.SetActive(true);
                 if (DashCameraEffect.Instance != null)
                 {
                     DashCameraEffect.Instance.InitSetup(pActor.transform);
                     CameraManager.Instance.SetupDashEffectComp(pActor);
+                    CameraManager.Instance.AddPosContraint(pActor.transform);
                 }
 
                 // 충돌 꼬임 방지를 위해 콜라이더 제거

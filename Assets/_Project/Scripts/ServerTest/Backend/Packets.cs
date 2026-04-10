@@ -267,25 +267,25 @@ public struct P_PlayerStatusNtf
 #endregion
 
 #region Physics Packet
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PlayerActionRequest
-{
-    [MarshalAs(UnmanagedType.I8)]
-    public long userUUID;
-    [MarshalAs(UnmanagedType.I1)]
-    public byte actionType;
-}
+// [StructLayout(LayoutKind.Sequential, Pack = 1)]
+// public struct P_PlayerActionRequest
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long userUUID;
+//     [MarshalAs(UnmanagedType.I1)]
+//     public byte actionType;
+// }
 
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PlayerActionNtf
-{
-    [MarshalAs(UnmanagedType.I8)]
-    public long attackerUUID;
-    [MarshalAs(UnmanagedType.I8)]
-    public long targetUUID;
-    [MarshalAs(UnmanagedType.I1)]
-    public byte actionType;
-}
+// [StructLayout(LayoutKind.Sequential, Pack = 1)]
+// public struct P_PlayerActionNtf
+// {
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long attackerUUID;
+//     [MarshalAs(UnmanagedType.I8)]
+//     public long targetUUID;
+//     [MarshalAs(UnmanagedType.I1)]
+//     public byte actionType;
+// }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_GimmickInteractReq

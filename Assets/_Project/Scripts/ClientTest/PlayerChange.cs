@@ -15,14 +15,21 @@ public class PlayerChange : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        DashCameraEffect.Instance.InitSetup(players[currentIndex].transform);
-        players[1].SetLocal(false);
+        if (players.Count == 0) return;
+
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].SetLocal(i == currentIndex);
+        }
+
+        SetLocalPlayer(currentIndex);
+        ActorManager.Instance.localID = players[currentIndex].name;
     }
 
     // Update is called once per frame
     void Update()
-    {  
-       if(Input.GetKeyDown(KeyCode.Tab))
+    {
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             SwitchPlayer();
         }

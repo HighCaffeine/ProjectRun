@@ -14,14 +14,6 @@ public class ActorManager : GenericSingleton<ActorManager>
     [SerializeField]
     private GameObject deadUIPrefab;
 
-    private void Start()
-    {
-        foreach (var actor in actors)
-        {
-            actor.Value.OnUpdatePoint += UpdateSpwanPoint;
-        }
-    }
-
     public void OnPlayerDead(string name)
     {
         bool isLocal = (name == localID);
@@ -50,8 +42,14 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     public void AddPlayer(PlayerActor actor)
     {
-        spawnPoints.Add(actor.gameObject.name, "1_0");
-        actors.Add(actor.gameObject.name, actor);
+        string actorID = actor.gameObject.name;
+        if (!actors.ContainsKey(actorID))
+        {
+            spawnPoints.Add(actorID, "1_0");
+            actors.Add(actorID, actor);
+
+            actor.OnUpdatePoint += UpdateSpwanPoint;
+        }
     }
 
     void UpdateSpwanPoint(string id, int index)
@@ -61,7 +59,7 @@ public class ActorManager : GenericSingleton<ActorManager>
         int currentMapID = DungeonPointManager.Instance.mapID;
 
 
-        spawnPoints[name] = $"{currentMapID}_{index}";
+        spawnPoints[id] = $"{currentMapID}_{index}";
     }
 
 
@@ -72,7 +70,7 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     void SendPlayerDeadPacket(string id)
     {
-        // ¼­¹ö ÆÐÅ¶ Àü¼Û ÄÚµå Ãß°¡
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ ï¿½ß°ï¿½
     }
 
     public Actor GetActor(string name)

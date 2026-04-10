@@ -33,6 +33,10 @@ public class ActionState : IState
     {
         timer = 0f;
 
+        //공통 연출 (애니메이션)
+
+        if (!actor.IsLocal) return;
+
         //카메라 연출
         actor.ShakeCamera();
 
@@ -41,7 +45,10 @@ public class ActionState : IState
         actor.LookAtDirection(searchForward);
         // 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
+
         PlayerActor closestTarget = null;
+        MovableGimmick closestGimmick = null;
+
         float minDistance = float.MaxValue;
         Vector3 dirToTarget = Vector3.zero;
         foreach (Collider hit in colliders)
@@ -62,6 +69,22 @@ public class ActionState : IState
                     minDistance = distance;
                 }
             }
+
+            MovableGimmick targetGimmick = hit.GetComponentInParent<MovableGimmick>();
+            if (targetGimmick != null)
+            {
+                Vector3 dir = targetGimmick.transform.position - actor.transform.position;
+                float distance = dir.magnitude;
+                float angle = Vector3.Angle(searchForward, dir);
+
+                if (angle <= maxAngle && distance < minDistance)
+                {
+                    closestGimmick = targetGimmick;
+                    closestTarget = null; //플레이어 x 
+                    minDistance = distance;
+                    dirToTarget = dir;
+                }
+            }
         }
 
         // 타겟을 찾았다면 타격 공식 및 넉백 상태 부여
@@ -72,12 +95,7 @@ public class ActionState : IState
                 Player targetPlayer = closestTarget.GetComponent<Player>();
                 if (targetPlayer != null)
                 {
-                    P_PlayerActionRequest req = new P_PlayerActionRequest
-                    {
-                        userUUID = targetPlayer.ID,
-                        actionType = actionType
-                    };
-                    Client.TCP.SendPacket2(E_PACKET.PLAYER_ACTION_REQUEST, req);
+                    actor.SendStateChange(eState.Knockback, dirToTarget, pushForce * pow, targetPlayer.ID);
                 }
             }
             else
@@ -85,6 +103,34 @@ public class ActionState : IState
                 PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
                 var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
                 a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, pushForce * pow, actionType == 1, actor.transform.position));
+            }
+        }
+        else if (closestGimmick != null)
+        {
+            Vector3 pushDir = dirToTarget.normalized;
+            pushDir.y = 0;
+            if (actionType == 1) pushDir = -pushDir;
+
+            float moveDist = (actionType == 0) ? 3f : (minDistance - 1.5f); // 당길 땐 내 앞 1.5m까지만
+            Vector3 destPos = closestGimmick.transform.position + (pushDir * moveDist);
+
+            if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+            {
+                // 서버 연동: 기믹 패킷 전송 (상호작용)
+                P_GimmickInteractReq req = new P_GimmickInteractReq
+                {
+                    activeUUID = LocalPlayerInfo.ID,
+                    gimmickID = closestGimmick.gimmickUID,
+                    state = 3, // 3 = 기믹 오브젝트 밀기/당기기 규약
+                    targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
+                    param = pushForce * pow
+                };
+                Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+            }
+            else
+            {
+                // 오프라인 테스트: 패킷 없이 상자를 즉시 부드럽게 이동시킴
+                closestGimmick.StartMove(destPos);
             }
         }
     }

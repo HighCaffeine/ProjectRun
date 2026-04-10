@@ -43,7 +43,7 @@ public class KnockbackState : IState
         // 연출
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
 
-        PlayerActor.ActionType actionType = isPull ? PlayerActor.ActionType.PULL : PlayerActor.ActionType.PUSH;
+        eState actionType = isPull ? eState.Pull : eState.Push;
         actor.PlayTravelSpark(actionType);
 
 

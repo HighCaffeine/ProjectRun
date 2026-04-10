@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine.Animations;
 
 public interface ICameraEffect
 {
@@ -19,6 +20,7 @@ public class CameraManager : MonoBehaviour
 
     public DashCameraEffect dashCameraEffect;
 
+    public PositionConstraint positionConstraint;
     private List<ICameraEffect> activeEffects = new List<ICameraEffect>();
 
     void Awake()
@@ -27,8 +29,19 @@ public class CameraManager : MonoBehaviour
         if (vCam != null)
         {
             camPerlin = vCam.GetComponent<CinemachineBasicMultiChannelPerlin>();
-            DontDestroyOnLoad(gameObject);
+            //DontDestroyOnLoad(gameObject);
         }
+    }
+
+    public void AddPosContraint(Transform target)
+    {
+        ConstraintSource source = new ConstraintSource();
+        source.sourceTransform = target;
+        source.weight = 1f;
+
+        positionConstraint.AddSource(source);
+
+        positionConstraint.constraintActive = true;
     }
 
     public void PlayEffect(ICameraEffect effect)
