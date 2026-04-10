@@ -1,8 +1,5 @@
 using System;
-using System.IO;
-using System.Reflection;
 using System.Text;
-using System.Runtime.InteropServices;
 using UnityEngine;
 
 public static class PacketSerializer
@@ -14,10 +11,12 @@ public static class PacketSerializer
             case P_LoginReq p: return SerializeLoginReq(p);
             case P_RoomEnterRequest p: return SerializeRoomEnterRequest(p);
             case P_PlayerMovement p: return SerializePlayerMovement(p);
+            case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_PlayerStateNtf p: return SerializePlayerStateNtf(p);
             case P_PlayerActionRequest p: return SerializePlayerActionRequest(p);
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
             case P_PlayerReadyRequest p: return SerializePlayerReadyRequest(p);
+            case P_GameStartNtf p: return SerializeGameStartNtf(p);
             case P_RoomChatRequest p: return SerializeRoomChatRequest(p);
             case P_ShopBuyRequest p: return SerializeShopBuyRequest(p);
             case P_TradeRequest p: return SerializeTradeRequest(p);
@@ -69,6 +68,11 @@ public static class PacketSerializer
         return buf;
     }
 
+    static byte[] SerializePlayerStatus(P_PlayerStatusNtf p)
+    {
+        return null;
+    }
+
     static byte[] SerializePlayerStateNtf(P_PlayerStateNtf p)
     {
         var buf = new byte[25]; // 8+1+12+4
@@ -108,6 +112,14 @@ public static class PacketSerializer
     static byte[] SerializePlayerReadyRequest(P_PlayerReadyRequest p)
     {
         return new byte[] { p.isReady ? (byte)1 : (byte)0 };
+    }
+
+    static byte[] SerializeGameStartNtf(P_GameStartNtf p)
+    {
+        var buf = new byte[4];
+        int o = 0;
+        Write(buf, ref o, p.mapId);
+        return buf;
     }
 
     static byte[] SerializeRoomChatRequest(P_RoomChatRequest p)

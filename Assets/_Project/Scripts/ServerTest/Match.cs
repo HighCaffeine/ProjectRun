@@ -252,22 +252,22 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     break;
                 }
-            case E_PACKET.PLAYER_ACTION_NTF:
-                {
-                    var actionNtf = UnsafeCode.ByteArrayToStructure<P_PlayerActionNtf>(packet.data);
+            // case E_PACKET.PLAYER_ACTION_NTF:
+            //     {
+            //         var actionNtf = UnsafeCode.ByteArrayToStructure<P_PlayerActionNtf>(packet.data);
 
-                    // 맞은 유저 찾기
-                    if (Players.TryGetValue(actionNtf.targetUUID, out Player targetPlayer))
-                    {
-                        // attacker 찾기
-                        if (Players.TryGetValue(actionNtf.attackerUUID, out Player attackerPlayer))
-                        {
-                            // 넉백 적용
-                            targetPlayer.ApplyKnockback(attackerPlayer.transform.position, actionNtf.actionType);
-                        }
-                    }
-                    break;
-                }
+            //         // 맞은 유저 찾기
+            //         if (Players.TryGetValue(actionNtf.targetUUID, out Player targetPlayer))
+            //         {
+            //             // attacker 찾기
+            //             if (Players.TryGetValue(actionNtf.attackerUUID, out Player attackerPlayer))
+            //             {
+            //                 // 넉백 적용
+            //                 targetPlayer.ApplyKnockback(attackerPlayer.transform.position, actionNtf.actionType);
+            //             }
+            //         }
+            //         break;
+            //     }
             case E_PACKET.GIMMICK_INTERACT_NTF:
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
@@ -507,6 +507,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 if (DashCameraEffect.Instance != null)
                 {
                     DashCameraEffect.Instance.InitSetup(pActor.transform);
+                    CameraManager.Instance.SetupDashEffectComp(pActor);
                 }
 
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
