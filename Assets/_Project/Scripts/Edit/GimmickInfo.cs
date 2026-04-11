@@ -5,10 +5,20 @@ using System;
 public enum GimmickKey
 {
     NONE,
-    magnetic_force,     //마그네틱
-    button,             //버튼
-    pressure_plate,     //압력판
-    breakable_wall,
+    BreakableWall,
+	Button,
+	MovableObject,
+	DrawBridge,
+	SeeSaw,
+	
+	// 
+	PresurePlate,
+	DisappearPlate,
+	MovePlate,
+	
+	//환경
+	Wind,
+    Count,
 }
 
 
