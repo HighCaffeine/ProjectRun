@@ -3,16 +3,17 @@ using UnityEngine;
 public class WindZone : MonoBehaviour
 {
     [Header("바람 설정")]
-    public Vector3 windDirection = Vector3.left; // 바람 방향
+    public Vector3 windDirection; // 바람 방향
     public float windPower = 1f; // 세기
 
 
     private void OnTriggerStay(Collider other)
     {
+        windDirection = transform.forward; // WindZone의 앞 방향을 바람 방향으로 설정
         PlayerActor player = other.GetComponent<PlayerActor>();
         if (player != null)
         {
-            player.SetWind(windDirection, windPower);
+            player.SetWind(transform.forward, windPower);
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -32,11 +33,13 @@ public class WindZone : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        // 바람 존의 범위를 시각적으로 표시하기 위해 Gizmos를 사용
-        Gizmos.color = new Color(0, 1, 0, 0.5f); // 반투명한 녹색
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, transform.forward * 20);
+
         Collider collider = GetComponent<Collider>();
         if (collider != null)
         {
+            Gizmos.color = new Color(0, 1, 0, 0.2f);
             Gizmos.DrawCube(collider.bounds.center, collider.bounds.size);
         }
     }
