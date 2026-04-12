@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Platform : MonoBehaviour
+public class Platform : BaseGimmick
 {
     [SerializeField]
     bool isMove = false;
@@ -28,10 +28,10 @@ public class Platform : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(isMove)
+        if (isMove)
         {
             StartCoroutine(MoveLoop());
-            isMove = false; // ÇÑ ¹ø¸¸ ÀÌµ¿ ½ÃÀÛÇÏµµ·Ï ¼³Á¤ 
+            isMove = false; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 
         }
     }
     void LateUpdate()
@@ -45,35 +45,60 @@ public class Platform : MonoBehaviour
 
         lastPos = transform.position;
     }
+
+    public override void Execute(P_GimmickInteractNtf ntf)
+    {
+        // ì´ë™ ì‹œì‘ ëª…ë ¹ì´ ì˜¤ë©´ 1íšŒë§Œ ì½”ë£¨í‹´ ì‹¤í–‰
+        if (ntf.state == (byte)eGimmickState.On_Activate && !hasStarted)
+        {
+            hasStarted = true;
+            StartCoroutine(MoveLoop());
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") &&!hasStarted)
-        {
-            hasStarted = true; 
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ÇÃ·§Æû¿¡ µé¾î¿Ô½À´Ï´Ù.");
-            isMove = true;
-        }
-
+        // íƒ‘ìŠ¹ì ë“±ë¡ë§Œ ìˆ˜í–‰
         PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null)
-        {
-            players.Add(actor);
-        }
+        if (actor != null) players.Add(actor);
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            other.transform.SetParent(null); // ÇÃ·¹ÀÌ¾î¸¦ ÇÃ·§Æû¿¡¼­ ºĞ¸®
-        }
-
+        if (other.CompareTag("Player")) other.transform.SetParent(null);
         PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null)
-        {
-            players.Remove(actor);
-        }
+        if (actor != null) players.Remove(actor);
     }
+
+    // private void OnTriggerEnter(Collider other)
+    // {
+    //     if (other.CompareTag("Player") && !hasStarted)
+    //     {
+    //         hasStarted = true;
+    //         Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ô½ï¿½ï¿½Ï´ï¿½.");
+    //         isMove = true;
+    //     }
+
+    //     PlayerActor actor = other.GetComponent<PlayerActor>();
+    //     if (actor != null)
+    //     {
+    //         players.Add(actor);
+    //     }
+    // }
+
+    // private void OnTriggerExit(Collider other)
+    // {
+    //     if (other.CompareTag("Player"))
+    //     {
+    //         other.transform.SetParent(null); // ï¿½Ã·ï¿½ï¿½Ì¾î¸¦ ï¿½Ã·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ğ¸ï¿½
+    //     }
+
+    //     PlayerActor actor = other.GetComponent<PlayerActor>();
+    //     if (actor != null)
+    //     {
+    //         players.Remove(actor);
+    //     }
+    // }
 
     IEnumerator MoveTo(Vector3 target)
     {
@@ -89,9 +114,9 @@ public class Platform : MonoBehaviour
         while (true)
         {
             yield return MoveTo(endPos.transform.position);
-            yield return new WaitForSeconds(3f); // µµÂø ÈÄ 1ÃÊ ´ë±â
+            yield return new WaitForSeconds(3f); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½
             yield return MoveTo(startPos.transform.position);
-            yield return new WaitForSeconds(3f); // Ãâ¹ß ÈÄ 1ÃÊ ´ë±â
+            yield return new WaitForSeconds(3f); // ï¿½ï¿½ï¿½ ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½
         }
     }
 

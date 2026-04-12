@@ -1,10 +1,15 @@
 using System.Collections;
 using UnityEngine;
 
-public class MovableGimmick : MonoBehaviour
+public class MovableGimmick : BaseGimmick
 {
-    public int gimmickUID;
     private bool isMoving = false;
+
+    public override void Execute(P_GimmickInteractNtf ntf)
+    {
+        // 목표 좌표(ntf.targetPos)로 이동!
+        if (!isMoving) StartCoroutine(MoveRoutine(ntf.targetPos.ToVector3()));
+    }
 
     public void StartMove(Vector3 destPos)
     {

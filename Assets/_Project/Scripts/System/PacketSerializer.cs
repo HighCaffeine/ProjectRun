@@ -87,10 +87,11 @@ public static class PacketSerializer
 
     static byte[] SerializeGimmickInteractReq(P_GimmickInteractReq p)
     {
-        var buf = new byte[29]; // 8+4+1+12+4
+        var buf = new byte[30]; // 8+4+1+1+12+4
         int o = 0;
         Write(buf, ref o, p.activeUUID);
         Write(buf, ref o, p.gimmickID);
+        buf[o++] = p.state;
         buf[o++] = p.state;
         Write(buf, ref o, p.targetPos.x);
         Write(buf, ref o, p.targetPos.y);

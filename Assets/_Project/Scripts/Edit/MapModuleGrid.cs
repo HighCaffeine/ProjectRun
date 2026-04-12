@@ -21,13 +21,21 @@ public class MapModuleGrid : MonoBehaviour
 
     void Update()
     {
-        // 에디터에서 자식 오브젝트(기믹 등)를 움직일 때 Cell에 자동으로 자석처럼 붙게
         if (enableAutoSnap && !Application.isPlaying)
         {
-            foreach (Transform child in transform)
+            SnapAllChildren(transform);
+        }
+    }
+
+    private void SnapAllChildren(Transform parentTransform)
+    {
+        foreach (Transform child in parentTransform)
+        {
+            // 위치가 변경된 오브젝트만 스냅 연산
+            if (child.hasChanged)
             {
                 Vector3 pos = child.localPosition;
-                Vector3 scale = child.localScale; // 오브젝트의 스케일을 가져옴
+                Vector3 scale = child.localScale;
 
                 // (위치 - 크기 절반)을 그리드에 맞춘 뒤 다시 크기 절반을 더해줌
                 pos.x = Mathf.Round((pos.x - scale.x / 2f) / cellSize) * cellSize + (scale.x / 2f);
@@ -40,6 +48,15 @@ public class MapModuleGrid : MonoBehaviour
                 pos.z = Mathf.Round((pos.z - scale.z / 2f) / cellSize) * cellSize + (scale.z / 2f);
 
                 child.localPosition = pos;
+
+                // 연산이 끝났으므로 플래그 초기화
+                child.hasChanged = false;
+            }
+
+            //자식들 검사
+            if (child.childCount > 0)
+            {
+                SnapAllChildren(child);
             }
         }
     }
@@ -60,7 +77,6 @@ public class MapModuleGrid : MonoBehaviour
         {
             Gizmos.DrawLine(new Vector3(start.x, transform.position.y, z), new Vector3(end.x, transform.position.y, z));
         }
-        // 세로선
         for (float x = start.x; x <= end.x + 0.01f; x += cellSize)
         {
             Gizmos.DrawLine(new Vector3(x, transform.position.y, start.z), new Vector3(x, transform.position.y, end.z));

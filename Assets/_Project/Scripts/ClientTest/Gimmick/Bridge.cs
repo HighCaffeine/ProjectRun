@@ -1,20 +1,28 @@
 using System.Collections;
 using UnityEngine;
 
-public class Bridge : MonoBehaviour
+public class Bridge : BaseGimmick
 {
-    [Header("È¸Àü ´ë»ó (Pivot)")]
+    [Header("È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ (Pivot)")]
     [SerializeField] private Transform pivot;
 
-    [Header("°¢µµ ¼³Á¤")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] private float closeAngle = 0f;
 
-    [Header("¼Óµµ")]
+    [Header("ï¿½Óµï¿½")]
     [SerializeField] private float speed = 2f;
 
     private Coroutine currentCoroutine;
 
-    // ¿ÜºÎ¿¡¼­ È£Ãâ (¾Ğ·ÂÆÇ µî)
+    // ï¿½ÜºÎ¿ï¿½ï¿½ï¿½ È£ï¿½ï¿½ (ï¿½Ğ·ï¿½ï¿½ï¿½ ï¿½ï¿½)
+
+    public override void Execute(P_GimmickInteractNtf ntf)
+    {
+        if (ntf.state == (byte)eGimmickState.On_Activate) // Active ëª…ë ¹ì´ë©´ ë‹¤ë¦¬ë¥¼ ë‹«ìŒ
+        {
+            StartRotate(closeAngle);
+        }
+    }
 
     public void CloseBridge()
     {

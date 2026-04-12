@@ -3,7 +3,7 @@ using UnityEngine;
 public class ActionState : IState
 {
     private PlayerActor actor;
-    private byte actionType;
+    private eState actionType;
     private float timer;
     private const float CAST_TIME = 0.3f; // 후딜레이
 
@@ -12,17 +12,17 @@ public class ActionState : IState
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
     private float pow = 1.5f;  // 계수
 
-    public ActionState(PlayerActor actor, byte type)
+    public ActionState(PlayerActor actor, eState type)
     {
         this.actor = actor;
         this.actionType = type;
 
-        if (actionType == 0) // 밀기
+        if (actionType == eState.Push) // 밀기
         {
             maxDistance = 3f;
             pushForce = 100;
         }
-        else if (actionType == 1) // 당기기
+        else if (actionType == eState.Pull) // 당기기
         {
             maxDistance = 10f;
             pushForce = 120;
@@ -102,14 +102,14 @@ public class ActionState : IState
             {
                 PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
                 var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
-                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, pushForce * pow, actionType == 1, actor.transform.position));
+                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, pushForce * pow, actionType == eState.Pull, actor.transform.position));
             }
         }
         else if (closestGimmick != null)
         {
             Vector3 pushDir = dirToTarget.normalized;
             pushDir.y = 0;
-            if (actionType == 1) pushDir = -pushDir;
+            if (actionType == eState.Pull) pushDir = -pushDir;
 
             float moveDist = (actionType == 0) ? 3f : (minDistance - 1.5f); // 당길 땐 내 앞 1.5m까지만
             Vector3 destPos = closestGimmick.transform.position + (pushDir * moveDist);
@@ -121,6 +121,7 @@ public class ActionState : IState
                 {
                     activeUUID = LocalPlayerInfo.ID,
                     gimmickID = closestGimmick.gimmickUID,
+                    gimmickKey = (byte)eGimmickKey.MovableObject,
                     state = 3, // 3 = 기믹 오브젝트 밀기/당기기 규약
                     targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
                     param = pushForce * pow

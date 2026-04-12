@@ -244,8 +244,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         {
                             case 0: pActor.sm.ChangeState(new IdleState(pActor)); break;
                             case 1: pActor.sm.ChangeState(new MoveState(pActor)); break;
-                            case 2: pActor.sm.ChangeState(new ActionState(pActor, 0)); break; // 밀기
-                            case 3: pActor.sm.ChangeState(new ActionState(pActor, 1)); break; // 당기기
+                            case 2: pActor.sm.ChangeState(new ActionState(pActor, eState.Push)); break; // 밀기
+                            case 3: pActor.sm.ChangeState(new ActionState(pActor, eState.Pull)); break; // 당기기
                             case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
                                 pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, false, Vector3.zero));
@@ -274,48 +274,28 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    // Next 구역 텔레포트 처리
-                    if (ntf.state == 2)
+                    // Next 구역 텔레포트
+                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.MovableObject) // 예외 처리용
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            // 보간(Lerp) 로직을 무시하고 즉시 순간이동 처리
                             Vector3 destPos = ntf.targetPos.ToVector3();
                             targetPlayer.transform.position = destPos;
-                            targetPlayer.SetPos(destPos); // Player.cs의 서버 동기화 좌표
+                            targetPlayer.SetPos(destPos);
+                        }
+                        break;
+                    }
 
-                            if (targetPlayer.IsLocal)
-                            {
-                                Debug.Log($"[System] 다음 기믹 구역으로 이동 완료");
-                            }
-                        }
-                    }
-                    // 2. 기존 맵 기믹 처리 (벽 부수기, 플랫폼 이동 등)
-                    else
+                    BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
+                    foreach (var gimmick in allGimmicks)
                     {
-                        // 최신 유니티 경고(노란 줄) 방지를 위해 FindObjectsByType 사용
-                        GimmickInfo[] allGimmicks = FindObjectsByType<GimmickInfo>(FindObjectsSortMode.None);
-                        foreach (GimmickInfo gimmick in allGimmicks)
+                        if (gimmick.gimmickUID == ntf.gimmickID)
                         {
-                            if (gimmick.gimmick_id == ntf.gimmickID)
-                            {
-                                // 기믹 종류별 동작
-                                if (gimmick.gimmick_type == "breakable_wall" && ntf.state == 0)
-                                {
-                                    Destroy(gimmick.gameObject);
-                                }
-                                else if (gimmick.gimmick_type == "moving_platform" && ntf.state == 1)
-                                {
-                                    // 플랫폼 이동 (도착 좌표 = ntf.targetPos.ToVector3(), 속도 = ntf.param)
-                                    // StartCoroutine(MovePlatform(gimmick.transform, ntf.targetPos.ToVector3(), ntf.param));
-                                }
-                                else if (gimmick.gimmick_type == "magnetic_force" && ntf.state == 1)
-                                {
-                                    // 특정 범위 내 유저 자력으로 당기기 등
-                                }
-                            }
+                            gimmick.Execute(ntf);
+                            break;
                         }
                     }
+
                     break;
                 }
             case E_PACKET.DUNGEON_CLEAR_NTF:
@@ -580,4 +560,21 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             Players.Remove(id);
         }
     }
+
+    // 공통 베이스 스크립트 사용
+    // private void FindGimmickAndExecute<T>(int id, Action<T> action) where T : MonoBehaviour
+    // {
+    //     T[] gimmicks = FindObjectsByType<T>(FindObjectsSortMode.None);
+
+    //     foreach (var g in gimmicks)
+    //     {
+    //         // 각 스크립트에 gimmickUID 변수가 있어야 함
+    //         var prop = g.GetType().GetField("gimmickUID");
+    //         if (prop != null && (int)prop.GetValue(g) == id)
+    //         {
+    //             action(g);
+    //             return;
+    //         }
+    //     }
+    // }
 }

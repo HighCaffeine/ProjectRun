@@ -15,8 +15,8 @@ public class MoveState : IState
     {
         if (!actor.IsLocal) return;
         //밀당 체크
-        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, 0)); return; }
-        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, 1)); return; }
+        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
+        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
         //대쉬 체크
         if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 

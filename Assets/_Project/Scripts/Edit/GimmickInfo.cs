@@ -6,18 +6,18 @@ public enum GimmickKey
 {
     NONE,
     BreakableWall,
-	Button,
-	MovableObject,
-	DrawBridge,
-	SeeSaw,
-	
-	// 
-	PresurePlate,
-	DisappearPlate,
-	MovePlate,
-	
-	//환경
-	Wind,
+    Button,
+    MovableObject,
+    Bridge,
+    SeeSaw,
+
+    // 
+    PresurePlate,
+    DisappearPlate,
+    MovePlate,
+
+    //환경
+    Wind,
     Count,
 }
 
