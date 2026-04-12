@@ -39,7 +39,9 @@ public class PlayerActor : Actor
     private int spawninDex = 0;
 
     private Vector3 platformDelta;
-
+    private Vector3 windDir;
+    private float windPower;
+    private bool isInWind;
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
@@ -54,7 +56,8 @@ public class PlayerActor : Actor
 
     protected override void Start()
     {
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test) ActorManager.Instance.AddPlayer(this);
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+        { ActorManager.Instance.AddPlayer(this); }
 
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));
@@ -78,18 +81,21 @@ public class PlayerActor : Actor
         }
 
         sm.Update();
+        ApplyWind();
 
         if (controller != null && controller.enabled)
         {
             ApplyGravity();
-            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
 
+            // 플랫폼(이동 발판) 델타 이동 우선 적용
             if (platformDelta != Vector3.zero)
             {
                 controller.Move(platformDelta);
                 platformDelta = Vector3.zero;
             }
 
+            // 바람과 중력이 모두 적용된 최종 이동 벡터
+            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
@@ -100,6 +106,50 @@ public class PlayerActor : Actor
     public void Move(Vector3 dir, float speed)
     {
         horizontalMove += dir * speed;
+    }
+    public void SetWind(Vector3 dir, float power)
+    {
+        windDir = dir.normalized;
+        windPower = power;
+        isInWind = true;
+    }
+
+    public void ClearWind()
+    {
+        isInWind = false;
+    }
+    private void ApplyWind()
+    {
+        if (!isInWind) return;
+
+        Vector3 move = horizontalMove;
+
+        //  가만히 있을 때
+        if (move.sqrMagnitude < 0.001f)
+        {
+            horizontalMove += windDir * windPower;
+            Debug.Log("[Wind] Idle Push");
+            return;
+        }
+
+        Vector3 moveDir = move.normalized;
+        float dot = Vector3.Dot(moveDir, windDir);
+
+        moveSpeed = 5f; // 기본 이동 속도로 초기화
+        //  역방향 (감속)
+        if (dot < 0f)
+        {
+            //horizontalMove -= moveDir * windPower;
+            moveSpeed = moveSpeed * 0.3f;
+            Debug.Log("[Wind] Decelerate");
+        }
+        // 정방향 (가속)
+        else
+        {
+            //  horizontalMove += windDir * windPower;
+            moveSpeed = moveSpeed * 1.7f;
+            Debug.Log("[Wind] Accelerate");
+        }
     }
     public void SetPlatformDelta(Vector3 delta)
     {
@@ -367,5 +417,15 @@ public class PlayerActor : Actor
         Array.Copy(BitConverter.GetBytes(pkt.axisV), 0, buf, offset, 4); offset += 4;
 
         return buf;
+    }
+    private void OnDrawGizmos()
+    {
+        if (!isInWind) return;
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawRay(transform.position, windDir * 3f);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
     }
 }

@@ -13,7 +13,7 @@ public class GameManager : GenericSingleton<GameManager>
 
     [Header("Test")]
     public Transform playerDashAnchor;
-
+    
     protected override void Awake()
     {
         base.Awake();
