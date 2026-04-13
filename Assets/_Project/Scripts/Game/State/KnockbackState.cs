@@ -106,12 +106,13 @@ public class KnockbackState : IState
         {
             if (wall.CompareTag("Breakable"))
             {
-                GimmickInfo gInfo = wall.GetComponent<GimmickInfo>();
+                GimmickTrigger gInfo = wall.GetComponent<GimmickTrigger>();
                 if (gInfo != null)
                 {
                     P_GimmickInteractReq req = new P_GimmickInteractReq
                     {
-                        gimmickID = gInfo.gimmick_id,
+                        gimmickID = gInfo.targetGimmickID,
+                        gimmickKey = (byte)gInfo.targetGimmickKey,
                         state = 0,
                         targetPos = new P_PacketVector3(),
                         param = 0f

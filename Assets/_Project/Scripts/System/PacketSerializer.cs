@@ -91,7 +91,7 @@ public static class PacketSerializer
         int o = 0;
         Write(buf, ref o, p.activeUUID);
         Write(buf, ref o, p.gimmickID);
-        buf[o++] = p.state;
+        buf[o++] = p.gimmickKey;
         buf[o++] = p.state;
         Write(buf, ref o, p.targetPos.x);
         Write(buf, ref o, p.targetPos.y);

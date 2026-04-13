@@ -5,8 +5,8 @@
   "SchemaVersion": "16",
   "SoundBankVersion": "172",
   "RootPaths": {
-   "ProjectRoot": "../../../../../Wwise/CKFinalProject",
-   "SourceFilesRoot": "../../../../../Wwise/CKFinalProject/.cache",
+   "ProjectRoot": "E:/ProjectFile/Wwise/ProjectRun_Wwise",
+   "SourceFilesRoot": "E:/ProjectFile/Wwise/ProjectRun_Wwise/.cache",
    "SoundBanksRoot": ".",
    "ExternalSourcesInputFile": "",
    "ExternalSourcesOutputRoot": "../../../GeneratedSoundBanks/Windows"
@@ -641,6 +641,6 @@
     ]
    }
   ],
-  "FileHash": "{0C3A1A95-7306-8B9C-8614-8475D8388C69}"
+  "FileHash": "{EDDDFA0E-8F91-95B5-7250-5C0B829BDE94}"
  }
 }

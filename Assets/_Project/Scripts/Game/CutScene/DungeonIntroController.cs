@@ -11,6 +11,16 @@ public class DungeonIntroController : MonoBehaviour
     void Start()
     {
         director.stopped += OnCutsceneFinished;
+
+        foreach (var cam in cutsceneCameras)
+        {
+            if (cam != null) cam.SetActive(true);
+        }
+
+        if (director != null && director.state != PlayState.Playing)
+        {
+            director.Play();
+        }
     }
 
     private void OnCutsceneFinished(PlayableDirector pd)
@@ -20,7 +30,8 @@ public class DungeonIntroController : MonoBehaviour
             if (cam != null) cam.SetActive(false);
         }
 
-        Debug.Log("[System] 컷씬 종료! 메인 카메라로 전환됩니다.");
+        Debug.Log("[System] 컷씬 종료 메인 카메라로 전환됩니다.");
+        Match.Instance.SpawnLocalPlayer(0); // 플레이어 스폰
     }
 
     void OnDestroy()

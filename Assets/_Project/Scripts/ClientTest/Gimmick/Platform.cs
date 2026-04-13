@@ -20,6 +20,9 @@ public class Platform : BaseGimmick
     private List<PlayerActor> players = new List<PlayerActor>();
     private Vector3 lastPos;
 
+    public void SetStartPos(GameObject start) {startPos = start;}
+    public void SetEndPos(GameObject end) {endPos = end;}
+
     void Start()
     {
         lastPos = transform.position;

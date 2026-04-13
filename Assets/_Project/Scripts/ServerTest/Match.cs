@@ -150,7 +150,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 P_RoomLeaveUserNotify roomLeaveUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
 
                 //버그로 우선 주석처리
-                //RemovePlayer(roomLeaveUserNotify.userUUID);
+                RemovePlayer(roomLeaveUserNotify.userUUID);
                 break;
 
             case E_PACKET.ROOM_HOST_NTF:
@@ -544,11 +544,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
         AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
 
-        // 내 캐릭터를 스폰한 직후, 서버에 "리모트 플레이어 정보 줘!" 라고 요청
         if (Client.IS_SERVER_PLAY)
         {
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
+            Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
         }
     }
 
@@ -556,8 +556,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     {
         if (Players != null && Players.TryGetValue(id, out Player player) && player != null)
         {
+            Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
             Destroy(player.gameObject);
             Players.Remove(id);
+        }
+        else
+        {
+            Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
         }
     }
 

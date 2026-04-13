@@ -3,13 +3,14 @@ using UnityEngine;
 
 public class ReMovePlatform : BaseGimmick
 {
-    [SerializeField] private float shakeTime = 3f;     // ???? ?©£?
+    [SerializeField] private float shakeTime = 3f;     // ???? ?ï¿½ï¿½?
     [SerializeField] private float shakePower = 0.05f; // ??? ???? ????
     [SerializeField] private float hangTime = 0.5f;    // ??? + ???? ?? ???
     [SerializeField] private float fallDistance = 15f;  // ???? ???
-    [SerializeField] private float fallDuration = 0.5f; // ???? ?©£?
+    [SerializeField] private float fallDuration = 0.5f; // ???? ?ï¿½ï¿½?
     [SerializeField] private float respawnDelay = 2f;  // ?????? ?? ???
-    [SerializeField] private float riseDuration = 5f;  // ?????? ?©£?
+    [SerializeField] private float riseDuration = 5f;  // ?????? ?ï¿½ï¿½?
+
 
     [SerializeField] private GameObject platform;
     [SerializeField] private Transform visual;
@@ -17,21 +18,26 @@ public class ReMovePlatform : BaseGimmick
     private Coroutine currentCoroutine;
     private bool isRestoring = false;
 
-    private Vector3 startPos;
+    private GameObject startPos;
+    private GameObject endPos;
     private Vector3 originPos;
+
+    public void SetStartPos(GameObject start) { startPos = start; }
+    public void SetEndPos(GameObject end) { endPos = end; }
+
 
     private void Awake()
     {
         platform = GetComponentInChildren<MeshRenderer>().gameObject;
         visual = platform.transform;
 
-        startPos = transform.position;
-        originPos = visual.localPosition;
+        originPos = transform.position;
+        //originPos = visual.localPosition;
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        // Ãß¶ô ¸í·ÉÀÌ ¿À°í, º¹±¸ ÁßÀÌ ¾Æ´Ï¶ó¸é ½ÇÇà
+        // ï¿½ß¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´Ï¶ï¿½ï¿? ï¿½ï¿½ï¿½ï¿½
         if (ntf.state == (byte)eGimmickState.On_Activate && !isRestoring)
         {
             if (currentCoroutine != null) StopCoroutine(currentCoroutine);
@@ -47,15 +53,35 @@ public class ReMovePlatform : BaseGimmick
         currentCoroutine = StartCoroutine(RemoveSequence());
     }
 
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (isRestoring) return;
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isRestoring) return; // ÀÌ¹Ì ¹«³ÊÁ³°Å³ª º¹±¸ ÁßÀÌ¸é ¹«½Ã
 
-    //     if (other.GetComponent<PlayerActor>() && other.transform.position.y > transform.position.y)
-    //     {
-    //         StartRemove();
-    //     }
-    // }
+        PlayerActor pActor = other.GetComponent<PlayerActor>();
+
+        // ¿ÀÁ÷ ³» Ä³¸¯ÅÍ°¡ ¹â¾ÒÀ» ¶§¸¸ ¿äÃ»
+        if (pActor != null && pActor.IsLocal)
+        {
+            if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+            {
+                P_GimmickInteractReq req = new P_GimmickInteractReq
+                {
+                    activeUUID = LocalPlayerInfo.ID,
+                    gimmickID = this.gimmickUID,
+                    gimmickKey = (byte)eGimmickKey.FallingPlatform,
+                    state = (byte)eGimmickState.On_Activate,
+                    targetPos = new P_PacketVector3(),
+                    param = 0f
+                };
+                Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+            }
+            else
+            {
+                // ¿ÀÇÁ¶óÀÎ Å×½ºÆ®¿ë
+                Execute(new P_GimmickInteractNtf { state = (byte)eGimmickState.On_Activate });
+            }
+        }
+    }
 
     IEnumerator RemoveSequence()
     {
@@ -75,7 +101,7 @@ public class ReMovePlatform : BaseGimmick
         // ????
         yield return StartCoroutine(DropPlatform());
 
-        // ?úô ????
+        // ?ï¿½ï¿½ ????
         platform.GetComponent<Collider>().enabled = false;
 
         // 6. 2?? ??? ?? ????
@@ -90,7 +116,7 @@ public class ReMovePlatform : BaseGimmick
         // ???? ?????? (5??)
         yield return StartCoroutine(MoveUp(riseDuration));
 
-        // ?úô ????
+        // ?ï¿½ï¿½ ????
         platform.GetComponent<Collider>().enabled = true;
 
         isRestoring = false;
@@ -119,7 +145,7 @@ public class ReMovePlatform : BaseGimmick
     IEnumerator DropPlatform()
     {
         float elapsed = 0f;
-        Vector3 target = startPos + Vector3.down * fallDistance;
+        Vector3 target = startPos.transform.position + Vector3.down * fallDistance;
 
         while (elapsed < fallDuration)
         {
@@ -128,7 +154,7 @@ public class ReMovePlatform : BaseGimmick
             float t = elapsed / fallDuration;
             t = t * t;
 
-            transform.position = Vector3.Lerp(startPos, target, t);
+            transform.position = Vector3.Lerp(startPos.transform.position, target, t);
 
             yield return null;
         }
@@ -148,11 +174,11 @@ public class ReMovePlatform : BaseGimmick
             float t = elapsed / duration;
             t = Mathf.SmoothStep(0f, 1f, t);
 
-            transform.position = Vector3.Lerp(current, startPos, t);
+            transform.position = Vector3.Lerp(current, startPos.transform.position, t);
 
             yield return null;
         }
 
-        transform.position = startPos;
+        transform.position = startPos.transform.position;
     }
 }

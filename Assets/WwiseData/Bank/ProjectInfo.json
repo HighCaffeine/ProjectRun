@@ -1,11 +1,11 @@
 {
  "ProjectInfo": {
   "Project": {
-   "Name": "CKFinalProject",
+   "Name": "CK_ProjectRun",
    "GUID": "{A7924039-5D93-4DF0-8F89-58502655489D}",
-   "Generator": "2025.1.3.9039"
+   "Generator": "2025.1.6.9117"
   },
-  "CacheRoot": "../../../../Wwise/CKFinalProject/.cache",
+  "CacheRoot": "E:/ProjectFile/Wwise/ProjectRun_Wwise/.cache",
   "Platforms": [
    {
     "Name": "Windows",
@@ -24,6 +24,6 @@
     "UseAsStandIn": "true"
    }
   ],
-  "FileHash": "{F97F2334-F4F0-11C1-92C4-584321DAEE96}"
+  "FileHash": "{5B98BAA8-4B0F-44AA-0CC8-18A9F53C7A48}"
  }
 }

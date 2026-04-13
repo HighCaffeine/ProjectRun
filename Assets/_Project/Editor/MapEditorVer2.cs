@@ -7,8 +7,8 @@ public class MapEditorVer2 : EditorWindow
     [Header("기믹 프리팹 설정")]
     private GameObject triggerPrefab;
     private GameObject bridgePrefab;
-    private GameObject movePlatePrefab;
-    private GameObject disappearPlatePrefab;
+    private GameObject MovePlatformPrefab;
+    private GameObject FallingPlatformPrefab;
     private GameObject seesawPrefab;
     private GameObject movableObjectPrefab;
 
@@ -20,7 +20,49 @@ public class MapEditorVer2 : EditorWindow
     [MenuItem("Tools/GimmickPlacePalette")]
     public static void ShowWindow()
     {
-        GetWindow<MapEditorVer2>("기믹 배치 팔레트");
+        GetWindow<MapEditorVer2>("GimmickPlacePalette");
+    }
+
+    void OnEnable()
+    {
+        triggerPrefab = LoadPrefab("MapEditor_trigger");
+        bridgePrefab = LoadPrefab("MapEditor_bridge");
+        MovePlatformPrefab = LoadPrefab("MapEditor_MovePlatform");
+        FallingPlatformPrefab = LoadPrefab("MapEditor_FallingPlatform");
+        seesawPrefab = LoadPrefab("MapEditor_seesaw");
+        movableObjectPrefab = LoadPrefab("MapEditor_movable");
+
+        useSnap = EditorPrefs.GetBool("MapEditor_useSnap", true);
+        snapSize = EditorPrefs.GetFloat("MapEditor_snapSize", 1.0f);
+
+        string parentName = EditorPrefs.GetString("MapEditor_customParent", "");
+        if (!string.IsNullOrEmpty(parentName))
+        {
+            GameObject obj = GameObject.Find(parentName);
+            if (obj != null) customParent = obj.transform;
+        }
+    }
+
+    void OnDisable()
+    {
+        SavePrefab("MapEditor_trigger", triggerPrefab);
+        SavePrefab("MapEditor_bridge", bridgePrefab);
+        SavePrefab("MapEditor_MovePlatform", MovePlatformPrefab);
+        SavePrefab("MapEditor_FallingPlatform", FallingPlatformPrefab);
+        SavePrefab("MapEditor_seesaw", seesawPrefab);
+        SavePrefab("MapEditor_movable", movableObjectPrefab);
+
+        EditorPrefs.SetBool("MapEditor_useSnap", useSnap);
+        EditorPrefs.SetFloat("MapEditor_snapSize", snapSize);
+
+        if (customParent != null)
+        {
+            EditorPrefs.SetString("MapEditor_customParent", customParent.name);
+        }
+        else
+        {
+            EditorPrefs.DeleteKey("MapEditor_customParent");
+        }
     }
 
     private void OnGUI()
@@ -55,8 +97,8 @@ public class MapEditorVer2 : EditorWindow
 
         triggerPrefab = (GameObject)EditorGUILayout.ObjectField("스위치/발판 (Trigger)", triggerPrefab, typeof(GameObject), false);
         bridgePrefab = (GameObject)EditorGUILayout.ObjectField("다리 (Bridge)", bridgePrefab, typeof(GameObject), false);
-        movePlatePrefab = (GameObject)EditorGUILayout.ObjectField("이동 발판 (Platform)", movePlatePrefab, typeof(GameObject), false);
-        disappearPlatePrefab = (GameObject)EditorGUILayout.ObjectField("무너지는 발판 (ReMove)", disappearPlatePrefab, typeof(GameObject), false);
+        MovePlatformPrefab = (GameObject)EditorGUILayout.ObjectField("이동 발판 (Platform)", MovePlatformPrefab, typeof(GameObject), false);
+        FallingPlatformPrefab = (GameObject)EditorGUILayout.ObjectField("무너지는 발판 (Falling)", FallingPlatformPrefab, typeof(GameObject), false);
         seesawPrefab = (GameObject)EditorGUILayout.ObjectField("시소 (Seesaw)", seesawPrefab, typeof(GameObject), false);
         movableObjectPrefab = (GameObject)EditorGUILayout.ObjectField("밀당 오브젝트 (Movable)", movableObjectPrefab, typeof(GameObject), false);
 
@@ -71,18 +113,18 @@ public class MapEditorVer2 : EditorWindow
         EditorGUILayout.HelpBox("버튼을 누르면 [그룹 폴더 + 기믹 + 스위치] 세트로 생성", MessageType.Info);
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("다리 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(bridgePrefab, "Bridge", true);
-        if (GUILayout.Button("이동 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(movePlatePrefab, "MovePlatform", true);
+        if (GUILayout.Button("다리 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(bridgePrefab, eGimmickKey.Bridge, true);
+        if (GUILayout.Button("이동 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(MovePlatformPrefab, eGimmickKey.MovePlatform, true);
         GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("무너지는 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(disappearPlatePrefab, "ReMovePlatform", true);
+        if (GUILayout.Button("무너지는 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(FallingPlatformPrefab, eGimmickKey.FallingPlatform, true);
 
         //시소와 밀당 오브젝트는 트리거가 필요 없기 떄문에 false
-        if (GUILayout.Button("시소 설치", GUILayout.Height(30))) PlaceGimmickSet(seesawPrefab, "Seesaw", false);
+        if (GUILayout.Button("시소 설치", GUILayout.Height(30))) PlaceGimmickSet(seesawPrefab, eGimmickKey.SeeSaw, false);
         GUILayout.EndHorizontal();
 
-        if (GUILayout.Button("밀당 오브젝트 설치", GUILayout.Height(30))) PlaceGimmickSet(movableObjectPrefab, "MovableObject", false);
+        if (GUILayout.Button("밀당 오브젝트 설치", GUILayout.Height(30))) PlaceGimmickSet(movableObjectPrefab, eGimmickKey.MovableObject, false);
 
         GUILayout.Space(20);
         DrawHorizontalLine();
@@ -131,14 +173,14 @@ public class MapEditorVer2 : EditorWindow
     private eGimmickKey GetGimmickKeyType(BaseGimmick gimmick)
     {
         if (gimmick is Bridge) return eGimmickKey.Bridge;
-        if (gimmick is ReMovePlatform) return eGimmickKey.DisappearPlate;
-        if (gimmick is Platform) return eGimmickKey.MovePlate;
+        if (gimmick is ReMovePlatform) return eGimmickKey.FallingPlatform;
+        if (gimmick is Platform) return eGimmickKey.MovePlatform;
         if (gimmick is SeesawTrigger) return eGimmickKey.SeeSaw;
         if (gimmick is MovableGimmick) return eGimmickKey.MovableObject;
         return eGimmickKey.BreakableWall; // 기본값
     }
 
-    private void PlaceGimmickSet(GameObject prefab, string defaultName, bool autoCreateTrigger)
+    private void PlaceGimmickSet(GameObject prefab, eGimmickKey defaultName, bool autoCreateTrigger)
     {
         if (prefab == null)
         {
@@ -163,7 +205,7 @@ public class MapEditorVer2 : EditorWindow
         GameObject gimmickObj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         BaseGimmick gimmickComp = gimmickObj.GetComponent<BaseGimmick>();
 
-        string groupName = defaultName;
+        string groupName = defaultName.ToString();
         eGimmickKey targetKey = eGimmickKey.BreakableWall;
 
         if (gimmickComp != null)
@@ -210,11 +252,48 @@ public class MapEditorVer2 : EditorWindow
             triggerComp.targetGimmickKey = targetKey;
         }
 
+        if (defaultName == eGimmickKey.MovePlatform || defaultName == eGimmickKey.FallingPlatform)
+        {
+            var startPivot = CreatePivot("StartPos");
+            var endPivot = CreatePivot("EndPos");
+
+            startPivot.transform.SetParent(groupObj.transform);
+            endPivot.transform.SetParent(groupObj.transform);
+
+            switch (defaultName)
+            {
+                case eGimmickKey.MovePlatform:
+                    var movableObj = gimmickObj.GetComponent<Platform>(); 
+                    if (movableObj != null)
+                    {
+                        movableObj.SetStartPos(startPivot);
+                        movableObj.SetEndPos(endPivot);
+                    }
+                    break;
+
+                case eGimmickKey.FallingPlatform:
+                    var fallingObj = gimmickObj.GetComponent<ReMovePlatform>();
+                    if (fallingObj != null)
+                    {
+                        fallingObj.SetStartPos(startPivot);
+                        fallingObj.SetEndPos(endPivot);
+                    }
+                    break;
+            }
+        }
+
         // Undo 처리 및 그룹 폴더 포커스
         Undo.RegisterCreatedObjectUndo(groupObj, $"Place {groupName} Set");
         Selection.activeGameObject = groupObj;
 
         Debug.Log($"<color=cyan>[MapEditor]</color> {groupName}_{uid} 생성 ");
+    }
+
+    private GameObject CreatePivot(string name)
+    {
+        GameObject obj = new GameObject(name);
+
+        return obj;
     }
 
     // 기존의 보조 트리거 생성 함수
@@ -282,5 +361,34 @@ public class MapEditorVer2 : EditorWindow
         Rect rect = EditorGUILayout.GetControlRect(false, height);
         rect.height = height;
         EditorGUI.DrawRect(rect, new Color(0.5f, 0.5f, 0.5f, 1f));
+    }
+
+    private void SavePrefab(string key, GameObject prefab)
+    {
+        if (prefab != null)
+        {
+            if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(prefab, out string guid, out long localId))
+            {
+                EditorPrefs.SetString(key, guid);
+            }
+        }
+        else
+        {
+            EditorPrefs.DeleteKey(key);
+        }
+    }
+
+    private GameObject LoadPrefab(string key)
+    {
+        string guid = EditorPrefs.GetString(key, "");
+        if (!string.IsNullOrEmpty(guid))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (!string.IsNullOrEmpty(path))
+            {
+                return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            }
+        }
+        return null;
     }
 }

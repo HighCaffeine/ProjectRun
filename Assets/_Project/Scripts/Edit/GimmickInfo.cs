@@ -13,8 +13,8 @@ public enum GimmickKey
 
     // 
     PresurePlate,
-    DisappearPlate,
-    MovePlate,
+    FallingPlatform,
+    MovePlatform,
 
     //환경
     Wind,

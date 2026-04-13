@@ -268,7 +268,7 @@ public class PlayerActor : Actor
             powerOrTime = param
         };
 
-        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATE_NTF, pkt);
+        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }
     public void SetLocal(bool value)
     {
@@ -387,7 +387,7 @@ public class PlayerActor : Actor
             axisV = axisV
         };
         pkt.currentPos.Set(transform.position);
-        pkt.currentRot.Set(transform.rotation);
+        pkt.currentRot.Set(playerPivot.rotation);
 
         //byte[] data = SerializePlayerMovement(pkt);
         //byte[] data = PacketSerializer.Serialize(pkt);

@@ -8,9 +8,8 @@ public enum eGimmickKey : byte
     MovableObject,
     Bridge,
     SeeSaw,
-    PresurePlate,
-    DisappearPlate,
-    MovePlate,
+    FallingPlatform,
+    MovePlatform,
     Wind
 }
 
@@ -29,6 +28,7 @@ public enum E_PACKET
     ROOM_LEAVE_REQUEST = 215,
     ROOM_LEAVE_RESPONSE = 216,
     ROOM_LEAVE_USER_NTF = 217, // PLAYER_LEFT
+    ROOM_HOST_NTF = 218,             // 방장 알림
 
     // Chat
     ROOM_CHAT_REQUEST = 221, // SEND_CHAT_MESSAGE
@@ -51,8 +51,6 @@ public enum E_PACKET
     GIMMICK_INTERACT_REQ = 261,
     GIMMICK_INTERACT_NTF = 262,
 
-    ROOM_HOST_NTF = 218,             // 방장 알림
-    PLAYER_STATE_NTF = 234,   // 상태 변경 알림
     PLAYER_READY_REQUEST = 271,      // 준비 구역 진입
     ROOM_READY_STATUS_NTF = 272,
     GAME_START_COUNTDOWN_NTF = 273,  // 5, 4, 3 카운트다운

@@ -35,6 +35,7 @@ public class Player : MonoBehaviour
 
     public void SetSpeed(float speed) { this.currentSpeed = speed; }
     public void SetPos(Vector3 pos) { this.serverPos = pos; }
+    public void SetRot(Quaternion rot) { this.serverRot = rot; }
     private bool hasReceivedFirstSync = false;
 
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
