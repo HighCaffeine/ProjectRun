@@ -74,7 +74,8 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                     isSceneLoading = true;
 
                     LocalPlayerInfo.ID = loginRes.result;
-                    SceneManager.LoadSceneAsync("Game_Lobby");
+                    //SceneManager.LoadSceneAsync("Game_Lobby");
+                    SceneManager.LoadSceneAsync("Dungeon_1");
                 }
                 catch (Exception ex)
                 {
