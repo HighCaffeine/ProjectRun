@@ -87,6 +87,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
     public void OnDestroy()
     {
         Client.TCP.RemovePacketReceiver(this);
+        if (AkUnitySoundEngine.IsInitialized()) AkUnitySoundEngine.Term();
     }
 
     public void OnJoinButtonClick()

@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: AkWwiseInitializationSettings
   m_EditorClassIdentifier: AK.Wwise.Unity.Addressables::AK.Wwise.Unity.WwiseAddressables.AkWwiseAddressablesInitializationSettings
   PlatformSettingsNameList:
+  - Mac
   - Windows
   PlatformSettingsList:
-  - {fileID: 11400000, guid: 97b6d483be971d34d8cb9035ffddda3a, type: 2}
+  - {fileID: 11400000, guid: 1a6779bc656749d44a084ddcfe8014eb, type: 2}
+  - {fileID: 11400000, guid: daa292801195e43439fec0423e00bd3d, type: 2}
   InvalidReferencePlatforms: []
   UserSettings:
     m_BasePath: Audio\GeneratedSoundBanks

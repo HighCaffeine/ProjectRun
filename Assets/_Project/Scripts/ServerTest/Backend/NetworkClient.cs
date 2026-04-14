@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Collections.Concurrent;
 using UnityEngine;
+using Wwise;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3)]
 public struct PacketBaseOld
@@ -49,7 +50,7 @@ public unsafe class NetworkClient
     private ConcurrentQueue<Packet> packetQueue = new ConcurrentQueue<Packet>();
 
 
-    private const int MAX_PROCESS_PER_FRAME = 15; // 한 프레임당 최대 처리 패킷 수
+    private const int MAX_PROCESS_PER_FRAME = 1000; // 한 프레임당 최대 처리 패킷 수
     public event Action OnDisconnect;
     public NetworkClient(string ip, int port, ProtocolType protocol)
     {
@@ -62,6 +63,7 @@ public unsafe class NetworkClient
     public void Start()
     {
         synchronizationContext = SynchronizationContext.Current;
+        Application.runInBackground = true;
 
         if (socketProtocol == ProtocolType.Tcp)
         {
@@ -128,7 +130,7 @@ public unsafe class NetworkClient
     {
         byte[] clientBuffer = new byte[UDP_MAX_DATA_LENGTH];
         EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-        if (socket != null) socket.Blocking = false;
+        if (socket != null) socket.Blocking = true;
         while (socket != null)
         {
             int bytesReceived = 0;
@@ -182,7 +184,7 @@ public unsafe class NetworkClient
         byte[] packetBaseBuffer = new byte[sizeof(PacketBase)];
         byte[] clientBuffer = null;
         bool bBase = false;
-        if (socket != null) socket.Blocking = false;
+        if (socket != null) socket.Blocking = true;
         while (socket != null && socket.Connected) // Connected 체크 추가
         {
             if (!bBase)
