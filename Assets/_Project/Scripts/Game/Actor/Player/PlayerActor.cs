@@ -36,6 +36,8 @@ public class PlayerActor : Actor
     private float verticalVelocity;     // 현재 수직 속도
     private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
+
+    public Animator animator;
     private int spawninDex = 0;
 
     private Vector3 platformDelta;
@@ -59,6 +61,7 @@ public class PlayerActor : Actor
         if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
         { ActorManager.Instance.AddPlayer(this); }
 
+        animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));
     }

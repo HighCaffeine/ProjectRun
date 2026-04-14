@@ -7,7 +7,7 @@ public class MoveState : IState
 
     public void Enter()
     {
-        //actor.SetAni(AniState.Move); 
+        actor.animator.SetBool("Move", true);
         actor.SendStateChange(eState.Move);
     }
 
@@ -45,5 +45,9 @@ public class MoveState : IState
             actor.sendTimer = 0f;
         }
     }
-    public void Exit() { actor.SendMovePacket(0f, 0f); }
+    public void Exit() 
+    {
+        actor.animator.SetBool("Move", false);
+        actor.SendMovePacket(0f, 0f);
+    }
 }

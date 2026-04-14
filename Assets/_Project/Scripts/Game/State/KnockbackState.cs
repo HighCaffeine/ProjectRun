@@ -18,6 +18,7 @@ public class KnockbackState : IState
 
     private const float K = 10f;
 
+    
     public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
         this.actor = actor;
@@ -44,10 +45,9 @@ public class KnockbackState : IState
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
 
         eState actionType = isPull ? eState.Pull : eState.Push;
+
+        actor.animator.SetTrigger("Knockback");
         actor.PlayTravelSpark(actionType);
-
-
-
     }
 
     public void Execute()
