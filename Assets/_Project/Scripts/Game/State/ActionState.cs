@@ -34,6 +34,7 @@ public class ActionState : IState
         timer = 0f;
 
         //공통 연출 (애니메이션)
+        actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
 
