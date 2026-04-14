@@ -128,7 +128,7 @@ public unsafe class NetworkClient
     {
         byte[] clientBuffer = new byte[UDP_MAX_DATA_LENGTH];
         EndPoint ep = new IPEndPoint(IPAddress.Any, 0);
-        //if (socket != null) socket.Blocking = true;
+        if (socket != null) socket.Blocking = false;
         while (socket != null)
         {
             int bytesReceived = 0;
@@ -182,7 +182,7 @@ public unsafe class NetworkClient
         byte[] packetBaseBuffer = new byte[sizeof(PacketBase)];
         byte[] clientBuffer = null;
         bool bBase = false;
-        //if (socket != null) socket.Blocking = true;
+        if (socket != null) socket.Blocking = false;
         while (socket != null && socket.Connected) // Connected 체크 추가
         {
             if (!bBase)
