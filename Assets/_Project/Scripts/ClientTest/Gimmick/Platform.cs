@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Platform : BaseGimmick
+public class Platform : MonoBehaviour
 {
     [SerializeField]
     bool isMove = false;
@@ -31,7 +31,7 @@ public class Platform : BaseGimmick
         if (isMove)
         {
             StartCoroutine(MoveLoop());
-            isMove = false; // �� ���� �̵� �����ϵ��� ���� 
+            isMove = false; // 한 번만 이동 시작하도록 설정 
         }
     }
     void LateUpdate()
@@ -45,60 +45,35 @@ public class Platform : BaseGimmick
 
         lastPos = transform.position;
     }
-
-    public override void Execute(P_GimmickInteractNtf ntf)
-    {
-        // 이동 시작 명령이 오면 1회만 코루틴 실행
-        if (ntf.state == (byte)eGimmickState.On_Activate && !hasStarted)
-        {
-            hasStarted = true;
-            StartCoroutine(MoveLoop());
-        }
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        // 탑승자 등록만 수행
+        if (other.CompareTag("Player") && !hasStarted)
+        {
+            hasStarted = true;
+            Debug.Log("플레이어가 플랫폼에 들어왔습니다.");
+            isMove = true;
+        }
+
         PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null) players.Add(actor);
+        if (actor != null)
+        {
+            players.Add(actor);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player")) other.transform.SetParent(null);
+        if (other.CompareTag("Player"))
+        {
+            other.transform.SetParent(null); // 플레이어를 플랫폼에서 분리
+        }
+
         PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null) players.Remove(actor);
+        if (actor != null)
+        {
+            players.Remove(actor);
+        }
     }
-
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (other.CompareTag("Player") && !hasStarted)
-    //     {
-    //         hasStarted = true;
-    //         Debug.Log("�÷��̾ �÷����� ���Խ��ϴ�.");
-    //         isMove = true;
-    //     }
-
-    //     PlayerActor actor = other.GetComponent<PlayerActor>();
-    //     if (actor != null)
-    //     {
-    //         players.Add(actor);
-    //     }
-    // }
-
-    // private void OnTriggerExit(Collider other)
-    // {
-    //     if (other.CompareTag("Player"))
-    //     {
-    //         other.transform.SetParent(null); // �÷��̾ �÷������� �и�
-    //     }
-
-    //     PlayerActor actor = other.GetComponent<PlayerActor>();
-    //     if (actor != null)
-    //     {
-    //         players.Remove(actor);
-    //     }
-    // }
 
     IEnumerator MoveTo(Vector3 target)
     {
@@ -114,9 +89,9 @@ public class Platform : BaseGimmick
         while (true)
         {
             yield return MoveTo(endPos.transform.position);
-            yield return new WaitForSeconds(3f); // ���� �� 1�� ���
+            yield return new WaitForSeconds(3f); // 도착 후 1초 대기
             yield return MoveTo(startPos.transform.position);
-            yield return new WaitForSeconds(3f); // ��� �� 1�� ���
+            yield return new WaitForSeconds(3f); // 출발 후 1초 대기
         }
     }
 

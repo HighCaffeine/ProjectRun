@@ -22,28 +22,30 @@ public class KnockbackTest : MonoBehaviour
     {
         Move(); 
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.F))
         {
             Debug.Log("밀치기");
             TryKnockback(false);
         }
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetKeyDown(KeyCode.G))
         {
             TryKnockback(true);
         }
 
         //  샌드백 생성
-        if (Input.GetKeyDown(KeyCode.Q))
+      /*  if (Input.GetKeyDown(KeyCode.Q))
         {
             SpawnDummy();
-        }
+        }*/
     }
 
     void Move()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        // float h = Input.GetAxisRaw("Horizontal");
+        //float v = Input.GetAxisRaw("Vertical");
+        float h = 0f;
+        float v = 0f;
 
         Vector3 isoForward = new Vector3(1f, 0f, 1f).normalized;
         Vector3 isoRight = new Vector3(1f, 0f, -1f).normalized;
@@ -69,10 +71,12 @@ public class KnockbackTest : MonoBehaviour
 
     void TryKnockback(bool isPull)
     {
-        Vector3 boxCenter = transform.position + transform.forward * 2f + Vector3.up * 0.5f;
-        Vector3 boxHalfExtents = new Vector3(1.5f, 1f, 2f);
+        Vector3 boxCenter = transform.position + transform.forward * range + Vector3.up * 0.5f;
+        //Vector3 boxHalfExtents = new Vector3(1.5f, 1f, 2f);
 
-        Collider[] hits = Physics.OverlapBox(boxCenter, boxHalfExtents, transform.rotation);
+        float radius = isPull ? 10f : 3f;
+
+        Collider[] hits = Physics.OverlapSphere(boxCenter, radius);
 
         foreach (var hit in hits)
         {

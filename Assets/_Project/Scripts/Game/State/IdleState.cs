@@ -29,10 +29,18 @@ public class IdleState : IState
         if (!actor.IsLocal) return;
 
         // 공격 입력 체크 (좌/우클릭)
-        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; } // 밀기
-        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; } // 당기기
+        if (actor.is2p)
+        {
+            if (Input.GetKeyDown(KeyCode.F)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
+            if (Input.GetKeyDown(KeyCode.G)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
+        }
+        else if (actor.is2p == false)
+        {
+            if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
+            if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
+        }
         //대쉬 체크
-        if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        //if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 
 
         // 이동 입력 체크

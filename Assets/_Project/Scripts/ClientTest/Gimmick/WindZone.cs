@@ -28,19 +28,21 @@ public class WindZone : MonoBehaviour
         if (other.GetComponent<PlayerActor>())
         {
             Debug.Log("플레이어가 바람 존에서 나갔습니다.");
+            other.GetComponent<PlayerActor>().ResetWind();
         }
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, transform.forward * 20);
 
-        Collider collider = GetComponent<Collider>();
-        if (collider != null)
-        {
-            Gizmos.color = new Color(0, 1, 0, 0.2f);
-            Gizmos.DrawCube(collider.bounds.center, collider.bounds.size);
-        }
+        Vector3 start = transform.position;
+        Vector3 end = transform.position + transform.forward * 20;
+
+        Vector3 mid = (start + end) / 2;
+        float length = Vector3.Distance(start, end);
+
+        Gizmos.matrix = Matrix4x4.TRS(mid, transform.rotation, Vector3.one);
+        Gizmos.DrawCube(Vector3.zero, new Vector3(0.1f, 0.1f, length));
     }
 }

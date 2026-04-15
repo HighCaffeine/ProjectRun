@@ -36,21 +36,24 @@ public class MapModuleGrid : MonoBehaviour
             {
                 Vector3 pos = child.localPosition;
                 Vector3 scale = child.localScale;
+                float snapX = Mathf.Round(pos.x / cellSize) * cellSize;
+                float snapZ = Mathf.Round(pos.z / cellSize) * cellSize;
 
-                // (위치 - 크기 절반)을 그리드에 맞춘 뒤 다시 크기 절반을 더해줌
-                pos.x = Mathf.Round((pos.x - scale.x / 2f) / cellSize) * cellSize + (scale.x / 2f);
+                bool isOddX = Mathf.RoundToInt(scale.x) % 2 != 0;
+                bool isOddZ = Mathf.RoundToInt(scale.z) % 2 != 0;
+
+                if (isOddX) snapX += (cellSize / 2f);
+                if (isOddZ) snapZ += (cellSize / 2f);
+
+                pos.x = snapX;
+                pos.z = snapZ;
 
                 if (enableSnapY)
                 {
                     pos.y = Mathf.Round(pos.y / snapStepY) * snapStepY;
                 }
 
-                pos.z = Mathf.Round((pos.z - scale.z / 2f) / cellSize) * cellSize + (scale.z / 2f);
-
                 child.localPosition = pos;
-
-                // 연산이 끝났으므로 플래그 초기화
-                child.hasChanged = false;
             }
 
             //자식들 검사
@@ -61,7 +64,7 @@ public class MapModuleGrid : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         // 전체 추출 영역 테두리
         Gizmos.color = Color.green;

@@ -15,10 +15,18 @@ public class MoveState : IState
     {
         if (!actor.IsLocal) return;
         //밀당 체크
-        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
-        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
+        if (actor.is2p)
+        {
+            if (Input.GetKeyDown(KeyCode.F)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
+            if (Input.GetKeyDown(KeyCode.G)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
+        }
+        else if(actor.is2p == false)
+        {
+            if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
+            if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
+        }
         //대쉬 체크
-        if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        //if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 
         // 멈춤 체크
         if (actor.h == 0 && actor.v == 0)

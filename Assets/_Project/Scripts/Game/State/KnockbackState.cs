@@ -89,9 +89,38 @@ public class KnockbackState : IState
                 timer = DURATION;
             }
         }
+        Vector3 windDir = actor.windDir;
+        float windPower = actor.windPower;
 
-        // 이동
-        actor.Move(knockbackDir, currentPower);
+        // 방향 관계
+        float dot = Vector3.Dot(knockbackDir, windDir);
+
+        // 가속/감속 계수
+        float windFactor = 1f;
+
+        if (dot > 0f)
+        {
+            // 순풍 → 가속
+            windFactor = 1f + (dot * 0.7f); // 최대 1.7배
+        }
+        else if (dot < 0f)
+        {
+            // 역풍 → 감속
+            windFactor = 1f + (dot * 0.7f); // 최소 0.3배
+        }
+
+        // 최종 힘
+        float finalPower = currentPower * windFactor;
+
+        // 옆바람도 살짝 반영하고 싶으면 추가
+        Vector3 sideWind = windDir * windPower * 0.2f;
+
+        // 최종 이동
+        Vector3 finalForce = (knockbackDir * finalPower) + sideWind;
+
+        actor.Move(finalForce.normalized, finalForce.magnitude);
+
+        // actor.Move(knockbackDir, currentPower);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
@@ -106,22 +135,7 @@ public class KnockbackState : IState
         {
             if (wall.CompareTag("Breakable"))
             {
-                GimmickInfo gInfo = wall.GetComponent<GimmickInfo>();
-                if (gInfo != null)
-                {
-                    P_GimmickInteractReq req = new P_GimmickInteractReq
-                    {
-                        gimmickID = gInfo.gimmick_id,
-                        state = 0,
-                        targetPos = new P_PacketVector3(),
-                        param = 0f
-                    };
-                    Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-                }
-                actor.PlayBrakeParticles();
-
-                actor.sm.ChangeState(new IdleState(actor));
-
+                wall.gameObject.SetActive(false);
                 return;
             }
         }

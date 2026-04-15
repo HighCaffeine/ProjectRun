@@ -42,7 +42,12 @@ public class ActionState : IState
         actor.ShakeCamera();
 
         //Vector3 searchForward = actor.GetForward();
-        Vector3 searchForward = GetMouseDirection();
+        Vector3 searchForward = actor.GetMouseDir();
+        if (actor.is2p)
+        {
+            searchForward = actor.GetForward();
+        }
+
         actor.LookAtDirection(searchForward);
         // 타겟 탐색
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
@@ -89,8 +94,9 @@ public class ActionState : IState
         }
 
         // 타겟을 찾았다면 타격 공식 및 넉백 상태 부여
-        if (closestTarget != null)
+        if (closestGimmick == null)
         {
+            if (closestTarget == null) return;
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 Player targetPlayer = closestTarget.GetComponent<Player>();
@@ -152,28 +158,7 @@ public class ActionState : IState
     {
     }
 
-    Vector3 GetMouseDirection()
-    {
-        Camera cam = Camera.main;
-
-        Vector3 playerScreen = cam.WorldToScreenPoint(actor.transform.position);
-        Vector3 mouse = Input.mousePosition;
-
-        Vector3 screenDir = mouse - playerScreen;
-
-        Vector3 forward = cam.transform.forward;
-        Vector3 right = cam.transform.right;
-
-        forward.y = 0;
-        right.y = 0;
-
-        forward.Normalize();
-        right.Normalize();
-
-        Vector3 worldDir = right * screenDir.x + forward * screenDir.y;
-
-        return worldDir.normalized;
-    }
+   
 
 
 

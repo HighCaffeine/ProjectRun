@@ -129,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 10503657}
   - component: {fileID: 10503656}
+  - component: {fileID: 10503658}
   m_Layer: 0
   m_Name: WwiseGlobal
   m_TagString: Untagged
@@ -176,6 +177,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &10503658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10503655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed39f2b237e573f4f85990bb5d1440ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.Addressables::AK.Wwise.Unity.WwiseAddressables.InitBankHolder
+  InitBank: {fileID: 11400000, guid: 05d75a12576ab6d499aaf45e5a7a06d6, type: 2}
 --- !u!1001 &57970791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3835,10 +3849,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1729710446}
     m_Modifications:
-    - target: {fileID: -8073363562775622486, guid: 35af0cb81bcee3542b841f1a284aff94, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: -9215920637029722006, guid: aba41c1b3d6cf8b45ad30f7deb0e6275, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
@@ -35542,6 +35552,10 @@ PrefabInstance:
     - target: {fileID: 9221993987542444501, guid: aba41c1b3d6cf8b45ad30f7deb0e6275, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -8073363562775622486, guid: 35af0cb81bcee3542b841f1a284aff94, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

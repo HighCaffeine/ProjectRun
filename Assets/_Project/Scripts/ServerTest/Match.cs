@@ -21,6 +21,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     public GameObject playerPrefab;
     public Transform cameraPivot;
 
+    private Dictionary<int, BaseGimmick> _gimmickCache = new Dictionary<int, BaseGimmick>();
+
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -32,6 +35,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     void Start()
     {
+        foreach (var g in FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None))
+        {
+            _gimmickCache[g.gimmickUID] = g;
+        }
         if (!Client.IS_SERVER_PLAY || isDebugMode)
         {
             Debug.Log("[Debug] 서버 연결 없이 로컬 테스트 모드로 시작합니다.");
@@ -48,15 +55,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             return; // 서버 입장 요청 패킷을 보내지 않고 여기서 종료
         }
 
-        // [핵심] 좆같은 Instance 널 체크 버리고, 진짜 씬 이름으로만 판단합니다.
         string currentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
-        // 던전 씬 이름이 "Dungeon_1", "Dungeon_2" 식으로 되어있다면
         if (currentSceneName.StartsWith("Dungeon"))
         {
             Debug.Log("[Match] 던전 씬 컷씬 종료 대기");
         }
-        else // 그 외 (Game_Lobby 등)
+        else
         {
             Debug.Log("[Match] 마을 씬 감지. 기본 위치에서 스폰합니다.");
             AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
@@ -100,7 +105,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         {
             case E_PACKET.ROOM_ENTER_RESPONSE:
                 P_RoomEnterResponse roomEnterResponse = UnsafeCode.ByteArrayToStructure<P_RoomEnterResponse>(packet.data);
-                Debug.Log($"ROOM_ENTER_RESPONSE result={roomEnterResponse.result}");
+                //Debug.Log($"ROOM_ENTER_RESPONSE result={roomEnterResponse.result}");
                 break;
 
             case E_PACKET.ROOM_NEW_USER_NTF:
@@ -108,7 +113,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     P_RoomNewUserNotify roomNewUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
                     Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(0) : Vector3.zero;
                     AddPlayer(roomNewUserNotify.userUUID, roomNewUserNotify.userName, pos);
-                    Debug.Log($"Player {roomNewUserNotify.userName} has joined");
+                    //Debug.Log($"Player {roomNewUserNotify.userName} has joined");
                     break;
                 }
             case E_PACKET.ROOM_USER_INFO_NTF:
@@ -124,7 +129,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                         newPlayer.SetPos(roomUserInfoNotify.position.ToVector3());
                     }
-                    Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
+                    //Debug.Log($"[AOI] Spawn User {roomUserInfoNotify.userUUID}");
                     break;
                 }
             // case E_PACKET.ROOM_USER_INFO_NTF:
@@ -150,7 +155,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 P_RoomLeaveUserNotify roomLeaveUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
 
                 //버그로 우선 주석처리
-                //RemovePlayer(roomLeaveUserNotify.userUUID);
+                RemovePlayer(roomLeaveUserNotify.userUUID);
                 break;
 
             case E_PACKET.ROOM_HOST_NTF:
@@ -273,6 +278,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GIMMICK_INTERACT_NTF:
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
+
+                    if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
+                    {
+                        targetGimmick.Execute(ntf);
+                    }
+                    break;
 
                     // Next 구역 텔레포트
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.MovableObject) // 예외 처리용
@@ -544,11 +555,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
         AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
 
-        // 내 캐릭터를 스폰한 직후, 서버에 "리모트 플레이어 정보 줘!" 라고 요청
         if (Client.IS_SERVER_PLAY)
         {
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
+            Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
         }
     }
 
@@ -556,8 +567,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     {
         if (Players != null && Players.TryGetValue(id, out Player player) && player != null)
         {
+            Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
             Destroy(player.gameObject);
             Players.Remove(id);
+        }
+        else
+        {
+            Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
         }
     }
 

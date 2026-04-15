@@ -394,6 +394,7 @@ MonoBehaviour:
   - spawnPoint: {fileID: 1153778737}
   - spawnPoint: {fileID: 278129851}
   - spawnPoint: {fileID: 1877562350}
+  mapID: 0
 --- !u!114 &221756143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1096,8 +1097,59 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 602494443}
+    - targetCorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 602494442}
   m_SourcePrefab: {fileID: 100100000, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+--- !u!1 &602494441 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+  m_PrefabInstance: {fileID: 602494440}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &602494442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602494441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00fe5fc0ed43efd458515f12fd594b5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
+--- !u!114 &602494443
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 602494441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46dcf1cb783960040a10eac2e06dd6d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 0
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!1 &644182332
 GameObject:
   m_ObjectHideFlags: 0
@@ -2032,6 +2084,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1187548330}
   - component: {fileID: 1187548329}
+  - component: {fileID: 1187548331}
   m_Layer: 0
   m_Name: WwiseGlobal
   m_TagString: Untagged
@@ -2079,6 +2132,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1187548331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1187548328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed39f2b237e573f4f85990bb5d1440ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.Addressables::AK.Wwise.Unity.WwiseAddressables.InitBankHolder
+  InitBank: {fileID: 11400000, guid: 05d75a12576ab6d499aaf45e5a7a06d6, type: 2}
 --- !u!1001 &1299077846
 PrefabInstance:
   m_ObjectHideFlags: 0

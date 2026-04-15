@@ -14,7 +14,7 @@ public class PlayerActor : Actor
     public LayerMask targetLayer;
     [SerializeField] private Transform playerPivot;
     private CharacterController controller;
-    private Vector3 horizontalMove;
+    public Vector3 horizontalMove;
 
     public DashCameraEffect dashCameraEffect;
 
@@ -41,9 +41,12 @@ public class PlayerActor : Actor
     private int spawninDex = 0;
 
     private Vector3 platformDelta;
-    private Vector3 windDir;
-    private float windPower;
-    private bool isInWind;
+    public Vector3 windDir;
+    public float windPower;
+    public bool isInWind;
+
+    [SerializeField]
+    public bool is2p = false;
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
@@ -76,16 +79,55 @@ public class PlayerActor : Actor
     {
         if (sm.currentState == null) return;
         horizontalMove = Vector3.zero;
+        h = 0f;
+        v = 0f;
 
-        if (IsLocal)
+        if (is2p)
         {
-            h = Input.GetAxisRaw("Horizontal");
-            v = Input.GetAxisRaw("Vertical");
+            if (Input.GetKey(KeyCode.W))
+            {
+                Debug.Log("W키 입력 감지");
+                v += 1f;
+
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                h -= 1f;
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                v -= 1f;
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                h += 1f;
+            }
         }
+        else
+        {
+            //    h = Input.GetAxisRaw("Horizontal");
+            //  v = Input.GetAxisRaw("Vertical");
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                v += 1f;
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                v -= 1f;
+            }
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                h -= 1f;
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                h += 1f;
+            }
 
-        sm.Update();
+        }
+            sm.Update();
         ApplyWind();
-
+       
         if (controller != null && controller.enabled)
         {
             ApplyGravity();
@@ -102,6 +144,7 @@ public class PlayerActor : Actor
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
+        Debug.Log(gameObject.name + " Move: " + horizontalMove + " Vertical: " + verticalVelocity);
     }
 
     public Action<string, int> OnUpdatePoint;
@@ -116,12 +159,16 @@ public class PlayerActor : Actor
         windPower = power;
         isInWind = true;
     }
-
-    public void ClearWind()
+    public void ResetWind()
     {
+        windDir = Vector3.zero;
+        windPower = 0f;
+
         isInWind = false;
+        moveSpeed = 5f;
     }
-    private void ApplyWind()
+
+    public void ApplyWind()
     {
         if (!isInWind) return;
 
@@ -177,26 +224,27 @@ public class PlayerActor : Actor
         }
     }
     //마우스 방향 보기
-    public void LookAtMouse()
+    public Vector3 GetMouseDir()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, transform.position);
+        Camera cam = Camera.main;
 
-        if (ground.Raycast(ray, out float enter))
-        {
-            Vector3 hit = ray.GetPoint(enter);
-            Vector3 dir = hit - transform.position;
-            dir.y = 0; // 수평 회전만
+        Vector3 playerScreen = cam.WorldToScreenPoint(transform.position);
+        Vector3 mouse = Input.mousePosition;
 
-            if (playerPivot != null)
-            {
-                playerPivot.rotation = Quaternion.LookRotation(dir);
-            }
-            else
-            {
-                transform.rotation = Quaternion.LookRotation(dir);
-            }
-        }
+        Vector3 screenDir = mouse - playerScreen;
+
+        Vector3 forward = cam.transform.forward;
+        Vector3 right = cam.transform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 worldDir = right * screenDir.x + forward * screenDir.y;
+
+        return worldDir.normalized;
     }
 
     public void LookAtDirection(Vector3 dir)
@@ -271,7 +319,7 @@ public class PlayerActor : Actor
             powerOrTime = param
         };
 
-        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATE_NTF, pkt);
+        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }
     public void SetLocal(bool value)
     {
@@ -390,7 +438,7 @@ public class PlayerActor : Actor
             axisV = axisV
         };
         pkt.currentPos.Set(transform.position);
-        pkt.currentRot.Set(transform.rotation);
+        pkt.currentRot.Set(playerPivot.rotation);
 
         //byte[] data = SerializePlayerMovement(pkt);
         //byte[] data = PacketSerializer.Serialize(pkt);
@@ -431,4 +479,5 @@ public class PlayerActor : Actor
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
     }
+
 }

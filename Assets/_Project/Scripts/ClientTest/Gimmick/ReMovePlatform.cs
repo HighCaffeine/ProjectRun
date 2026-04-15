@@ -1,20 +1,21 @@
 using System.Collections;
 using UnityEngine;
 
-public class ReMovePlatform : BaseGimmick
+public class ReMovePlatform : MonoBehaviour
 {
-    [SerializeField] private float shakeTime = 3f;     // ???? ?ð?
-    [SerializeField] private float shakePower = 0.05f; // ??? ???? ????
-    [SerializeField] private float hangTime = 0.5f;    // ??? + ???? ?? ???
-    [SerializeField] private float fallDistance = 15f;  // ???? ???
-    [SerializeField] private float fallDuration = 0.5f; // ???? ?ð?
-    [SerializeField] private float respawnDelay = 2f;  // ?????? ?? ???
-    [SerializeField] private float riseDuration = 5f;  // ?????? ?ð?
+    [SerializeField] private float shakeTime = 3f;     // 진동 시간
+    [SerializeField] private float shakePower = 0.05f; // 최대 진동 세기
+    [SerializeField] private float hangTime = 0.5f;    // 멈칫 + 낙하 전 대기
+    [SerializeField] private float fallDistance = 15f;  // 낙하 거리
+    [SerializeField] private float fallDuration = 0.5f; // 낙하 시간
+    [SerializeField] private float respawnDelay = 2f;  // 떨어진 후 대기
+    [SerializeField] private float riseDuration = 5f;  // 올라오는 시간
 
     [SerializeField] private GameObject platform;
     [SerializeField] private Transform visual;
 
     private Coroutine currentCoroutine;
+    [SerializeField]
     private bool isRestoring = false;
 
     private Vector3 startPos;
@@ -29,56 +30,47 @@ public class ReMovePlatform : BaseGimmick
         originPos = visual.localPosition;
     }
 
-    public override void Execute(P_GimmickInteractNtf ntf)
-    {
-        // 추락 명령이 오고, 복구 중이 아니라면 실행
-        if (ntf.state == (byte)eGimmickState.On_Activate && !isRestoring)
-        {
-            if (currentCoroutine != null) StopCoroutine(currentCoroutine);
-            currentCoroutine = StartCoroutine(RemoveSequence());
-        }
-    }
-
     public void StartRemove()
     {
+        Debug  .Log("StartRemove 호출");
         if (currentCoroutine != null)
             StopCoroutine(currentCoroutine);
 
         currentCoroutine = StartCoroutine(RemoveSequence());
     }
 
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (isRestoring) return;
-
-    //     if (other.GetComponent<PlayerActor>() && other.transform.position.y > transform.position.y)
-    //     {
-    //         StartRemove();
-    //     }
-    // }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (isRestoring) return;
+        
+        if (other.GetComponent<PlayerActor>() && other.transform.position.y > transform.position.y)
+        {Debug.Log("플레이어가 플랫폼에 들어왔습니다.");
+            StartRemove();
+        }
+    }
 
     IEnumerator RemoveSequence()
     {
         isRestoring = true;
-        // 1. ?????? 0.5?? ???
+        // 1. 올라오고 0.5초 대기
         yield return new WaitForSeconds(0.5f);
 
-        // 2~3. ???? (???? ??????)
+        // 2~3. 진동 (점점 강해짐)
         yield return StartCoroutine(ShakePlatform(shakeTime, shakePower));
 
-        // 4. ??? ???? ???? ???? 0.5??
+        // 4. 최대 진동 상태 유지 0.5초
         yield return new WaitForSeconds(0.5f);
 
-        // 5. ???? ?? ???
+        // 5. 낙하 전 멈칫
         yield return new WaitForSeconds(hangTime);
 
-        // ????
+        // 낙하
         yield return StartCoroutine(DropPlatform());
 
-        // ?浹 ????
+        // 충돌 끄기
         platform.GetComponent<Collider>().enabled = false;
 
-        // 6. 2?? ??? ?? ????
+        // 6. 2초 대기 후 복구
         yield return new WaitForSeconds(respawnDelay);
 
         currentCoroutine = StartCoroutine(RestorePlatform());
@@ -87,10 +79,10 @@ public class ReMovePlatform : BaseGimmick
     IEnumerator RestorePlatform()
     {
 
-        // ???? ?????? (5??)
+        // 천천히 올라오기 (5초)
         yield return StartCoroutine(MoveUp(riseDuration));
 
-        // ?浹 ????
+        // 충돌 복구
         platform.GetComponent<Collider>().enabled = true;
 
         isRestoring = false;
