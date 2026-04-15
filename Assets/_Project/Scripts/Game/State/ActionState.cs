@@ -96,7 +96,8 @@ public class ActionState : IState
                 Player targetPlayer = closestTarget.GetComponent<Player>();
                 if (targetPlayer != null)
                 {
-                    actor.SendStateChange(eState.Knockback, dirToTarget, pushForce * pow, targetPlayer.ID);
+                    dirToTarget *= (actionType == eState.Push ? 1.0f : -1.0f);
+                    actor.SendStateChange(eState.Knockback, dirToTarget.normalized, pushForce * pow, targetPlayer.ID);
                 }
             }
             else
