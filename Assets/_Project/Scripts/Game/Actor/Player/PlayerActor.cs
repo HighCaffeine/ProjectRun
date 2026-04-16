@@ -86,7 +86,6 @@ public class PlayerActor : Actor
         {
             if (Input.GetKey(KeyCode.W))
             {
-                Debug.Log("W키 입력 감지");
                 v += 1f;
 
             }
@@ -144,7 +143,7 @@ public class PlayerActor : Actor
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
-        Debug.Log(gameObject.name + " Move: " + horizontalMove + " Vertical: " + verticalVelocity);
+       
     }
 
     public Action<string, int> OnUpdatePoint;

@@ -95,9 +95,4 @@ public class Platform : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(startPos.transform.position, endPos.transform.position);
-    }
 }

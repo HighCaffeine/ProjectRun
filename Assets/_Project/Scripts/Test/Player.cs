@@ -181,7 +181,7 @@ public class Player : MonoBehaviour
             pullDir.y = 0; // 수평으로만 당김
 
             float strength = isMoving ? 1.5f : 3.0f;
-            actor.Move(pullDir, strength);
+           // actor.Move(pullDir, strength);
         }
 
         // transform.position = new Vector3(transform.position.x, lerpY, transform.position.z);

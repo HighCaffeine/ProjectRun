@@ -82,4 +82,32 @@ public class ActorManager : GenericSingleton<ActorManager>
         }
         return null;
     }
+    public void UpdateAllSpawnPoints(int newIndex)
+    {
+        int currentMapID = DungeonPointManager.Instance.mapID;
+
+        List<string> keys = new List<string>(actors.Keys);
+
+        foreach (var id in keys)
+        {
+            spawnPoints[id] = $"{currentMapID}_{newIndex}";
+        }
+    }
+    public void MoveAllPlayersToSector(int index)
+    {
+        Vector3 pos = DungeonPointManager.Instance.GetSpawnPosition(index);
+
+        foreach (var actor in actors.Values)
+        {
+            CharacterController cc = actor.GetComponent<CharacterController>();
+
+            if (cc != null)
+                cc.enabled = false;
+
+            actor.transform.position = pos;
+
+            if (cc != null)
+                cc.enabled = true;
+        }
+    }
 }

@@ -21,6 +21,8 @@ public class DungeonPointManager : MonoBehaviour
 
     public int mapID;
 
+
+    public int currentSectorIndex = 0;
     void Awake()
     {
         if (instance == null)
@@ -42,5 +44,23 @@ public class DungeonPointManager : MonoBehaviour
             return Vector3.zero;
         }
         return sectors[sectorIndex].spawnPoint.position;
+    }
+
+    public void MoveToNextSector()
+    {
+        if (currentSectorIndex + 1 >= sectors.Length)
+        {
+            Debug.Log("[Dungeon] 마지막 구역입니다.");
+            return;
+        }
+
+        currentSectorIndex++;
+
+        Vector3 spawnPos = GetSpawnPosition(currentSectorIndex);
+
+        Debug.Log($"[Dungeon] 다음 구역 이동: {currentSectorIndex}");
+
+        ActorManager.Instance.UpdateAllSpawnPoints(currentSectorIndex);
+        ActorManager.Instance.MoveAllPlayersToSector(currentSectorIndex);
     }
 }
