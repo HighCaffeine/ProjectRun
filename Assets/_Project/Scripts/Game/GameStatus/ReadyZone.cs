@@ -13,7 +13,6 @@ public class ReadyZone : MonoBehaviour
     {
         if (!isTriggered && readyPlayers.Count == 2)
         {
-            Debug.Log("ddd");
             isTriggered = true;
             pointManager.MoveToNextSector();
         }
