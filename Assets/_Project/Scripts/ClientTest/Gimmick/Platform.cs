@@ -20,8 +20,8 @@ public class Platform : BaseGimmick
     private List<PlayerActor> players = new List<PlayerActor>();
     private Vector3 lastPos;
 
-    public void SetStartPos(GameObject start) {startPos = start;}
-    public void SetEndPos(GameObject end) {endPos = end;}
+    public void SetStartPos(GameObject start) { startPos = start; }
+    public void SetEndPos(GameObject end) { endPos = end; }
 
     void Start()
     {
@@ -125,6 +125,7 @@ public class Platform : BaseGimmick
 
     private void OnDrawGizmos()
     {
+        if (startPos == null || endPos == null) return;
         Gizmos.color = Color.red;
         Gizmos.DrawLine(startPos.transform.position, endPos.transform.position);
     }

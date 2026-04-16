@@ -61,6 +61,8 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        if (float.IsNaN(serverPos.x) || float.IsNaN(serverRot.x)) return;
+
         if (isLocal)
         {
             ProcessLocalCalibration();

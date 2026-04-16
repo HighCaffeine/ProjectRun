@@ -16,6 +16,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
     void Start()
     {
         Client.TCP.AddPacketReceiver(this);
+        isSceneLoading = false;
     }
 
     // public unsafe void OnPacketReceived(Packet packet)
@@ -70,7 +71,11 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                     Debug.Log($"[Client] Login Result: {loginRes.result}");
 
                     // 씬 로딩 중복 호출 방지
-                    if (isSceneLoading) return;
+                    if (isSceneLoading)
+                    {
+                        Debug.Log("씬 중복 로딩 처리");
+                        return;
+                    }
                     isSceneLoading = true;
 
                     LocalPlayerInfo.ID = loginRes.result;
@@ -81,6 +86,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                 {
                     Debug.LogError($"[Client] Login Parsing Error: {ex.Message}");
                 }
+
                 break;
         }
     }
@@ -96,6 +102,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
         GameObject.Find("JoinButton").GetComponent<Button>().interactable = false;
 
         string inputName = GameObject.Find("NameInput").GetComponent<InputField>().text;
+        LocalPlayerInfo.Name = inputName;
         P_LoginReq loginReq = default;
         loginReq.userID = inputName;
         loginReq.userPW = inputName;

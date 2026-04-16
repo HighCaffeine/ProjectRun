@@ -14,6 +14,7 @@ public static class PacketSerializer
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_PlayerStateNtf p: return SerializePlayerStateNtf(p);
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
+            case P_PlayerDeadReq p: return SerializePlayerDeadReq(p);
             case P_PlayerReadyRequest p: return SerializePlayerReadyRequest(p);
             case P_GameStartNtf p: return SerializeGameStartNtf(p);
             case P_RoomChatRequest p: return SerializeRoomChatRequest(p);
@@ -97,6 +98,16 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetPos.y);
         Write(buf, ref o, p.targetPos.z);
         Write(buf, ref o, p.param);
+        return buf;
+    }
+
+    static byte[] SerializePlayerDeadReq(P_PlayerDeadReq p)
+    {
+        var buf = new byte[12];
+        int o = 0;
+        Write(buf, ref o, p.respawnPos.x);
+        Write(buf, ref o, p.respawnPos.y);
+        Write(buf, ref o, p.respawnPos.z);
         return buf;
     }
 

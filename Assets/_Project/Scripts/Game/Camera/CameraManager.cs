@@ -18,7 +18,7 @@ public class CameraManager : MonoBehaviour
     public CinemachineCamera vCam;
     public CinemachineBasicMultiChannelPerlin camPerlin { get; private set; }
 
-    public DashCameraEffect dashCameraEffect;
+    //public DashCameraEffect dashCameraEffect;
 
     public PositionConstraint positionConstraint;
     private List<ICameraEffect> activeEffects = new List<ICameraEffect>();
@@ -59,7 +59,7 @@ public class CameraManager : MonoBehaviour
 
     public void SetupDashEffectComp(PlayerActor localPlayer)
     {
-        localPlayer.dashCameraEffect = dashCameraEffect;
+        //localPlayer.dashCameraEffect = dashCameraEffect;
     }
 
     void Update()

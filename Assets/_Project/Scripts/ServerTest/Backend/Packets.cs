@@ -10,7 +10,8 @@ public enum eGimmickKey : byte
     SeeSaw,
     FallingPlatform,
     MovePlatform,
-    Wind
+    Wind,
+    NextZone,
 }
 
 public enum E_PACKET
@@ -60,6 +61,8 @@ public enum E_PACKET
 
     DUNGEON_ESCAPE_REQ = 281,        // 탈출 구역 진입
     DUNGEON_CLEAR_NTF = 282,         // 던전 클리어 알림
+    PLAYER_DEAD_REQ = 283,
+    PLAYER_DEAD_NTF = 284,
 
     //인벤 / 상점용
     INVENTORY_INFO = 301,       // 접속갱신 시 인벤토리 정보 전송
@@ -318,6 +321,18 @@ public struct P_GimmickInteractNtf
     [MarshalAs(UnmanagedType.I1)] public byte state;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
     [MarshalAs(UnmanagedType.R4)] public float param;
+}
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerDeadReq
+{
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 respawnPos;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_PlayerDeadNtf
+{
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 respawnPos;
 }
 #endregion
 

@@ -273,6 +273,11 @@ public class PlayerActor : Actor
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }
+
+    public void SetControllerEnabled(bool isEnable)
+    {
+        if (controller != null) controller.enabled = isEnable;
+    }
     public void SetLocal(bool value)
     {
         IsLocal = value;
@@ -296,16 +301,25 @@ public class PlayerActor : Actor
         else
         {
             controller.enabled = false;
-            transform.position = pos;
             playerPivot.gameObject.SetActive(false);
-            StartCoroutine(RespawnAfterDelay(spawnDelay));
+            StartCoroutine(RespawnAfterDelay(spawnDelay, pos));
         }
     }
-    IEnumerator RespawnAfterDelay(float delay)
+
+
+    IEnumerator RespawnAfterDelay(float delay, Vector3 pos)
     {
+        if (controller != null) controller.enabled = false;
+        transform.position = pos;
+        if (controller != null) controller.enabled = true;
+
+        if (IsLocal)
+        {
+            curPos.Set(pos);
+            SendMovePacket(0, 0);
+        }
+
         yield return new WaitForSeconds(delay);
-        controller.enabled = true;
-        playerPivot.gameObject.SetActive(true);
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송

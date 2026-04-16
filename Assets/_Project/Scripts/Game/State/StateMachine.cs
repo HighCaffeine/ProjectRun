@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum eState
 {
-    Idle, Move, Push, Pull, Dash, Knockback, Count
+    Idle, Move, Push, Pull, Dash, Knockback, Teleport, Count
 }
 
 public interface IState

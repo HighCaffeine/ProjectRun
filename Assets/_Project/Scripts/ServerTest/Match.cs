@@ -213,11 +213,16 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     {
                         countdownText.gameObject.SetActive(false);
                     }
-                    if (pkt.mapId == 0) UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
 
-                    // 비동기 씬 로딩 시작 (던전 씬 이름이 Dungeon_1 구조임)
-                    //UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
-                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_1");
+                    if (pkt.mapId == 0)
+                    {
+                        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
+                    }
+                    else
+                    {
+                        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_1");
+                        //UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Dungeon_" + pkt.mapId);
+                    }
                     break;
                 }
 
@@ -257,6 +262,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 5:
                                 pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, false, Vector3.zero));
                                 break;
+                            case 6:
+                                pActor.sm.ChangeState(new TeleportState(pActor, statePkt.targetDir.ToVector3()));
+                                break;
                         }
                     }
                     break;
@@ -282,13 +290,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
                     // Next 구역 텔레포트
-                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.MovableObject) // 예외 처리용
+                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
                             Vector3 destPos = ntf.targetPos.ToVector3();
+
+                            CharacterController controller = targetPlayer.GetComponent<CharacterController>();
+                            if (controller != null) controller.enabled = false;
+
                             targetPlayer.transform.position = destPos;
                             targetPlayer.SetPos(destPos);
+
+                            if (controller != null) controller.enabled = true;
                         }
                         break;
                     }
@@ -303,6 +317,30 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         }
                     }
 
+                    break;
+                }
+            case E_PACKET.PLAYER_DEAD_NTF:
+                {
+                    var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
+
+                    if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
+                    {
+                        // 내 캐릭터는 ActorManager에서 이미 처리했으므로 리모트 유저만 처리
+                        if (ntf.userUUID != LocalPlayerInfo.ID)
+                        {
+                            Vector3 respawnPos = ntf.respawnPos.ToVector3();
+
+                            CharacterController cc = targetPlayer.GetComponent<CharacterController>();
+                            if (cc != null) cc.enabled = false;
+
+                            targetPlayer.transform.position = respawnPos;
+                            targetPlayer.SetPos(respawnPos); // Player 보정 클래스 위치도 덮어쓰기
+
+                            if (cc != null) cc.enabled = true;
+
+                            Debug.Log($"[System] 다른 유저({ntf.userUUID})가 부활 위치로 강제 이동됨");
+                        }
+                    }
                     break;
                 }
             case E_PACKET.DUNGEON_CLEAR_NTF:
@@ -489,7 +527,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 cc.center = new Vector3(0.0f, 1.0f, 0.0f);
                 cc.slopeLimit = 60f;
                 pActor.SetController(cc);
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
                 //카메라 세팅
@@ -502,14 +540,14 @@ Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                     CameraManager.Instance.SetupDashEffectComp(pActor);
                     CameraManager.Instance.AddPosContraint(pActor.transform);
                 }
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
                 Collider[] cols = playerObj.GetComponents<Collider>();
                 foreach (Collider c in cols)
                 {
                     if (c.GetType() != typeof(CharacterController)) Destroy(c);
                 }
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
@@ -517,17 +555,17 @@ Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
             else // 리모트 플레이어
             {
                 Collider[] existingCols = playerObj.GetComponents<Collider>();
-                foreach (var c in existingCols) DestroyImmediate(c);
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                foreach (var c in existingCols) Destroy(c);
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
-                if (cc != null) DestroyImmediate(cc);
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                if (cc != null) Destroy(cc);
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
                 col.isTrigger = true;
                 col.radius = 0.5f;
                 col.height = 2f;
                 col.center = new Vector3(0, 1f, 0);
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
                 rb.useGravity = false;
@@ -539,7 +577,7 @@ Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
             if (player == null) player = playerObj.AddComponent<Player>();
             player.Init(pActor, playerName, id, local, spawnPos);
             Players.Add(id, player);
-Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
             return player;
         }
         catch (Exception e)

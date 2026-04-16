@@ -309,6 +309,8 @@ public unsafe class NetworkClient
     }
 
 
+
+
     public void SendPacket(E_PACKET packetId)
     {
         if (socket != null)
@@ -326,6 +328,32 @@ public unsafe class NetworkClient
         }
     }
 
+    // public void SendPacket2(E_PACKET packetId, object packet)
+    // {
+    //     if (socket == null) return;
+
+    //     byte[] data = PacketSerializer.Serialize(packet);
+    //     int sz = data.Length + 5;
+    //     byte[] buff = new byte[sz];
+
+    //     Buffer.BlockCopy(BitConverter.GetBytes((ushort)sz), 0, buff, 0, 2);
+    //     Buffer.BlockCopy(BitConverter.GetBytes((ushort)packetId), 0, buff, 2, 2);
+    //     buff[4] = 0;
+    //     Buffer.BlockCopy(data, 0, buff, 5, data.Length);
+
+    //     try
+    //     {
+    //         if (socketProtocol == ProtocolType.Tcp) socket.Send(buff);
+    //         else socket.SendTo(buff, endPoint);
+    //     }
+    //     catch (SocketException se)
+    //     {
+    //         if (se.SocketErrorCode == SocketError.WouldBlock) return;
+    //         if (socketProtocol == ProtocolType.Tcp) Close();
+    //     }
+    //     catch { }
+    // }
+
     public void SendPacket2(E_PACKET packetId, object packet)
     {
         if (socket == null) return;
@@ -341,8 +369,20 @@ public unsafe class NetworkClient
 
         try
         {
-            if (socketProtocol == ProtocolType.Tcp) socket.Send(buff);
-            else socket.SendTo(buff, endPoint);
+            if (socketProtocol == ProtocolType.Tcp)
+            {
+                socket.BeginSend(buff, 0, buff.Length, SocketFlags.None, (ar) =>
+                {
+                    try { if (socket != null) socket.EndSend(ar); } catch { Close(); }
+                }, null);
+            }
+            else
+            {
+                socket.BeginSendTo(buff, 0, buff.Length, SocketFlags.None, endPoint, (ar) =>
+                {
+                    try { if (socket != null) socket.EndSendTo(ar); } catch { }
+                }, null);
+            }
         }
         catch (SocketException se)
         {
