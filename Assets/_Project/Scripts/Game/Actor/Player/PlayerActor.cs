@@ -485,37 +485,5 @@ public class PlayerActor : Actor
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
     }
-    void OnDrawGizmosSelected()
-    {
-        float maxDistance = 3f;   // Push 거리
-        float maxAngle = 30f;     // Push 각도
 
-        Vector3 origin = transform.position;
-        origin.y += 0.1f;
-
-        Vector3 forward = is2p ? GetForward() : playerPivot.transform.forward;
-
-        Gizmos.color = Color.red;
-
-        int segments = 20;
-        float angleStep = (maxAngle * 2) / segments;
-
-        Vector3 prevPoint = origin + Quaternion.Euler(0, -maxAngle, 0) * forward * maxDistance;
-
-        for (int i = 1; i <= segments; i++)
-        {
-            float angle = -maxAngle + angleStep * i;
-            Vector3 nextPoint = origin + Quaternion.Euler(0, angle, 0) * forward * maxDistance;
-
-            Gizmos.DrawLine(prevPoint, nextPoint);
-            prevPoint = nextPoint;
-        }
-
-        // 양쪽 경계선
-        Vector3 left = Quaternion.Euler(0, -maxAngle, 0) * forward;
-        Vector3 right = Quaternion.Euler(0, maxAngle, 0) * forward;
-
-        Gizmos.DrawLine(origin, origin + left * maxDistance);
-        Gizmos.DrawLine(origin, origin + right * maxDistance);
-    }
 }

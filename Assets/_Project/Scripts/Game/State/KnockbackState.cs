@@ -51,11 +51,13 @@ public class KnockbackState : IState
 
         if(isPull)
         {
-            actor.pullCount++;     
+            actor.pullCount++;
+            Debug.Log(actor.gameObject.name + "pull :" + actor.pullCount);      
         }
         else
         {
-            actor.pushCount++;      
+            actor.pushCount++;
+            Debug.Log(actor.gameObject.name + "push :" + actor.pushCount);
         }
     }
 
