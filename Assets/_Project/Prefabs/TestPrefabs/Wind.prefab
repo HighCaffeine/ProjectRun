@@ -67,4 +67,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindZone
   windDirection: {x: -1, y: 0, z: 0}
-  windPower: 3
+  windPower: 5
