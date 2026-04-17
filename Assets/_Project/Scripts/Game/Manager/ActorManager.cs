@@ -14,6 +14,22 @@ public class ActorManager : GenericSingleton<ActorManager>
     [SerializeField]
     private GameObject deadUIPrefab;
 
+    public PlayerActor p1 = null;
+    public PlayerActor p2 = null;
+
+    public PlayerActor GetPlayer(bool is2p)
+    {
+        foreach (var actor in actors.Values)
+        {
+            PlayerActor pa = actor as PlayerActor;
+            if (pa == null) continue;
+
+            if (pa.is2p == is2p)
+                return pa;
+        }
+
+        return null;
+    }
     public void OnPlayerDead(string name)
     {
         bool isLocal = (name == localID);

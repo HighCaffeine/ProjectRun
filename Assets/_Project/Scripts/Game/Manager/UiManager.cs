@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,10 @@ public class UiManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI player2Text;
 
+    [SerializeField]
+    PlayerActor p1;
+    [SerializeField]
+    PlayerActor p2;
 
 
     private void Awake()
@@ -37,6 +42,7 @@ public class UiManager : MonoBehaviour
         }
         timer = 0f;
     }
+
 
     public  void StartCount()
     {
@@ -57,9 +63,30 @@ public class UiManager : MonoBehaviour
     }
     IEnumerator TimeCount()
     {
+        Debug.Log("타이머 시작");
         while (true)
         {
-            timeText.text = "timer :" + timer.ToString();
+            if (p1 == null || p2 == null)
+            {
+                if (ActorManager.Instance != null)
+                {
+                    if (p1 == null)
+                        p1 = ActorManager.Instance.GetPlayer(false);
+
+                    if (p2 == null)
+                        p2 = ActorManager.Instance.GetPlayer(true);
+                }
+            }
+
+            if (p1 != null)
+            {
+                player1Text.text = $"P1\nDIE: {p1.fallDeathCount}\nPull: {p1.pullCount}\nPush: {p1.pushCount}";
+            }
+
+            if (p2 != null)
+            {
+                player2Text.text = $"P2\nDIE: {p2.fallDeathCount}\nPull: {p2.pullCount}\nPush: {p2.pushCount}";
+            }
             yield return new WaitForSeconds(1f);
             timer++;
         }
