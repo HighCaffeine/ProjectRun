@@ -4,72 +4,49 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    [SerializeField]
-    bool isMove = false;
-    [SerializeField]
-    private bool hasStarted = false;
-    [SerializeField]
-    GameObject startPos;
-    [SerializeField]
-    GameObject endPos;
-
-    [SerializeField]
-    float moveSpeed = 3f;
+    [Header("이동 설정")]
+    [SerializeField] private Transform startPos;
+    [SerializeField] private Transform endPos;
+    [SerializeField] private float moveSpeed = 3f;
 
     [SerializeField]
     private List<PlayerActor> players = new List<PlayerActor>();
     private Vector3 lastPos;
 
-    void Start()
+    private void Start()
     {
         lastPos = transform.position;
+        StartCoroutine(MoveLoop()); // 시작하자마자 이동
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (isMove)
-        {
-            StartCoroutine(MoveLoop());
-            isMove = false; // 한 번만 이동 시작하도록 설정 
-        }
-    }
-    void LateUpdate()
+    private void LateUpdate()
     {
         Vector3 delta = transform.position - lastPos;
 
         foreach (var actor in players)
         {
-            actor.SetPlatformDelta(delta);
+            if (actor != null)
+                actor.SetPlatformDelta(delta);
         }
 
         lastPos = transform.position;
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player") && !hasStarted)
-        {
-            hasStarted = true;
-            Debug.Log("플레이어가 플랫폼에 들어왔습니다.");
-            isMove = true;
-        }
 
-        PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null)
+    public void AddPlayer(PlayerActor actor)
+    {
+        if (actor == null) return;
+
+        if (!players.Contains(actor))
         {
             players.Add(actor);
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    public void RemovePlayer(PlayerActor actor)
     {
-        if (other.CompareTag("Player"))
-        {
-            other.transform.SetParent(null); // 플레이어를 플랫폼에서 분리
-        }
+        if (actor == null) return;
 
-        PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null)
+        if (players.Contains(actor))
         {
             players.Remove(actor);
         }
@@ -77,9 +54,14 @@ public class Platform : MonoBehaviour
 
     IEnumerator MoveTo(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.1f)
+        while (Vector3.Distance(transform.position, target) > 0.05f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
+
             yield return null;
         }
     }
@@ -88,11 +70,8 @@ public class Platform : MonoBehaviour
     {
         while (true)
         {
-            yield return MoveTo(endPos.transform.position);
-            yield return new WaitForSeconds(3f); // 도착 후 1초 대기
-            yield return MoveTo(startPos.transform.position);
-            yield return new WaitForSeconds(3f); // 출발 후 1초 대기
+            yield return MoveTo(endPos.position);
+            yield return MoveTo(startPos.position);
         }
     }
-
 }

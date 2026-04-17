@@ -67,9 +67,7 @@ public class ReMovePlatform : MonoBehaviour
         // 낙하
         yield return StartCoroutine(DropPlatform());
 
-        // 충돌 끄기
-        platform.GetComponent<Collider>().enabled = false;
-
+     
         // 6. 2초 대기 후 복구
         yield return new WaitForSeconds(respawnDelay);
 
@@ -84,6 +82,7 @@ public class ReMovePlatform : MonoBehaviour
 
         // 충돌 복구
         platform.GetComponent<Collider>().enabled = true;
+        transform.parent.GetComponent<Collider>().enabled = true;
 
         isRestoring = false;
         currentCoroutine = null;
@@ -112,9 +111,12 @@ public class ReMovePlatform : MonoBehaviour
     {
         float elapsed = 0f;
         Vector3 target = startPos + Vector3.down * fallDistance;
-
+        // 충돌 끄기
+        platform.GetComponent<Collider>().enabled = false;
+        transform.parent.GetComponent<Collider>().enabled = false;
         while (elapsed < fallDuration)
         {
+
             elapsed += Time.deltaTime;
 
             float t = elapsed / fallDuration;

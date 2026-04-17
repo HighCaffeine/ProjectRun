@@ -7,16 +7,36 @@ using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.Rendering.DebugUI;
 public class UiManager : MonoBehaviour
 {
-    [SerializeField] private GameObject countPanel;
-    [SerializeField] private TextMeshProUGUI countText;
+    public static UiManager instance;  
+
     private Coroutine countdownCoroutine;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    float timer=0f;
+
+    [SerializeField]
+    private TextMeshProUGUI timeText;
+    [SerializeField]
+    private TextMeshProUGUI goldText;
+    [SerializeField]
+    private TextMeshProUGUI player1Text;
+    [SerializeField]
+    private TextMeshProUGUI player2Text;
+
+
 
     private void Awake()
     {
-        
-    }
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            instance.gameObject.SetActive(false);
 
+        }
+        timer = 0f;
+    }
 
     public  void StartCount()
     {
@@ -24,29 +44,26 @@ public class UiManager : MonoBehaviour
         {
             StopCoroutine(countdownCoroutine);
         }
-        countdownCoroutine = StartCoroutine(TimeCount(5f));
+        countdownCoroutine = StartCoroutine(TimeCount());
     }
     public void StopCount()
     {
         if (countdownCoroutine != null)
         {
             StopCoroutine(countdownCoroutine);
+            
             countdownCoroutine = null;
         }
-        countPanel.gameObject.SetActive(false);
     }
-    IEnumerator TimeCount(float time)
+    IEnumerator TimeCount()
     {
-        countPanel.gameObject.SetActive(true);
-        while (time > 0)
+        while (true)
         {
-            countText.text = time.ToString();
+            timeText.text = "timer :" + timer.ToString();
             yield return new WaitForSeconds(1f);
-            time--;
+            timer++;
         }
-        countText.text = "START!";
-        yield return new WaitForSeconds(1f);
-        countPanel.gameObject.SetActive(false);
+
     }
 
 

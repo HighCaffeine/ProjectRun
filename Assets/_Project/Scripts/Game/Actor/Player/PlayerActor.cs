@@ -51,7 +51,9 @@ public class PlayerActor : Actor
     public float h { private set; get; }
     public float v { private set; get; }
 
-
+    public int fallDeathCount=0;
+    public int pushCount=0;
+    public int pullCount=0;
 
 
     public Vector3 GetForward() { return playerPivot.forward; }
@@ -67,6 +69,9 @@ public class PlayerActor : Actor
         animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));
+        fallDeathCount = 0;
+        pushCount = 0;
+        pullCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
     {
@@ -346,6 +351,8 @@ public class PlayerActor : Actor
             transform.position = pos;
             playerPivot.gameObject.SetActive(false);
             StartCoroutine(RespawnAfterDelay(spawnDelay));
+            fallDeathCount++;
+            Debug.Log(gameObject.name + "Die" +  fallDeathCount);
         }
     }
     IEnumerator RespawnAfterDelay(float delay)

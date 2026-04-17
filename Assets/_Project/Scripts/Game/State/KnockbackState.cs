@@ -48,6 +48,17 @@ public class KnockbackState : IState
 
         actor.animator.SetTrigger("Knockback");
         actor.PlayTravelSpark(actionType);
+
+        if(isPull)
+        {
+            actor.pullCount++;
+            Debug.Log(actor.gameObject.name + "pull :" + actor.pullCount);      
+        }
+        else
+        {
+            actor.pushCount++;
+            Debug.Log(actor.gameObject.name + "push :" + actor.pushCount);
+        }
     }
 
     public void Execute()
@@ -75,6 +86,7 @@ public class KnockbackState : IState
         {
             float decayFactor = 1f - (Mathf.Log(1 + K * t) / Mathf.Log(1 + K));
             currentPower = initialPower * decayFactor;
+
         }
 
         if (isPull)
