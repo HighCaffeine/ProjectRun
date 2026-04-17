@@ -109,8 +109,8 @@ public class PlayerActor : Actor
         }
         else
         {
-            //    h = Input.GetAxisRaw("Horizontal");
-            //  v = Input.GetAxisRaw("Vertical");
+              //  h = Input.GetAxisRaw("Horizontal");
+           //  v = Input.GetAxisRaw("Vertical");
             if (Input.GetKey(KeyCode.UpArrow))
             {
                 v += 1f;

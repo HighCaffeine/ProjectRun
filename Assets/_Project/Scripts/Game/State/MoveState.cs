@@ -26,7 +26,7 @@ public class MoveState : IState
             if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
         }
         //대쉬 체크
-        //if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+       // if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 
         // 멈춤 체크
         if (actor.h == 0 && actor.v == 0)
