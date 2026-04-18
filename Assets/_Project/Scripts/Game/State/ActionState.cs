@@ -35,6 +35,16 @@ public class ActionState : IState
     {
         timer = 0f;
 
+        if (actor.IsLocal)
+        {
+            if (Time.time - actor.lastSkillUseTime < PlayerActor.SKILL_COOLDOWN)
+            {
+                actor.sm.ChangeState(new IdleState(actor));
+                return;
+            }
+            actor.lastSkillUseTime = Time.time; // 스킬 사용 시간 갱신
+        }
+
         actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
@@ -52,7 +62,7 @@ public class ActionState : IState
         if (actionType == eState.Pull)
         {
             Vector3 origin = actor.transform.position;
-            origin.y += 1.0f; 
+            origin.y += 1.0f;
 
             Vector3 dir = searchForward.normalized;
 
@@ -85,7 +95,7 @@ public class ActionState : IState
                     {
                         var a = ActorManager.Instance.GetActor(targetActor.gameObject.name);
                         a.sm.ChangeState(new KnockbackState(
-                            (PlayerActor)a,pulldir,pushForce * pow,true,actor.transform.position));
+                            (PlayerActor)a, pulldir, pushForce * pow, true, actor.transform.position));
                     }
                 }
                 else if (targetGimmick != null)
@@ -117,7 +127,7 @@ public class ActionState : IState
                 }
             }
 
-            return; 
+            return;
         }
         Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance);
 

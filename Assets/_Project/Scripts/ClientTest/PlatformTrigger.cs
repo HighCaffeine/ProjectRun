@@ -14,17 +14,19 @@ public class PlatformTrigger : MonoBehaviour
         Debug.Log(other.name);
         PlayerActor actor = other.GetComponent<PlayerActor>();
 
-        if (actor == null) return;
-
-        platform.AddPlayer(actor);
+        if (actor != null && actor.IsLocal)
+        {
+            platform.AddPlayer(actor);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         PlayerActor actor = other.GetComponent<PlayerActor>();
 
-        if (actor == null) return;
-
-        platform.RemovePlayer(actor);
+        if (actor != null && actor.IsLocal)
+        {
+            platform.RemovePlayer(actor);
+        }
     }
 }

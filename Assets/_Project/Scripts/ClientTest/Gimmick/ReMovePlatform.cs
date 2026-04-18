@@ -48,14 +48,14 @@ public class ReMovePlatform : BaseGimmick
 
     public void StartRemove()
     {
-        Debug  .Log("StartRemove ȣ��");
+        Debug.Log("StartRemove ȣ��");
         if (currentCoroutine != null)
             StopCoroutine(currentCoroutine);
 
         currentCoroutine = StartCoroutine(RemoveSequence());
     }
 
-    private void OnColisionEnter(Collision other)
+    private void OnCollisionEnter(Collision other)
     {
         if (isRestoring) return; // �̹� �������ų� ���� ���̸� ����
 

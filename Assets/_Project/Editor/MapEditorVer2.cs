@@ -147,22 +147,31 @@ public class MapEditorVer2 : EditorWindow
     // 핵심 로직 구현부
     // ----------------------------------------------------
 
-    private int GetUniqueGimmickID()
+    // private int GetUniqueGimmickID()
+    // {
+    //     BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
+    //     HashSet<int> existingIDs = new HashSet<int>();
+    //     foreach (var g in allGimmicks) existingIDs.Add(g.gimmickUID);
+
+    //     int newID;
+    //     int safetyCount = 0;
+    //     do
+    //     {
+    //         newID = Mathf.Abs(System.Guid.NewGuid().GetHashCode()) % 100000;
+    //         if (++safetyCount > 1000) break;
+    //     }
+    //     while (existingIDs.Contains(newID) || newID == 0);
+
+    //     return newID;
+    // }
+
+    private int GetNextGlobalGimmickUID()
     {
-        BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
-        HashSet<int> existingIDs = new HashSet<int>();
-        foreach (var g in allGimmicks) existingIDs.Add(g.gimmickUID);
+        int currentUID = EditorPrefs.GetInt("GlobalGimmickUID_Counter", 1000);
 
-        int newID;
-        int safetyCount = 0;
-        do
-        {
-            newID = Mathf.Abs(System.Guid.NewGuid().GetHashCode()) % 100000;
-            if (++safetyCount > 1000) break;
-        }
-        while (existingIDs.Contains(newID) || newID == 0);
+        EditorPrefs.SetInt("GlobalGimmickUID_Counter", currentUID + 1);
 
-        return newID;
+        return currentUID;
     }
 
     private float ApplySnap(float value)
@@ -199,11 +208,11 @@ public class MapEditorVer2 : EditorWindow
         spawnPos.z = ApplySnap(spawnPos.z);
 
         // 고유 UID 발급
-        int uid = GetUniqueGimmickID();
+        int uid = GetNextGlobalGimmickUID();
 
         // 기믹을 임시 생성하여 타입 확인
         GameObject gimmickObj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-        BaseGimmick gimmickComp = gimmickObj.GetComponent<BaseGimmick>();
+        BaseGimmick gimmickComp = gimmickObj.GetComponentInChildren<BaseGimmick>();
 
         string groupName = defaultName.ToString();
         eGimmickKey targetKey = eGimmickKey.BreakableWall;
@@ -215,9 +224,16 @@ public class MapEditorVer2 : EditorWindow
             groupName = targetKey.ToString();
             EditorUtility.SetDirty(gimmickComp);
         }
-
+        GimmickInfo info = gimmickObj.GetComponentInChildren<GimmickInfo>();
+        if (info != null)
+        {
+            info.gimmick_id = uid;
+            info.gimmick_type = targetKey.ToString();
+            EditorUtility.SetDirty(gimmickObj);
+        }
         // 그룹 관리를 위한 빈 오브젝트 생성
         GameObject groupObj = new GameObject($"{groupName}_{uid}");
+        groupObj.tag = "Gimmick";
         groupObj.transform.position = spawnPos;
         if (customParent != null) groupObj.transform.SetParent(customParent);
 
@@ -245,11 +261,15 @@ public class MapEditorVer2 : EditorWindow
             triggerObj.transform.localPosition = new Vector3(0f, 0.1f, -3f);
             triggerObj.name = $"Trigger_{uid}";
 
-            GimmickTrigger triggerComp = triggerObj.GetComponent<GimmickTrigger>();
+            GimmickTrigger triggerComp = triggerObj.GetComponentInChildren<GimmickTrigger>();
             if (triggerComp == null) triggerComp = triggerObj.AddComponent<GimmickTrigger>();
 
-            triggerComp.targetGimmickID = uid;
-            triggerComp.targetGimmickKey = targetKey;
+            TargetGimmickInfo targetInfo = new TargetGimmickInfo();
+            targetInfo.gimmickID = uid;
+            targetInfo.gimmickKey = (GimmickKey)targetKey;
+
+            triggerComp.targetGimmicks.Clear();
+            triggerComp.targetGimmicks.Add(targetInfo);
         }
 
         if (defaultName == eGimmickKey.MovePlatform || defaultName == eGimmickKey.FallingPlatform)
@@ -263,7 +283,7 @@ public class MapEditorVer2 : EditorWindow
             switch (defaultName)
             {
                 case eGimmickKey.MovePlatform:
-                    var movableObj = gimmickObj.GetComponent<Platform>(); 
+                    var movableObj = gimmickObj.GetComponentInChildren<Platform>();
                     if (movableObj != null)
                     {
                         movableObj.SetStartPos(startPivot);
@@ -272,7 +292,7 @@ public class MapEditorVer2 : EditorWindow
                     break;
 
                 case eGimmickKey.FallingPlatform:
-                    var fallingObj = gimmickObj.GetComponent<ReMovePlatform>();
+                    var fallingObj = gimmickObj.GetComponentInChildren<ReMovePlatform>();
                     if (fallingObj != null)
                     {
                         fallingObj.SetStartPos(startPivot);
@@ -301,7 +321,7 @@ public class MapEditorVer2 : EditorWindow
     {
         if (Selection.activeGameObject == null) return;
 
-        BaseGimmick targetGimmick = Selection.activeGameObject.GetComponent<BaseGimmick>();
+        BaseGimmick targetGimmick = Selection.activeGameObject.GetComponentInChildren<BaseGimmick>();
         if (targetGimmick == null)
         {
             Debug.LogWarning("[MapEditor] 선택한 오브젝트가 기믹이 아님");
@@ -333,7 +353,6 @@ public class MapEditorVer2 : EditorWindow
 
         triggerObj.name = $"Trigger_{targetGimmick.gimmickUID}_Sub";
 
-        // 선택한 기믹이 이미 그룹 폴더 안에 있다면 그곳에 종속, 아니면 customParent에 종속
         Transform gimmickParent = targetGimmick.transform.parent;
         if (gimmickParent != null && gimmickParent.name.Contains(targetGimmick.gimmickUID.ToString()))
         {
@@ -344,17 +363,25 @@ public class MapEditorVer2 : EditorWindow
             triggerObj.transform.SetParent(customParent);
         }
 
-        GimmickTrigger triggerComp = triggerObj.GetComponent<GimmickTrigger>();
+        GimmickTrigger triggerComp = triggerObj.GetComponentInChildren<GimmickTrigger>();
         if (triggerComp == null) triggerComp = triggerObj.AddComponent<GimmickTrigger>();
 
-        triggerComp.targetGimmickID = targetGimmick.gimmickUID;
-        triggerComp.targetGimmickKey = GetGimmickKeyType(targetGimmick);
+        TargetGimmickInfo info = new TargetGimmickInfo();
+        info.gimmickID = targetGimmick.gimmickUID;
+
+        info.gimmickKey = (GimmickKey)GetGimmickKeyType(targetGimmick);
+
+        triggerComp.targetGimmicks.Clear();
+        triggerComp.targetGimmicks.Add(info);
 
         Undo.RegisterCreatedObjectUndo(triggerObj, "Create Sub Trigger");
         Selection.activeGameObject = triggerObj;
 
         Debug.Log($"<color=green>[MapEditor]</color> 보조 스위치가 생성");
     }
+
+
+
 
     private void DrawHorizontalLine(int height = 1)
     {

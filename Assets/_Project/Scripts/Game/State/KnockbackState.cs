@@ -18,7 +18,7 @@ public class KnockbackState : IState
 
     private const float K = 10f;
 
-    
+
     public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
         this.actor = actor;
@@ -49,13 +49,13 @@ public class KnockbackState : IState
         actor.animator.SetTrigger("Knockback");
         actor.PlayTravelSpark(actionType);
 
-        if(isPull)
+        if (isPull)
         {
-            actor.pullCount++;     
+            actor.pullCount++;
         }
         else
         {
-            actor.pushCount++;      
+            actor.pushCount++;
         }
     }
 
@@ -148,15 +148,19 @@ public class KnockbackState : IState
                 GimmickTrigger gInfo = wall.GetComponent<GimmickTrigger>();
                 if (gInfo != null)
                 {
-                    P_GimmickInteractReq req = new P_GimmickInteractReq
+                    foreach (var target in gInfo.targetGimmicks)
                     {
-                        gimmickID = gInfo.targetGimmickID,
-                        gimmickKey = (byte)gInfo.targetGimmickKey,
-                        state = 0,
-                        targetPos = new P_PacketVector3(),
-                        param = 0f
-                    };
-                    Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+                        P_GimmickInteractReq req = new P_GimmickInteractReq
+                        {
+                            activeUUID = LocalPlayerInfo.ID,
+                            gimmickID = target.gimmickID,
+                            gimmickKey = (byte)target.gimmickKey,
+                            state = (byte)eGimmickState.Off_Destroy,
+                            targetPos = new P_PacketVector3(),
+                            param = 0f
+                        };
+                        Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+                    }
                 }
                 actor.PlayBrakeParticles();
                 actor.sm.ChangeState(new IdleState(actor));

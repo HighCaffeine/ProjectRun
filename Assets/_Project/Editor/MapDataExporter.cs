@@ -76,10 +76,10 @@ public class MapDataExporter : Editor
                     gd.position = new _Vector3(child.position); // 월드 좌표라 레벨 위치 그대로 유지됨
                     gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
-                    GimmickInfo info = child.GetComponent<GimmickInfo>();
+                    GimmickInfo info = child.GetComponentInChildren<GimmickInfo>();
                     if (info != null)
                     {
-                        gd.gimmick_id = info.gimmick_id != 0 ? info.gimmick_id : ++autoGimmickId;
+                        gd.gimmick_id = info.gimmick_id;
                         gd.type = info.gimmick_type;
                         foreach (var prop in info.properties)
                         {

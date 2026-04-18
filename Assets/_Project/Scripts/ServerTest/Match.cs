@@ -183,7 +183,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
                     Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
-                    // TODO: 화면 중앙에 숫자 텍스트 표시
                     if (countdownText != null)
                     {
                         countdownText.gameObject.SetActive(true);
@@ -195,7 +194,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_READY_CANCEL_NTF:
                 {
                     Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
-                    // TODO: 카운트다운 UI 숨기기
                     if (countdownText != null)
                     {
                         countdownText.gameObject.SetActive(false);
@@ -260,6 +258,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 3: pActor.sm.ChangeState(new ActionState(pActor, eState.Pull)); break; // 당기기
                             case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
+                                if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
+                                {
+                                    Debug.Log($"[Packet] {pActor.gameObject.name} 연속 넉백 패킷 무시");
+                                    break;
+                                }
+
+                                pActor.lastKnockbackTime = Time.time;
+
                                 pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, false, Vector3.zero));
                                 break;
                             case 6:

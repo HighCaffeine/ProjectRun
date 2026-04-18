@@ -4,6 +4,11 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
+    public float lastSkillUseTime = -999f;
+    public const float SKILL_COOLDOWN = 1.0f;
+    public float lastKnockbackTime = -999f;
+    public const float KNOCKBACK_IMMUNE_TIME = 1.0f;
+
     const float CAMERA_SHAKE = 1.0f;
 
     [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
@@ -51,9 +56,9 @@ public class PlayerActor : Actor
     public float h { private set; get; }
     public float v { private set; get; }
 
-    public int fallDeathCount=0;
-    public int pushCount=0;
-    public int pullCount=0;
+    public int fallDeathCount = 0;
+    public int pushCount = 0;
+    public int pullCount = 0;
 
 
     public Vector3 GetForward() { return playerPivot.forward; }
@@ -108,8 +113,8 @@ public class PlayerActor : Actor
         }
         else
         {
-              //  h = Input.GetAxisRaw("Horizontal");
-           //  v = Input.GetAxisRaw("Vertical");
+            //  h = Input.GetAxisRaw("Horizontal");
+            //  v = Input.GetAxisRaw("Vertical");
             if (Input.GetKey(KeyCode.UpArrow))
             {
                 v += 1f;
@@ -128,9 +133,9 @@ public class PlayerActor : Actor
             }
 
         }
-            sm.Update();
+        sm.Update();
         ApplyWind();
-       
+
         if (controller != null && controller.enabled)
         {
             ApplyGravity();
@@ -147,7 +152,7 @@ public class PlayerActor : Actor
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
-       
+
     }
 
     public Action<string, int> OnUpdatePoint;
