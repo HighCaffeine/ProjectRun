@@ -20,7 +20,7 @@ public class ReMovePlatform : BaseGimmick
     private bool isRestoring = false;
 
     private GameObject startPos;
-    private GameObject endPos;
+    public GameObject endPos;
     private Vector3 originPos;
 
     public void SetStartPos(GameObject start) { startPos = start; }
