@@ -5,8 +5,7 @@ using UnityEngine;
 public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
-    { 
-        Debug.Log($"[DeadZone] {other.name}ÀÌ(°¡) »ç¸Á ±¸¿ª¿¡ ÁøÀÔÇß½À´Ï´Ù.");
+    {
         ActorManager.Instance.OnPlayerDead(other.name);
     }
 
@@ -16,10 +15,10 @@ public class DeadZone : MonoBehaviour
         BoxCollider col = GetComponent<BoxCollider>();
         if (col == null) return;
 
-        // ¿ùµå ±âÁØ Áß½É À§Ä¡
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß½ï¿½ ï¿½ï¿½Ä¡
         Vector3 center = transform.TransformPoint(col.center);
 
-        // ½ºÄÉÀÏ ¹Ý¿µµÈ ½ÇÁ¦ Å©±â
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ý¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
         Vector3 size = Vector3.Scale(col.size, transform.lossyScale);
 
         Gizmos.DrawWireCube(center, size);

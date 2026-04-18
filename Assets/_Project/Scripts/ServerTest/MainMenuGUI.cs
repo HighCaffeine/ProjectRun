@@ -2,61 +2,97 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Net.Sockets;
+using System.Net;
 
 public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 {
+    [Header("UI Panels")]
+    public GameObject connectionPanel; // 서버 접속 패널
+    public GameObject loginPanel;      // 로그인 패널
+
+    [Header("Connection Inputs")]
+    public InputField ipInput;
+    public Button connectButton;
+
+    [Header("Login Inputs")]
+    public InputField nameInput;
+    public Button joinButton;
+
+    private bool isSceneLoading = false;
+
     void Awake()
     {
         Application.targetFrameRate = 60;
-
-        Client.Start();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        Client.TCP.AddPacketReceiver(this);
+        if (connectionPanel != null) connectionPanel.SetActive(true);
+        if (loginPanel != null) loginPanel.SetActive(false);
+
+        // 이전 접속 IP/Port
+        string savedIP = PlayerPrefs.GetString("ServerIP", "127.0.0.1");
+        IPInputManager.Instance.SetIP(savedIP);
+
         isSceneLoading = false;
     }
 
-    // public unsafe void OnPacketReceived(Packet packet)
-    // {
-    //     ushort packetId = packet.pbase.packet_id;
-    //     switch ((E_PACKET)packetId)
-    //     {
-    //         case E_PACKET.LOGIN_RESPONSE:
-    //             P_LoginRes loginRes = UnsafeCode.ByteArrayToStructure<P_LoginRes>(packet.data);
+    // 서버 접속 처리
+    public void OnConnectButtonClick()
+    {
+        string ipStr = IPInputManager.Instance.GetFullIP();
 
-    //             string inputName = GameObject.Find("NameInput").GetComponent<InputField>().text;
+        if (!IPAddress.TryParse(ipStr, out IPAddress parsedIp))
+        {
+            Debug.LogError("[System] 올바른 IP 주소 형식이 아닙니다.");
+            return;
+        }
 
-    //             Debug.Log($"login {loginRes.result}");
+        connectButton.interactable = false;
 
-    //             LocalPlayerInfo.ID = loginRes.result;
-    //             LocalPlayerInfo.Name = inputName;
-    //             SceneManager.LoadSceneAsync("Game_Lobby", LoadSceneMode.Single);
-    //             break;
-    //     }
-    // }
+        try
+        {
+            Client.Connect(parsedIp.ToString(), 11021, 5025);
 
-    private bool isSceneLoading = false; // 플래그 추가
+            Client.TCP.AddPacketReceiver(this);
+            Debug.Log($"[Network] 서버 연결 성공 (IP: {parsedIp})");
 
-    // public unsafe void OnPacketReceived(Packet packet)
-    // {
-    //     if (isSceneLoading || SceneManager.GetActiveScene().name == "Game_Lobby") return;
+            PlayerPrefs.SetString("ServerIP", parsedIp.ToString());
 
-    //     ushort packetId = packet.pbase.packet_id;
-    //     if ((E_PACKET)packetId == E_PACKET.LOGIN_RESPONSE)
-    //     {
-    //         if (isSceneLoading) return; // 이미 로딩 중이면 무시
+            connectionPanel.SetActive(false);
+            loginPanel.SetActive(true);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[Network] 서버 연결 실패: {ex.Message}");
+            connectButton.interactable = true;
+        }
+    }
 
-    //         P_LoginRes loginRes = UnsafeCode.ByteArrayToStructure<P_LoginRes>(packet.data);
-    //         isSceneLoading = true; // 로딩 시작 알림
+    // 로그인 처리
+    public void OnJoinButtonClick()
+    {
+        if (Client.TCP == null)
+        {
+            Debug.LogError("[System] 서버에 먼저 접속해야 합니다.");
+            return;
+        }
 
-    //         LocalPlayerInfo.ID = loginRes.result;
-    //         SceneManager.LoadSceneAsync("Game_Lobby");
-    //     }
-    // }
+        joinButton.interactable = false;
 
+        string inputName = nameInput.text;
+        LocalPlayerInfo.Name = inputName;
+
+        P_LoginReq loginReq = default;
+        loginReq.userID = inputName;
+        loginReq.userPW = inputName;
+
+        Client.TCP.SendPacket2(E_PACKET.LOGIN_REQUEST, loginReq);
+        Debug.Log($"[Client] 로그인 요청 전송: {inputName}");
+    }
+
+    // 패킷 수신 처리
     public unsafe void OnPacketReceived(Packet packet)
     {
         ushort packetId = packet.pbase.packet_id;
@@ -73,39 +109,29 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                     // 씬 로딩 중복 호출 방지
                     if (isSceneLoading)
                     {
-                        Debug.Log("씬 중복 로딩 처리");
+                        Debug.LogWarning("씬 중복 로딩 처리 차단");
                         return;
                     }
                     isSceneLoading = true;
 
                     LocalPlayerInfo.ID = loginRes.result;
                     SceneManager.LoadSceneAsync("Game_Lobby");
-                    //SceneManager.LoadSceneAsync("Dungeon_1");
                 }
                 catch (Exception ex)
                 {
                     Debug.LogError($"[Client] Login Parsing Error: {ex.Message}");
                 }
-
                 break;
         }
     }
 
     public void OnDestroy()
     {
-        Client.TCP.RemovePacketReceiver(this);
+        if (Client.TCP != null)
+        {
+            Client.TCP.RemovePacketReceiver(this);
+        }
+
         if (AkUnitySoundEngine.IsInitialized()) AkUnitySoundEngine.Term();
-    }
-
-    public void OnJoinButtonClick()
-    {
-        GameObject.Find("JoinButton").GetComponent<Button>().interactable = false;
-
-        string inputName = GameObject.Find("NameInput").GetComponent<InputField>().text;
-        LocalPlayerInfo.Name = inputName;
-        P_LoginReq loginReq = default;
-        loginReq.userID = inputName;
-        loginReq.userPW = inputName;
-        Client.TCP.SendPacket2(E_PACKET.LOGIN_REQUEST, loginReq);
     }
 }

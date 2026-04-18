@@ -23,18 +23,19 @@ public class ActorManager : GenericSingleton<ActorManager>
             spawnPoints.Add(actorID, "1_0");
             actors.Add(actorID, actor);
 
-            actor.OnUpdatePoint += UpdateSpwanPoint;
+            actor.OnUpdatePoint += UpdateSpawnIndex;
         }
     }
 
-    void UpdateSpwanPoint(string id, int index)
+    public void UpdateSpawnIndex(string playerName, int newSectorIndex)
     {
-
-        //int currentMapID = MapManager.Instance.currentMapID;
-        int currentMapID = DungeonPointManager.Instance.mapID;
-
-
-        spawnPoints[id] = $"{currentMapID}_{index}";
+        if (spawnPoints.ContainsKey(playerName))
+        {
+            string current = spawnPoints[playerName];
+            string mapLevel = current.Split('_')[0];
+            spawnPoints[playerName] = $"{mapLevel}_{newSectorIndex}";
+            Debug.Log($"[System] {playerName}의 스폰 포인트가 {newSectorIndex} 구역으로 갱신되었습니다.");
+        }
     }
 
 
@@ -67,7 +68,6 @@ public class ActorManager : GenericSingleton<ActorManager>
         }
     }
 
-    // ★ 구현됨: 로컬 유저일 때만 서버로 패킷 전송
     void SendPlayerDeadPacket(string id, Vector3 spawnPos)
     {
         if (id != localID) return; // 내 캐릭터가 죽은 것만 서버에 보고

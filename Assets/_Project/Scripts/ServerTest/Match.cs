@@ -303,6 +303,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             targetPlayer.SetPos(destPos);
 
                             if (controller != null) controller.enabled = true;
+
+                            PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
+                            if (pActor != null)
+                            {
+                                int nextSpawnIndex = (int)ntf.param;
+                                pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
+                            }
                         }
                         break;
                     }
@@ -316,7 +323,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             break;
                         }
                     }
-
                     break;
                 }
             case E_PACKET.PLAYER_DEAD_NTF:

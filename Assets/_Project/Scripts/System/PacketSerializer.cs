@@ -13,6 +13,7 @@ public static class PacketSerializer
             case P_PlayerMovement p: return SerializePlayerMovement(p);
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_PlayerStateNtf p: return SerializePlayerStateNtf(p);
+            case P_DungeonEscapeReq p: return new byte[] { p.dummy };
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
             case P_PlayerDeadReq p: return SerializePlayerDeadReq(p);
             case P_PlayerReadyRequest p: return SerializePlayerReadyRequest(p);
@@ -24,7 +25,7 @@ public static class PacketSerializer
             case P_TradeItemUpdate p: return SerializeTradeItemUpdate(p);
             case P_TradeLock p: return SerializeTradeLock(p);
             case P_TradeConfirm p: return SerializeTradeConfirm(p);
-            case P_SceneSyncReq _: return new byte[0];
+            case P_SceneSyncReq _: return new byte[] { 0 };
             default:
                 Debug.LogError($"[PacketSerializer] 미등록 패킷: {packet.GetType().Name}");
                 return new byte[0];
@@ -70,7 +71,7 @@ public static class PacketSerializer
 
     static byte[] SerializePlayerStatus(P_PlayerStatusNtf p)
     {
-        return null;
+        return new byte[0];
     }
 
     static byte[] SerializePlayerStateNtf(P_PlayerStateNtf p)
@@ -84,6 +85,11 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetDir.z);
         Write(buf, ref o, p.powerOrTime);
         return buf;
+    }
+
+    static byte[] SerializeDungeonEscapeReq(P_DungeonEscapeReq p)
+    {
+        return new byte[] { p.dummy };
     }
 
     static byte[] SerializeGimmickInteractReq(P_GimmickInteractReq p)

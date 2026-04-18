@@ -193,6 +193,12 @@ struct P_RoomLeaveUserNotify
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)]
     public string userName;
 }
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_DungeonEscapeReq
+{
+    public byte dummy;
+}
 #endregion
 
 #region Player Move Packet
@@ -369,7 +375,10 @@ public struct P_GameStartNtf
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_SceneSyncReq { }
+public struct P_SceneSyncReq
+{
+    public byte dummy;
+}
 #endregion
 
 #region Chat Packet

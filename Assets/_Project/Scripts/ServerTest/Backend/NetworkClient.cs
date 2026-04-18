@@ -94,6 +94,14 @@ public unsafe class NetworkClient
 
     public void Update()
     {
+        if (socketProtocol == ProtocolType.Udp && packetQueue.Count > 50)
+        {
+            while (packetQueue.Count > 10)
+            {
+                packetQueue.TryDequeue(out _);
+            }
+        }
+
         int count = 0;
         while (packetQueue.TryDequeue(out Packet packet) && count < MAX_PROCESS_PER_FRAME)
         {

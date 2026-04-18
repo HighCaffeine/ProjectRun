@@ -58,8 +58,7 @@ public class PlayerActor : Actor
 
     protected override void Start()
     {
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
-        { ActorManager.Instance.AddPlayer(this); }
+        ActorManager.Instance.AddPlayer(this);
 
         animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
@@ -309,17 +308,24 @@ public class PlayerActor : Actor
 
     IEnumerator RespawnAfterDelay(float delay, Vector3 pos)
     {
-        if (controller != null) controller.enabled = false;
+        SetControllerEnabled(false);
+
+        yield return new WaitForSeconds(delay);
+
         transform.position = pos;
-        if (controller != null) controller.enabled = true;
+        SetControllerEnabled(true);
+
+        playerPivot.gameObject.SetActive(true);
 
         if (IsLocal)
         {
+            SetVerticalVelocity(0f);
+            horizontalMove = Vector3.zero;
+
             curPos.Set(pos);
             SendMovePacket(0, 0);
+            sm.ChangeState(new IdleState(this));
         }
-
-        yield return new WaitForSeconds(delay);
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송

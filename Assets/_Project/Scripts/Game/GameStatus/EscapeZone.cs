@@ -7,16 +7,12 @@ public class EscapeZone : MonoBehaviour
         PlayerActor actor = other.GetComponent<PlayerActor>();
 
         // 던전이 클리어된 상태에서만 작동하도록 제어
-        // and로 던전 클리어 상태추가
         if (actor != null && actor.IsLocal)
         {
-            P_GameStartNtf pkt = new P_GameStartNtf
-            {
-              mapId = 0  
-            };
+            P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
 
             Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-            Debug.Log("[System] 탈출 대기 중");
+            Debug.Log("[System] 탈출 요청 패킷 전송 완료");
         }
     }
 }

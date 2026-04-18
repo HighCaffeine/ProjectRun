@@ -3,32 +3,39 @@ using UnityEngine;
 
 public static unsafe class Client
 {
-    //private const string IP = "127.0.0.1";
-    /// <summary>
-    private const string IP = "20.196.66.227";
-    //private const string IP = "192.168.31.36";
-    /// </summary>
-    //public static NetworkClient TCP = new NetworkClient(IP, 5004, ProtocolType.Tcp);
-    public static NetworkClient TCP = new NetworkClient(IP, 11021, ProtocolType.Tcp);
-    public static NetworkClient UDP = new NetworkClient(IP, 5025, ProtocolType.Udp);
+    public static NetworkClient TCP;
+    public static NetworkClient UDP;
 
     public static bool IS_SERVER_PLAY = true;
 
+    private static GameObject updaterObj;
 
-    public static void Start()
+    public static void Connect(string ip, int tcpPort, int udpPort)
     {
+        // 혹시 이미 열려있는 소켓이 있다면 닫고 초기화
+        Close();
+
+        TCP = new NetworkClient(ip, tcpPort, ProtocolType.Tcp);
+        UDP = new NetworkClient(ip, udpPort, ProtocolType.Udp);
+
         TCP.Start();
         UDP.Start();
+
+        TCP.OnDisconnect -= OnDisconnect; // 중복 등록 방지
         TCP.OnDisconnect += OnDisconnect;
+
+        Application.wantsToQuit -= OnApplicationQuit; // 중복 등록 방지
         Application.wantsToQuit += OnApplicationQuit;
 
         Application.runInBackground = true;
 
-        GameObject updaterObj = new GameObject("NetworkUpdater");
-        Object.DontDestroyOnLoad(updaterObj);
-        updaterObj.AddComponent<NetworkUpdater>();
+        if (updaterObj == null)
+        {
+            updaterObj = new GameObject("NetworkUpdater");
+            Object.DontDestroyOnLoad(updaterObj);
+            updaterObj.AddComponent<NetworkUpdater>();
+        }
     }
-
 
     private static bool OnApplicationQuit()
     {
@@ -47,8 +54,7 @@ public static unsafe class Client
 
     private static void OnDisconnect()
     {
-        // do stuff
-        // maybe display a message or something
+        Debug.LogWarning("[Network] 서버와 연결이 끊어졌습니다.");
     }
 
     public static void Close()
@@ -56,10 +62,12 @@ public static unsafe class Client
         if (TCP != null)
         {
             TCP.Close();
+            TCP = null;
         }
         if (UDP != null)
         {
             UDP.Close();
+            UDP = null;
         }
     }
 }
