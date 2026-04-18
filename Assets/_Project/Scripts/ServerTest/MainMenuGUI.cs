@@ -132,6 +132,6 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
             Client.TCP.RemovePacketReceiver(this);
         }
 
-        if (AkUnitySoundEngine.IsInitialized()) AkUnitySoundEngine.Term();
+        //if (AkUnitySoundEngine.IsInitialized()) AkUnitySoundEngine.Term();
     }
 }

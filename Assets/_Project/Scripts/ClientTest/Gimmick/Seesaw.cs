@@ -1,46 +1,47 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//seesawtrigger ì‚¬ìš©
 public class Seesaw : MonoBehaviour
 {
-    public float force = 50f;
+    // public float force = 50f;
 
-    private Rigidbody rb;
-    private List<Transform> players = new List<Transform>();
+    // private Rigidbody rb;
+    // private List<Transform> players = new List<Transform>();
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-    }
+    // void Start()
+    // {
+    //     rb = GetComponent<Rigidbody>();
+    // }
 
-    void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Trigger Enter: " + other.name);
-        if (other.GetComponent<PlayerActor>())
-        {
-            players.Add(other.transform);
-        }
-    }
+    // void OnTriggerEnter(Collider other)
+    // {
+    //     Debug.Log("Trigger Enter: " + other.name);
+    //     if (other.GetComponent<PlayerActor>())
+    //     {
+    //         players.Add(other.transform);
+    //     }
+    // }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (other.GetComponent<PlayerActor>())
-        {
-            players.Remove(other.transform);
-        }
-    }
+    // void OnTriggerExit(Collider other)
+    // {
+    //     if (other.GetComponent<PlayerActor>())
+    //     {
+    //         players.Remove(other.transform);
+    //     }
+    // }
 
-    void FixedUpdate()
-    {
-        foreach (var player in players)
-        {
-            Vector3 localPos = transform.InverseTransformPoint(player.position);
+    // void FixedUpdate()
+    // {
+    //     foreach (var player in players)
+    //     {
+    //         Vector3 localPos = transform.InverseTransformPoint(player.position);
 
-            // xÃà ±âÁØÀ¸·Î ÁÂ¿ì ÆÇ´Ü
-            float direction = localPos.x;
+    //         // xï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Â¿ï¿½ ï¿½Ç´ï¿½
+    //         float direction = localPos.x;
 
-            // Èû Àû¿ë (³¡À¸·Î °¥¼ö·Ï °­ÇÏ°Ô)
-            rb.AddTorque(Vector3.forward * -direction * force);
-        }
-    }
+    //         // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ï°ï¿½)
+    //         rb.AddTorque(Vector3.forward * -direction * force);
+    //     }
+    // }
 }

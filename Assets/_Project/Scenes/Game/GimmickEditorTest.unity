@@ -189,7 +189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed39f2b237e573f4f85990bb5d1440ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.Addressables::AK.Wwise.Unity.WwiseAddressables.InitBankHolder
-  InitBank: {fileID: 11400000, guid: 05d75a12576ab6d499aaf45e5a7a06d6, type: 2}
+  InitBank: {fileID: 11400000, guid: 59a66c5330b210b4a973d410407592d3, type: 2}
 --- !u!1001 &57970791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2647,6 +2647,8 @@ MonoBehaviour:
   localID: 
   spawnDelay: 5
   deadUIPrefab: {fileID: 0}
+  p1: {fileID: 0}
+  p2: {fileID: 0}
 --- !u!1 &787620566
 GameObject:
   m_ObjectHideFlags: 0
@@ -3369,6 +3371,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1145253049}
+    - targetCorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1145253052}
+    - targetCorrespondingSourceObject: {fileID: 1375924528138828985, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1145253051}
   m_SourcePrefab: {fileID: 100100000, guid: 483c5c7bc4c7299478df7f60abbe957a, type: 3}
 --- !u!1 &1145253048 stripped
 GameObject:
@@ -3401,6 +3409,46 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46dcf1cb783960040a10eac2e06dd6d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 0
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
+--- !u!114 &1145253051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145253048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d1eb3e4b81c63448569e4d57392b88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
+--- !u!114 &1145253052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145253048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08d8257617bbe1c45bc7b8fc66a14c58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
   m_listeners:
@@ -37133,6 +37181,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2980209337218416271, guid: 2d99b4a1d9096b245addff2d3b49cb68, type: 3}
   m_PrefabInstance: {fileID: 1825855000}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2000684333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2000684335}
+  - component: {fileID: 2000684334}
+  m_Layer: 0
+  m_Name: WwiseGlobal
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2000684334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000684333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcbb2660eb0d8a149bcfb957b27efb28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkInitializer
+  InitializationSettings: {fileID: 11400000, guid: eec05755f2f174241af95a197de927bb, type: 2}
+  basePath: 
+  language: 
+  defaultPoolSize: 0
+  lowerPoolSize: 0
+  streamingPoolSize: 0
+  memoryCutoffThreshold: 0
+  monitorPoolSize: 0
+  monitorQueuePoolSize: 0
+  callbackManagerBufferSize: 0
+  spatialAudioPoolSize: 0
+  maxSoundPropagationDepth: 0
+  engineLogging: 0
+--- !u!4 &2000684335
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000684333}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2023341074
 GameObject:
   m_ObjectHideFlags: 0
@@ -37239,17 +37344,6 @@ Transform:
   - {fileID: 1566009613017296937}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &41635353412494177 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3093180381018587779, guid: 5009d8ed1cc066b4fbc0e317d253f975, type: 3}
-  m_PrefabInstance: {fileID: 3530802936178889751}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b3b32a06c68d7b4e97e13c1d32e5765, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bridge
 --- !u!1001 &639923170595007714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -38380,8 +38474,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b1ed30b20b4c954c986f8be7cec3c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PressurePlate
-  wall: {fileID: 0}
-  bridge: {fileID: 41635353412494177}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -38401,3 +38493,4 @@ SceneRoots:
   - {fileID: 8607355328938997184}
   - {fileID: 639923170595007714}
   - {fileID: 1596398077}
+  - {fileID: 2000684335}

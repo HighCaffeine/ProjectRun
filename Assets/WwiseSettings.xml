@@ -3,7 +3,7 @@
   <CopySoundBanksAsPreBuildStep>true</CopySoundBanksAsPreBuildStep>
   <GenerateSoundBanksAsPreBuildStep>false</GenerateSoundBanksAsPreBuildStep>
   <WwiseStreamingAssetsPath>Audio\GeneratedSoundBanks</WwiseStreamingAssetsPath>
-  <RootOutputPath>../ProjectRun_Client_WwiseProject/GeneratedSoundBanks/</RootOutputPath>
+  <RootOutputPath>WwiseData/Bank</RootOutputPath>
   <CreatedPicker>true</CreatedPicker>
   <CreateWwiseGlobal>true</CreateWwiseGlobal>
   <CreateWwiseListener>true</CreateWwiseListener>
@@ -13,7 +13,7 @@
   <ShowSpatialAudioWarningMsg>true</ShowSpatialAudioWarningMsg>
   <WwiseInstallationPathMac />
   <WwiseInstallationPathWindows>C:\Audiokinetic\Wwise2025.1.6.9117</WwiseInstallationPathWindows>
-  <WwiseProjectPath>../ProjectRun_Client_WwiseProject/ProjectRun_Client_WwiseProject.wproj</WwiseProjectPath>
+  <WwiseProjectPath>../../ProjectRun_Client/ProjectRun_Client_WwiseProject/ProjectRun_Client_WwiseProject.wproj</WwiseProjectPath>
   <UseWaapi>true</UseWaapi>
   <WaapiPort>8080</WaapiPort>
   <WaapiIP>127.0.0.1</WaapiIP>
@@ -24,7 +24,7 @@
   <PackageSource />
   <AddressableBankFolder>WwiseData/Bank</AddressableBankFolder>
   <UseCustomBuildScript>false</UseCustomBuildScript>
-  <AddressableAssetBuilderPath>Assets/AddressableAssetsData/DataBuilders/BuildScriptWwisePacked.asset</AddressableAssetBuilderPath>
+  <AddressableAssetBuilderPath>Assets/AddressableAssetsData/DataBuilders\BuildScriptWwisePacked.asset</AddressableAssetBuilderPath>
   <AutomaticallyUpdateExternalSourcesPath>false</AutomaticallyUpdateExternalSourcesPath>
   <ExternalSourcesPath>WwiseData/Bank</ExternalSourcesPath>
   <EnableUninstallationPrompt>true</EnableUninstallationPrompt>

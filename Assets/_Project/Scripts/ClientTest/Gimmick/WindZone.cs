@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class WindZone : MonoBehaviour
 {
-    [Header("¹Ù¶÷ ¼³Á¤")]
-    public Vector3 windDirection; // ¹Ù¶÷ ¹æÇâ
-    public float windPower = 1f; // ¼¼±â
+    [Header("ï¿½Ù¶ï¿½ ï¿½ï¿½ï¿½ï¿½")]
+    public Vector3 windDirection; // ï¿½Ù¶ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public float windPower = 1f; // ï¿½ï¿½ï¿½ï¿½
 
 
     private void OnTriggerStay(Collider other)
     {
-        windDirection = transform.forward; // WindZoneÀÇ ¾Õ ¹æÇâÀ» ¹Ù¶÷ ¹æÇâÀ¸·Î ¼³Á¤
+        windDirection = transform.forward; // WindZoneï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         PlayerActor player = other.GetComponent<PlayerActor>();
         if (player != null)
         {
@@ -20,14 +20,14 @@ public class WindZone : MonoBehaviour
     {
         if (other.GetComponent<PlayerActor>())
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ¹Ù¶÷ Á¸¿¡ µé¾î¿Ô½À´Ï´Ù.");
+            Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ù¶ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ô½ï¿½ï¿½Ï´ï¿½.");
         }
     }
     private void OnTriggerExit(Collider other)
     {
         if (other.GetComponent<PlayerActor>())
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ¹Ù¶÷ Á¸¿¡¼­ ³ª°¬½À´Ï´Ù.");
+            Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ù¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
             other.GetComponent<PlayerActor>().ResetWind();
         }
     }

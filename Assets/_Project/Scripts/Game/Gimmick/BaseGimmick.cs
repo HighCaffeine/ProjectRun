@@ -11,6 +11,7 @@ public abstract class BaseGimmick : MonoBehaviour
 {
     [Header("Base Gimmick Info")]
     public int gimmickUID; // 모든 기믹이 공통으로 가지는 ID
+    public P_PacketVector3 v;
 
     public abstract void Execute(P_GimmickInteractNtf ntf);
 }

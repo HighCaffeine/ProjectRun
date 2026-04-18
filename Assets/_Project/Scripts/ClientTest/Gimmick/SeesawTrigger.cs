@@ -10,21 +10,23 @@ public class SeesawTrigger : MonoBehaviour
     [SerializeField]
     private List<Transform> players = new List<Transform>();
 
-    void OnTriggerEnter(Collider other)
+    void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Trigger Enter: " + other.name);
-        if (other.GetComponent<PlayerActor>())
-            players.Add(other.transform);
+        Debug.Log("Trigger Enter: " + collision.transform.name);
+        if (collision.transform.GetComponent<PlayerActor>())
+            players.Add(collision.transform);
     }
 
-    void OnTriggerExit(Collider other)
+    void OnCollisionExit(Collision collision)
     {
-        if (other.GetComponent<PlayerActor>())
-            players.Remove(other.transform);
+        if (collision.transform.GetComponent<PlayerActor>())
+            players.Remove(collision.transform);
     }
 
     void FixedUpdate()
     {
+        if (!GameManager.Instance.isHost) return;
+
         players.RemoveAll(p => p == null);
 
         foreach (var player in players)

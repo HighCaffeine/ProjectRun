@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Collections.Concurrent;
 using UnityEngine;
-using Wwise;
 
 [StructLayout(LayoutKind.Sequential, Pack = 1, Size = 3)]
 public struct PacketBaseOld

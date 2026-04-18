@@ -1,25 +1,26 @@
 using UnityEngine;
 
+//GimmickTrigger ì‚¬ìš©
 public class PressurePlate : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject wall; // º® ¿ÀºêÁ§Æ®¸¦ ¿¬°áÇÒ º¯¼ö
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    [SerializeField]
-    Bridge bridge;
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponent<PlayerActor>())
-        {
-            Debug.Log("ÇÃ·¹ÀÌ¾î°¡ ¾Ð·ÂÆÇ¿¡ µé¾î¿Ô½À´Ï´Ù.");
-            bridge.CloseBridge();
-            // OpenWall(); 
-        }
-    }
+    // [SerializeField]
+    // private GameObject wall; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    // // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // [SerializeField]
+    // Bridge bridge;
+    // private void OnTriggerEnter(Collider other)
+    // {
+    //     if (other.GetComponent<PlayerActor>())
+    //     {
+    //         Debug.Log("ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½Ð·ï¿½ï¿½Ç¿ï¿½ ï¿½ï¿½ï¿½Ô½ï¿½ï¿½Ï´ï¿½.");
+    //         bridge.CloseBridge();
+    //         // OpenWall(); 
+    //     }
+    // }
 
-    void OpenWall()
-    {
-        Debug.Log("º®ÀÌ ¿­·È½À´Ï´Ù.");
-        wall.SetActive(false); // º® ¿ÀºêÁ§Æ®¸¦ ºñÈ°¼ºÈ­ÇÏ¿© ¿­¸®´Â È¿°ú¸¦ ÁÝ´Ï´Ù.
-    }
+    // void OpenWall()
+    // {
+    //     Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½È½ï¿½ï¿½Ï´ï¿½.");
+    //     wall.SetActive(false); // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½Ý´Ï´ï¿½.
+    // }
 }

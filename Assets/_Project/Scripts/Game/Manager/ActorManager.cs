@@ -44,7 +44,7 @@ public class ActorManager : GenericSingleton<ActorManager>
         int spawnIndex = int.Parse(split[1]);
         //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapID, spawnIndex);
         Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
-        SendPlayerDeadPacket(name);
+        SendPlayerDeadPacket(name, spawnPos);
 
         actor.PlayerDead(spawnPos, spawnDelay);
 
@@ -86,28 +86,28 @@ public class ActorManager : GenericSingleton<ActorManager>
         deadUIPrefab.SetActive(true);
     }
 
-    public void OnPlayerDead(string name)
-    {
-        if (!actors.ContainsKey(name)) return;
-        bool isLocal = (name == localID);
+    // public void OnPlayerDead(string name)
+    // {
+    //     if (!actors.ContainsKey(name)) return;
+    //     bool isLocal = (name == localID);
 
-        PlayerActor actor = actors[name];
-        string spawnInfo = spawnPoints[name];
-        string[] split = spawnInfo.Split('_');
+    //     PlayerActor actor = actors[name];
+    //     string spawnInfo = spawnPoints[name];
+    //     string[] split = spawnInfo.Split('_');
 
-        int mapLevel = int.Parse(split[0]);
-        int spawnIndex = int.Parse(split[1]);
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
+    //     int mapLevel = int.Parse(split[0]);
+    //     int spawnIndex = int.Parse(split[1]);
+    //     Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
 
-        SendPlayerDeadPacket(name, spawnPos);
+    //     SendPlayerDeadPacket(name, spawnPos);
 
-        actor.PlayerDead(spawnPos, spawnDelay);
+    //     actor.PlayerDead(spawnPos, spawnDelay);
 
-        if (isLocal)
-        {
-            ShowDeadUI(spawnDelay);
-        }
-    }
+    //     if (isLocal)
+    //     {
+    //         ShowDeadUI(spawnDelay);
+    //     }
+    // }
 
     void SendPlayerDeadPacket(string id, Vector3 spawnPos)
     {

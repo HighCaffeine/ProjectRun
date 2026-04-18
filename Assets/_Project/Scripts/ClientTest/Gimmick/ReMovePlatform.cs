@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class ReMovePlatform : MonoBehaviour
+public class ReMovePlatform : BaseGimmick
 {
     [SerializeField] private float shakeTime = 3f;     // ???? ?��?
     [SerializeField] private float shakePower = 0.05f; // ??? ???? ????
@@ -55,11 +55,11 @@ public class ReMovePlatform : MonoBehaviour
         currentCoroutine = StartCoroutine(RemoveSequence());
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnColisionEnter(Collision other)
     {
         if (isRestoring) return; // �̹� �������ų� ���� ���̸� ����
 
-        PlayerActor pActor = other.GetComponent<PlayerActor>();
+        PlayerActor pActor = other.transform.GetComponent<PlayerActor>();
 
         // ���� �� ĳ���Ͱ� ����� ���� ��û
         if (pActor != null && pActor.IsLocal)

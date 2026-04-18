@@ -63,7 +63,7 @@ public class UiManager : MonoBehaviour
     }
     IEnumerator TimeCount()
     {
-        Debug.Log("Å¸ÀÌ¸Ó ½ÃÀÛ");
+        Debug.Log("Å¸ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½");
         while (true)
         {
             if (p1 == null || p2 == null)
@@ -80,12 +80,12 @@ public class UiManager : MonoBehaviour
 
             if (p1 != null)
             {
-                player1Text.text = $"P1\nDIE: {p1.fallDeathCount}\nPull: {p1.pullCount}\nPush: {p1.pushCount}";
+                player1Text.text = $"{p1.transform.name}\nDIE: {p1.fallDeathCount}\nPull: {p1.pullCount}\nPush: {p1.pushCount}";
             }
 
             if (p2 != null)
             {
-                player2Text.text = $"P2\nDIE: {p2.fallDeathCount}\nPull: {p2.pullCount}\nPush: {p2.pushCount}";
+                player2Text.text = $"{p2.transform.name}\nDIE: {p2.fallDeathCount}\nPull: {p2.pullCount}\nPush: {p2.pushCount}";
             }
             yield return new WaitForSeconds(1f);
             timer++;
