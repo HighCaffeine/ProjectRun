@@ -2,31 +2,28 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public enum GimmickKey
+public enum GimmickKey : byte
 {
-    NONE,
-    BreakableWall,
-    Button,
-    MovableObject,
-    Bridge,
-    SeeSaw,
-
-    // 
-    PresurePlate,
-    FallingPlatform,
-    MovePlatform,
-
-    //환경
-    Wind,
-    Count,
+    NONE = 0,
+    BreakableWall = 1,
+    Button = 2,
+    MovableObject = 3,
+    Bridge = 4,
+    SeeSaw = 5,
+    PresurePlate = 6,
+    FallingPlatform = 7,
+    MovePlatform = 8,
+    Wind = 9,
+    NextZone = 10,
+    Count = 11
 }
 
 
 [Serializable]
 public class GimmickProperty
 {
-    public GimmickKey key;  //magnetic_force 기믹 속성용
-    public float value; //가중치
+    public GimmickKey key;
+    public float value;
 }
 
 public class GimmickInfo : MonoBehaviour

@@ -3,15 +3,18 @@ using UnityEngine;
 
 public enum eGimmickKey : byte
 {
-    BreakableWall = 0,
-    Button,
-    MovableObject,
-    Bridge,
-    SeeSaw,
-    FallingPlatform,
-    MovePlatform,
-    Wind,
-    NextZone,
+    NONE = 0,
+    BreakableWall = 1,
+    Button = 2,
+    MovableObject = 3,
+    Bridge = 4,
+    SeeSaw = 5,
+    PresurePlate = 6,
+    FallingPlatform = 7,
+    MovePlatform = 8,
+    Wind = 9,
+    NextZone = 10,
+    Count = 11
 }
 
 public enum E_PACKET
