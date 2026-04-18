@@ -30,7 +30,6 @@ public class DungeonIntroController : MonoBehaviour
             if (cam != null) cam.SetActive(false);
         }
 
-        Debug.Log("[System] 컷씬 종료 메인 카메라로 전환됩니다.");
         Match.Instance.SpawnLocalPlayer(0); // 플레이어 스폰
     }
 

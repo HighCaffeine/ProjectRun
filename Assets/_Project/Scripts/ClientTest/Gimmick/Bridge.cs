@@ -1,10 +1,12 @@
+using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Bridge : BaseGimmick
 {
     [Header("ȸ�� ��� (Pivot)")]
-    [SerializeField] private Transform pivot;
+    [SerializeField] private List<Transform> pivot;
 
     [Header("���� ����")]
     [SerializeField] private float closeAngle = 0f;
@@ -39,22 +41,35 @@ public class Bridge : BaseGimmick
 
     private IEnumerator RotateBridge(float targetAngle)
     {
-        Quaternion startRot = pivot.rotation;
-        Quaternion targetRot = Quaternion.Euler(targetAngle, pivot.eulerAngles.y, pivot.eulerAngles.z);
+        List<Quaternion> startRots = new List<Quaternion>();
+        List<Quaternion> targetRots = new List<Quaternion>();
+
+        // 초기값 저장
+        foreach (var p in pivot)
+        {
+            startRots.Add(p.rotation);
+            targetRots.Add(Quaternion.Euler(targetAngle, p.eulerAngles.y, p.eulerAngles.z));
+        }
 
         float t = 0f;
 
         while (t < 1f)
         {
             t += Time.deltaTime * speed;
-
             float smoothT = Mathf.SmoothStep(0f, 1f, t);
 
-            pivot.rotation = Quaternion.Lerp(startRot, targetRot, smoothT);
+            for (int i = 0; i < pivot.Count; i++)
+            {
+                pivot[i].rotation = Quaternion.Lerp(startRots[i], targetRots[i], smoothT);
+            }
 
             yield return null;
         }
 
-        pivot.rotation = targetRot;
+        // 마지막 보정
+        for (int i = 0; i < pivot.Count; i++)
+        {
+            pivot[i].rotation = targetRots[i];
+        }
     }
 }

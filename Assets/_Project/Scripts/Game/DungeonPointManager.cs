@@ -21,6 +21,11 @@ public class DungeonPointManager : MonoBehaviour
 
     public int mapID;
 
+
+    public int currentSectorIndex = 0;
+
+    [SerializeField]
+    private GameObject resultUI;
     void Awake()
     {
         if (instance == null)
@@ -31,6 +36,23 @@ public class DungeonPointManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        resultUI.gameObject.SetActive(false);
+    }
+    private void Update()
+    {
+        if(Input.GetKeyUp(KeyCode.Escape))
+        {
+            if (!resultUI.gameObject.activeSelf)
+            {
+                resultUI.gameObject.SetActive(true);
+
+            }
+            else
+            {
+                resultUI.gameObject.SetActive(false);
+            }
+        }
+
     }
 
     // 특정 구역의 스폰 좌표를 반환하는 함수
@@ -42,5 +64,25 @@ public class DungeonPointManager : MonoBehaviour
             return Vector3.zero;
         }
         return sectors[sectorIndex].spawnPoint.position;
+    }
+
+    public void MoveToNextSector()
+    {
+        if (currentSectorIndex + 1 >= sectors.Length)
+        {
+            Debug.Log("[Dungeon] 마지막 구역입니다.");
+            UiManager.instance.StopCount();
+            resultUI.gameObject.SetActive(true);
+            return;
+        }
+
+        currentSectorIndex++;
+
+        Vector3 spawnPos = GetSpawnPosition(currentSectorIndex);
+
+        Debug.Log($"[Dungeon] 다음 구역 이동: {currentSectorIndex}");
+
+        ActorManager.Instance.UpdateAllSpawnPoints(currentSectorIndex);
+        ActorManager.Instance.MoveAllPlayersToSector(currentSectorIndex);
     }
 }

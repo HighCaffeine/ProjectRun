@@ -14,7 +14,7 @@ public class PlayerActor : Actor
     public LayerMask targetLayer;
     [SerializeField] private Transform playerPivot;
     private CharacterController controller;
-    private Vector3 horizontalMove;
+    public Vector3 horizontalMove;
 
     public DashCameraEffect dashCameraEffect;
 
@@ -41,14 +41,19 @@ public class PlayerActor : Actor
     private int spawninDex = 0;
 
     private Vector3 platformDelta;
-    private Vector3 windDir;
-    private float windPower;
-    private bool isInWind;
+    public Vector3 windDir;
+    public float windPower;
+    public bool isInWind;
+
+    [SerializeField]
+    public bool is2p = false;
     // 상태머신 값
     public float h { private set; get; }
     public float v { private set; get; }
 
-
+    public int fallDeathCount=0;
+    public int pushCount=0;
+    public int pullCount=0;
 
 
     public Vector3 GetForward() { return playerPivot.forward; }
@@ -63,6 +68,9 @@ public class PlayerActor : Actor
         animator = GetComponentInChildren<Animator>();
         controller = GetComponent<CharacterController>();
         sm.ChangeState(new IdleState(this));
+        fallDeathCount = 0;
+        pushCount = 0;
+        pullCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
     {
@@ -75,16 +83,54 @@ public class PlayerActor : Actor
     {
         if (sm.currentState == null) return;
         horizontalMove = Vector3.zero;
+        h = 0f;
+        v = 0f;
 
-        if (IsLocal)
+        if (is2p)
         {
-            h = Input.GetAxisRaw("Horizontal");
-            v = Input.GetAxisRaw("Vertical");
+            if (Input.GetKey(KeyCode.W))
+            {
+                v += 1f;
+
+            }
+            if (Input.GetKey(KeyCode.A))
+            {
+                h -= 1f;
+            }
+            if (Input.GetKey(KeyCode.S))
+            {
+                v -= 1f;
+            }
+            if (Input.GetKey(KeyCode.D))
+            {
+                h += 1f;
+            }
         }
+        else
+        {
+              //  h = Input.GetAxisRaw("Horizontal");
+           //  v = Input.GetAxisRaw("Vertical");
+            if (Input.GetKey(KeyCode.UpArrow))
+            {
+                v += 1f;
+            }
+            if (Input.GetKey(KeyCode.DownArrow))
+            {
+                v -= 1f;
+            }
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                h -= 1f;
+            }
+            if (Input.GetKey(KeyCode.RightArrow))
+            {
+                h += 1f;
+            }
 
-        sm.Update();
+        }
+            sm.Update();
         ApplyWind();
-
+       
         if (controller != null && controller.enabled)
         {
             ApplyGravity();
@@ -101,6 +147,7 @@ public class PlayerActor : Actor
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
+       
     }
 
     public Action<string, int> OnUpdatePoint;
@@ -115,12 +162,16 @@ public class PlayerActor : Actor
         windPower = power;
         isInWind = true;
     }
-
-    public void ClearWind()
+    public void ResetWind()
     {
+        windDir = Vector3.zero;
+        windPower = 0f;
+
         isInWind = false;
+        moveSpeed = 5f;
     }
-    private void ApplyWind()
+
+    public void ApplyWind()
     {
         if (!isInWind) return;
 
@@ -176,26 +227,27 @@ public class PlayerActor : Actor
         }
     }
     //마우스 방향 보기
-    public void LookAtMouse()
+    public Vector3 GetMouseDir()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane ground = new Plane(Vector3.up, transform.position);
+        Camera cam = Camera.main;
 
-        if (ground.Raycast(ray, out float enter))
-        {
-            Vector3 hit = ray.GetPoint(enter);
-            Vector3 dir = hit - transform.position;
-            dir.y = 0; // 수평 회전만
+        Vector3 playerScreen = cam.WorldToScreenPoint(transform.position);
+        Vector3 mouse = Input.mousePosition;
 
-            if (playerPivot != null)
-            {
-                playerPivot.rotation = Quaternion.LookRotation(dir);
-            }
-            else
-            {
-                transform.rotation = Quaternion.LookRotation(dir);
-            }
-        }
+        Vector3 screenDir = mouse - playerScreen;
+
+        Vector3 forward = cam.transform.forward;
+        Vector3 right = cam.transform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 worldDir = right * screenDir.x + forward * screenDir.y;
+
+        return worldDir.normalized;
     }
 
     public void LookAtDirection(Vector3 dir)
@@ -302,6 +354,7 @@ public class PlayerActor : Actor
             controller.enabled = false;
             playerPivot.gameObject.SetActive(false);
             StartCoroutine(RespawnAfterDelay(spawnDelay, pos));
+            fallDeathCount++;
         }
     }
 
@@ -450,5 +503,38 @@ public class PlayerActor : Actor
 
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
+    }
+    void OnDrawGizmosSelected()
+    {
+        float maxDistance = 3f;   // Push 거리
+        float maxAngle = 30f;     // Push 각도
+
+        Vector3 origin = transform.position;
+        origin.y += 0.1f;
+
+        Vector3 forward = is2p ? GetForward() : playerPivot.transform.forward;
+
+        Gizmos.color = Color.red;
+
+        int segments = 20;
+        float angleStep = (maxAngle * 2) / segments;
+
+        Vector3 prevPoint = origin + Quaternion.Euler(0, -maxAngle, 0) * forward * maxDistance;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = -maxAngle + angleStep * i;
+            Vector3 nextPoint = origin + Quaternion.Euler(0, angle, 0) * forward * maxDistance;
+
+            Gizmos.DrawLine(prevPoint, nextPoint);
+            prevPoint = nextPoint;
+        }
+
+        // 양쪽 경계선
+        Vector3 left = Quaternion.Euler(0, -maxAngle, 0) * forward;
+        Vector3 right = Quaternion.Euler(0, maxAngle, 0) * forward;
+
+        Gizmos.DrawLine(origin, origin + left * maxDistance);
+        Gizmos.DrawLine(origin, origin + right * maxDistance);
     }
 }

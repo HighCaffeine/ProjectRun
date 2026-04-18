@@ -48,6 +48,15 @@ public class KnockbackState : IState
 
         actor.animator.SetTrigger("Knockback");
         actor.PlayTravelSpark(actionType);
+
+        if(isPull)
+        {
+            actor.pullCount++;     
+        }
+        else
+        {
+            actor.pushCount++;      
+        }
     }
 
     public void Execute()
@@ -75,6 +84,7 @@ public class KnockbackState : IState
         {
             float decayFactor = 1f - (Mathf.Log(1 + K * t) / Mathf.Log(1 + K));
             currentPower = initialPower * decayFactor;
+
         }
 
         if (isPull)
@@ -89,9 +99,38 @@ public class KnockbackState : IState
                 timer = DURATION;
             }
         }
+        Vector3 windDir = actor.windDir;
+        float windPower = actor.windPower;
 
-        // 이동
-        actor.Move(knockbackDir, currentPower);
+        // 방향 관계
+        float dot = Vector3.Dot(knockbackDir, windDir);
+
+        // 가속/감속 계수
+        float windFactor = 1f;
+
+        if (dot > 0f)
+        {
+            // 순풍 → 가속
+            windFactor = 1f + (dot * 0.7f); // 최대 1.7배
+        }
+        else if (dot < 0f)
+        {
+            // 역풍 → 감속
+            windFactor = 1f + (dot * 0.7f); // 최소 0.3배
+        }
+
+        // 최종 힘
+        float finalPower = currentPower * windFactor;
+
+        // 옆바람도 살짝 반영하고 싶으면 추가
+        Vector3 sideWind = windDir * windPower * 0.2f;
+
+        // 최종 이동
+        Vector3 finalForce = (knockbackDir * finalPower) + sideWind;
+
+        actor.Move(finalForce.normalized, finalForce.magnitude);
+
+        // actor.Move(knockbackDir, currentPower);
 
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
@@ -120,7 +159,6 @@ public class KnockbackState : IState
                     Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
                 }
                 actor.PlayBrakeParticles();
-
                 actor.sm.ChangeState(new IdleState(actor));
 
                 return;

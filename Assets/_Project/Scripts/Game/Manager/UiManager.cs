@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,14 +8,39 @@ using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.Rendering.DebugUI;
 public class UiManager : MonoBehaviour
 {
-    [SerializeField] private GameObject countPanel;
-    [SerializeField] private TextMeshProUGUI countText;
+    public static UiManager instance;  
+
     private Coroutine countdownCoroutine;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    float timer=0f;
+
+    [SerializeField]
+    private TextMeshProUGUI timeText;
+    [SerializeField]
+    private TextMeshProUGUI goldText;
+    [SerializeField]
+    private TextMeshProUGUI player1Text;
+    [SerializeField]
+    private TextMeshProUGUI player2Text;
+
+    [SerializeField]
+    PlayerActor p1;
+    [SerializeField]
+    PlayerActor p2;
+
 
     private void Awake()
     {
-        
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            instance.gameObject.SetActive(false);
+
+        }
+        timer = 0f;
     }
 
 
@@ -24,29 +50,47 @@ public class UiManager : MonoBehaviour
         {
             StopCoroutine(countdownCoroutine);
         }
-        countdownCoroutine = StartCoroutine(TimeCount(5f));
+        countdownCoroutine = StartCoroutine(TimeCount());
     }
     public void StopCount()
     {
         if (countdownCoroutine != null)
         {
             StopCoroutine(countdownCoroutine);
+            
             countdownCoroutine = null;
         }
-        countPanel.gameObject.SetActive(false);
     }
-    IEnumerator TimeCount(float time)
+    IEnumerator TimeCount()
     {
-        countPanel.gameObject.SetActive(true);
-        while (time > 0)
+        Debug.Log("타이머 시작");
+        while (true)
         {
-            countText.text = time.ToString();
+            if (p1 == null || p2 == null)
+            {
+                if (ActorManager.Instance != null)
+                {
+                    if (p1 == null)
+                        p1 = ActorManager.Instance.GetPlayer(false);
+
+                    if (p2 == null)
+                        p2 = ActorManager.Instance.GetPlayer(true);
+                }
+            }
+
+            if (p1 != null)
+            {
+                player1Text.text = $"P1\nDIE: {p1.fallDeathCount}\nPull: {p1.pullCount}\nPush: {p1.pushCount}";
+            }
+
+            if (p2 != null)
+            {
+                player2Text.text = $"P2\nDIE: {p2.fallDeathCount}\nPull: {p2.pullCount}\nPush: {p2.pushCount}";
+            }
             yield return new WaitForSeconds(1f);
-            time--;
+            timer++;
         }
-        countText.text = "START!";
-        yield return new WaitForSeconds(1f);
-        countPanel.gameObject.SetActive(false);
+
     }
 
 

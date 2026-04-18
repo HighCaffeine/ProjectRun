@@ -289,6 +289,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
+                    if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
+                    {
+                        targetGimmick.Execute(ntf);
+                    }
+                    break;
+
                     // Next 구역 텔레포트
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {

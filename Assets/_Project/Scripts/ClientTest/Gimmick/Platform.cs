@@ -2,19 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Platform : BaseGimmick
+public class Platform : MonoBehaviour
 {
-    [SerializeField]
-    bool isMove = false;
-    [SerializeField]
-    private bool hasStarted = false;
-    [SerializeField]
-    GameObject startPos;
-    [SerializeField]
-    GameObject endPos;
-
-    [SerializeField]
-    float moveSpeed = 3f;
+    [Header("이동 설정")]
+    [SerializeField] private Transform startPos;
+    [SerializeField] private Transform endPos;
+    [SerializeField] private float moveSpeed = 3f;
 
     [SerializeField]
     private List<PlayerActor> players = new List<PlayerActor>();
@@ -23,91 +16,55 @@ public class Platform : BaseGimmick
     public void SetStartPos(GameObject start) { startPos = start; }
     public void SetEndPos(GameObject end) { endPos = end; }
 
-    void Start()
+    private void Start()
     {
         lastPos = transform.position;
+        StartCoroutine(MoveLoop()); // 시작하자마자 이동
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (isMove)
-        {
-            StartCoroutine(MoveLoop());
-            isMove = false; // �� ���� �̵� �����ϵ��� ���� 
-        }
-    }
-    void LateUpdate()
+    private void LateUpdate()
     {
         Vector3 delta = transform.position - lastPos;
 
         foreach (var actor in players)
         {
-            actor.SetPlatformDelta(delta);
+            if (actor != null)
+                actor.SetPlatformDelta(delta);
         }
 
         lastPos = transform.position;
     }
 
-    public override void Execute(P_GimmickInteractNtf ntf)
+    public void AddPlayer(PlayerActor actor)
     {
-        // 이동 시작 명령이 오면 1회만 코루틴 실행
-        if (ntf.state == (byte)eGimmickState.On_Activate && !hasStarted)
+        if (actor == null) return;
+
+        if (!players.Contains(actor))
         {
-            hasStarted = true;
-            StartCoroutine(MoveLoop());
+            players.Add(actor);
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void RemovePlayer(PlayerActor actor)
     {
-        // 탑승자 등록만 수행
-        PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null) players.Add(actor);
+        if (actor == null) return;
+
+        if (players.Contains(actor))
+        {
+            players.Remove(actor);
+        }
     }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player")) other.transform.SetParent(null);
-        PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null) players.Remove(actor);
-    }
-
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (other.CompareTag("Player") && !hasStarted)
-    //     {
-    //         hasStarted = true;
-    //         Debug.Log("�÷��̾ �÷����� ���Խ��ϴ�.");
-    //         isMove = true;
-    //     }
-
-    //     PlayerActor actor = other.GetComponent<PlayerActor>();
-    //     if (actor != null)
-    //     {
-    //         players.Add(actor);
-    //     }
-    // }
-
-    // private void OnTriggerExit(Collider other)
-    // {
-    //     if (other.CompareTag("Player"))
-    //     {
-    //         other.transform.SetParent(null); // �÷��̾ �÷������� �и�
-    //     }
-
-    //     PlayerActor actor = other.GetComponent<PlayerActor>();
-    //     if (actor != null)
-    //     {
-    //         players.Remove(actor);
-    //     }
-    // }
 
     IEnumerator MoveTo(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.1f)
+        while (Vector3.Distance(transform.position, target) > 0.05f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
+
             yield return null;
         }
     }
@@ -116,17 +73,8 @@ public class Platform : BaseGimmick
     {
         while (true)
         {
-            yield return MoveTo(endPos.transform.position);
-            yield return new WaitForSeconds(3f); // ���� �� 1�� ���
-            yield return MoveTo(startPos.transform.position);
-            yield return new WaitForSeconds(3f); // ��� �� 1�� ���
+            yield return MoveTo(endPos.position);
+            yield return MoveTo(startPos.position);
         }
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (startPos == null || endPos == null) return;
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(startPos.transform.position, endPos.transform.position);
     }
 }
