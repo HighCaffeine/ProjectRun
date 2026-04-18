@@ -49,6 +49,7 @@ public class MoveState : IState
         actor.sendTimer += Time.deltaTime;
         if (actor.sendTimer >= PlayerActor.sendInterval)
         {
+            
             actor.SendMovePacket(actor.h, actor.v);
             actor.sendTimer = 0f;
         }

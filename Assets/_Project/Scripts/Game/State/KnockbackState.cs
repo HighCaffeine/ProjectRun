@@ -55,7 +55,7 @@ public class KnockbackState : IState
             Debug.Log(actor.gameObject.name + "pull :" + actor.pullCount);      
         }
         else
-        {
+        {   
             actor.pushCount++;
             Debug.Log(actor.gameObject.name + "push :" + actor.pushCount);
         }

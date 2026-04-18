@@ -142,9 +142,27 @@ public class PlayerActor : Actor
                 controller.Move(platformDelta);
                 platformDelta = Vector3.zero;
             }
+            Vector3 move = horizontalMove;
 
-            // 바람과 중력이 모두 적용된 최종 이동 벡터
-            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+            if (move != Vector3.zero)
+            {
+                RaycastHit hit;
+                float checkDistance = 0.6f;
+                Vector3 origin = transform.position + Vector3.up * 0.3f;
+
+                if (Physics.Raycast(origin, move.normalized, out hit, checkDistance))
+                {
+                    float dot = Vector3.Dot(hit.normal, Vector3.up);
+
+                    if (dot < 0.3f) // 거의 수직면일 때만
+                    {
+                        move = Vector3.ProjectOnPlane(move, hit.normal);
+                    }
+                }
+            }
+            // 최종 이동
+            Vector3 finalMove = move + (Vector3.up * verticalVelocity);
+
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
