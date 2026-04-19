@@ -295,8 +295,8 @@ public class MapEditorVer2 : EditorWindow
                     var fallingObj = gimmickObj.GetComponentInChildren<ReMovePlatform>();
                     if (fallingObj != null)
                     {
-                        fallingObj.SetStartPos(startPivot);
-                        fallingObj.SetEndPos(endPivot);
+                        // fallingObj.SetStartPos(startPivot);
+                        // fallingObj.SetEndPos(endPivot);
                     }
                     break;
             }

@@ -13,10 +13,13 @@ public class NextZone : MonoBehaviour
         {
             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetSectorIndex);
 
+            Debug.Log(destPos);
+
+            actor.OnUpdatePoint?.Invoke(actor.name, targetSectorIndex);
+            
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
             {
-                actor.OnUpdatePoint?.Invoke(actor.name, targetSectorIndex);
-                return; // 오프라인 테스트 모드에서는 텔레포트 비활성화
+                return; 
             }
             if (!Client.IS_SERVER_PLAY || Match.Instance.isDebugMode)
             {

@@ -14,6 +14,7 @@ public class Platform : BaseGimmick
     private P_GimmickInteractReq pkt;
     private float sendTimer = 0f; // 패킷 전송 타이머
     private Vector3 targetSyncPos;
+    
 
     public void SetStartPos(GameObject start) { startPos = start.transform; }
     public void SetEndPos(GameObject end) { endPos = end.transform; }
@@ -40,9 +41,23 @@ public class Platform : BaseGimmick
 
     private void Update()
     {
-        if (!GameManager.Instance.isHost)
+        if (GameManager.Instance.isHost)
         {
-            transform.position = Vector3.Lerp(transform.position, targetSyncPos, Time.deltaTime * 5f);
+            if (Client.IS_SERVER_PLAY)
+            {
+                sendTimer += Time.deltaTime;
+                if (sendTimer >= 0.1f)
+                {
+                    pkt.targetPos.Set(transform.position);
+                    Client.UDP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, pkt);
+                    
+                    sendTimer = 0f;
+                }
+            }
+        }
+        else
+        {
+            transform.position = Vector3.Lerp(transform.position, targetSyncPos, Time.deltaTime * moveSpeed * 3f);
         }
     }
 
@@ -52,21 +67,13 @@ public class Platform : BaseGimmick
 
         foreach (var actor in players)
         {
-            if (actor != null && actor.IsLocal) actor.SetPlatformDelta(delta);
-        }
-        lastPos = transform.position;
-
-        if (GameManager.Instance.isHost)
-        {
-            sendTimer += Time.deltaTime;
-            if (sendTimer >= 0.1f)
+            if (actor != null && actor.IsLocal) 
             {
-                v.Set(transform.position);
-                pkt.targetPos.Set(transform.position);
-                Client.UDP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, pkt);
-                sendTimer = 0f;
+                actor.SetPlatformDelta(delta);
             }
         }
+        
+        lastPos = transform.position;
     }
 
     public void AddPlayer(PlayerActor actor)
@@ -111,14 +118,14 @@ public class Platform : BaseGimmick
         }
     }
 
-    public override void Execute(P_GimmickInteractNtf ntf)
+    public override void Execute(P_GimmickInteractNtf ntf) 
     {
-        if (GameManager.Instance.isHost) return;
+        Debug.Log($"[Platform Execute ntf] {((eGimmickKey)pkt.gimmickKey).ToString()}, {pkt.targetPos}, isHost : {GameManager.Instance.isHost}");
 
-        // 클라이언트는 도착한 좌표를 목표지점으로 갱신
-        if (ntf.state == (byte)eGimmickState.Sync)
+        if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost) 
         {
             targetSyncPos = ntf.targetPos.ToVector3();
+            Debug.Log(targetSyncPos);
         }
     }
 }

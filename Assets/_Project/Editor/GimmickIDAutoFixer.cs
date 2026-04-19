@@ -3,8 +3,28 @@ using UnityEditor;
 
 public class GimmickAutoFixer : Editor
 {
-    [MenuItem("Tools/GimmickIDAutoFixer")]
-    public static void FixAllExistingGimmicks()
+    // 기믹 타입을 판별하는 헬퍼 함수
+    private static int GetGimmickKeyType(BaseGimmick gimmick)
+    {
+        if (gimmick is Bridge) return 4;           // Bridge
+        if (gimmick is ReMovePlatform) return 7;   // FallingPlatform
+        if (gimmick is Platform) return 8;         // MovePlatform
+        if (gimmick is SeesawTrigger) return 5;    // SeeSaw
+        // if (gimmick is MovableGimmick) return 3; // MovableObject
+        return 1; // BreakableWall (기본값)
+    }
+
+    private static string GetGimmickTypeName(BaseGimmick gimmick)
+    {
+        if (gimmick is Bridge) return "Bridge";
+        if (gimmick is ReMovePlatform) return "FallingPlatform";
+        if (gimmick is Platform) return "MovePlatform";
+        if (gimmick is SeesawTrigger) return "SeeSaw";
+        return "BreakableWall";
+    }
+
+    [MenuItem("Tools/GimmickAutoFixer")]
+    public static void FixAndLinkAllGimmicks()
     {
         BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
         int fixedCount = 0;
@@ -24,16 +44,23 @@ public class GimmickAutoFixer : Editor
             if (info != null)
             {
                 info.gimmick_id = uid;
-
-                // 타입 자동 추론
-                if (gimmick is Bridge) info.gimmick_type = "Bridge";
-                else if (gimmick is ReMovePlatform) info.gimmick_type = "FallingPlatform";
-                else if (gimmick is Platform) info.gimmick_type = "MovePlatform";
-                else if (gimmick is SeesawTrigger) info.gimmick_type = "SeeSaw";
-                // else if (gimmick is MovableGimmick) info.gimmick_type = "MovableObject";
-                else info.gimmick_type = "BreakableWall";
-
+                info.gimmick_type = GetGimmickTypeName(gimmick);
                 EditorUtility.SetDirty(info);
+            }
+
+            GimmickTrigger trigger = gimmick.GetComponent<GimmickTrigger>();
+            if (trigger == null) trigger = gimmick.GetComponentInChildren<GimmickTrigger>();
+
+            if (trigger != null)
+            {
+                TargetGimmickInfo tInfo = new TargetGimmickInfo();
+                tInfo.gimmickID = uid;
+                
+                tInfo.gimmickKey = (GimmickKey)GetGimmickKeyType(gimmick); 
+
+                trigger.targetGimmicks.Clear();
+                trigger.targetGimmicks.Add(tInfo);
+                EditorUtility.SetDirty(trigger);
             }
 
             Transform parentT = gimmick.transform.parent;
@@ -50,6 +77,6 @@ public class GimmickAutoFixer : Editor
             fixedCount++;
         }
 
-        Debug.Log($"<color=cyan>[완료]</color> 총 {fixedCount}개의 기믹에 ID, Type, Tag 설정 완료");
+        Debug.Log($"<color=cyan>[완료]</color> 총 {fixedCount}개의 기믹 세팅 및 트리거 자동 연결");
     }
 }

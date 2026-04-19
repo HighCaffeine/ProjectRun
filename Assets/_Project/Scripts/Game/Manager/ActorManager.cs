@@ -34,6 +34,8 @@ public class ActorManager : GenericSingleton<ActorManager>
     {
         bool isLocal = (name == localID);
 
+        if (!actors.ContainsKey(name)) return;
+
         PlayerActor actor = actors[name];
 
         string spawnInfo = spawnPoints[name];
@@ -70,6 +72,8 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     public void UpdateSpawnIndex(string playerName, int newSectorIndex)
     {
+        Debug.Log($"[UpdateSpawnIndex] {playerName}_{newSectorIndex}");
+
         if (spawnPoints.ContainsKey(playerName))
         {
             string current = spawnPoints[playerName];

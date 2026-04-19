@@ -91,48 +91,9 @@ public class PlayerActor : Actor
         h = 0f;
         v = 0f;
 
-        if (is2p)
-        {
-            if (Input.GetKey(KeyCode.W))
-            {
-                v += 1f;
-
-            }
-            if (Input.GetKey(KeyCode.A))
-            {
-                h -= 1f;
-            }
-            if (Input.GetKey(KeyCode.S))
-            {
-                v -= 1f;
-            }
-            if (Input.GetKey(KeyCode.D))
-            {
-                h += 1f;
-            }
-        }
-        else
-        {
-            //  h = Input.GetAxisRaw("Horizontal");
-            //  v = Input.GetAxisRaw("Vertical");
-            if (Input.GetKey(KeyCode.UpArrow))
-            {
-                v += 1f;
-            }
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                v -= 1f;
-            }
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                h -= 1f;
-            }
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                h += 1f;
-            }
-
-        }
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+        
         sm.Update();
         ApplyWind();
 

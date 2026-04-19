@@ -166,6 +166,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     // 서버가 지정한 방장 UUID가 내 UUID와 같다면 나는 방장
                     GameManager.Instance.isHost = (hostPkt.hostUUID == LocalPlayerInfo.ID);
 
+                    Debug.Log($"[Room Host NTF]{hostPkt.hostUUID}");
+                    Debug.Log($"[Room Host NTF]{LocalPlayerInfo.ID}");
+
                     if (GameManager.Instance.isHost)
                     {
                         Debug.Log("[System] 호스트가 되었습니다");
@@ -295,18 +298,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
-                    {
-                        targetGimmick.Execute(ntf);
-                    }
-                    break;
-
                     // Next 구역 텔레포트
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            Vector3 destPos = ntf.targetPos.ToVector3();
+                            int nextSpawnIndex = (int)ntf.param; 
+                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(nextSpawnIndex);
 
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
                             if (controller != null) controller.enabled = false;
@@ -319,22 +317,26 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
                             if (pActor != null)
                             {
-                                int nextSpawnIndex = (int)ntf.param;
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
                             }
                         }
                         break;
                     }
 
-                    BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
-                    foreach (var gimmick in allGimmicks)
+                    if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
                     {
-                        if (gimmick.gimmickUID == ntf.gimmickID)
-                        {
-                            gimmick.Execute(ntf);
-                            break;
-                        }
+                        targetGimmick.Execute(ntf);
                     }
+
+                    // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
+                    // foreach (var gimmick in allGimmicks)
+                    // {
+                    //     if (gimmick.gimmickUID == ntf.gimmickID)
+                    //     {
+                    //         gimmick.Execute(ntf);
+                    //         break;
+                    //     }
+                    // }
                     break;
                 }
             case E_PACKET.PLAYER_DEAD_NTF:
@@ -572,6 +574,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             }
             else // 리모트 플레이어
             {
+                //임시 테스트 is2p
+                pActor.is2p = true;
+
                 Collider[] existingCols = playerObj.GetComponents<Collider>();
                 foreach (var c in existingCols) Destroy(c);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");

@@ -89,6 +89,7 @@ public class ActionState : IState
                     if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
                     {
                         Player targetPlayer = targetActor.GetComponent<Player>();
+                        pulldir *= actionType == eState.Push ?  1.0f : -1.0f;
                         actor.SendStateChange(eState.Knockback, pulldir, pushForce * pow, targetPlayer.ID);
                     }
                     else
