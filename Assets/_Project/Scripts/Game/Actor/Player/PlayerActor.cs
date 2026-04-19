@@ -11,6 +11,8 @@ public class PlayerActor : Actor
 
     const float CAMERA_SHAKE = 1.0f;
 
+    private P_PlayerMovement movePkt;
+
     [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
     public float PushMulti => pushMulti;
 
@@ -76,6 +78,16 @@ public class PlayerActor : Actor
         fallDeathCount = 0;
         pushCount = 0;
         pullCount = 0;
+
+        movePkt = new P_PlayerMovement
+        {
+            userUUID = LocalPlayerInfo.ID,
+            inputSeq = 0,
+            currentPos = new P_PacketVector3(),
+            currentRot = new P_PacketQuaternion(),
+            axisH = 0.0f,
+            axisV = 0.0f
+        };
     }
     void OnApplicationFocus(bool hasFocus)
     {
@@ -93,7 +105,7 @@ public class PlayerActor : Actor
 
         h = Input.GetAxisRaw("Horizontal");
         v = Input.GetAxisRaw("Vertical");
-        
+
         sm.Update();
         ApplyWind();
 
@@ -114,6 +126,21 @@ public class PlayerActor : Actor
             controller.Move(finalMove * safeDelta);
         }
 
+        if (IsLocal && Client.IS_SERVER_PLAY)
+        {
+            sendTimer += Time.deltaTime;
+            if (sendTimer >= sendInterval)
+            {
+                // 조건: 1. 키보드를 누르고 있거나
+                //       2. 바닥에 닿아있지 않거나 (밀치기로 떴거나 떨어지는 중)
+                //       3. 바람이나 넉백으로 강제 이동 중일 때 (velocity > 0)
+                if (h != 0 || v != 0 || !controller.isGrounded || controller.velocity.sqrMagnitude > 0.01f)
+                {
+                    SendMovePacket(h, v);
+                }
+                sendTimer = 0f;
+            }
+        }
     }
 
     public Action<string, int> OnUpdatePoint;
@@ -419,21 +446,12 @@ public class PlayerActor : Actor
     {
         if (!IsLocal) return;
 
-        P_PlayerMovement pkt = new P_PlayerMovement
-        {
-            userUUID = LocalPlayerInfo.ID,
-            inputSeq = ++inputSeq,
-            currentPos = new P_PacketVector3(),
-            currentRot = new P_PacketQuaternion(),
-            axisH = axisH,
-            axisV = axisV
-        };
-        pkt.currentPos.Set(transform.position);
-        pkt.currentRot.Set(playerPivot.rotation);
+        movePkt.currentPos.Set(transform.position);
+        movePkt.currentRot.Set(playerPivot.rotation);
 
         //byte[] data = SerializePlayerMovement(pkt);
         //byte[] data = PacketSerializer.Serialize(pkt);
-        Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
+        Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, movePkt);
     }
     public static byte[] SerializePlayerMovement(P_PlayerMovement pkt)
     {

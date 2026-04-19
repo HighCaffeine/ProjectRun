@@ -17,9 +17,9 @@ public class MoveState : IState
         //밀당 체크
         if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
         if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
-        
+
         //대쉬 체크
-       // if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        // if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
 
         // 멈춤 체크
         if (actor.h == 0 && actor.v == 0)
@@ -36,17 +36,17 @@ public class MoveState : IState
         // 회전
         actor.LookAtDirection(moveDir);
 
-        // 이동 및 패킷 전송
-        actor.Move(moveDir, actor.moveSpeed);
+        // 이동 및 패킷 전송 (Actor에서 전송)
+        // actor.Move(moveDir, actor.moveSpeed);
 
-        actor.sendTimer += Time.deltaTime;
-        if (actor.sendTimer >= PlayerActor.sendInterval)
-        {
-            actor.SendMovePacket(actor.h, actor.v);
-            actor.sendTimer = 0f;
-        }
+        // actor.sendTimer += Time.deltaTime;
+        // if (actor.sendTimer >= PlayerActor.sendInterval)
+        // {
+        //     actor.SendMovePacket(actor.h, actor.v);
+        //     actor.sendTimer = 0f;
+        // }
     }
-    public void Exit() 
+    public void Exit()
     {
         actor.animator.SetBool("Move", false);
         actor.SendMovePacket(0f, 0f);

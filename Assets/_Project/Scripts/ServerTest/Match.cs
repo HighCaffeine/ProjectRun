@@ -298,12 +298,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
+                    Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            int nextSpawnIndex = (int)ntf.param; 
+                            int nextSpawnIndex = (int)ntf.param;
                             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(nextSpawnIndex);
 
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
@@ -323,9 +324,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         break;
                     }
 
+                    Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
+
                     if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
                     {
                         targetGimmick.Execute(ntf);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[GIMMICK] ID {ntf.gimmickID} 캐시에 없음! 등록된 키: {string.Join(", ", _gimmickCache.Keys)}");
                     }
 
                     // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
