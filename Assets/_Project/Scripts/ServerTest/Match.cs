@@ -263,15 +263,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 5:
                                 if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
                                 {
-                                    Debug.Log($"[Packet] {pActor.gameObject.name} 연속 넉백 패킷 무시");
                                     break;
                                 }
 
                                 pActor.lastKnockbackTime = Time.time;
 
-                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, false, Vector3.zero));
+                                bool pullFlag = (statePkt.isPull == 1);
+                                Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+
+                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos));
+                                
                                 break;
                             case 6:
+                                if (pActor.ignoreServerPosTimer > 0) return;
                                 pActor.sm.ChangeState(new TeleportState(pActor, statePkt.targetDir.ToVector3()));
                                 break;
                         }
@@ -298,7 +302,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
+                    //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {
@@ -311,20 +315,22 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             if (controller != null) controller.enabled = false;
 
                             targetPlayer.transform.position = destPos;
+                            Physics.SyncTransforms();
                             targetPlayer.SetPos(destPos);
-
                             if (controller != null) controller.enabled = true;
 
                             PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
                             if (pActor != null)
                             {
+                                pActor.ignoreServerPosTimer = 0.5f;
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
+                                //ActorManager.Instance.OnPlayerDeadTestSpawn(pActor.gameObject.name,)
                             }
                         }
                         break;
                     }
 
-                    Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
+                    //Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
 
                     if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
                     {
@@ -374,9 +380,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     Debug.Log("<color=cyan>[System] 던전 클리어</color>");
 
-                    // 결과 UI 창 띄우기 (몇 초간 대기)
-                    // 비동기 마을 씬 로딩 호출
-                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
+                    GameManager.Instance.Invoke("LoadLobby", 10.0f);
                     break;
                 }
             case E_PACKET.MOVE_PATH_RESPONSE:
@@ -578,6 +582,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+
+                ActorManager.Instance.p1 = pActor;
             }
             else // 리모트 플레이어
             {
@@ -601,6 +607,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 rb.useGravity = false;
                 rb.isKinematic = true;
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                ActorManager.Instance.p2 = pActor;
             }
 
             Player player = playerObj.GetComponent<Player>();
@@ -622,14 +629,35 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         if (DungeonPointManager.Instance == null) return;
 
         Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
-        AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+        Player p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
 
         if (Client.IS_SERVER_PLAY)
         {
+            PlayerActor pActor = p.GetComponent<PlayerActor>();
+
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
             Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
+
+            pActor.SetControllerEnabled(false);
+            pActor.transform.position = spawnPos; 
+            pActor.SetControllerEnabled(true);
+
+            Physics.SyncTransforms();
+
+            if (pActor.IsLocal) 
+            {
+                StartCoroutine(SendInitialPositionDelay(pActor));
+            }
         }
+    }
+
+    private IEnumerator SendInitialPositionDelay(PlayerActor pActor)
+    {
+        yield return new WaitForFixedUpdate(); 
+
+        pActor.SendMovePacket(0.0f, 0.0f); 
+        Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
     }
 
     private void RemovePlayer(long id)

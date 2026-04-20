@@ -31,10 +31,16 @@ public class ReMovePlatform : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
+        Debug.Log($"[ReMove Platform] {ntf.state}, {((eGimmickKey)ntf.gimmickKey).ToString()}");
         if (ntf.state == (byte)eGimmickState.On_Activate && !isRestoring)
         {
+            Debug.Log($"[ReMove Platform] Execute");
             if (currentCoroutine != null) StopCoroutine(currentCoroutine);
             currentCoroutine = StartCoroutine(RemoveSequence());
+        }
+        else if (ntf.state == (byte)eGimmickState.Restore)
+        {
+            currentCoroutine = StartCoroutine(RestorePlatform());
         }
     }
 
@@ -70,6 +76,8 @@ public class ReMovePlatform : BaseGimmick
 
     IEnumerator RemoveSequence()
     {
+        Debug.Log($"[ReMove Platform] RemoveSequence");
+
         isRestoring = true;
         yield return new WaitForSeconds(0.5f);
 
@@ -82,7 +90,7 @@ public class ReMovePlatform : BaseGimmick
 
         yield return new WaitForSeconds(respawnDelay);
 
-        currentCoroutine = StartCoroutine(RestorePlatform());
+        //currentCoroutine = StartCoroutine(RestorePlatform());
     }
 
     IEnumerator RestorePlatform()

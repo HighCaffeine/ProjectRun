@@ -58,6 +58,27 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     }
 
+    public void OnPlayerDeadTestSpawn(string name, float time = 0.0f)
+    {
+        bool isLocal = (name == localID);
+
+        if (!actors.ContainsKey(name)) return;
+
+        PlayerActor actor = actors[name];
+
+        string spawnInfo = spawnPoints[name];
+        string[] split = spawnInfo.Split('_');
+
+
+        int mapLevel = int.Parse(split[0]);
+        int spawnIndex = int.Parse(split[1]);
+        //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapID, spawnIndex);
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
+        SendPlayerDeadPacket(name, spawnPos);
+
+        actor.PlayerDead(spawnPos, time);
+    }
+
     public void AddPlayer(PlayerActor actor)
     {
         string actorID = actor.gameObject.name;

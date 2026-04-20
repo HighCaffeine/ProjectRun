@@ -4,6 +4,8 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
+    public float ignoreServerPosTimer = 0f;
+
     public float lastSkillUseTime = -999f;
     public const float SKILL_COOLDOWN = 1.0f;
     public float lastKnockbackTime = -999f;
@@ -16,7 +18,7 @@ public class PlayerActor : Actor
     [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
     public float PushMulti => pushMulti;
 
-    public float moveSpeed = 5.0f;
+    public float moveSpeed = 7.5f;
     private bool wasMoving = false;
     public LayerMask targetLayer;
     [SerializeField] private Transform playerPivot;
@@ -35,7 +37,7 @@ public class PlayerActor : Actor
 
     [Header("Visual Effects")]
     public TrailRenderer trailRenderer;
-    public ParticleSystem travelSparkParticle;
+    public ParticleSystem[] travelSparkParticle;
     public ParticleSystem[] brakeParticle;
 
     [Header("Gravity Settings")]
@@ -109,19 +111,38 @@ public class PlayerActor : Actor
         sm.Update();
         ApplyWind();
 
+        bool movedByPlatform = (platformDelta != Vector3.zero);
+
         if (controller != null && controller.enabled)
         {
             ApplyGravity();
 
-            // 플랫폼(이동 발판) 델타 이동 우선 적용
-            if (platformDelta != Vector3.zero)
+            if (movedByPlatform)
             {
                 controller.Move(platformDelta);
-                platformDelta = Vector3.zero;
             }
 
-            // 바람과 중력이 모두 적용된 최종 이동 벡터
-            Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+            Vector3 move = horizontalMove;
+
+            if (move != Vector3.zero)
+            {
+                RaycastHit hit;
+                float checkDistance = 0.6f;
+                Vector3 origin = transform.position + Vector3.up * 0.3f;
+
+                if (Physics.Raycast(origin, move.normalized, out hit, checkDistance, ~0, QueryTriggerInteraction.Ignore))
+                {
+                    float dot = Vector3.Dot(hit.normal, Vector3.up);
+
+                    if (dot < 0.3f) // 거의 수직면일 때만
+                    {
+                        move = Vector3.ProjectOnPlane(move, hit.normal);
+                    }
+                }
+            }
+            // 최종 이동
+            Vector3 finalMove = move + (Vector3.up * verticalVelocity);
+
             float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
             controller.Move(finalMove * safeDelta);
         }
@@ -131,18 +152,21 @@ public class PlayerActor : Actor
             sendTimer += Time.deltaTime;
             if (sendTimer >= sendInterval)
             {
-                // 조건: 1. 키보드를 누르고 있거나
-                //       2. 바닥에 닿아있지 않거나 (밀치기로 떴거나 떨어지는 중)
-                //       3. 바람이나 넉백으로 강제 이동 중일 때 (velocity > 0)
-                if (h != 0 || v != 0 || !controller.isGrounded || controller.velocity.sqrMagnitude > 0.01f)
+                if (movedByPlatform || h != 0 || v != 0 || !controller.isGrounded || controller.velocity.sqrMagnitude > 0.01f)
                 {
                     SendMovePacket(h, v);
                 }
                 sendTimer = 0f;
             }
         }
-    }
 
+        if (ignoreServerPosTimer > 0)
+        {
+            ignoreServerPosTimer -= Time.deltaTime;
+        }
+
+        platformDelta = Vector3.zero;
+    }
     public Action<string, int> OnUpdatePoint;
 
     public void Move(Vector3 dir, float speed)
@@ -161,7 +185,7 @@ public class PlayerActor : Actor
         windPower = 0f;
 
         isInWind = false;
-        moveSpeed = 5f;
+        moveSpeed = 7.5f;
     }
 
     public void ApplyWind()
@@ -181,19 +205,19 @@ public class PlayerActor : Actor
         Vector3 moveDir = move.normalized;
         float dot = Vector3.Dot(moveDir, windDir);
 
-        moveSpeed = 5f; // 기본 이동 속도로 초기화
+        moveSpeed = 7.5f; // 기본 이동 속도로 초기화
         //  역방향 (감속)
         if (dot < 0f)
         {
             //horizontalMove -= moveDir * windPower;
-            moveSpeed = moveSpeed * 0.3f;
+            moveSpeed = moveSpeed * 0.5f;
             Debug.Log("[Wind] Decelerate");
         }
         // 정방향 (가속)
         else
         {
             //  horizontalMove += windDir * windPower;
-            moveSpeed = moveSpeed * 1.7f;
+            moveSpeed = moveSpeed * 1.4f;
             Debug.Log("[Wind] Accelerate");
         }
     }
@@ -274,49 +298,57 @@ public class PlayerActor : Actor
     public void PlayTravelSpark(eState actionType)
     {
         if (travelSparkParticle == null) return;
-
-        Transform sparkTransform = travelSparkParticle.transform;
-
-        if (actionType == eState.Pull)
+        foreach (ParticleSystem p in travelSparkParticle)
         {
-            sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
-        }
-        else
-        {
-            sparkTransform.localRotation = Quaternion.identity;
-        }
+            Transform sparkTransform = p.transform;
 
-        travelSparkParticle.Play();
+            if (actionType == eState.Pull)
+            {
+                sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
+            }
+            else
+            {
+                sparkTransform.localRotation = Quaternion.identity;
+            }
+
+
+            p.Play();
+        }
     }
 
     public void StopTravelSpark()
     {
-        if (travelSparkParticle != null && travelSparkParticle.isPlaying)
+        foreach (ParticleSystem p in travelSparkParticle)
         {
-            travelSparkParticle.Stop();
+            if (p != null && p.isPlaying)
+            {
+                p.Stop();
+            }
         }
     }
 
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 변경 패킷 전송용 함수
-    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0)
+    public void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
+{
+    if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+
+    long finalUUID = (targetUUID == 0) ? LocalPlayerInfo.ID : targetUUID;
+
+    // P_PlayerStateNtf (또는 P_PlayerStatusNtf) 패킷 조립
+    P_PlayerStateNtf pkt = new P_PlayerStateNtf
     {
-        // 로컬이 쏘는거 아니면 리턴
-        if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+        userUUID = finalUUID,
+        newState = (byte)stateCode,
+        targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
+        powerOrTime = param, 
+        isPull = (byte)(isPull ? 1 : 0),
+        casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z }
+    };
 
-        long finalUUID = (targetUUID == 0) ? LocalPlayerInfo.ID : targetUUID;
-
-        P_PlayerStateNtf pkt = new P_PlayerStateNtf
-        {
-            userUUID = finalUUID,
-            newState = (byte)stateCode,
-            targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
-            powerOrTime = param
-        };
-
-        Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
-    }
+    Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
+}
 
     public void SetControllerEnabled(bool isEnable)
     {
@@ -371,6 +403,7 @@ public class PlayerActor : Actor
             curPos.Set(pos);
             SendMovePacket(0, 0);
             sm.ChangeState(new IdleState(this));
+            ignoreServerPosTimer = 1.0f;
         }
     }
 
@@ -488,6 +521,7 @@ public class PlayerActor : Actor
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
     }
+
     void OnDrawGizmosSelected()
     {
         float maxDistance = 3f;   // Push 거리

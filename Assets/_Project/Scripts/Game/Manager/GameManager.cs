@@ -28,5 +28,12 @@ public class GameManager : GenericSingleton<GameManager>
         }
 
         DontDestroyOnLoad(gameObject);
+
+        //if (UiManager.Instance != null) UiManager.Instance.StartCount();
+    }
+
+    public void LoadLobby()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
     }
 }

@@ -2,16 +2,10 @@ using UnityEngine;
 
 public class ResultUi : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
+    void Start()
     {
-        UiManager.instance.StartCount();
-        gameObject.SetActive(false);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        //UiManager.Instance.StartCount();
         
+        //gameObject.SetActive(false);
     }
 }

@@ -70,14 +70,22 @@ public class Platform : BaseGimmick
     {
         Vector3 delta = transform.position - lastPos;
 
-        foreach (var actor in players)
+        for (int i = players.Count - 1; i >= 0; i--)
         {
-            if (actor != null && actor.IsLocal)
+            PlayerActor p = players[i];
+            
+            float dist = Vector3.Distance(transform.position, p.transform.position);
+            if (p == null || p.gameObject.activeInHierarchy == false || dist > 15f)
             {
-                actor.SetPlatformDelta(delta);
+                players.RemoveAt(i);
+                continue;
+            }
+
+            if (p.IsLocal)
+            {
+                p.SetPlatformDelta(delta);
             }
         }
-
         lastPos = transform.position;
     }
 
@@ -90,7 +98,11 @@ public class Platform : BaseGimmick
     public void RemovePlayer(PlayerActor actor)
     {
         if (actor == null) return;
-        if (players.Contains(actor)) players.Remove(actor);
+        if (players.Contains(actor)) 
+        {
+            actor.SetPlatformDelta(Vector3.zero);
+            players.Remove(actor);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -125,12 +137,9 @@ public class Platform : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        Debug.Log($"[Platform Execute ntf] {((eGimmickKey)ntf.gimmickKey).ToString()}, {ntf.targetPos.ToVector3()}, isHost : {GameManager.Instance.isHost}");
-
         if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost)
         {
             targetSyncPos = ntf.targetPos.ToVector3();
-            Debug.Log($"[Platform Sync] targetSyncPos = {targetSyncPos}");
         }
     }
 }

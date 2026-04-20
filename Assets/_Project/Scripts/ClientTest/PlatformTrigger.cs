@@ -19,6 +19,7 @@ public class PlatformTrigger : MonoBehaviour
             platform.AddPlayer(actor);
         }
     }
+    
 
     private void OnTriggerExit(Collider other)
     {

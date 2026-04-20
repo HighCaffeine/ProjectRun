@@ -285,6 +285,9 @@ public struct P_PlayerStatusNtf
     [MarshalAs(UnmanagedType.I1)] public byte newState;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
     [MarshalAs(UnmanagedType.R4)] public float param;
+    [MarshalAs(UnmanagedType.I1)] public byte isPull;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
+
 }
 #endregion
 #endregion
@@ -357,6 +360,8 @@ public struct P_PlayerStateNtf
     [MarshalAs(UnmanagedType.I1)] public byte newState;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
     [MarshalAs(UnmanagedType.R4)] public float powerOrTime;
+    [MarshalAs(UnmanagedType.I1)] public byte isPull;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

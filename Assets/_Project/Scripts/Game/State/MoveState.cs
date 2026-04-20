@@ -35,9 +35,9 @@ public class MoveState : IState
 
         // 회전
         actor.LookAtDirection(moveDir);
+        actor.Move(moveDir, actor.moveSpeed);
 
         // 이동 및 패킷 전송 (Actor에서 전송)
-        // actor.Move(moveDir, actor.moveSpeed);
 
         // actor.sendTimer += Time.deltaTime;
         // if (actor.sendTimer >= PlayerActor.sendInterval)

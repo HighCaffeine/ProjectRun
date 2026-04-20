@@ -76,7 +76,7 @@ public static class PacketSerializer
 
     static byte[] SerializePlayerStateNtf(P_PlayerStateNtf p)
     {
-        var buf = new byte[25]; // 8+1+12+4
+        var buf = new byte[38]; // 8+1+12+4+1+12
         int o = 0;
         Write(buf, ref o, p.userUUID);
         buf[o++] = p.newState;
@@ -84,6 +84,10 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetDir.y);
         Write(buf, ref o, p.targetDir.z);
         Write(buf, ref o, p.powerOrTime);
+        buf[o++] = p.isPull;
+        Write(buf, ref o, p.casterPos.x);
+        Write(buf, ref o, p.casterPos.y);
+        Write(buf, ref o, p.casterPos.z);
         return buf;
     }
 

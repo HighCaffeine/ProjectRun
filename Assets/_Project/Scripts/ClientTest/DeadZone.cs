@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public class DeadZone : MonoBehaviour
 {
+    private List<PlayerActor> players;
     private void OnTriggerEnter(Collider other)
     {
         ActorManager.Instance.OnPlayerDead(other.name);
+        Debug.Log(other.gameObject.name);
+
+        
     }
 
     private void OnDrawGizmosSelected()

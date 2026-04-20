@@ -156,7 +156,7 @@ public class Player : MonoBehaviour
         else
         {
             // 리모트: 이펙트만 (위치는 서버에서 UPDATE_PLAYER_MOVEMENT로 옴)
-            StartCoroutine(RemoteVisualRoutine());
+            StartCoroutine(RemoteVisualRoutine(actionType));
         }
     }
 
@@ -211,13 +211,13 @@ public class Player : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
     }
 
-    private IEnumerator RemoteVisualRoutine()
+    private IEnumerator RemoteVisualRoutine(byte actionType)
     {
         PlayerActor pActor = GetComponent<PlayerActor>();
         if (pActor != null)
         {
             if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = true;
-            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Play();
+            if (pActor.travelSparkParticle != null) pActor.PlayTravelSpark((eState)actionType);
         }
 
         yield return new WaitForSeconds(0.25f); // 넉백 지속시간
@@ -225,7 +225,7 @@ public class Player : MonoBehaviour
         if (pActor != null)
         {
             if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = false;
-            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Stop();
+            if (pActor.travelSparkParticle != null) pActor.StopTravelSpark();
         }
     }
 }

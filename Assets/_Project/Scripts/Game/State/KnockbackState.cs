@@ -41,6 +41,8 @@ public class KnockbackState : IState
         // var impulseSource = actor.GetComponent<CinemachineImpulseSource>();
         // if (impulseSource != null) impulseSource.GenerateImpulse(knockbackDir * 1.0f);
 
+        actor.trailRenderer.enabled = true;
+
         // 연출
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = true;
 
@@ -89,14 +91,18 @@ public class KnockbackState : IState
 
         if (isPull)
         {
-            Vector3 myPos = new Vector3(actor.transform.position.x, 0, actor.transform.position.z);
-            Vector3 targetPos = new Vector3(this.casterPos.x, 0, this.casterPos.z);
-            float dist = Vector3.Distance(myPos, targetPos);
+            Vector3 myPos2D = new Vector3(actor.transform.position.x, 0f, actor.transform.position.z);
+            Vector3 casterPos2D = new Vector3(casterPos.x, 0f, casterPos.z);
+            
+            float dist2D = Vector3.Distance(myPos2D, casterPos2D);
 
-            if (dist <= STOP_DISTANCE)
+            Vector3 dirToCaster = (casterPos2D - myPos2D).normalized;
+            float dotProduct = Vector3.Dot(knockbackDir, dirToCaster);
+
+            if (dist2D <= 1.5f || dotProduct <= 0f)
             {
-                currentPower = 0f;
-                timer = DURATION;
+                actor.sm.ChangeState(new IdleState(actor)); 
+                return;
             }
         }
         Vector3 windDir = actor.windDir;
@@ -111,12 +117,12 @@ public class KnockbackState : IState
         if (dot > 0f)
         {
             // 순풍 → 가속
-            windFactor = 1f + (dot * 0.7f); // 최대 1.7배
+            windFactor = 1f + (dot * 0.4f); // 최대 1.4배
         }
         else if (dot < 0f)
         {
             // 역풍 → 감속
-            windFactor = 1f + (dot * 0.7f); // 최소 0.3배
+            windFactor = 1f + (dot * 0.3f); // 최소 0.7배
         }
 
         // 최종 힘
@@ -180,8 +186,8 @@ public class KnockbackState : IState
     {
         if (actor.trailRenderer != null) actor.trailRenderer.emitting = false;
 
+        actor.trailRenderer.enabled = false;
         actor.StopTravelSpark();
-
         actor.SendMovePacket(0f, 0f);
     }
 }

@@ -11,10 +11,8 @@ public struct DungeonSector
     // public int requiredGimmickID; 
 }
 
-public class DungeonPointManager : MonoBehaviour
+public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 {
-    public static DungeonPointManager Instance => instance;
-    private static DungeonPointManager instance;
     [Header("던전 구역(Sector) 데이터")]
     [Tooltip("0번: 던전 시작 구역 / 1~N번: 다음 기믹 구역")]
     public DungeonSector[] sectors;
@@ -24,35 +22,9 @@ public class DungeonPointManager : MonoBehaviour
 
     public int currentSectorIndex = 0;
 
-    [SerializeField]
-    private GameObject resultUI;
-    void Awake()
+    private new void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-        resultUI.gameObject.SetActive(false);
-    }
-    private void Update()
-    {
-        if(Input.GetKeyUp(KeyCode.Escape))
-        {
-            if (!resultUI.gameObject.activeSelf)
-            {
-                resultUI.gameObject.SetActive(true);
-
-            }
-            else
-            {
-                resultUI.gameObject.SetActive(false);
-            }
-        }
-
+        base.Awake();
     }
 
     // 특정 구역의 스폰 좌표를 반환하는 함수
@@ -71,8 +43,7 @@ public class DungeonPointManager : MonoBehaviour
         if (currentSectorIndex + 1 >= sectors.Length)
         {
             Debug.Log("[Dungeon] 마지막 구역입니다.");
-            UiManager.instance.StopCount();
-            resultUI.gameObject.SetActive(true);
+            UiManager.Instance.ShowResult(); 
             return;
         }
 

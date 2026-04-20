@@ -4,12 +4,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using static System.Net.Mime.MediaTypeNames;
-using static UnityEngine.Rendering.DebugUI;
-public class UiManager : MonoBehaviour
+public class UiManager : GenericSingleton<UiManager>
 {
-    public static UiManager instance;  
-
     private Coroutine countdownCoroutine;
 
     float timer=0f;
@@ -29,17 +25,11 @@ public class UiManager : MonoBehaviour
     PlayerActor p2;
 
 
-    private void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            instance.gameObject.SetActive(false);
+    public GameObject resultUIPanel;
 
-        }
+    private new void Awake()
+    {
+        base.Awake();
         timer = 0f;
     }
 
@@ -63,7 +53,6 @@ public class UiManager : MonoBehaviour
     }
     IEnumerator TimeCount()
     {
-        Debug.Log("Ÿ�̸� ����");
         while (true)
         {
             if (p1 == null || p2 == null)
@@ -77,6 +66,8 @@ public class UiManager : MonoBehaviour
                         p2 = ActorManager.Instance.GetPlayer(true);
                 }
             }
+            Debug.Log(timer);
+            timeText.text =$"탐험 시간 :{timer.ToString()}";
 
             if (p1 != null)
             {
@@ -93,6 +84,24 @@ public class UiManager : MonoBehaviour
 
     }
 
+    public void ShowResult()
+    {
+        StopCount(); 
+        
+        ForceUpdateUI(); 
 
+        // 결과창 패널 켜기!
+        if(resultUIPanel != null)
+            resultUIPanel.SetActive(true); 
+    }
+
+    private void ForceUpdateUI()
+    {
+        timeText.text = $"탐험 시간 : {timer}초";
+
+        if (p1 != null) player1Text.text = $"{p1.transform.name}\nDIE: {p1.fallDeathCount}\nPull: {p1.pullCount}\nPush: {p1.pushCount}";
+
+        if (p2 != null) player2Text.text = $"{p2.transform.name}\nDIE: {p2.fallDeathCount}\nPull: {p2.pullCount}\nPush: {p2.pushCount}";
+    }
 
 }
