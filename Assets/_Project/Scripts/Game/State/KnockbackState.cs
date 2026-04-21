@@ -146,7 +146,7 @@ public class KnockbackState : IState
         }
 
         //충돌감지
-        Collider[] hitWalls = Physics.OverlapSphere(actor.transform.position, 0.6f);
+        Collider[] hitWalls = Physics.OverlapSphere(actor.transform.position, 1.5f);
         foreach (var wall in hitWalls)
         {
             if (wall.CompareTag("Breakable"))
@@ -156,6 +156,7 @@ public class KnockbackState : IState
                 {
                     foreach (var target in gInfo.targetGimmicks)
                     {
+                        Debug.Log($"[Knockback] Packet Send");
                         P_GimmickInteractReq req = new P_GimmickInteractReq
                         {
                             activeUUID = LocalPlayerInfo.ID,

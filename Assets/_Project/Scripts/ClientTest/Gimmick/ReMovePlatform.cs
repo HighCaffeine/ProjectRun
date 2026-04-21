@@ -31,10 +31,10 @@ public class ReMovePlatform : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        Debug.Log($"[ReMove Platform] {ntf.state}, {((eGimmickKey)ntf.gimmickKey).ToString()}");
+        //Debug.Log($"[ReMove Platform] {ntf.state}, {((eGimmickKey)ntf.gimmickKey).ToString()}");
         if (ntf.state == (byte)eGimmickState.On_Activate && !isRestoring)
         {
-            Debug.Log($"[ReMove Platform] Execute");
+            //Debug.Log($"[ReMove Platform] Execute");
             if (currentCoroutine != null) StopCoroutine(currentCoroutine);
             currentCoroutine = StartCoroutine(RemoveSequence());
         }

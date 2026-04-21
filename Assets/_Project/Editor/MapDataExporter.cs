@@ -68,25 +68,27 @@ public class MapDataExporter : Editor
         // 찾은 모든 레벨을 순회하며 기믹을 하나로 합침
         foreach (MapModuleGrid grid in grids)
         {
-            foreach (Transform child in grid.transform)
+            GimmickInfo[] allGimmicks = grid.GetComponentsInChildren<GimmickInfo>(true);
+
+            foreach (GimmickInfo info in allGimmicks)
             {
-                if (child.CompareTag("Gimmick"))
+                Transform child = info.transform;
+
+                if (child.CompareTag("Gimmick") || child.CompareTag("Breakable"))
                 {
                     GimmickData gd = new GimmickData();
-                    gd.position = new _Vector3(child.position); // 월드 좌표라 레벨 위치 그대로 유지됨
+                    gd.position = new _Vector3(child.position); 
                     gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
-                    GimmickInfo info = child.GetComponentInChildren<GimmickInfo>();
-                    if (info != null)
-                    {
-                        gd.gimmick_id = info.gimmick_id;
-                        gd.type = info.gimmick_type;
+                    gd.gimmick_id = info.gimmick_id;
+                    gd.type = info.gimmick_type;
+
                         foreach (var prop in info.properties)
                         {
                             string keyStr = prop.key.ToString();
-                            if (!gd.properties.ContainsKey(keyStr)) gd.properties.Add(keyStr, prop.value);
+                            if (!gd.properties.ContainsKey(keyStr)) 
+                                gd.properties.Add(keyStr, prop.value);
                         }
-                    }
 
                     Transform startPivot = child.Find("StartPos");
                     Transform endPivot = child.Find("EndPos");

@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Runtime.InteropServices;
 using TMPro;
 using System;
+using NUnit.Framework.Internal.Filters;
 
 public unsafe class Match : MonoBehaviour, IPacketReceiver
 {
@@ -330,6 +331,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         break;
                     }
 
+                    if (ntf.gimmickKey == (byte)eGimmickKey.BreakableWall)
+                    {
+                        //Debug.Log($"<color=cyan> [Match packet ntf]{ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey}");
+                    }
+
                     //Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
 
                     if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
@@ -338,7 +344,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     else
                     {
-                        Debug.LogWarning($"[GIMMICK] ID {ntf.gimmickID} 캐시에 없음! 등록된 키: {string.Join(", ", _gimmickCache.Keys)}");
+                        //Debug.LogWarning($"[GIMMICK] ID {ntf.gimmickID} 캐시에 없음! 등록된 키: {string.Join(", ", _gimmickCache.Keys)}");
                     }
 
                     // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
