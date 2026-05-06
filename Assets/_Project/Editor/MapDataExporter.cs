@@ -77,18 +77,17 @@ public class MapDataExporter : Editor
                 if (child.CompareTag("Gimmick") || child.CompareTag("Breakable"))
                 {
                     GimmickData gd = new GimmickData();
-                    gd.position = new _Vector3(child.position); 
+                    gd.position = new _Vector3(child.position);
                     gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
                     gd.gimmick_id = info.gimmick_id;
                     gd.type = info.gimmick_type;
 
-                        foreach (var prop in info.properties)
-                        {
-                            string keyStr = prop.key.ToString();
-                            if (!gd.properties.ContainsKey(keyStr)) 
-                                gd.properties.Add(keyStr, prop.value);
-                        }
+                    foreach (var prop in info.properties)
+                    {
+                        string keyStr = prop.key.ToString();
+                        if (!gd.properties.ContainsKey(keyStr)) gd.properties.Add(keyStr, prop.value);
+                    }
 
                     Transform startPivot = child.Find("StartPos");
                     Transform endPivot = child.Find("EndPos");
