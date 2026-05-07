@@ -13,14 +13,13 @@ public class TeleportState : IState
 
     public void Enter()
     {
-        actor.SetControllerEnabled(false);
+        actor.SetControllerActive(false);
 
         actor.transform.position = destPos;
         Player playerSync = actor.GetComponent<Player>();
         if (playerSync != null) playerSync.SetPos(destPos);
-        actor.GetComponent<Player>().SetPos(destPos);
 
-        actor.SetControllerEnabled(true);
+        actor.SetControllerActive(true);
         actor.sm.ChangeState(new IdleState(actor));
     }
 

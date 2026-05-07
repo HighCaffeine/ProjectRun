@@ -20,6 +20,9 @@ public class KnockbackState : IState
 
     private static Collider[] wallHitBuffer = new Collider[5];
 
+    private float logDivisorPull;
+    private float logDivisorPush;
+
 
     public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
@@ -61,6 +64,10 @@ public class KnockbackState : IState
             actor.pushCount++;
             Debug.Log(actor.gameObject.name + "push :" + actor.pushCount);
         }
+
+        float kValue = K * 0.5f;
+        logDivisorPull = Mathf.Log(1 + kValue);
+        logDivisorPush = Mathf.Log(1 + K);
     }
 
     public void Execute()
@@ -73,7 +80,7 @@ public class KnockbackState : IState
         {
             float kValue = K * 0.5f;
 
-            float logValue = Mathf.Log(1 + kValue * t) / Mathf.Log(1 + kValue);
+            float logValue = Mathf.Log(1 + kValue * t) / logDivisorPull;
 
             float reversed = 1f - logValue;
             float smooth = reversed * reversed;
@@ -86,7 +93,7 @@ public class KnockbackState : IState
         }
         else
         {
-            float decayFactor = 1f - (Mathf.Log(1 + K * t) / Mathf.Log(1 + K));
+            float decayFactor = 1f - (Mathf.Log(1 + K * t) / logDivisorPush);
             currentPower = initialPower * decayFactor;
 
         }

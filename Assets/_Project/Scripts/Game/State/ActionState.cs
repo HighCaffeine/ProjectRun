@@ -13,6 +13,7 @@ public class ActionState : IState
     private float pow = 1.5f;  // 계수
 
     private static Collider[] hitBuffer = new Collider[20];
+    private static int targetLayerMask = -1;
 
     public ActionState(Actor actor, eState type)
     {
@@ -41,13 +42,13 @@ public class ActionState : IState
         actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
-       
+
         if (Time.time - actor.lastSkillUseTime < Actor.SKILL_COOLDOWN)
         {
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
-      
+
         actor.lastSkillUseTime = Time.time; // 스킬 사용 시간 갱신
 
         //Vector3 searchForward = actor.GetForward();
@@ -59,8 +60,9 @@ public class ActionState : IState
         }
 
         actor.LookAtDirection(searchForward);
+        if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
         // 타겟 탐색
-        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, mask);
+        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
 
         PlayerActor closestTarget = null;
         MovableGimmick closestGimmick = null;
@@ -169,7 +171,7 @@ public class ActionState : IState
     {
     }
 
-   
+
 
 
 

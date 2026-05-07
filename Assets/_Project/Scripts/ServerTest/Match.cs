@@ -273,7 +273,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                                 Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
 
                                 pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos));
-                                
+
                                 break;
                             case 6:
                                 if (pActor.ignoreServerPosTimer > 0) return;
@@ -548,7 +548,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             PlayerActor pActor = playerObj.GetComponent<PlayerActor>();
             if (pActor != null)
             {
-                pActor.IsLocal = local;
+                pActor.isLocal = local;
             }
 
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
@@ -645,13 +645,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
             Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
 
-            pActor.SetControllerEnabled(false);
-            pActor.transform.position = spawnPos; 
-            pActor.SetControllerEnabled(true);
+            pActor.SetControllerActive(false);
+            pActor.transform.position = spawnPos;
+            pActor.SetControllerActive(true);
 
             Physics.SyncTransforms();
 
-            if (pActor.IsLocal) 
+            if (pActor.IsLocal)
             {
                 StartCoroutine(SendInitialPositionDelay(pActor));
             }
@@ -660,9 +660,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     private IEnumerator SendInitialPositionDelay(PlayerActor pActor)
     {
-        yield return new WaitForFixedUpdate(); 
+        yield return new WaitForFixedUpdate();
 
-        pActor.SendMovePacket(0.0f, 0.0f); 
+        pActor.SendMovePacket(0.0f, 0.0f);
         Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
     }
 

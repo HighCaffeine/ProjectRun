@@ -5,6 +5,8 @@ using UnityEngine.Rendering.Universal;
 
 public class PlayerActor : Actor
 {
+    private Camera cam;
+
     const float CAMERA_SHAKE = 1.0f;
 
     [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
@@ -17,6 +19,8 @@ public class PlayerActor : Actor
 
     public override bool IsLocal => isLocal;
     public bool isLocal;
+
+    public float ignoreServerPosTimer = 0f;
 
 
     [Header("Visual Effects")]
@@ -53,6 +57,8 @@ public class PlayerActor : Actor
         pullCount = 0;
 
         mainCam = Camera.main.transform;
+        cam = mainCam.GetComponent<Camera>();
+
         cachedMovePacket = new P_PlayerMovement
         {
             currentPos = new P_PacketVector3(),
@@ -69,6 +75,11 @@ public class PlayerActor : Actor
 
     void Update()
     {
+        if (ignoreServerPosTimer > 0f)
+        {
+            ignoreServerPosTimer -= Time.deltaTime;
+        }
+
         if (sm.currentState == null) return;
 
         if (IsLocal) HandleInput();
@@ -134,7 +145,6 @@ public class PlayerActor : Actor
         if (move.sqrMagnitude < 0.001f)
         {
             horizontalMove += windDir * windPower;
-            Debug.Log("[Wind] Idle Push");
             return;
         }
 
@@ -147,14 +157,12 @@ public class PlayerActor : Actor
         {
             //horizontalMove -= moveDir * windPower;
             moveSpeed = moveSpeed * 0.5f;
-            Debug.Log("[Wind] Decelerate");
         }
         // 정방향 (가속)
         else
         {
             //  horizontalMove += windDir * windPower;
             moveSpeed = moveSpeed * 1.4f;
-            Debug.Log("[Wind] Accelerate");
         }
     }
     public void SetPlatformDelta(Vector3 delta)
@@ -188,8 +196,6 @@ public class PlayerActor : Actor
 
     private Vector3 GetMouseDir()
     {
-        Camera cam = Camera.main;
-
         Vector3 playerScreen = cam.WorldToScreenPoint(transform.position);
         Vector3 mouse = Input.mousePosition;
 
@@ -222,7 +228,14 @@ public class PlayerActor : Actor
     public IEnumerator HitStopRoutine(float duration = 0.05f)
     {
         Time.timeScale = 0.05f;
-        yield return new WaitForSecondsRealtime(duration);
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
         Time.timeScale = 1.0f;
     }
 
