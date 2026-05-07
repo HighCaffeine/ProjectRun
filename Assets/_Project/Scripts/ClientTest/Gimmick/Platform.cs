@@ -8,61 +8,49 @@ public class Platform : BaseGimmick
     [SerializeField] private Transform startPos;
     [SerializeField] private Transform endPos;
     [SerializeField] private float moveSpeed = 3f;
+    [SerializeField] private float waitTimeAtSide = 0.5f;
     [SerializeField] private List<PlayerActor> players = new List<PlayerActor>();
 
     private Vector3 lastPos;
-    private P_GimmickInteractReq pkt;
-    private float sendTimer = 0f; // 패킷 전송 타이머
-    private Vector3 targetSyncPos;
+    private Vector3 currentTargetPos;
 
 
     public void SetStartPos(GameObject start) { startPos = start.transform; }
     public void SetEndPos(GameObject end) { endPos = end.transform; }
 
-    private Vector3 lastSentPos;
-    private const float SEND_THRESHOLD = 0.01f;
-
     private void Start()
     {
         lastPos = transform.position;
-        targetSyncPos = transform.position;
 
         if (GameManager.Instance.isHost)
         {
-            pkt = new P_GimmickInteractReq
+            currentTargetPos = endPos.position;
+            StartCoroutine(HostMoveLoop());
+        }
+    }
+
+    private IEnumerator HostMoveLoop()
+    {
+        while (true)
+        {
+            //출발 전 목표위치 전송
+            P_GimmickInteractReq req = new P_GimmickInteractReq
             {
                 activeUUID = LocalPlayerInfo.ID,
                 gimmickID = gimmickUID,
                 gimmickKey = (byte)eGimmickKey.MovePlatform,
                 state = (byte)eGimmickState.Sync,
-                targetPos = new P_PacketVector3(),
-                param = 0.0f
+                targetPos = new P_PacketVector3 { x = currentTargetPos.x, y = currentTargetPos.y, z = currentTargetPos.z },
+                param = moveSpeed
             };
-            StartCoroutine(MoveLoop());
-        }
-    }
+            Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
 
-    private void Update()
-    {
-        if (GameManager.Instance.isHost)
-        {
-            if (Client.IS_SERVER_PLAY)
-            {
-                sendTimer += Time.deltaTime;
-                Vector3 currentPos = transform.position;
+            // 본인 플랫폼 이동
+            yield return StartCoroutine(MoveTo(currentTargetPos));
 
-                if (Vector3.SqrMagnitude(currentPos - lastSentPos) > SEND_THRESHOLD * SEND_THRESHOLD)
-                {
-                    pkt.targetPos.Set(currentPos);
-                    Client.UDP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, pkt);
-                    lastSentPos = currentPos;
-                }
-                sendTimer = 0f;
-            }
-        }
-        else
-        {
-            transform.position = Vector3.Lerp(transform.position, targetSyncPos, Time.deltaTime * moveSpeed * 3f);
+            // 목적지 설정, 대기
+            currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
+            yield return new WaitForSeconds(waitTimeAtSide);
         }
     }
 
@@ -70,12 +58,13 @@ public class Platform : BaseGimmick
     {
         Vector3 delta = transform.position - lastPos;
 
+        if (delta == Vector3.zero) return;
+
         for (int i = players.Count - 1; i >= 0; i--)
         {
             PlayerActor p = players[i];
-            
-            float dist = Vector3.Distance(transform.position, p.transform.position);
-            if (p == null || p.gameObject.activeInHierarchy == false || dist > 15f)
+
+            if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(transform.position, p.transform.position) > 15f)
             {
                 players.RemoveAt(i);
                 continue;
@@ -98,7 +87,7 @@ public class Platform : BaseGimmick
     public void RemovePlayer(PlayerActor actor)
     {
         if (actor == null) return;
-        if (players.Contains(actor)) 
+        if (players.Contains(actor))
         {
             actor.SetPlatformDelta(Vector3.zero);
             players.Remove(actor);
@@ -119,27 +108,24 @@ public class Platform : BaseGimmick
 
     IEnumerator MoveTo(Vector3 target)
     {
-        while (Vector3.Distance(transform.position, target) > 0.05f)
+        while (Vector3.Distance(transform.position, target) > 0.01f)
         {
             transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
             yield return null;
         }
-    }
 
-    IEnumerator MoveLoop()
-    {
-        while (true)
-        {
-            yield return MoveTo(endPos.position);
-            yield return MoveTo(startPos.position);
-        }
+        transform.position = target;
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
         if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost)
         {
-            targetSyncPos = ntf.targetPos.ToVector3();
+            Vector3 targetSyncPos = ntf.targetPos.ToVector3();
+            // float syncSpeed = ntf.param; // 필요시 속도 동기화
+
+            StopAllCoroutines();
+            StartCoroutine(MoveTo(targetSyncPos)); // 호스트가 지시한 목표로 이동 시작
         }
     }
 }
