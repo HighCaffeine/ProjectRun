@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class MoveState : IState
 {
-    private PlayerActor actor;
-    public MoveState(PlayerActor actor) { this.actor = actor; }
+    private Actor actor;
+    public MoveState(Actor actor) { this.actor = actor; }
 
     public void Enter()
     {
@@ -14,37 +14,44 @@ public class MoveState : IState
     public void Execute()
     {
         if (!actor.IsLocal) return;
-        //밀당 체크
-        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
-        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
 
-        //대쉬 체크
-        // if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        PlayerActor pActor = actor as PlayerActor;
+        if (pActor != null && pActor.CheckActionInput()) return;
 
-        // 멈춤 체크
         if (actor.h == 0 && actor.v == 0)
         {
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
 
-        // 이동 벡터 계산
-        Vector3 isoForward = new Vector3(1f, 0f, 1f).normalized;
-        Vector3 isoRight = new Vector3(1f, 0f, -1f).normalized;
-        Vector3 moveDir = (isoForward * actor.v + isoRight * actor.h).normalized;
+        Transform camTransform = Camera.main.transform;
+        Vector3 forward = camTransform.forward;
+        Vector3 right = camTransform.right;
 
-        // 회전
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+
+        // 입력값에 따른 이동 방향 (카메라 기준)
+        Vector3 moveDir = (forward * actor.v + right * actor.h).normalized;
+
+        // 4. 캐릭터 회전 및 이동 명령
         actor.LookAtDirection(moveDir);
-        actor.Move(moveDir, actor.moveSpeed);
+        actor.Move(moveDir, actor.MoveSpeed);
 
-        // 이동 및 패킷 전송 (Actor에서 전송)
+        // 5. 네트워크 패킷 전송
+        HandleNetworkSync();
+    }
 
-        // actor.sendTimer += Time.deltaTime;
-        // if (actor.sendTimer >= PlayerActor.sendInterval)
-        // {
-        //     actor.SendMovePacket(actor.h, actor.v);
-        //     actor.sendTimer = 0f;
-        // }
+    private void HandleNetworkSync()
+    {
+        actor.sendTimer += Time.deltaTime;
+        if (actor.sendTimer >= PlayerActor.sendInterval)
+        {
+            actor.SendMovePacket(actor.h, actor.v);
+            actor.sendTimer = 0f;
+        }
     }
     public void Exit()
     {

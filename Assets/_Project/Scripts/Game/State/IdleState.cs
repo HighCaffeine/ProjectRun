@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class IdleState : IState
 {
-    public PlayerActor actor;
+    public Actor actor;
 
-    public IdleState(PlayerActor actor)
+    public IdleState(Actor actor)
     {
         this.actor = actor;
     }
@@ -28,14 +28,10 @@ public class IdleState : IState
     {
         if (!actor.IsLocal) return;
 
-        if (Input.GetMouseButtonDown(0)) { actor.sm.ChangeState(new ActionState(actor, eState.Push)); return; }
-        if (Input.GetMouseButtonDown(1)) { actor.sm.ChangeState(new ActionState(actor, eState.Pull)); return; }
-        
-        //대쉬 체크
-        //if (Input.GetKeyDown(KeyCode.LeftShift)) { actor.sm.ChangeState(new DashState(actor)); return; }
+        // 공격 입력 체크 (좌/우클릭)
+        PlayerActor pActor = actor as PlayerActor;
+        if (pActor != null && pActor.CheckActionInput()) return;
 
-
-        // 이동 입력 체크
         if (actor.h != 0 || actor.v != 0)
         {
             actor.sm.ChangeState(new MoveState(actor));

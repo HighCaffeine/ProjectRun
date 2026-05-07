@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ActionState : IState
 {
-    private PlayerActor actor;
+    private Actor actor;
     private eState actionType;
     private float timer;
     private const float CAST_TIME = 0.3f; // 후딜레이
@@ -12,7 +12,9 @@ public class ActionState : IState
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
     private float pow = 1.5f;  // 계수
 
-    public ActionState(PlayerActor actor, eState type)
+    private static Collider[] hitBuffer = new Collider[20];
+
+    public ActionState(Actor actor, eState type)
     {
         this.actor = actor;
         this.actionType = type;
@@ -40,40 +42,36 @@ public class ActionState : IState
 
         if (!actor.IsLocal) return;
        
-        if (Time.time - actor.lastSkillUseTime < PlayerActor.SKILL_COOLDOWN)
+        if (Time.time - actor.lastSkillUseTime < Actor.SKILL_COOLDOWN)
         {
             actor.sm.ChangeState(new IdleState(actor));
             return;
         }
       
         actor.lastSkillUseTime = Time.time; // 스킬 사용 시간 갱신
-      
-        //카메라 연출
-        actor.ShakeCamera();
 
         //Vector3 searchForward = actor.GetForward();
-        Vector3 searchForward = actor.GetMouseDir();
-        if (actor.is2p)
+        //Vector3 searchForward = actor.GetMouseDir();
+        Vector3 searchForward = actor.GetActionDir();
+        if (actor.Is2p)
         {
             searchForward = actor.GetForward();
         }
 
         actor.LookAtDirection(searchForward);
         // 타겟 탐색
-        int mask = LayerMask.GetMask("Actionable");
-
-
-        Collider[] colliders = Physics.OverlapSphere(actor.transform.position, maxDistance, mask);
+        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, mask);
 
         PlayerActor closestTarget = null;
         MovableGimmick closestGimmick = null;
-
         float minDistance = float.MaxValue;
         Vector3 dirToTarget = Vector3.zero;
-        foreach (Collider hit in colliders)
+
+        for (int i = 0; i < hitCount; i++)
         {
+            Collider hit = hitBuffer[i];
             if (hit.transform == actor.transform) continue;
-            
+
             PlayerActor targetActor = hit.GetComponentInParent<PlayerActor>();
             if (targetActor != null)
             {
@@ -113,8 +111,10 @@ public class ActionState : IState
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 Player targetPlayer = closestTarget.GetComponent<Player>();
-                
-                actor.SendStateChange(eState.Knockback, dirToTarget, pushForce * pow, targetPlayer.ID, actionType == eState.Pull, actor.transform.position);
+                if (targetPlayer != null)
+                {
+                    actor.SendStateChange(eState.Knockback, dirToTarget, pushForce * pow, targetPlayer.ID);
+                }
             }
             else
             {
