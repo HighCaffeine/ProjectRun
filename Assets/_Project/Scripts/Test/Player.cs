@@ -166,9 +166,11 @@ public class Player : MonoBehaviour
 
         Vector3 currentPos = transform.position;
         // 거리 체크를 X, Z 평면에서만 수행 (높이 차이는 무시)
-        float distXZ = Vector2.Distance(new Vector2(currentPos.x, currentPos.z), new Vector2(serverPos.x, serverPos.z));
+        float dx = serverPos.x - currentPos.x;
+        float dz = serverPos.z - currentPos.z;
+        float sqrDistXZ = (dx * dx) + (dz * dz);
 
-        if (distXZ > snapThreshold)
+        if (sqrDistXZ > (snapThreshold * snapThreshold)) // 제곱값끼리 비교
         {
             actor.SetControllerActive(false);
 
@@ -178,13 +180,13 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (distXZ > 0.01f)
+        if (sqrDistXZ > 0.01f)
         {
             Vector3 pullDir = (serverPos - currentPos);
             pullDir.y = 0; // 수평으로만 당김
 
             float strength = isMoving ? 1.5f : 3.0f;
-           // actor.Move(pullDir, strength);
+            // actor.Move(pullDir, strength);
         }
 
         // transform.position = new Vector3(transform.position.x, lerpY, transform.position.z);
@@ -192,18 +194,20 @@ public class Player : MonoBehaviour
     private void ProcessRemoteMovement()
     {
         // 거리를 X, Z 기준으로만 계산
-        Vector3 flatCurrent = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 flatServer = new Vector3(serverPos.x, 0, serverPos.z);
-        float dist = Vector3.Distance(flatCurrent, flatServer);
+        Vector3 currentPos = transform.position;
+        float dx = serverPos.x - currentPos.x;
+        float dz = serverPos.z - currentPos.z;
+        float sqrDistXZ = (dx * dx) + (dz * dz);
+        float snapLimit = snapThreshold * 2.0f;
 
-        if (dist > snapThreshold * 2.0f)
+        if (sqrDistXZ > (snapLimit * snapLimit))
         {
             transform.position = new Vector3(serverPos.x, serverPos.y, serverPos.z);
             transform.rotation = serverRot;
             return;
         }
 
-        float adaptiveSpeed = dist > 1.0f ? lerpSpeed * 1.5f : lerpSpeed;
+        float adaptiveSpeed = sqrDistXZ > 1.0f ? lerpSpeed * 1.5f : lerpSpeed;
 
         Vector3 targetPos = new Vector3(serverPos.x, serverPos.y, serverPos.z);
         transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * adaptiveSpeed);

@@ -17,17 +17,13 @@ public class PlayerActor : Actor
 
     public override bool IsLocal => isLocal;
     public bool isLocal;
-    
+
 
     [Header("Visual Effects")]
     public TrailRenderer trailRenderer;
     public ParticleSystem[] travelSparkParticle;
     public ParticleSystem[] brakeParticle;
 
-    [Header("Gravity Settings")]
-    public float gravity = -20f;       // 기본 중력 값
-    private float verticalVelocity;     // 현재 수직 속도
-    private float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
     private Vector3 platformDelta;
     public Vector3 windDir;
@@ -43,7 +39,7 @@ public class PlayerActor : Actor
     public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
     public void SetPlayerPivot(Transform pivot) => this.playerPivot = pivot;
 
-
+    public Transform mainCam { get; private set; }
     private P_PlayerMovement cachedMovePacket;
 
     protected new void Start()
@@ -56,6 +52,7 @@ public class PlayerActor : Actor
         pushCount = 0;
         pullCount = 0;
 
+        mainCam = Camera.main.transform;
         cachedMovePacket = new P_PlayerMovement
         {
             currentPos = new P_PacketVector3(),
@@ -69,44 +66,19 @@ public class PlayerActor : Actor
             sendTimer = 0f;
         }
     }
-    // PlayerActor.cs의 Update 및 이동 관련 핵심 부분 수정
+
     void Update()
     {
         if (sm.currentState == null) return;
-        horizontalMove = Vector3.zero;
-        h = 0f;
-        v = 0f;
 
-        // 1. 입력 처리 (기존 로직 유지)
-        HandleInput();
-
-        // 2. 상태 머신 실행 (여기서 MoveState가 호출되어 horizontalMove를 채움)
+        if (IsLocal) HandleInput();
 
         sm.Update();
 
-        // 3. 바람 효과 적용
-        ApplyWind();
-
-        if (controller != null && controller.enabled)
-        {
-            ApplyGravity();
-
-            // [리팩토링] 벽 슬라이딩 로직을 별도 함수로 분리하여 Update문 간소화
-            Vector3 finalMove = CalculateWallSlide(horizontalMove);
-
-            if (platformDelta != Vector3.zero)
-            {
-                finalMove += platformDelta;
-                platformDelta = Vector3.zero;
-            }
-
-            finalMove += (Vector3.up * verticalVelocity);
-            float safeDelta = Mathf.Min(Time.deltaTime, 0.1f);
-            controller.Move(finalMove * safeDelta);
-        }
+        base.ApplyMovement();
     }
 
-    
+
     public bool CheckActionInput()
     {
         if (Is2p)
@@ -478,6 +450,29 @@ public class PlayerActor : Actor
             if (Input.GetKey(KeyCode.LeftArrow)) h -= 1f;
             if (Input.GetKey(KeyCode.RightArrow)) h += 1f;
         }
+    }
+
+    public override Vector3 GetMovementDirection()
+    {
+        Vector3 forward = mainCam.forward;
+        Vector3 right = mainCam.right;
+        forward.y = 0; right.y = 0;
+
+        return (forward.normalized * v + right.normalized * h).normalized;
+    }
+
+    public override bool HasMoveIntent()
+    {
+        return (h != 0 || v != 0);
+    }
+
+    public override bool CheckActionIntent()
+    {
+        if (!IsLocal) return false;
+
+        if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
+        if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
+        return false;
     }
 }
 

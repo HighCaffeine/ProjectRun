@@ -12,14 +12,6 @@ public class IdleState : IState
 
     public void Enter()
     {
-        //여기서 idle 애니메이션 실행
-        /*
-        공격을 예로 들면
-        여기서 움직임을 잠궈주고 무기에 충돌 판정을 키고
-        exit에서 다시 해제해주는 느낌
-        */
-
-        //actor.SetAni(AniState::Idle); 
         actor.SendMovePacket(0f, 0f);
         actor.SendStateChange(eState.Idle);
     }
@@ -28,11 +20,9 @@ public class IdleState : IState
     {
         if (!actor.IsLocal) return;
 
-        // 공격 입력 체크 (좌/우클릭)
-        PlayerActor pActor = actor as PlayerActor;
-        if (pActor != null && pActor.CheckActionInput()) return;
+        if (actor.CheckActionIntent()) return;
 
-        if (actor.h != 0 || actor.v != 0)
+        if (actor.HasMoveIntent())
         {
             actor.sm.ChangeState(new MoveState(actor));
         }

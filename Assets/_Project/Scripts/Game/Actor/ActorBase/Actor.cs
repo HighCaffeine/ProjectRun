@@ -3,8 +3,13 @@ using UnityEngine;
 
 public enum AniState { Idle, Move, Dead, Count };
 
-public class Actor : MonoBehaviour
+public abstract class Actor : MonoBehaviour
 {
+    public abstract Vector3 GetMovementDirection(); //이동방향 (플레이어 카메라 기준, 몬스터 타겟 위치)
+    public abstract bool HasMoveIntent();           //이동 입력이 있는지 (h / v가 0이 아니거나, 몬스터는 이동 타겟을 받았을 때)
+    public abstract bool CheckActionIntent();       //액션 입력 판단 (키입력 / 몬스터 -> 쿨타임)
+
+
     //sync
     public float sendTimer = 0f;
     public const float sendInterval = 0.02f;
@@ -19,17 +24,20 @@ public class Actor : MonoBehaviour
 
 
     protected CharacterController controller;
-    protected Vector3 horizontalMove;
     [SerializeField]
     public Animator animator;
 
     public virtual bool IsLocal => false;
     public virtual bool Is2p => false;
-    // ���¸ӽ� ��
+    // ���¸ӽ� ��
     public float h { protected set; get; }
     public float v { protected set; get; }
+    protected Vector3 horizontalMove;
+    protected float verticalVelocity;
+    protected float gravity = -20f;
+    protected float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
-    #region �׼� ��Ÿ�� ����
+    #region �׼� ��Ÿ�� ����
     public float lastSkillUseTime = -999f;
     public const float SKILL_COOLDOWN = 1.0f;
     public float lastKnockbackTime = -999f;
@@ -45,6 +53,7 @@ public class Actor : MonoBehaviour
         sm.ChangeState(new IdleState(this));
     }
 
+
     public void SetAni(AniState aniState)
     {
         switch (aniState)
@@ -56,6 +65,20 @@ public class Actor : MonoBehaviour
             case AniState.Dead:
                 break;
         }
+    }
+
+    public virtual void ApplyMovement()
+    {
+        if (controller == null || !controller.enabled) return;
+
+        // 중력 처리 (몬스터도 떨어져야 함)
+        if (controller.isGrounded && verticalVelocity < 0) verticalVelocity = -2f;
+        else verticalVelocity += gravity * Mathf.Min(Time.deltaTime, 0.1f);
+
+        Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+        controller.Move(finalMove * Mathf.Min(Time.deltaTime, 0.1f));
+
+        horizontalMove = Vector3.zero; // 프레임 끝날 때 초기화
     }
     public void Move(Vector3 dir, float speed)
     {
@@ -78,5 +101,5 @@ public class Actor : MonoBehaviour
     public virtual void SendMovePacket(float h, float v) { }
     public virtual void SendStateChange(eState newState, Vector3 dir = default, float power = 0f, long targetUUID = 0) { }
 
-   
+
 }

@@ -18,6 +18,8 @@ public class KnockbackState : IState
 
     private const float K = 10f;
 
+    private static Collider[] wallHitBuffer = new Collider[5];
+
 
     public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
@@ -140,12 +142,12 @@ public class KnockbackState : IState
         }
 
         //충돌감지
-        Collider[] hitWalls = Physics.OverlapSphere(actor.transform.position, 0.6f);
-        foreach (var wall in hitWalls)
+        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, 0.6f, wallHitBuffer);
+        for (int i = 0; i < hitCount; i++)
         {
-            if (wall.CompareTag("Breakable"))
+            if (wallHitBuffer[i].CompareTag("Breakable"))
             {
-                wall.gameObject.SetActive(false);
+                wallHitBuffer[i].gameObject.SetActive(false);
                 return;
             }
         }
