@@ -396,7 +396,7 @@ public class PlayerActor : Actor
     // }
 
 
-    public void SendMovePacket(float axisH, float axisV)
+    public override void SendMovePacket(float axisH, float axisV)
     {
         if (!IsLocal) return;
 
