@@ -42,6 +42,7 @@ public class ActionState : IState
         actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
+        if (actionType == eState.Push) ((PlayerActor)actor).PushParticle();
 
         if (Time.time - actor.lastSkillUseTime < Actor.SKILL_COOLDOWN)
         {
@@ -59,7 +60,14 @@ public class ActionState : IState
             searchForward = actor.GetForward();
         }
 
-        actor.LookAtDirection(searchForward);
+        if (searchForward != Vector3.zero)
+        {
+            actor.LookAtDirection(searchForward);
+        }
+        else
+        {
+            searchForward = actor.transform.forward;
+        }
         if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
         // 타겟 탐색
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
@@ -133,6 +141,7 @@ public class ActionState : IState
 
             float moveDist = (actionType == 0) ? 3f : (minDistance - 1.5f); // 당길 땐 내 앞 1.5m까지만
             Vector3 destPos = closestGimmick.transform.position + (pushDir * moveDist);
+            destPos.y = actor.transform.position.y;
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {

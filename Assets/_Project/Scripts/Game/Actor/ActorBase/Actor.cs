@@ -71,14 +71,21 @@ public abstract class Actor : MonoBehaviour
     {
         if (controller == null || !controller.enabled) return;
 
-        // 중력 처리 (몬스터도 떨어져야 함)
-        if (controller.isGrounded && verticalVelocity < 0) verticalVelocity = -2f;
-        else verticalVelocity += gravity * Mathf.Min(Time.deltaTime, 0.1f);
+        if (controller.isGrounded)
+        {
+            if (verticalVelocity < 0) verticalVelocity = -2f;
+        }
+        else
+        {
+            verticalVelocity += gravity * Time.deltaTime;
+
+            if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
+        }
 
         Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
-        controller.Move(finalMove * Mathf.Min(Time.deltaTime, 0.1f));
+        controller.Move(finalMove * Time.deltaTime);
 
-        horizontalMove = Vector3.zero; // 프레임 끝날 때 초기화
+        horizontalMove = Vector3.zero;
     }
     public void Move(Vector3 dir, float speed)
     {

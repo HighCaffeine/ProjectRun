@@ -49,7 +49,7 @@ public class PlayerChange : MonoBehaviour
     {
         camPivot.SetParent(players[index].transform);
         camPivot.localPosition = Vector3.zero;
-        DashCameraEffect.Instance.InitSetup(players[index].transform);
+        //DashCameraEffect.Instance.InitSetup(players[index].transform);
         players[index].SetLocal(true);
 
     }

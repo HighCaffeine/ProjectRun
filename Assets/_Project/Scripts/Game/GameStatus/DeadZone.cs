@@ -8,10 +8,7 @@ public class DeadZone : MonoBehaviour
     private List<PlayerActor> players;
     private void OnTriggerEnter(Collider other)
     {
-        ActorManager.Instance.OnPlayerDead(other.name);
-        Debug.Log(other.gameObject.name);
-
-        
+        if (other.CompareTag("Player")) ActorManager.Instance.OnPlayerDead(other.name);
     }
 
     private void OnDrawGizmosSelected()

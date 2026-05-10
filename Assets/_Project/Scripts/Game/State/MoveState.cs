@@ -27,19 +27,8 @@ public class MoveState : IState
 
         actor.LookAtDirection(moveDir);
         actor.Move(moveDir, actor.MoveSpeed);
-
-        HandleNetworkSync();
     }
 
-    private void HandleNetworkSync()
-    {
-        actor.sendTimer += Time.deltaTime;
-        if (actor.sendTimer >= Actor.sendInterval)
-        {
-            actor.SendMovePacket(actor.h, actor.v);
-            actor.sendTimer = 0f;
-        }
-    }
     public void Exit()
     {
         actor.animator.SetBool("Move", false);

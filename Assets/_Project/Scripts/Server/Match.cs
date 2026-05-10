@@ -260,7 +260,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 1: pActor.sm.ChangeState(new MoveState(pActor)); break;
                             case 2: pActor.sm.ChangeState(new ActionState(pActor, eState.Push)); break; // 밀기
                             case 3: pActor.sm.ChangeState(new ActionState(pActor, eState.Pull)); break; // 당기기
-                            case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
+                            //case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
                                 if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
                                 {
@@ -571,12 +571,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //cameraPivot.SetParent(playerObj.transform);
                 cameraPivot.position = pActor.transform.position;
                 cameraPivot.gameObject.SetActive(true);
-                if (DashCameraEffect.Instance != null)
-                {
-                    DashCameraEffect.Instance.InitSetup(pActor.transform);
-                    CameraManager.Instance.SetupDashEffectComp(pActor);
-                    CameraManager.Instance.AddPosContraint(pActor.transform);
-                }
+                // if (DashCameraEffect.Instance != null)
+                // {
+                //     DashCameraEffect.Instance.InitSetup(pActor.transform);
+                //     CameraManager.Instance.SetupDashEffectComp(pActor);
+                //     CameraManager.Instance.AddPosContraint(pActor.transform);
+                // }
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
                 Collider[] cols = playerObj.GetComponents<Collider>();

@@ -24,6 +24,11 @@ public class PlayerActor : Actor
 
 
     [Header("Visual Effects")]
+
+    public ParticleSystem pushParticle;
+
+    public void PushParticle() { pushParticle.Play(); }
+
     public TrailRenderer trailRenderer;
     public ParticleSystem[] travelSparkParticle;
     public ParticleSystem[] brakeParticle;
@@ -48,22 +53,21 @@ public class PlayerActor : Actor
 
     protected new void Start()
     {
-        base.Start();
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
-        { ActorManager.Instance.AddPlayer(this); }
-
-        fallDeathCount = 0;
-        pushCount = 0;
-        pullCount = 0;
-
         mainCam = Camera.main.transform;
-        cam = mainCam.GetComponent<Camera>();
-
         cachedMovePacket = new P_PlayerMovement
         {
             currentPos = new P_PacketVector3(),
             currentRot = new P_PacketQuaternion()
         };
+
+        base.Start();
+
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
+        {
+            ActorManager.Instance.AddPlayer(this);
+        }
+
+        fallDeathCount = 0; pushCount = 0; pullCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
     {
@@ -75,20 +79,39 @@ public class PlayerActor : Actor
 
     void Update()
     {
-        if (ignoreServerPosTimer > 0f)
-        {
-            ignoreServerPosTimer -= Time.deltaTime;
-        }
-
         if (sm.currentState == null) return;
 
-        if (IsLocal) HandleInput();
+        if (IsLocal)
+        {
+            HandleInput();
+
+            ApplyWind();
+        }
 
         sm.Update();
-
         base.ApplyMovement();
+
+        if (IsLocal) HandleNetworkSync();
     }
 
+    public override void ApplyMovement()
+    {
+        if (controller == null || !controller.enabled) return;
+
+        if (sm.currentState is ActionState || sm.currentState is KnockbackState)
+        {
+            verticalVelocity = 0f;
+        }
+        else
+        {
+            ApplyGravity();
+        }
+
+        Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
+        controller.Move(finalMove * Mathf.Min(Time.deltaTime, 0.1f));
+
+        horizontalMove = Vector3.zero;
+    }
 
     public bool CheckActionInput()
     {
@@ -171,7 +194,23 @@ public class PlayerActor : Actor
     }
     private void ApplyGravity()
     {
-        if (sm.currentState is KnockbackState) return; // 넉백 상태에서는 중력 적용 안 함
+        if (sm.currentState is KnockbackState) return;
+
+        if (sm.currentState is ActionState)
+        {
+            if (IsLocal)
+            {
+                verticalVelocity = 0f;
+                return;
+            }
+
+            if (controller.isGrounded)
+            {
+                verticalVelocity = -2f;
+                return;
+            }
+        }
+
         if (controller.isGrounded && verticalVelocity < 0)
         {
             verticalVelocity = -2f;
@@ -407,7 +446,7 @@ public class PlayerActor : Actor
         cachedMovePacket.axisH = axisH;
         cachedMovePacket.axisV = axisV;
 
-        Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, cachedMovePacket);
+        if (Client.UDP != null) Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, cachedMovePacket);
     }
     public static byte[] SerializePlayerMovement(P_PlayerMovement pkt)
     {
@@ -449,7 +488,8 @@ public class PlayerActor : Actor
     public bool is2p = false;
     private void HandleInput()
     {
-        if (Is2p)
+        h = 0f; v = 0f;
+        if (!Is2p)
         {
             if (Input.GetKey(KeyCode.W)) v += 1f;
             if (Input.GetKey(KeyCode.A)) h -= 1f;
@@ -477,6 +517,19 @@ public class PlayerActor : Actor
     public override bool HasMoveIntent()
     {
         return (h != 0 || v != 0);
+    }
+
+    private void HandleNetworkSync()
+    {
+        sendTimer += Time.deltaTime;
+        if (sendTimer >= Actor.sendInterval)
+        {
+            if (HasMoveIntent() || sm.currentState is KnockbackState)
+            {
+                SendMovePacket(h, v);
+                sendTimer = 0f;
+            }
+        }
     }
 
     public override bool CheckActionIntent()
