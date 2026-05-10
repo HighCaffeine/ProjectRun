@@ -20,16 +20,16 @@ public class ActionState : IState
         this.actor = actor;
         this.actionType = type;
 
-        if (actionType == eState.Push) // 밀기
+        if (actionType == eState.Push)
         {
             maxDistance = 3f;
-            pushForce = 100;
-            maxAngle = 60;
+            pushForce = 5f;
+            maxAngle = 60f;
         }
-        else if (actionType == eState.Pull) // 당기기
+        else if (actionType == eState.Pull)
         {
             maxDistance = 10f;
-            pushForce = 120;
+            pushForce = 3f;
             maxAngle = 30f;
         }
     }
@@ -42,7 +42,6 @@ public class ActionState : IState
         actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
-        if (actionType == eState.Push) ((PlayerActor)actor).PushParticle();
 
         if (Time.time - actor.lastSkillUseTime < Actor.SKILL_COOLDOWN)
         {
@@ -68,6 +67,16 @@ public class ActionState : IState
         {
             searchForward = actor.transform.forward;
         }
+        if (actionType == eState.Push) ((PlayerActor)actor).PushParticle();
+
+        // 임시 테스트용
+        if (((PlayerActor)actor).PushMulti <= 0.0f)
+        {
+            actor.sm.ChangeState(new IdleState(actor));
+            return;
+        }
+
+
         if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
         // 타겟 탐색
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
@@ -80,9 +89,8 @@ public class ActionState : IState
         for (int i = 0; i < hitCount; i++)
         {
             Collider hit = hitBuffer[i];
-            if (hit.transform == actor.transform) continue;
-
             PlayerActor targetActor = hit.GetComponentInParent<PlayerActor>();
+            if (targetActor != null && targetActor == actor) continue;
             if (targetActor != null)
             {
                 dirToTarget = targetActor.transform.position - actor.transform.position;
@@ -118,19 +126,33 @@ public class ActionState : IState
         if (closestGimmick == null)
         {
             if (closestTarget == null) return;
+
+            float finalDistance = 0f;
+            float stopDistance = 1.5f;
+
+            if (actionType == eState.Push)
+            {
+                finalDistance = pushForce;
+            }
+            else if (actionType == eState.Pull)
+            {
+                finalDistance = Mathf.Max(0f, minDistance - stopDistance);
+            }
+
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 Player targetPlayer = closestTarget.GetComponent<Player>();
                 if (targetPlayer != null)
                 {
-                    actor.SendStateChange(eState.Knockback, dirToTarget, pushForce * pow, targetPlayer.ID);
+                    actor.SendStateChange(eState.Knockback, dirToTarget, finalDistance, targetPlayer.ID);
                 }
             }
             else
             {
                 PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
                 var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
-                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, pushForce * pow, actionType == eState.Pull, actor.transform.position));
+
+                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, finalDistance, actionType == eState.Pull, actor.transform.position));
             }
         }
         else if (closestGimmick != null)

@@ -26,8 +26,9 @@ public class PlayerActor : Actor
     [Header("Visual Effects")]
 
     public ParticleSystem pushParticle;
+    public Transform attackEffectPivot;
 
-    public void PushParticle() { pushParticle.Play(); }
+    public void PushParticle() { attackEffectPivot.localRotation = playerPivot.localRotation; pushParticle.Play(); }
 
     public TrailRenderer trailRenderer;
     public ParticleSystem[] travelSparkParticle;
@@ -237,23 +238,17 @@ public class PlayerActor : Actor
 
     private Vector3 GetMouseDir()
     {
-        Vector3 playerScreen = cam.WorldToScreenPoint(transform.position);
-        Vector3 mouse = Input.mousePosition;
+        Vector3 playerScreenPos = cam.WorldToScreenPoint(transform.position);
 
-        Vector3 screenDir = mouse - playerScreen;
+        Vector3 mousePos = Input.mousePosition;
+        mousePos.z = playerScreenPos.z;
 
-        Vector3 forward = cam.transform.forward;
-        Vector3 right = cam.transform.right;
+        Vector3 mouseWorldPos = cam.ScreenToWorldPoint(mousePos);
+        Vector3 dir = mouseWorldPos - transform.position;
 
-        forward.y = 0;
-        right.y = 0;
+        dir.y = 0;
 
-        forward.Normalize();
-        right.Normalize();
-
-        Vector3 worldDir = right * screenDir.x + forward * screenDir.y;
-
-        return worldDir.normalized;
+        return dir.normalized;
     }
 
     public void PlayBrakeParticles()
