@@ -71,19 +71,20 @@ public abstract class Actor : MonoBehaviour
     {
         if (controller == null || !controller.enabled) return;
 
-        if (controller.isGrounded)
+        if (controller.isGrounded && verticalVelocity < 0)
         {
-            if (verticalVelocity < 0) verticalVelocity = -2f;
+            verticalVelocity = -0.5f;
         }
         else
         {
             verticalVelocity += gravity * Time.deltaTime;
-
-            if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
         }
 
-        Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
-        controller.Move(finalMove * Time.deltaTime);
+        if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
+
+        Vector3 moveDelta = (horizontalMove + Vector3.up * verticalVelocity) * Time.deltaTime;
+
+        controller.Move(moveDelta);
 
         horizontalMove = Vector3.zero;
     }

@@ -53,7 +53,8 @@ public class PlayerActor : Actor
 
     protected new void Start()
     {
-        mainCam = Camera.main.transform;
+        cam = Camera.main;
+        mainCam = cam.transform;
         cachedMovePacket = new P_PlayerMovement
         {
             currentPos = new P_PacketVector3(),
@@ -83,13 +84,14 @@ public class PlayerActor : Actor
 
         if (IsLocal)
         {
+            h = 0f; v = 0f;
             HandleInput();
 
             ApplyWind();
         }
 
         sm.Update();
-        base.ApplyMovement();
+        ApplyMovement();
 
         if (IsLocal) HandleNetworkSync();
     }
@@ -316,7 +318,9 @@ public class PlayerActor : Actor
     public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0)
     {
         // 로컬이 쏘는거 아니면 리턴
+        if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
         if (!Client.IS_SERVER_PLAY || !IsLocal) return;
+        if (Client.TCP == null) return;
 
         long finalUUID = (targetUUID == 0) ? LocalPlayerInfo.ID : targetUUID;
 
@@ -488,7 +492,6 @@ public class PlayerActor : Actor
     public bool is2p = false;
     private void HandleInput()
     {
-        h = 0f; v = 0f;
         if (!Is2p)
         {
             if (Input.GetKey(KeyCode.W)) v += 1f;
