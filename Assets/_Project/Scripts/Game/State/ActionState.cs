@@ -157,7 +157,7 @@ public class ActionState : IState
 
                 if (targetPlayer != null)
                 {
-                    actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetPlayer.ID);
+                    actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetPlayer.ID, actionType == eState.Pull, actor.transform.position);
                 }
             }
             else

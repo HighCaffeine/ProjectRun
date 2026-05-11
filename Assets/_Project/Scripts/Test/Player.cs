@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
         {
             if (pkt.lastInputSeq < lastProcessedSeq) return;
             lastProcessedSeq = pkt.lastInputSeq;
+
+            if (actor != null && actor.sm.currentState is KnockbackState) return;
         }
 
         serverPos = pkt.currentPos.ToVector3();
@@ -62,6 +64,8 @@ public class Player : MonoBehaviour
     void Update()
     {
         if (float.IsNaN(serverPos.x) || float.IsNaN(serverRot.x)) return;
+
+        if (actor != null && actor.ignoreServerPosTimer > 0f) actor.ignoreServerPosTimer -= Time.deltaTime;
 
         if (isLocal)
         {
@@ -163,6 +167,7 @@ public class Player : MonoBehaviour
     private void ProcessLocalCalibration()
     {
         if (actor.sm.currentState is KnockbackState) return;
+        if (actor.ignoreServerPosTimer > 0f) return;
 
         Vector3 currentPos = transform.position;
         // 거리 체크를 X, Z 평면에서만 수행 (높이 차이는 무시)
@@ -192,34 +197,33 @@ public class Player : MonoBehaviour
         // transform.position = new Vector3(transform.position.x, lerpY, transform.position.z);
     }
     private void ProcessRemoteMovement()
+{
+    Vector3 targetPos = serverPos;
+    float dist = Vector3.Distance(transform.position, targetPos);
+
+    if (dist > snapThreshold * 2f)
     {
-        Vector3 targetPos = serverPos;
-
-        float dist = Vector3.Distance(transform.position, targetPos);
-
-        if (dist > snapThreshold * 2f)
-        {
-            actor.SetControllerActive(false);
-            transform.position = targetPos;
-            actor.SetControllerActive(true);
-
-            transform.rotation = serverRot;
-            return;
-        }
-
-        Vector3 delta =
-            Vector3.Lerp(Vector3.zero,
-            targetPos - transform.position,
-            Time.deltaTime * lerpSpeed);
-
-        actor.Move(delta.normalized, delta.magnitude);
-
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation,
-            serverRot,
-            Time.deltaTime * lerpSpeed
-        );
+        actor.SetControllerActive(false);
+        transform.position = targetPos;
+        actor.SetControllerActive(true);
+        transform.rotation = serverRot;
+        return;
     }
+
+    Vector3 delta = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * lerpSpeed) - transform.position;
+    
+    CharacterController cc = actor.GetComponent<CharacterController>();
+    if (cc != null && cc.enabled) 
+    {
+        cc.Move(delta);
+    }
+    else 
+    {
+        transform.position += delta;
+    }
+
+    transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
+}
 
     private IEnumerator RemoteVisualRoutine(byte actionType)
     {

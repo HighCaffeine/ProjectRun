@@ -49,49 +49,53 @@ public class KnockbackState : IState
 
         logDivisor = Mathf.Log(1 + K);
 
-        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower);
+        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, isPull: isPull, casterPos: casterPos);
         actor.StartCoroutine(actor.HitStopRoutine());
         actor.SetVerticalVelocity(3.0f);
 
         eState actionType = isPull ? eState.Pull : eState.Push;
         actor.animator.SetTrigger("Knockback");
         actor.PlayTravelSpark(actionType);
+
+        actor.ignoreServerPosTimer = DURATION + 0.5f;
     }
 
     public void Execute()
     {
         timer += Time.deltaTime;
-        float t = Mathf.Clamp01(timer / DURATION);
+        float t = timer / DURATION;
+        float logValue = Mathf.Log(1f + K * t) / logDivisor;
+        
+        float smooth = isPull ? 1f - ((1f - logValue) * (1f - logValue)) : logValue;
 
-        float logValue = Mathf.Log(1 + K * t) / logDivisor;
-        float smooth = isPull ? (1f - logValue) * (1f - logValue) : logValue;
-
-        Vector3 nextPos = Vector3.Lerp(startPos, targetPos, smooth);
-
-        Vector3 moveDelta = nextPos - actor.transform.position;
-        actor.Move(moveDelta.normalized, moveDelta.magnitude / Time.deltaTime);
-
-        if (isPull)
+        if (actor.IsLocal)
         {
-            float dx = casterPos.x - actor.transform.position.x;
-            float dz = casterPos.z - actor.transform.position.z;
-            float sqrDist = (dx * dx) + (dz * dz);
+            Vector3 nextPos = Vector3.Lerp(startPos, targetPos, smooth);
+            Vector3 moveDelta = nextPos - actor.transform.position;
+            actor.Move(moveDelta.normalized, moveDelta.magnitude / Time.deltaTime);
 
-            if (sqrDist <= STOP_DISTANCE)
+            if (isPull)
             {
-                timer = DURATION;
+                float dx = casterPos.x - actor.transform.position.x;
+                float dz = casterPos.z - actor.transform.position.z;
+                float sqrDist = (dx * dx) + (dz * dz);
+
+                if (sqrDist <= STOP_DISTANCE)
+                {
+                    timer = DURATION;
+                }
+
+                Vector3 dir = casterPos - actor.transform.position;
+                dir.y = 0f;
+                knockbackDir = dir.normalized;
             }
 
-            Vector3 dir = casterPos - actor.transform.position;
-            dir.y = 0f;
-            knockbackDir = dir.normalized;
-        }
-
-        actor.sendTimer += Time.deltaTime;
-        if (actor.sendTimer >= Actor.sendInterval)
-        {
-            actor.SendMovePacket(0f, 0f);
-            actor.sendTimer = 0f;
+            actor.sendTimer += Time.deltaTime;
+            if (actor.sendTimer >= Actor.sendInterval)
+            {
+                actor.SendMovePacket(0f, 0f);
+                actor.sendTimer = 0f;
+            }
         }
 
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, 0.6f, wallHitBuffer);

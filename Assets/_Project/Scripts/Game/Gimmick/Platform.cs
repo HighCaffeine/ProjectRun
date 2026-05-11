@@ -108,13 +108,41 @@ public class Platform : BaseGimmick
 
     IEnumerator MoveTo(Vector3 target)
     {
+        float syncTimer = 0f;
+        const float SYNC_INTERVAL = 0.5f; // 0.5초마다 현재 상태 재전송
+
         while (Vector3.Distance(transform.position, target) > 0.01f)
         {
             transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+
+            if (GameManager.Instance.isHost)
+            {
+                syncTimer += Time.deltaTime;
+                if (syncTimer >= SYNC_INTERVAL)
+                {
+                    syncTimer = 0f;
+                    SendSyncPacket(target); // 현재 목표 위치 재전송
+                }
+            }
+
             yield return null;
         }
 
         transform.position = target;
+    }
+
+    private void SendSyncPacket(Vector3 target)
+    {
+        P_GimmickInteractReq req = new P_GimmickInteractReq
+        {
+            activeUUID = LocalPlayerInfo.ID,
+            gimmickID = gimmickUID,
+            gimmickKey = (byte)eGimmickKey.MovePlatform,
+            state = (byte)eGimmickState.Sync,
+            targetPos = new P_PacketVector3 { x = target.x, y = target.y, z = target.z },
+            param = moveSpeed
+        };
+        Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)

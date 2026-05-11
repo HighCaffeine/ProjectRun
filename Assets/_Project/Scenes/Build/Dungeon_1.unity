@@ -4409,7 +4409,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &968816715
 Transform:
   m_ObjectHideFlags: 0
@@ -14353,7 +14353,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 9896822735022615, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 65253934725953990, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: gimmick_id
@@ -14365,7 +14365,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 113779010341570996, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 123584013188867739, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
@@ -14413,7 +14413,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 479071351825205326, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 523817375691366463, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: gimmick_id
@@ -14521,7 +14521,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1281030719145637870, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1327592791444804867, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -14605,7 +14605,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1836598783317881005, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1854143317160569771, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
@@ -14653,7 +14653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2049161764534186900, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2067338170358902613, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_LocalPosition.z
@@ -14745,7 +14745,7 @@ PrefabInstance:
       objectReference: {fileID: 177595377}
     - target: {fileID: 2414127592974883141, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2436408468461661963, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -14829,7 +14829,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2700887853520959160, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2714604290273410206, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -14889,7 +14889,7 @@ PrefabInstance:
       objectReference: {fileID: 1035653680}
     - target: {fileID: 2859842609575582886, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2898226095639623370, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -14905,7 +14905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2935349583510525816, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2946235300676892059, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -15089,7 +15089,7 @@ PrefabInstance:
       objectReference: {fileID: 579425673}
     - target: {fileID: 3868818183505737102, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3880975072356578749, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.size
@@ -15473,7 +15473,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5690266773576770676, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5718658810860822114, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -15553,7 +15553,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5931585185572264033, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5941841034422763857, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_Mesh
@@ -15597,7 +15597,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6148017817648513851, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6151235591871963939, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: isOneTimeUse
@@ -15617,7 +15617,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6201672127634356724, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6262282600414527428, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
@@ -15645,7 +15645,7 @@ PrefabInstance:
       objectReference: {fileID: 1035653680}
     - target: {fileID: 6378087278652144474, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6443679435758740400, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
@@ -15661,7 +15661,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6490154924776548032, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6494693938960777547, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
@@ -15757,7 +15757,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6936844949643327118, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6963599634752477875, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: gimmick_id
@@ -15805,7 +15805,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7134046194163029129, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7172875508571388714, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -15845,7 +15845,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7327425207250653419, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7329539377563816739, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: targetGimmicks.Array.size
@@ -15873,7 +15873,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7437556135061340202, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7463652283092971405, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: isOneTimeUse
@@ -15905,7 +15905,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7534122043870183255, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7576458783153188937, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_Mesh
@@ -16037,7 +16037,7 @@ PrefabInstance:
       objectReference: {fileID: 177595377}
     - target: {fileID: 8261778715887375695, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8330493293683977502, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
@@ -16089,7 +16089,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8475222882185468876, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8482348335492283391, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_Mesh
@@ -16197,7 +16197,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9155607093757538246, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9185467492039472915, guid: fd8ddfe7854bc094eabea0de8bdb8fb4, type: 3}
       propertyPath: gimmickUID

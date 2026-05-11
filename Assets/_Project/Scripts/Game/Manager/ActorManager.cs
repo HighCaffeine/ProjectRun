@@ -9,7 +9,7 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     public string localID;
 
-    public float spawnDelay = 5f;
+    public float spawnDelay = 1f;
 
     [SerializeField]
     private GameObject deadUIPrefab;

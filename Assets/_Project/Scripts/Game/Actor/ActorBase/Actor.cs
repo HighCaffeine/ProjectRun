@@ -12,7 +12,7 @@ public abstract class Actor : MonoBehaviour
 
     //sync
     public float sendTimer = 0f;
-    public const float sendInterval = 0.02f;
+    public const float sendInterval = 0.05f;
     //
 
     public StateMachine sm = new StateMachine();
@@ -104,12 +104,13 @@ public abstract class Actor : MonoBehaviour
         }
     }
 
+    public void ResetVerticalVelocity()
+    {
+        verticalVelocity = 0f;
+    }
+
     public virtual Vector3 GetActionDir() { return Vector3.zero; }
 
     public virtual void SendMovePacket(float h, float v) { }
-    public virtual void SendStateChange(eState newState, Vector3 dir = default, float power = 0f, long targetUUID = 0) { }
-
-
-   
-
+    public virtual void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default) {}
 }

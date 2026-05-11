@@ -12,16 +12,18 @@ public class TeleportState : IState
     }
 
     public void Enter()
-    {
-        actor.SetControllerActive(false);
+{
+    actor.SetControllerActive(false);
+    
+    actor.ResetVerticalVelocity(); 
+    
+    actor.transform.position = destPos;
+    Player playerSync = actor.GetComponent<Player>();
+    if (playerSync != null) playerSync.SetPos(destPos);
 
-        actor.transform.position = destPos;
-        Player playerSync = actor.GetComponent<Player>();
-        if (playerSync != null) playerSync.SetPos(destPos);
-
-        actor.SetControllerActive(true);
-        actor.sm.ChangeState(new IdleState(actor));
-    }
+    actor.SetControllerActive(true);
+    actor.sm.ChangeState(new IdleState(actor));
+}
 
     public void Execute()
     {

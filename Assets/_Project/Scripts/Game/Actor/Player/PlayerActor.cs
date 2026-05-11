@@ -92,8 +92,6 @@ public class PlayerActor : Actor
     {
         if (sm.currentState == null) return;
 
-
-
         if (IsLocal)
         {
             h = 0f; v = 0f;
@@ -106,10 +104,14 @@ public class PlayerActor : Actor
         }
 
         sm.Update();
-        ApplyMovement();
 
-        if (IsLocal) HandleNetworkSync();
+        if (IsLocal) 
+        {
+            ApplyMovement();
+            HandleNetworkSync();
+        }
     }
+
 
     public override void ApplyMovement()
     {
@@ -125,9 +127,11 @@ public class PlayerActor : Actor
         }
 
         Vector3 finalMove = horizontalMove + (Vector3.up * verticalVelocity);
-        controller.Move(finalMove * Mathf.Min(Time.deltaTime, 0.1f));
+        controller.Move((finalMove * Mathf.Min(Time.deltaTime, 0.1f)) + platformDelta);
 
         horizontalMove = Vector3.zero;
+        
+        platformDelta = Vector3.zero;
     }
 
     public bool CheckActionInput()
@@ -328,9 +332,8 @@ public class PlayerActor : Actor
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 변경 패킷 전송용 함수
-    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0)
+    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
     {
-        // 로컬이 쏘는거 아니면 리턴
         if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
         if (!Client.IS_SERVER_PLAY || !IsLocal) return;
         if (Client.TCP == null) return;
@@ -342,7 +345,10 @@ public class PlayerActor : Actor
             userUUID = finalUUID,
             newState = (byte)stateCode,
             targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
-            powerOrTime = param
+            powerOrTime = param,
+            
+            isPull = isPull ? (byte)1 : (byte)0,
+            casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z }
         };
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
@@ -365,12 +371,10 @@ public class PlayerActor : Actor
     {
         if (!controller)
         {
-            Debug.Log("노 컨트롤러");
             return;
         }
         else
         {
-            Debug.Log("들어옴");
             controller.enabled = false;
             transform.position = pos;
             playerPivot.gameObject.SetActive(false);
@@ -542,7 +546,7 @@ public class PlayerActor : Actor
         sendTimer += Time.deltaTime;
         if (sendTimer >= Actor.sendInterval)
         {
-            if (HasMoveIntent() || sm.currentState is KnockbackState)
+            if (HasMoveIntent() || sm.currentState is KnockbackState || (controller != null && !controller.isGrounded))
             {
                 SendMovePacket(h, v);
                 sendTimer = 0f;
