@@ -969,14 +969,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb561c666a703e84b8e7fbceeafbd6b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashCameraEffect
-  cam: {fileID: 1980322081}
-  camfov: 0
-  dashFov: 20
-  playerTransform: {fileID: 0}
-  dashAnchor: {fileID: 636745793}
-  holdTime: 0.3
-  camPivot: {fileID: 1185767964}
-  fff: 40
 --- !u!43 &221196989
 Mesh:
   m_ObjectHideFlags: 0
@@ -17182,25 +17174,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3637604745295841880, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4357494613103905100, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7898950515565763866, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_Name
       value: ToonShaderTest
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8
+      value: 8.959213
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.07903
+      value: -0.07902998
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.97
+      value: 2.0753403
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.1931245
+      value: 0.38240913
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalRotation.x
@@ -17208,7 +17208,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.9811743
+      value: 0.9239931
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalRotation.z
@@ -17220,7 +17220,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 157.73
+      value: 855.034
       objectReference: {fileID: 0}
     - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -19163,8 +19163,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 883445981}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.9950198, z: 0, w: -0.09967799}
-  m_LocalPosition: {x: 8.50747, y: 0.88097, z: 5.0846553}
+  m_LocalRotation: {x: 0, y: 0.995181, z: 0, w: 0.09805501}
+  m_LocalPosition: {x: 7.823245, y: 0.88097, z: 6.2408743}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19309,10 +19309,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf37df989adbdad438619820b57986aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
-  isDefaultListener: 1
-  bOverrideScalingFactor: 0
-  scalingFactor: -1
-  listenerId: 0
 --- !u!114 &883445988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19325,18 +19321,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3061f8bcd056fdc4e8b0a8d899937509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
-  m_listeners:
-    initialListenerList: []
-    useDefaultListeners: 1
-  isEnvironmentAware: 1
-  isStaticObject: 0
-  usePositionOffsetData: 0
-  m_positionOffsetData:
-    KeepMe: 0
-    positionOffset: {x: 0, y: 0, z: 0}
-  scalingFactor: 1
-  m_posOffsetData: {fileID: 0}
-  listenerMask: 1
 --- !u!114 &883445989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19349,10 +19333,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00fe5fc0ed43efd458515f12fd594b5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
-  isDefaultListener: 1
-  bOverrideScalingFactor: 0
-  scalingFactor: -1
-  listenerId: 0
 --- !u!114 &883445990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19365,18 +19345,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46dcf1cb783960040a10eac2e06dd6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
-  m_listeners:
-    initialListenerList: []
-    useDefaultListeners: 1
-  isEnvironmentAware: 0
-  isStaticObject: 0
-  usePositionOffsetData: 0
-  m_positionOffsetData:
-    KeepMe: 0
-    positionOffset: {x: 0, y: 0, z: 0}
-  scalingFactor: 1
-  m_posOffsetData: {fileID: 0}
-  listenerMask: 1
 --- !u!114 &883445991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19742,17 +19710,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: '[gym][04.17]vegitation'
       objectReference: {fileID: 0}
+    - target: {fileID: 6992737735403450119, guid: 124343bd0c69bcb439a1b0301025f469, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8220241825273047997, guid: 124343bd0c69bcb439a1b0301025f469, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.41
+      value: 9.45621
       objectReference: {fileID: 0}
     - target: {fileID: 8220241825273047997, guid: 124343bd0c69bcb439a1b0301025f469, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.58
+      value: -0.07902
       objectReference: {fileID: 0}
     - target: {fileID: 8220241825273047997, guid: 124343bd0c69bcb439a1b0301025f469, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.01
+      value: 0.84511
       objectReference: {fileID: 0}
     - target: {fileID: 8220241825273047997, guid: 124343bd0c69bcb439a1b0301025f469, type: 3}
       propertyPath: m_LocalRotation.w
@@ -20060,11 +20032,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1008205915912217112, guid: 50449cea1554656499e3400e16d377aa, type: 3}
   m_PrefabInstance: {fileID: 1176144499}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1185767964 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5612125318155587296, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
-  m_PrefabInstance: {fileID: 1980322079}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1197743905
 GameObject:
@@ -20454,6 +20421,98 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227547465}
   m_CullTransparentMesh: 1
+--- !u!1001 &1251524036
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1729710446}
+    m_Modifications:
+    - target: {fileID: 3362880633106810428, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3404920506523158408, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5079462173814747027, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7804982004013231584, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9.45621
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.07902
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.84511
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8127285848241349266, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8547748613472876625, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_Name
+      value: '[gym][05.11]cliff'
+      objectReference: {fileID: 0}
+    - target: {fileID: 8547748613472876625, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8654364897195559400, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8654364897195559400, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+    - {fileID: 1557516922057220581, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+--- !u!4 &1251524037 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+  m_PrefabInstance: {fileID: 1251524036}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1261663820
 GameObject:
   m_ObjectHideFlags: 0
@@ -20553,14 +20612,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb561c666a703e84b8e7fbceeafbd6b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashCameraEffect
-  cam: {fileID: 1378608098}
-  camfov: 0
-  dashFov: 40
-  playerTransform: {fileID: 6731980799024870978}
-  dashAnchor: {fileID: 636745793}
-  holdTime: 0.3
-  camPivot: {fileID: 187916728}
-  fff: 3
 --- !u!114 &1378608093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21388,6 +21439,7 @@ Transform:
   - {fileID: 636745793}
   - {fileID: 234806291}
   - {fileID: 1036328453}
+  - {fileID: 1251524037}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1732989415 stripped
@@ -22119,7 +22171,7 @@ Light:
   serializedVersion: 12
   m_Type: 1
   m_Color: {r: 0.9716981, g: 0.9716981, b: 0.9716981, a: 1}
-  m_Intensity: 1
+  m_Intensity: 1.29
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -23632,11 +23684,6 @@ MonoBehaviour:
     FrequencyGain: 1
     Duration: 1
     m_NoiseOffsets: {x: -849.319, y: -63.952118, z: 794.7986}
---- !u!4 &6731980799024870978 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5534662068807721850, guid: 7ef27771cee5e7b438dddf2b859ff1a9, type: 3}
-  m_PrefabInstance: {fileID: 8043995374744059831}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7116918933005548322
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23999,14 +24046,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb561c666a703e84b8e7fbceeafbd6b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashCameraEffect
-  cam: {fileID: 8081437617123573706}
-  camfov: 0
-  dashFov: 40
-  playerTransform: {fileID: 6731980799024870978}
-  dashAnchor: {fileID: 636745793}
-  holdTime: 0.3
-  camPivot: {fileID: 2889754750562329012}
-  fff: 3
 --- !u!114 &9143668699321989209
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -28,7 +28,11 @@ public class PlayerActor : Actor
     public ParticleSystem pushParticle;
     public Transform attackEffectPivot;
 
-    public void PushParticle() { attackEffectPivot.localRotation = playerPivot.localRotation; pushParticle.Play(); }
+    public void PushParticle()
+    {
+        attackEffectPivot.localRotation = playerPivot.localRotation; 
+        pushParticle.Stop(); pushParticle.Play();
+    }
 
     public TrailRenderer trailRenderer;
     public ParticleSystem[] travelSparkParticle;
@@ -36,9 +40,9 @@ public class PlayerActor : Actor
 
 
     private Vector3 platformDelta;
-    public Vector3 windDir;
-    public float windPower;
-    public bool isInWind;
+    private Vector3 windDir;
+    private float windPower;
+    private bool isInWind;
 
     #region 플레이어 통계
     public int fallDeathCount = 0;
@@ -51,7 +55,11 @@ public class PlayerActor : Actor
 
     public Transform mainCam { get; private set; }
     private P_PlayerMovement cachedMovePacket;
-
+    [Space(5f)]
+    [Header("Action Sprite")]
+    public SpriteRenderer Indicator;
+    public SpriteRenderer PullIndicator;
+    public SpriteRenderer PushIndicator;
     protected new void Start()
     {
         cam = Camera.main;
@@ -68,7 +76,8 @@ public class PlayerActor : Actor
         {
             ActorManager.Instance.AddPlayer(this);
         }
-
+        PullIndicator.gameObject.SetActive(false);
+        PushIndicator.gameObject.SetActive(false);   
         fallDeathCount = 0; pushCount = 0; pullCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
@@ -83,11 +92,16 @@ public class PlayerActor : Actor
     {
         if (sm.currentState == null) return;
 
+
+
         if (IsLocal)
         {
             h = 0f; v = 0f;
-            HandleInput();
-
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || animator.GetCurrentAnimatorStateInfo(0).IsName("Move"))
+            {
+                CheckActionIntent();
+                HandleInput();
+            }
             ApplyWind();
         }
 
@@ -278,8 +292,30 @@ public class PlayerActor : Actor
     public void PlayTravelSpark(eState actionType)
     {
         if (travelSparkParticle == null) return;
-        foreach (ParticleSystem p in travelSparkParticle)
+        //foreach (ParticleSystem p in travelSparkParticle)
+        //{
+        //    Transform sparkTransform = p.transform;
+
+        //    if (actionType == eState.Pull)
+        //    {
+        //        sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
+        //    }
+        //    else
+        //    {
+        //        sparkTransform.localRotation = Quaternion.identity;
+        //    }
+
+
+        //    p.Play();
+        //}
+
+        for (int i = 0; i < travelSparkParticle.Length; i++)
         {
+            // Push일 때 마지막 파티클 제외
+            if (actionType == eState.Push && i == travelSparkParticle.Length - 1)
+                continue;
+
+            ParticleSystem p = travelSparkParticle[i];
             Transform sparkTransform = p.transform;
 
             if (actionType == eState.Pull)
@@ -290,7 +326,6 @@ public class PlayerActor : Actor
             {
                 sparkTransform.localRotation = Quaternion.identity;
             }
-
 
             p.Play();
         }
@@ -537,6 +572,17 @@ public class PlayerActor : Actor
         if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
         if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
         return false;
+    }
+
+    public void InvokeSSaGay()
+    {
+        Invoke(nameof(AniTimer), 0.5f);
+    }
+
+    public void AniTimer()
+    {
+       PushIndicator.gameObject.SetActive(false);
+       PullIndicator.gameObject.SetActive(false);
     }
 }
 

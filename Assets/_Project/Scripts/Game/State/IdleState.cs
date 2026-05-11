@@ -20,7 +20,7 @@ public class IdleState : IState
     {
         if (!actor.IsLocal) return;
 
-        if (actor.CheckActionIntent()) return;
+        //if (actor.CheckActionIntent()) return;
 
         if (actor.HasMoveIntent())
         {

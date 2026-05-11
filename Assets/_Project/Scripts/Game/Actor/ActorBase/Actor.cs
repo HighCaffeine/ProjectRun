@@ -110,4 +110,6 @@ public abstract class Actor : MonoBehaviour
     public virtual void SendStateChange(eState newState, Vector3 dir = default, float power = 0f, long targetUUID = 0) { }
 
 
+   
+
 }

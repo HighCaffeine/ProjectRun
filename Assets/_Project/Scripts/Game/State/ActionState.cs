@@ -1,5 +1,6 @@
 using UnityEngine;
-
+using System;
+using System.Collections.Generic;
 public class ActionState : IState
 {
     private Actor actor;
@@ -67,8 +68,11 @@ public class ActionState : IState
         {
             searchForward = actor.transform.forward;
         }
-        if (actionType == eState.Push) ((PlayerActor)actor).PushParticle();
-
+        if (actionType == eState.Push)
+        {
+            ((PlayerActor)actor).PushParticle();
+            ((PlayerActor)actor).PushIndicator.gameObject.SetActive(true);
+        }
         // 임시 테스트용
         if (((PlayerActor)actor).PushMulti <= 0.0f)
         {
@@ -136,6 +140,7 @@ public class ActionState : IState
             }
             else if (actionType == eState.Pull)
             {
+                ((PlayerActor)actor).PullIndicator.gameObject.SetActive(true);
                 finalDistance = Mathf.Max(0f, minDistance - stopDistance);
             }
 
@@ -200,7 +205,9 @@ public class ActionState : IState
 
     public void Exit()
     {
+        ((PlayerActor)actor).InvokeSSaGay();
     }
+
 
 
 
