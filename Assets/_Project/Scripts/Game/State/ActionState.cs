@@ -144,12 +144,20 @@ public class ActionState : IState
                 finalDistance = Mathf.Max(0f, minDistance - stopDistance);
             }
 
+            Vector3 knockbackDir = dirToTarget.normalized;
+
+            if (actionType == eState.Pull)
+            {
+                knockbackDir = -knockbackDir;
+            }
+
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 Player targetPlayer = closestTarget.GetComponent<Player>();
+
                 if (targetPlayer != null)
                 {
-                    actor.SendStateChange(eState.Knockback, dirToTarget, finalDistance, targetPlayer.ID);
+                    actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetPlayer.ID);
                 }
             }
             else
@@ -157,7 +165,7 @@ public class ActionState : IState
                 PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
                 var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
 
-                a.sm.ChangeState(new KnockbackState((PlayerActor)a, dirToTarget, finalDistance, actionType == eState.Pull, actor.transform.position));
+                a.sm.ChangeState(new KnockbackState((PlayerActor)a, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
             }
         }
         else if (closestGimmick != null)

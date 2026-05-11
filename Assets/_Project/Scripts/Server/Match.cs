@@ -568,7 +568,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
                 //카메라 세팅
-                //cameraPivot.SetParent(playerObj.transform);
+                cameraPivot.SetParent(playerObj.transform);
                 cameraPivot.position = pActor.transform.position;
                 cameraPivot.gameObject.SetActive(true);
                 // if (DashCameraEffect.Instance != null)
@@ -585,8 +585,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     if (c.GetType() != typeof(CharacterController)) Destroy(c);
                 }
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
-                Rigidbody rb = playerObj.GetComponent<Rigidbody>();
-                if (rb != null) Destroy(rb);
+                //Rigidbody rb = playerObj.GetComponent<Rigidbody>();
+                //if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
                 ActorManager.Instance.p1 = pActor;

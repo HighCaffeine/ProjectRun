@@ -193,26 +193,32 @@ public class Player : MonoBehaviour
     }
     private void ProcessRemoteMovement()
     {
-        // 거리를 X, Z 기준으로만 계산
-        Vector3 currentPos = transform.position;
-        float dx = serverPos.x - currentPos.x;
-        float dz = serverPos.z - currentPos.z;
-        float sqrDistXZ = (dx * dx) + (dz * dz);
-        float snapLimit = snapThreshold * 2.0f;
+        Vector3 targetPos = serverPos;
 
-        if (sqrDistXZ > (snapLimit * snapLimit))
+        float dist = Vector3.Distance(transform.position, targetPos);
+
+        if (dist > snapThreshold * 2f)
         {
-            transform.position = new Vector3(serverPos.x, serverPos.y, serverPos.z);
+            actor.SetControllerActive(false);
+            transform.position = targetPos;
+            actor.SetControllerActive(true);
+
             transform.rotation = serverRot;
             return;
         }
 
-        float adaptiveSpeed = sqrDistXZ > 1.0f ? lerpSpeed * 1.5f : lerpSpeed;
+        Vector3 delta =
+            Vector3.Lerp(Vector3.zero,
+            targetPos - transform.position,
+            Time.deltaTime * lerpSpeed);
 
-        Vector3 targetPos = new Vector3(serverPos.x, serverPos.y, serverPos.z);
-        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * adaptiveSpeed);
+        actor.Move(delta.normalized, delta.magnitude);
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            serverRot,
+            Time.deltaTime * lerpSpeed
+        );
     }
 
     private IEnumerator RemoteVisualRoutine(byte actionType)

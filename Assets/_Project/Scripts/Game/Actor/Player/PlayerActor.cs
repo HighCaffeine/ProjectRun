@@ -36,6 +36,7 @@ public class PlayerActor : Actor
 
     public TrailRenderer trailRenderer;
     public ParticleSystem[] travelSparkParticle;
+
     public ParticleSystem[] brakeParticle;
 
 
@@ -72,10 +73,9 @@ public class PlayerActor : Actor
 
         base.Start();
 
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
-        {
-            ActorManager.Instance.AddPlayer(this);
-        }
+       
+        ActorManager.Instance.AddPlayer(this);
+        
         PullIndicator.gameObject.SetActive(false);
         PushIndicator.gameObject.SetActive(false);   
         fallDeathCount = 0; pushCount = 0; pullCount = 0;
@@ -292,43 +292,26 @@ public class PlayerActor : Actor
     public void PlayTravelSpark(eState actionType)
     {
         if (travelSparkParticle == null) return;
-        //foreach (ParticleSystem p in travelSparkParticle)
-        //{
-        //    Transform sparkTransform = p.transform;
 
-        //    if (actionType == eState.Pull)
-        //    {
-        //        sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
-        //    }
-        //    else
-        //    {
-        //        sparkTransform.localRotation = Quaternion.identity;
-        //    }
+        int index = (actionType == eState.Pull) ? 1 : 0;
 
+        ParticleSystem particle = travelSparkParticle[index];
 
-        //    p.Play();
-        //}
+        if (particle == null) return;
 
-        for (int i = 0; i < travelSparkParticle.Length; i++)
+        Transform sparkTransform = particle.transform;
+
+        // 기본 방향
+        sparkTransform.localRotation = Quaternion.identity;
+
+        // Pull이면 뒤집기
+        if (actionType == eState.Pull)
         {
-            // Push일 때 마지막 파티클 제외
-            if (actionType == eState.Push && i == travelSparkParticle.Length - 1)
-                continue;
-
-            ParticleSystem p = travelSparkParticle[i];
-            Transform sparkTransform = p.transform;
-
-            if (actionType == eState.Pull)
-            {
-                sparkTransform.localRotation = Quaternion.Euler(0, 180, 0);
-            }
-            else
-            {
-                sparkTransform.localRotation = Quaternion.identity;
-            }
-
-            p.Play();
+            sparkTransform.Rotate(0f, 180f, 0f, Space.Self);
         }
+
+        particle.Stop();
+        particle.Play();
     }
 
     public void StopTravelSpark()
@@ -382,10 +365,12 @@ public class PlayerActor : Actor
     {
         if (!controller)
         {
+            Debug.Log("노 컨트롤러");
             return;
         }
         else
         {
+            Debug.Log("들어옴");
             controller.enabled = false;
             transform.position = pos;
             playerPivot.gameObject.SetActive(false);
@@ -583,6 +568,15 @@ public class PlayerActor : Actor
     {
        PushIndicator.gameObject.SetActive(false);
        PullIndicator.gameObject.SetActive(false);
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        Debug.Log(collision.gameObject.name);
+    }
+    private void OnTriggerStay(Collider other)
+    {
+        Debug.Log(other.name);
     }
 }
 
