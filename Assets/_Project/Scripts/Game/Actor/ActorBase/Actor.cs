@@ -20,7 +20,7 @@ public abstract class Actor : MonoBehaviour
     public StateMachine sm = new StateMachine();
     protected P_PacketVector3 dir;
     public float MoveSpeed { get => moveSpeed; set => moveSpeed = value; }
-    protected float moveSpeed = 5.0f;
+    public float moveSpeed = 5.0f;
     [SerializeField]
     protected Transform playerPivot;
 
