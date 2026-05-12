@@ -68,10 +68,15 @@ public class ActorManager : GenericSingleton<ActorManager>
         string actorID = actor.gameObject.name;
         if (!actors.ContainsKey(actorID))
         {
-            spawnPoints.Add(actorID, "1_0");
-            actors.Add(actorID, actor);
+            // 현재 던전 매니저의 맵/섹터 정보로 초기화
+            int currentMap = DungeonPointManager.Instance.currentMapID;
+            int currentSector = DungeonPointManager.Instance.currentSectorIndex;
 
+            spawnPoints.Add(actorID, $"{currentMap}_{currentSector}");
+            actors.Add(actorID, actor);
             actor.OnUpdatePoint += UpdateSpawnIndex;
+
+            Debug.Log($"[ActorManager] {actorID} 초기 스폰 포인트: Map{currentMap}_Sector{currentSector}");
         }
     }
 

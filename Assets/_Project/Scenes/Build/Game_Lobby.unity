@@ -17797,9 +17797,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 814fdbcbc7dad1d488157a33dc534f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonPointManager
-  sectors:
-  - spawnPoint: {fileID: 1554594897}
-  mapID: 0
+  mapDataList: []
+  currentMapID: 1
   currentSectorIndex: 0
 --- !u!1001 &488171153
 PrefabInstance:
@@ -19167,8 +19166,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 883445981}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.35355338, y: 0.35355338, z: -0.1464466, w: 0.8535535}
-  m_LocalPosition: {x: -10, y: 14.142137, z: -10.000001}
+  m_LocalRotation: {x: 0.31598538, y: 0.3596048, z: -0.13088542, w: 0.8681629}
+  m_LocalPosition: {x: -16.25026, y: 19.283627, z: -16.25026}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -22833,23 +22832,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8535535
+      value: 0.8681629
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.35355338
+      value: 0.31598538
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.35355338
+      value: 0.3596048
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.1464466
+      value: -0.13088542
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 45
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 1058396361775087826, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -22869,7 +22868,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9127134485710383714, guid: 8fc97f23e4485fe43b0c89e34030d343, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -20
+      value: -30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -37,7 +37,7 @@ public class GimmickData
 public class MapExportData
 {
     public MapMeta meta;
-    public List<GimmickData> gimmicks = new List<GimmickData>(); // 5개 레벨 기믹 통합
+    public List<GimmickData> gimmicks = new List<GimmickData>();
 }
 #endregion
 
@@ -47,33 +47,85 @@ public class MapDataExporter : Editor
     public static void ExportSelectedModule()
     {
         GameObject selectedObj = Selection.activeGameObject;
+
+        // 선택 확인
         if (selectedObj == null)
         {
-            Debug.LogWarning("MapModuleGrid 루트 오브젝트를 선택해주세요.");
+            Debug.LogError("[Export] 오브젝트가 선택되지 않았습니다!");
             return;
         }
+        Debug.Log($"[Export] 선택된 오브젝트: {selectedObj.name}");
 
+        // MapModuleGrid 찾기
         MapModuleGrid[] grids = selectedObj.GetComponentsInChildren<MapModuleGrid>();
+        Debug.Log($"[Export] 찾은 MapModuleGrid 개수: {grids.Length}");
+
         if (grids.Length == 0)
         {
-            Debug.LogWarning("선택한 오브젝트 내에 MapModuleGrid가 없습니다.");
+            Debug.LogError("[Export] MapModuleGrid 컴포넌트를 찾을 수 없습니다!");
+            Debug.Log($"[Export Tip] '{selectedObj.name}' 또는 그 자식에 MapModuleGrid 컴포넌트가 있는지 확인하세요.");
             return;
         }
 
-        MapExportData exportData = new MapExportData();
-        exportData.meta = new MapMeta { map_id = 101, map_name = selectedObj.name, version = "1.0.0" };
+        GimmickInfo[] allGimmicksInMap = selectedObj.GetComponentsInChildren<GimmickInfo>(true);
+        HashSet<int> usedIds = new HashSet<int>();
+        List<GimmickInfo> gimmicksToAssign = new List<GimmickInfo>();
 
+        // 이미 사용 중인 고유 ID 수집
+        foreach (var info in allGimmicksInMap)
+        {
+            if (info.gimmick_id > 0 && !usedIds.Contains(info.gimmick_id))
+            {
+                usedIds.Add(info.gimmick_id); // 안전한 기존 ID 등록
+            }
+            else
+            {
+                gimmicksToAssign.Add(info); // ID가 0이거나 중복된 녀석들은 대기열로
+            }
+        }
+
+        // 빈 번호를 찾아서 새로 할당
         int autoGimmickId = 1000;
+        foreach (var info in gimmicksToAssign)
+        {
+            // 사용 중인 ID를 피해서 빈 번호 찾기
+            while (usedIds.Contains(autoGimmickId))
+            {
+                autoGimmickId++;
+            }
 
-        // 찾은 모든 레벨을 순회하며 기믹을 하나로 합침
+            info.gimmick_id = autoGimmickId;
+            usedIds.Add(autoGimmickId);
+
+            EditorUtility.SetDirty(info);
+            Debug.Log($"<color=cyan>[Export ID 발급]</color> '{info.gameObject.name}'에 새 ID 할당 -> {autoGimmickId}");
+        }
+
+
+        MapExportData exportData = new MapExportData();
+        exportData.meta = new MapMeta
+        {
+            map_id = 101,
+            map_name = selectedObj.name,
+            version = "1.0.0"
+        };
+
+        int totalGimmicksFound = 0;
+
+        // 각 Grid 순회
         foreach (MapModuleGrid grid in grids)
         {
+            Debug.Log($"[Export] Grid 처리 중: {grid.gameObject.name}");
+
             GimmickInfo[] allGimmicks = grid.GetComponentsInChildren<GimmickInfo>(true);
+            Debug.Log($"[Export]   └─ 찾은 GimmickInfo 개수: {allGimmicks.Length}");
 
             foreach (GimmickInfo info in allGimmicks)
             {
                 Transform child = info.transform;
+                string tag = child.tag;
 
+                // Tag 확인
                 if (child.CompareTag("Gimmick") || child.CompareTag("Breakable"))
                 {
                     GimmickData gd = new GimmickData();
@@ -98,19 +150,51 @@ public class MapDataExporter : Editor
                     }
 
                     exportData.gimmicks.Add(gd);
+                    totalGimmicksFound++;
+                }
+                else
+                {
+                    Debug.LogWarning($"[Export] 스킵됨: Tag가 {tag}. (Gimmick 또는 Breakable이어야 함)");
                 }
             }
         }
 
+        // 결과 확인
+        if (totalGimmicksFound == 0)
+        {
+            Debug.LogError("[Export] 추출된 기믹이 0개입니다!");
+            Debug.LogError("[Export] 확인사항:");
+            Debug.LogError("  1. GimmickInfo 컴포넌트가 붙어있는지");
+            Debug.LogError("  2. Tag가 'Gimmick' 또는 'Breakable'인지");
+            return;
+        }
+
         // JSON 저장
-        string jsonOutput = JsonConvert.SerializeObject(exportData, Formatting.Indented);
-        string dirPath = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "ServerData");
-        if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+        try
+        {
+            string jsonOutput = JsonConvert.SerializeObject(exportData, Formatting.Indented);
+            string dirPath = Path.Combine(Directory.GetParent(Application.dataPath).FullName, "ServerData");
 
-        string filePath = Path.Combine(dirPath, $"{exportData.meta.map_name}_{exportData.meta.version}.json");
-        File.WriteAllText(filePath, jsonOutput);
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+                Debug.Log($"[Export] 디렉토리 생성: {dirPath}");
+            }
 
-        Debug.Log($"[추출 완료] {selectedObj.name} 스테이지 내 {grids.Length}개 레벨에서 총 {exportData.gimmicks.Count}개의 기믹 추출");
-        AssetDatabase.Refresh();
+            string filePath = Path.Combine(dirPath, $"{exportData.meta.map_name}_{exportData.meta.version}.json");
+            File.WriteAllText(filePath, jsonOutput);
+
+            Debug.Log($"<color=green>[추출 완료]</color> {selectedObj.name} 스테이지 내 {grids.Length}개 레벨에서 총 {exportData.gimmicks.Count}개의 기믹 추출");
+            Debug.Log($"<color=green>[파일 위치]</color> {filePath}");
+
+            AssetDatabase.Refresh();
+
+            // 파일 열기
+            EditorUtility.RevealInFinder(filePath);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Export] JSON 저장 실패: {e.Message}");
+        }
     }
 }

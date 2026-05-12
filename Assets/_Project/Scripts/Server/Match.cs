@@ -305,12 +305,16 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
-                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
+                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone)
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            int nextSpawnIndex = (int)ntf.param;
-                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, nextSpawnIndex);
+                            // float에서 mapID와 sectorIndex 디코딩
+                            int encodedValue = (int)ntf.param;
+                            int mapID = encodedValue / 100;
+                            int nextSpawnIndex = encodedValue % 100;
+
+                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(mapID, nextSpawnIndex);
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
                             if (controller != null) controller.enabled = false;
 
@@ -324,8 +328,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             {
                                 pActor.ignoreServerPosTimer = 0.5f;
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
-                                //ActorManager.Instance.OnPlayerDeadTestSpawn(pActor.gameObject.name,)
                             }
+
+                            Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
                         }
                         break;
                     }

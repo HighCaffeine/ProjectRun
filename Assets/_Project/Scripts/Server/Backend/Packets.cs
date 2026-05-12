@@ -14,7 +14,8 @@ public enum eGimmickKey : byte
     MovePlatform = 8,
     Wind = 9,
     NextZone = 10,
-    Count = 11
+    Checkpoint = 11,
+    Count = 12
 }
 
 public enum E_PACKET

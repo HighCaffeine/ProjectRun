@@ -33,19 +33,21 @@ public class NextZone : MonoBehaviour
                 return;
             }
 
-            // 서버로 기믹 이동 패킷 전송
+            // mapID와 sectorIndex를 하나의 float으로 인코딩
+            float encodedValue = (targetMapID * 100) + targetSectorIndex;
+
             P_GimmickInteractReq req = new P_GimmickInteractReq
             {
                 activeUUID = LocalPlayerInfo.ID,
-                gimmickID = 999, // 포탈 공통 ID
+                gimmickID = 999,
                 gimmickKey = (byte)eGimmickKey.NextZone,
-                state = 2,       // 2 = Next 텔레포트
+                state = 2,
                 targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-                param = targetSectorIndex
+                param = encodedValue // 예: 1_2 -> 102
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-            Debug.Log($"[System] {targetSectorIndex}번 구역으로 이동 요청");
+            Debug.Log($"[System] Map{targetMapID}_Sector{targetSectorIndex}번 구역으로 이동 요청 (encoded: {encodedValue})");
         }
     }
 }
