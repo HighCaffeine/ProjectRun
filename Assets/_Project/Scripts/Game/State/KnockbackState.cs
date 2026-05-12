@@ -103,8 +103,16 @@ public class KnockbackState : IState
         {
             if (wallHitBuffer[i].CompareTag("Breakable"))
             {
+                if (actor.IsLocal)
+                {
+                    GimmickTrigger gimmick = wallHitBuffer[i].GetComponent<GimmickTrigger>();
+                    if (gimmick != null)
+                    {
+                        gimmick.ProcessInteract(actor.gameObject);
+                    }
+                }
+
                 wallHitBuffer[i].gameObject.SetActive(false);
-                return;
             }
         }
 

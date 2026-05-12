@@ -11,7 +11,7 @@ public class ActionState : IState
     private float maxDistance;
     private float maxAngle = 30f;
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
-    private float pow = 1.5f;  // 계수
+    private float pow = 2f;  // 계수
 
     private static Collider[] hitBuffer = new Collider[20];
     private static int targetLayerMask = -1;
@@ -24,13 +24,13 @@ public class ActionState : IState
         if (actionType == eState.Push)
         {
             maxDistance = 3f;
-            pushForce = 5f;
+            pushForce = 5f * pow;
             maxAngle = 60f;
         }
         else if (actionType == eState.Pull)
         {
-            maxDistance = 10f;
-            pushForce = 3f;
+            maxDistance = 13f;
+            pushForce = 3f * pow;
             maxAngle = 30f;
         }
     }

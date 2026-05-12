@@ -12,8 +12,10 @@ public abstract class Actor : MonoBehaviour
 
     //sync
     public float sendTimer = 0f;
-    public const float sendInterval = 0.05f;
+    public const float sendInterval = 0.1f;
     //
+
+    public bool isDead = false;
 
     public StateMachine sm = new StateMachine();
     protected P_PacketVector3 dir;

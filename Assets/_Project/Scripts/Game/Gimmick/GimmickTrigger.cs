@@ -29,7 +29,7 @@ public class GimmickTrigger : MonoBehaviour
         ProcessInteract(collision.gameObject);
     }
 
-    private void ProcessInteract(GameObject otherObj)
+    public void ProcessInteract(GameObject otherObj)
     {
         if (isOneTimeUse && isTriggered) 
         {

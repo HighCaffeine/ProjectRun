@@ -90,6 +90,7 @@ public class PlayerActor : Actor
 
     void Update()
     {
+        if (isDead || controller == null || !controller.enabled) return;
         if (sm.currentState == null) return;
 
         if (IsLocal)
@@ -117,9 +118,15 @@ public class PlayerActor : Actor
     {
         if (controller == null || !controller.enabled) return;
 
+        bool isOnPlatform = (platformDelta.sqrMagnitude > 0.00001f);
+
         if (sm.currentState is ActionState || sm.currentState is KnockbackState)
         {
             verticalVelocity = 0f;
+        }
+        else if (isOnPlatform)
+        {
+            verticalVelocity = -0.1f; 
         }
         else
         {
@@ -369,25 +376,37 @@ public class PlayerActor : Actor
     }
     public void PlayerDead(Vector3 pos, float spawnDelay)
     {
-        if (!controller)
-        {
-            return;
-        }
-        else
-        {
-            controller.enabled = false;
-            transform.position = pos;
-            playerPivot.gameObject.SetActive(false);
-            StartCoroutine(RespawnAfterDelay(spawnDelay));
-            fallDeathCount++;
-            Debug.Log(gameObject.name + "Die" + fallDeathCount);
-        }
+        
+        if (isDead || !controller) return;
+
+        isDead = true;
+
+        verticalVelocity = 0f;
+        controller.enabled = false;
+
+        pos.y += 1.5f;
+        transform.position = pos;
+
+        if (isLocal) SendMovePacket(0f, 0f);
+
+        playerPivot.gameObject.SetActive(false);
+        StartCoroutine(RespawnAfterDelay(spawnDelay));
+        fallDeathCount++;
+        Debug.Log(gameObject.name + "Die" + fallDeathCount);
+        
     }
     IEnumerator RespawnAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
         controller.enabled = true;
+        verticalVelocity = 0f;
+        isDead = false;
         playerPivot.gameObject.SetActive(true);
+
+        if (IsLocal) 
+        {
+            SendMovePacket(0f, 0f);
+        }
     }
 
     // 상태 머신이 호출, 확정 좌표 패킷 전송
@@ -541,18 +560,26 @@ public class PlayerActor : Actor
         return (h != 0 || v != 0);
     }
 
+    private Vector3 lastSentPos;
+
     private void HandleNetworkSync()
     {
+        if (isDead) return;
+
         sendTimer += Time.deltaTime;
         if (sendTimer >= Actor.sendInterval)
         {
-            if (HasMoveIntent() || sm.currentState is KnockbackState || (controller != null && !controller.isGrounded))
-            {
-                SendMovePacket(h, v);
-                sendTimer = 0f;
-            }
+        bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.001f;
+
+        if (HasMoveIntent() || sm.currentState is KnockbackState || (controller != null && !controller.isGrounded) || isPositionChanged)
+        {
+            SendMovePacket(h, v);
+            
+            lastSentPos = transform.position; 
+            sendTimer = 0f;
         }
     }
+}
 
     public override bool CheckActionIntent()
     {
@@ -572,15 +599,6 @@ public class PlayerActor : Actor
     {
        PushIndicator.gameObject.SetActive(false);
        PullIndicator.gameObject.SetActive(false);
-    }
-
-    private void OnCollisionStay(Collision collision)
-    {
-        Debug.Log(collision.gameObject.name);
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        Debug.Log(other.name);
     }
 }
 

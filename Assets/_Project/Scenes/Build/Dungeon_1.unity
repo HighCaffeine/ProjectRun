@@ -4546,7 +4546,7 @@ PrefabInstance:
       objectReference: {fileID: 2066070013}
     - target: {fileID: 7266026983877994438, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: sectors.Array.size
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7266026983877994438, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: sectors.Array.data[0].spawnPoint
@@ -4559,22 +4559,22 @@ PrefabInstance:
     - target: {fileID: 7266026983877994438, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: sectors.Array.data[2].spawnPoint
       value: 
-      objectReference: {fileID: 8098790659562987787}
+      objectReference: {fileID: 0}
     - target: {fileID: 7266026983877994438, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: sectors.Array.data[3].spawnPoint
       value: 
-      objectReference: {fileID: 9002879129164962130}
+      objectReference: {fileID: 0}
     - target: {fileID: 7266026983877994438, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: sectors.Array.data[4].spawnPoint
       value: 
-      objectReference: {fileID: 727234676042077108}
+      objectReference: {fileID: 0}
     - target: {fileID: 8390769556861452719, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: m_Name
       value: DungeonPointManager (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8390769556861452719, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -16362,7 +16362,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8390769556861452719, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
