@@ -32,51 +32,35 @@ public class ActorManager : GenericSingleton<ActorManager>
     }
     public void OnPlayerDead(string name)
     {
-        bool isLocal = (name == localID);
-
         if (!actors.ContainsKey(name)) return;
 
-        PlayerActor actor = actors[name];
+        bool isLocal = (name == localID);
 
         string spawnInfo = spawnPoints[name];
         string[] split = spawnInfo.Split('_');
-
-
         int mapLevel = int.Parse(split[0]);
         int spawnIndex = int.Parse(split[1]);
-        //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapID, spawnIndex);
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
-        SendPlayerDeadPacket(name, spawnPos);
 
-        actor.PlayerDead(spawnPos, spawnDelay);
+        // 새로 바뀐 다중 맵 스폰 로직 적용
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(mapLevel, spawnIndex);
+
+        // 모든 플레이어를 같이 죽이고 부활시킴
+        foreach (var kvp in actors)
+        {
+            PlayerActor teammate = kvp.Value;
+
+            // 아직 안 죽은 팀원도 강제로 데스 처리
+            if (!teammate.isDead)
+            {
+                teammate.PlayerDead(spawnPos, spawnDelay);
+            }
+        }
 
         if (isLocal)
         {
+            SendPlayerDeadPacket(name, spawnPos);
             ShowDeadUI(spawnDelay);
         }
-
-
-    }
-
-    public void OnPlayerDeadTestSpawn(string name, float time = 0.0f)
-    {
-        bool isLocal = (name == localID);
-
-        if (!actors.ContainsKey(name)) return;
-
-        PlayerActor actor = actors[name];
-
-        string spawnInfo = spawnPoints[name];
-        string[] split = spawnInfo.Split('_');
-
-
-        int mapLevel = int.Parse(split[0]);
-        int spawnIndex = int.Parse(split[1]);
-        //  Vector3 spawnPos = MapManager.Instance.GetSpawnPoint(mapID, spawnIndex);
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(spawnIndex);
-        SendPlayerDeadPacket(name, spawnPos);
-
-        actor.PlayerDead(spawnPos, time);
     }
 
     public void AddPlayer(PlayerActor actor)
@@ -153,32 +137,27 @@ public class ActorManager : GenericSingleton<ActorManager>
         }
         return null;
     }
-    public void UpdateAllSpawnPoints(int newIndex)
+    public void UpdateAllSpawnPoints(int mapID, int newIndex)
     {
-        int currentMapID = DungeonPointManager.Instance.mapID;
-
         List<string> keys = new List<string>(actors.Keys);
-
         foreach (var id in keys)
         {
-            spawnPoints[id] = $"{currentMapID}_{newIndex}";
+            spawnPoints[id] = $"{mapID}_{newIndex}";
         }
     }
-    public void MoveAllPlayersToSector(int index)
+
+    public void MoveAllPlayersToSector(int mapID, int index)
     {
-        Vector3 pos = DungeonPointManager.Instance.GetSpawnPosition(index);
+        Vector3 pos = DungeonPointManager.Instance.GetSpawnPosition(mapID, index);
 
         foreach (var actor in actors.Values)
         {
             CharacterController cc = actor.GetComponent<CharacterController>();
-
-            if (cc != null)
-                cc.enabled = false;
+            if (cc != null) cc.enabled = false;
 
             actor.transform.position = pos;
 
-            if (cc != null)
-                cc.enabled = true;
+            if (cc != null) cc.enabled = true;
         }
     }
 }

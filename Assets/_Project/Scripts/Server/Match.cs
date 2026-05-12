@@ -112,7 +112,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.ROOM_NEW_USER_NTF:
                 {
                     P_RoomNewUserNotify roomNewUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-                    Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(0) : Vector3.zero;
+                    Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, 0) : Vector3.zero;
                     AddPlayer(roomNewUserNotify.userUUID, roomNewUserNotify.userName, pos);
                     //Debug.Log($"Player {roomNewUserNotify.userName} has joined");
                     break;
@@ -310,8 +310,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
                             int nextSpawnIndex = (int)ntf.param;
-                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(nextSpawnIndex);
-
+                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, nextSpawnIndex);
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
                             if (controller != null) controller.enabled = false;
 
@@ -369,15 +368,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         {
                             Vector3 respawnPos = ntf.respawnPos.ToVector3();
 
-                            CharacterController cc = targetPlayer.GetComponent<CharacterController>();
-                            if (cc != null) cc.enabled = false;
+                            PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
+                            if (pActor != null)
+                            {
+                                pActor.PlayerDead(respawnPos, ActorManager.Instance.spawnDelay);
+                            }
 
-                            targetPlayer.transform.position = respawnPos;
-                            targetPlayer.SetPos(respawnPos); // Player 보정 클래스 위치도 덮어쓰기
+                            targetPlayer.SetPos(respawnPos);
 
-                            if (cc != null) cc.enabled = true;
-
-                            Debug.Log($"[System] 다른 유저({ntf.userUUID})가 부활 위치로 강제 이동됨");
+                            Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
                         }
                     }
                     break;
@@ -634,7 +633,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     {
         if (DungeonPointManager.Instance == null) return;
 
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, sectorIndex);
         Player p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
 
         if (Client.IS_SERVER_PLAY)

@@ -3,6 +3,7 @@ using UnityEngine;
 public class NextZone : MonoBehaviour
 {
     [Header("텔레포트 설정")]
+    public int targetMapID = 1;
     public int targetSectorIndex;
 
     private void OnTriggerEnter(Collider other)
@@ -11,15 +12,18 @@ public class NextZone : MonoBehaviour
 
         if (actor != null && actor.IsLocal)
         {
-            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetSectorIndex);
+            DungeonPointManager.Instance.currentMapID = targetMapID;
+            DungeonPointManager.Instance.currentSectorIndex = targetSectorIndex;
+
+            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetMapID, targetSectorIndex);
 
             Debug.Log(destPos);
 
             actor.OnUpdatePoint?.Invoke(actor.name, targetSectorIndex);
-            
+
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
             {
-                return; 
+                return;
             }
             if (!Client.IS_SERVER_PLAY || Match.Instance.isDebugMode)
             {
