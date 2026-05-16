@@ -34,19 +34,19 @@ public class AimState : IState
     public void Enter()
     {
         if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
-        // push 실행 후 팔 든 상태에서 속도 0으로 전환
     }
 
     public void Execute()
     {
-        // 마우스 방향 바라보기
-        Vector3 aimDir = actor.GetActionDir();
+        Vector3 aimDir = actor.Is2p ? actor.GetForward() : actor.GetActionDir();
+
+        // 조준 방향 실시간 바라보기
         actor.LookAtDirection(aimDir, true);
 
-        // 타겟팅 (점수 기준)
+        // 타겟팅 점수 계산
         FindBestTarget(aimDir);
 
-        // 대상에게 선 긋기
+        // 대상에게 선 긋기 시각화
         if (currentTargetGimmick != null)
         {
             actor.DrawAimLine(currentTargetGimmick.transform.position);
@@ -66,6 +66,7 @@ public class AimState : IState
 
         if (isReleased)
         {
+            // 확정된 타겟들을 들고 ActionState로 전환
             actor.sm.ChangeState(new ActionState(actor, actionType, currentTargetPlayer, currentTargetGimmick));
         }
     }
@@ -106,8 +107,17 @@ public class AimState : IState
                 if (score < bestScore)
                 {
                     bestScore = score;
-                    currentTargetGimmick = gimmick;
-                    currentTargetPlayer = targetActor;
+
+                    if (gimmick != null)
+                    {
+                        currentTargetGimmick = gimmick;
+                        currentTargetPlayer = null;
+                    }
+                    else if (targetActor != null)
+                    {
+                        currentTargetPlayer = targetActor;
+                        currentTargetGimmick = null;
+                    }
                 }
             }
         }
