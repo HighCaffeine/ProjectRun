@@ -228,7 +228,7 @@ public class MapEditorVer2 : EditorWindow
         if (info != null)
         {
             info.gimmick_id = uid;
-            info.gimmick_type = targetKey.ToString();
+            info.gimmick_type = targetKey;
             EditorUtility.SetDirty(gimmickObj);
         }
         // 그룹 관리를 위한 빈 오브젝트 생성
@@ -266,7 +266,7 @@ public class MapEditorVer2 : EditorWindow
 
             TargetGimmickInfo targetInfo = new TargetGimmickInfo();
             targetInfo.gimmickID = uid;
-            targetInfo.gimmickKey = (GimmickKey)targetKey;
+            targetInfo.gimmickKey = (eGimmickKey)targetKey;
 
             triggerComp.targetGimmicks.Clear();
             triggerComp.targetGimmicks.Add(targetInfo);
@@ -369,7 +369,7 @@ public class MapEditorVer2 : EditorWindow
         TargetGimmickInfo info = new TargetGimmickInfo();
         info.gimmickID = targetGimmick.gimmickUID;
 
-        info.gimmickKey = (GimmickKey)GetGimmickKeyType(targetGimmick);
+        info.gimmickKey = GetGimmickKeyType(targetGimmick);
 
         triggerComp.targetGimmicks.Clear();
         triggerComp.targetGimmicks.Add(info);

@@ -8,11 +8,27 @@ public enum eGimmickState : byte
     Restore = 3      // 다시 초기 위치로 돌아가야 하는 상태
 }
 
+public enum eGimmickType
+{
+    NONE = 0,
+    Movable,    // 밀거나 당길 수 있는 기믹
+    Breakable   // 부서지기만 하는 기믹 (항아리, 벽 등)
+}
+
 public abstract class BaseGimmick : MonoBehaviour
 {
     [Header("Base Gimmick Info")]
     public int gimmickUID; // 모든 기믹이 공통으로 가지는 ID
     public P_PacketVector3 v;
+
+    public eGimmickType gimmickType;
+
+    public GimmickStat stat { get; protected set; }
+
+    protected virtual void Awake()
+    {
+        stat = GetComponent<GimmickStat>();
+    }
 
     public abstract void Execute(P_GimmickInteractNtf ntf);
 }

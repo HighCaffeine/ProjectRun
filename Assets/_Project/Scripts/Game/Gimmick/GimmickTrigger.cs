@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public struct TargetGimmickInfo
 {
     public int gimmickID;
-    public GimmickKey gimmickKey;
+    public eGimmickKey gimmickKey;
 }
 
 public class GimmickTrigger : MonoBehaviour
@@ -31,7 +31,7 @@ public class GimmickTrigger : MonoBehaviour
 
     public void ProcessInteract(GameObject otherObj)
     {
-        if (isOneTimeUse && isTriggered) 
+        if (isOneTimeUse && isTriggered)
         {
             return;
         }

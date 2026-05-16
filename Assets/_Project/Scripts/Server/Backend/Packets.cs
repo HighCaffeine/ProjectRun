@@ -1,23 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using UnityEngine;
 
-public enum eGimmickKey : byte
-{
-    NONE = 0,
-    BreakableWall = 1,
-    Button = 2,
-    MovableObject = 3,
-    Bridge = 4,
-    SeeSaw = 5,
-    PresurePlate = 6,
-    FallingPlatform = 7,
-    MovePlatform = 8,
-    Wind = 9,
-    NextZone = 10,
-    Checkpoint = 11,
-    Count = 12
-}
-
 public enum E_PACKET
 {
     LOGIN_REQUEST = 201, // LOGIN_REQ = 201,

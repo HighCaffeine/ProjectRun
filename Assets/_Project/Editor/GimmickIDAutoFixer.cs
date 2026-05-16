@@ -4,24 +4,26 @@ using UnityEditor;
 public class GimmickAutoFixer : Editor
 {
     // 기믹 타입을 판별하는 헬퍼 함수
-    private static int GetGimmickKeyType(BaseGimmick gimmick)
+    private static eGimmickKey GetGimmickKey(BaseGimmick gimmick)
     {
-        if (gimmick is Bridge) return 4;           // Bridge
-        if (gimmick is ReMovePlatform) return 7;   // FallingPlatform
-        if (gimmick is Platform) return 8;         // MovePlatform
-        if (gimmick is SeesawTrigger) return 5;    // SeeSaw
-        // if (gimmick is MovableGimmick) return 3; // MovableObject
-        return 1; // BreakableWall (기본값)
+        if (gimmick is Bridge) return eGimmickKey.Bridge;
+        if (gimmick is ReMovePlatform) return eGimmickKey.FallingPlatform;
+        if (gimmick is Platform) return eGimmickKey.MovePlatform;
+        if (gimmick is SeesawTrigger) return eGimmickKey.SeeSaw;
+        if (gimmick is MovableGimmick) return eGimmickKey.MovableObject;
+
+        if (gimmick is BreakableWall) return eGimmickKey.BreakableWall; // 넉백 벽
+        if (gimmick is BreakableObj) return eGimmickKey.BreakableObj;   // 평타 항아리
+        return eGimmickKey.BreakableWall;
     }
 
-    private static string GetGimmickTypeName(BaseGimmick gimmick)
+    private static eGimmickType GetBaseGimmickType(BaseGimmick gimmick)
     {
-        if (gimmick is Bridge) return "Bridge";
-        if (gimmick is ReMovePlatform) return "FallingPlatform";
-        if (gimmick is Platform) return "MovePlatform";
-        if (gimmick is SeesawTrigger) return "SeeSaw";
-        return "BreakableWall";
+        if (gimmick is MovableGimmick) return eGimmickType.Movable;
+        if (gimmick is BreakableWall || gimmick is BreakableObj) return eGimmickType.Breakable;
+        return eGimmickType.NONE;
     }
+
 
     [MenuItem("Tools/GimmickAutoFixer")]
     public static void FixAndLinkAllGimmicks()
@@ -40,11 +42,14 @@ public class GimmickAutoFixer : Editor
                 EditorUtility.SetDirty(gimmick);
             }
 
+            gimmick.gimmickType = GetBaseGimmickType(gimmick);
+            EditorUtility.SetDirty(gimmick);
+
             GimmickInfo info = gimmick.GetComponent<GimmickInfo>();
             if (info != null)
             {
                 info.gimmick_id = uid;
-                info.gimmick_type = GetGimmickTypeName(gimmick);
+                info.gimmick_type = GetGimmickKey(gimmick);
                 EditorUtility.SetDirty(info);
             }
 
@@ -55,8 +60,8 @@ public class GimmickAutoFixer : Editor
             {
                 TargetGimmickInfo tInfo = new TargetGimmickInfo();
                 tInfo.gimmickID = uid;
-                
-                tInfo.gimmickKey = (GimmickKey)GetGimmickKeyType(gimmick); 
+
+                tInfo.gimmickKey = GetGimmickKey(gimmick);
 
                 trigger.targetGimmicks.Clear();
                 trigger.targetGimmicks.Add(tInfo);

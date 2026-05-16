@@ -86,7 +86,7 @@ public class ActionState : IState
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
 
         PlayerActor closestTarget = null;
-        MovableGimmick closestGimmick = null;
+        BaseGimmick closestGimmick = null;
         float minDistance = float.MaxValue;
         Vector3 dirToTarget = Vector3.zero;
 
@@ -109,7 +109,7 @@ public class ActionState : IState
                 }
             }
 
-            MovableGimmick targetGimmick = hit.GetComponentInParent<MovableGimmick>();
+            BaseGimmick targetGimmick = hit.GetComponentInParent<BaseGimmick>();
             if (targetGimmick != null)
             {
                 Vector3 dir = targetGimmick.transform.position - actor.transform.position;
@@ -180,13 +180,12 @@ public class ActionState : IState
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
-                // 서버 연동: 기믹 패킷 전송 (상호작용)
                 P_GimmickInteractReq req = new P_GimmickInteractReq
                 {
                     activeUUID = LocalPlayerInfo.ID,
                     gimmickID = closestGimmick.gimmickUID,
-                    gimmickKey = (byte)eGimmickKey.MovableObject,
-                    state = 3, // 3 = 기믹 오브젝트 밀기/당기기 규약
+                    gimmickKey = (byte)closestGimmick.gimmickType,
+                    state = 3,
                     targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
                     param = pushForce * pow
                 };
@@ -194,8 +193,14 @@ public class ActionState : IState
             }
             else
             {
-                // 오프라인 테스트: 패킷 없이 상자를 즉시 부드럽게 이동시킴
-                closestGimmick.StartMove(destPos);
+                if (closestGimmick.gimmickType == eGimmickType.Movable)
+                {
+                    ((MovableGimmick)closestGimmick).StartMove(destPos);
+                }
+                else if (closestGimmick.gimmickType == eGimmickType.Breakable)
+                {
+                    closestGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
+                }
             }
         }
     }

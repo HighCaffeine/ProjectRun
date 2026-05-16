@@ -133,7 +133,7 @@ public class MapDataExporter : Editor
                     gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
 
                     gd.gimmick_id = info.gimmick_id;
-                    gd.type = info.gimmick_type;
+                    gd.type = info.gimmick_type.ToString();
 
                     foreach (var prop in info.properties)
                     {
