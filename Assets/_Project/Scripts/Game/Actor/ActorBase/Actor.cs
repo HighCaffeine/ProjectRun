@@ -96,14 +96,21 @@ public abstract class Actor : MonoBehaviour
     {
         horizontalMove += dir * speed;
     }
-    public virtual void LookAtDirection(Vector3 dir)
+    public virtual void LookAtDirection(Vector3 dir, bool isImmediate = false)
     {
         if (dir == Vector3.zero) return;
 
         Transform target = (playerPivot != null) ? playerPivot : transform;
         Quaternion targetRot = Quaternion.LookRotation(dir);
 
-        target.rotation = Quaternion.Slerp(target.rotation, targetRot, Time.deltaTime * ROT_INTERPOLATION_VALUE);
+        if (isImmediate)
+        {
+            target.rotation = targetRot;
+        }
+        else
+        {
+            target.rotation = Quaternion.Slerp(target.rotation, targetRot, Time.deltaTime * 15f);
+        }
     }
 
     public void ResetVerticalVelocity()

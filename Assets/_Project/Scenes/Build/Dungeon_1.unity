@@ -33806,9 +33806,49 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1220600550794721047, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1220600550794721047, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].key
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1220600550794721047, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1220600550794721047, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1220600550794721047, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2275521328806998840, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2275521328806998840, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].key
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2275521328806998840, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2275521328806998840, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2275521328806998840, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3214521437328424904, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 136.2
+      value: 71.5
       objectReference: {fileID: 0}
     - target: {fileID: 3214521437328424904, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
       propertyPath: m_LocalPosition.y
@@ -33816,7 +33856,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3214521437328424904, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 132
+      value: 66
       objectReference: {fileID: 0}
     - target: {fileID: 3214521437328424904, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -33850,9 +33890,33 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level
       objectReference: {fileID: 0}
+    - target: {fileID: 5629583224967902210, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7273595786301728818, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
       propertyPath: gimmick_id
       value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830400263790275863, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830400263790275863, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].key
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830400263790275863, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830400263790275863, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7830400263790275863, guid: cf8c3922758f6434389b89149b88de4d, type: 3}
+      propertyPath: properties.Array.data[1].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -50675,7 +50739,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1237798813998209394, guid: 157ba3671562c4d4fb08ba5bcf1bca70, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2159287080451382988, guid: 157ba3671562c4d4fb08ba5bcf1bca70, type: 3}
       propertyPath: m_LocalPosition.x

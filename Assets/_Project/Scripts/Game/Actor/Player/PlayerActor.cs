@@ -30,6 +30,9 @@ public class PlayerActor : Actor
     public ParticleSystem pushParticle;
     public Transform attackEffectPivot;
 
+    [Header("Aiming Indicator")]
+    public LineRenderer aimLine;
+
     public void PushParticle()
     {
         attackEffectPivot.localRotation = playerPivot.localRotation;
@@ -276,6 +279,20 @@ public class PlayerActor : Actor
         dir.y = 0;
 
         return dir.normalized;
+    }
+
+    public void DrawAimLine(Vector3 targetPos)
+    {
+        if (aimLine == null) return;
+        aimLine.enabled = true;
+        // 가슴 높이(y + 1f)에서부터 목표물까지 선을 그림
+        aimLine.SetPosition(0, transform.position + Vector3.up * 1f);
+        aimLine.SetPosition(1, targetPos + Vector3.up * 1f);
+    }
+
+    public void HideAimLine()
+    {
+        if (aimLine != null) aimLine.enabled = false;
     }
 
     public void PlayBrakeParticles()
@@ -593,8 +610,9 @@ public class PlayerActor : Actor
     {
         if (!IsLocal) return false;
 
-        if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
-        if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
+        if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new AimState(this, eState.Push)); return true; }
+        if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new AimState(this, eState.Pull)); return true; }
+
         return false;
     }
 

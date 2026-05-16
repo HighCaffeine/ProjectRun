@@ -6,200 +6,102 @@ public class ActionState : IState
     private Actor actor;
     private eState actionType;
     private float timer;
-    private const float CAST_TIME = 0.3f; // 후딜레이
+    private const float CAST_TIME = 0.7f; // 후딜레이
 
-    private float maxDistance;
-    private float maxAngle = 30f;
     private float pushForce = 100f;      // 최대 밀쳐내는 힘
     private float pow = 2f;  // 계수
 
     private static Collider[] hitBuffer = new Collider[20];
     private static int targetLayerMask = -1;
 
-    public ActionState(Actor actor, eState type)
+    //aimstate에서 받은 확정 타겟
+    private PlayerActor targetPlayer;
+    private BaseGimmick targetGimmick;
+
+    public ActionState(Actor actor, eState type, PlayerActor targetPlayer = null, BaseGimmick targetGimmick = null)
     {
         this.actor = actor;
         this.actionType = type;
+        this.targetPlayer = targetPlayer;
+        this.targetGimmick = targetGimmick;
 
-        if (actionType == eState.Push)
-        {
-            maxDistance = 3f;
-            pushForce = 5f * pow;
-            maxAngle = 60f;
-        }
-        else if (actionType == eState.Pull)
-        {
-            maxDistance = 13f;
-            pushForce = 3f * pow;
-            maxAngle = 30f;
-        }
+        pushForce = (actionType == eState.Push) ? (5f * pow) : (3f * pow);
     }
 
     public void Enter()
     {
         timer = 0f;
-
-        //공통 연출 (애니메이션)
         actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
 
         if (!actor.IsLocal) return;
 
-        if (Time.time - actor.lastSkillUseTime < Actor.SKILL_COOLDOWN)
-        {
-            actor.sm.ChangeState(new IdleState(actor));
-            return;
-        }
+        actor.lastSkillUseTime = Time.time;
 
-        actor.lastSkillUseTime = Time.time; // 스킬 사용 시간 갱신
-
-        //Vector3 searchForward = actor.GetForward();
-        //Vector3 searchForward = actor.GetMouseDir();
-        Vector3 searchForward = actor.GetActionDir();
-        if (actor.Is2p)
-        {
-            searchForward = actor.GetForward();
-        }
-
-        if (searchForward != Vector3.zero)
-        {
-            actor.LookAtDirection(searchForward);
-        }
-        else
-        {
-            searchForward = actor.transform.forward;
-        }
         if (actionType == eState.Push)
         {
             ((PlayerActor)actor).PushParticle();
             ((PlayerActor)actor).PushIndicator.gameObject.SetActive(true);
         }
-        // 임시 테스트용
-        if (((PlayerActor)actor).PushMulti <= 0.0f)
+        else
         {
-            actor.sm.ChangeState(new IdleState(actor));
-            return;
+            ((PlayerActor)actor).PullIndicator.gameObject.SetActive(true);
         }
 
-
-        if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
-        // 타겟 탐색
-        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
-
-        PlayerActor closestTarget = null;
-        BaseGimmick closestGimmick = null;
-        float minDistance = float.MaxValue;
-        Vector3 dirToTarget = Vector3.zero;
-
-        for (int i = 0; i < hitCount; i++)
+        if (targetPlayer != null)
         {
-            Collider hit = hitBuffer[i];
-            PlayerActor targetActor = hit.GetComponentInParent<PlayerActor>();
-            if (targetActor != null && targetActor == actor) continue;
-            if (targetActor != null)
-            {
-                dirToTarget = targetActor.transform.position - actor.transform.position;
-                float distance = dirToTarget.magnitude;
-                float angleToTarget = Vector3.Angle(searchForward, dirToTarget);
+            Vector3 dirToTarget = targetPlayer.transform.position - actor.transform.position;
+            float minDistance = dirToTarget.magnitude;
 
-                // 정면 각도 내에 있고, 제일 가까운 놈 찾기
-                if (angleToTarget <= maxAngle && distance < minDistance)
-                {
-                    closestTarget = targetActor;
-                    minDistance = distance;
-                }
-            }
-
-            BaseGimmick targetGimmick = hit.GetComponentInParent<BaseGimmick>();
-            if (targetGimmick != null)
-            {
-                Vector3 dir = targetGimmick.transform.position - actor.transform.position;
-                float distance = dir.magnitude;
-                float angle = Vector3.Angle(searchForward, dir);
-
-                if (angle <= maxAngle && distance < minDistance)
-                {
-                    closestGimmick = targetGimmick;
-                    closestTarget = null; //플레이어 x 
-                    minDistance = distance;
-                    dirToTarget = dir;
-                }
-            }
-        }
-
-        // 타겟을 찾았다면 타격 공식 및 넉백 상태 부여
-        if (closestGimmick == null)
-        {
-            if (closestTarget == null) return;
-
-            float finalDistance = 0f;
-            float stopDistance = 1.5f;
-
-            if (actionType == eState.Push)
-            {
-                finalDistance = pushForce;
-            }
-            else if (actionType == eState.Pull)
-            {
-                ((PlayerActor)actor).PullIndicator.gameObject.SetActive(true);
-                finalDistance = Mathf.Max(0f, minDistance - stopDistance);
-            }
-
+            float finalDistance = (actionType == eState.Push) ? pushForce : Mathf.Max(0f, minDistance - 1.5f);
             Vector3 knockbackDir = dirToTarget.normalized;
 
-            if (actionType == eState.Pull)
-            {
-                knockbackDir = -knockbackDir;
-            }
+            if (actionType == eState.Pull) knockbackDir = -knockbackDir;
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
-                Player targetPlayer = closestTarget.GetComponent<Player>();
-
-                if (targetPlayer != null)
-                {
-                    actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetPlayer.ID, actionType == eState.Pull, actor.transform.position);
-                }
+                actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetPlayer.ID, actionType == eState.Pull, actor.transform.position);
             }
             else
             {
-                PlayerActor targetPlayer = closestTarget.GetComponent<PlayerActor>();
-                var a = ActorManager.Instance.GetActor(targetPlayer.gameObject.name);
-
-                a.sm.ChangeState(new KnockbackState((PlayerActor)a, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
+                targetPlayer.sm.ChangeState(new KnockbackState((PlayerActor)targetPlayer, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
             }
         }
-        else if (closestGimmick != null)
+        else if (targetGimmick != null)
         {
+            Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
             Vector3 pushDir = dirToTarget.normalized;
             pushDir.y = 0;
+
             if (actionType == eState.Pull) pushDir = -pushDir;
 
-            float moveDist = (actionType == 0) ? 3f : (minDistance - 1.5f); // 당길 땐 내 앞 1.5m까지만
-            Vector3 destPos = closestGimmick.transform.position + (pushDir * moveDist);
-            destPos.y = actor.transform.position.y;
+            float moveDist = (actionType == eState.Push) ? 3f : (dirToTarget.magnitude - 1.5f);
+            Vector3 destPos = targetGimmick.transform.position + (pushDir * moveDist);
+
+            destPos.y = targetGimmick.transform.position.y;
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 P_GimmickInteractReq req = new P_GimmickInteractReq
                 {
                     activeUUID = LocalPlayerInfo.ID,
-                    gimmickID = closestGimmick.gimmickUID,
-                    gimmickKey = (byte)closestGimmick.gimmickType,
+                    gimmickID = targetGimmick.gimmickUID,
+                    gimmickKey = (byte)targetGimmick.gimmickType,
                     state = 3,
                     targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
                     param = pushForce * pow
                 };
+
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
             }
             else
             {
-                if (closestGimmick.gimmickType == eGimmickType.Movable)
+                if (targetGimmick.gimmickType == eGimmickType.Movable)
                 {
-                    ((MovableGimmick)closestGimmick).StartMove(destPos);
+                    ((MovableGimmick)targetGimmick).StartMove(destPos);
                 }
-                else if (closestGimmick.gimmickType == eGimmickType.Breakable)
+                else if (targetGimmick.gimmickType == eGimmickType.Breakable)
                 {
-                    closestGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
+                    targetGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
                 }
             }
         }
@@ -207,7 +109,6 @@ public class ActionState : IState
 
     public void Execute()
     {
-
         timer += Time.deltaTime;
 
         if (timer >= CAST_TIME)
@@ -220,10 +121,4 @@ public class ActionState : IState
     {
         ((PlayerActor)actor).InvokeSSaGay();
     }
-
-
-
-
-
-
 }
