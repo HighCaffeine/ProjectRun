@@ -5,6 +5,8 @@ public enum AniState { Idle, Move, Dead, Count };
 
 public abstract class Actor : MonoBehaviour
 {
+    private const float ROT_INTERPOLATION_VALUE = 15f;
+
     public abstract Vector3 GetMovementDirection(); //이동방향 (플레이어 카메라 기준, 몬스터 타겟 위치)
     public abstract bool HasMoveIntent();           //이동 입력이 있는지 (h / v가 0이 아니거나, 몬스터는 이동 타겟을 받았을 때)
     public abstract bool CheckActionIntent();       //액션 입력 판단 (키입력 / 몬스터 -> 쿨타임)
@@ -96,14 +98,12 @@ public abstract class Actor : MonoBehaviour
     }
     public virtual void LookAtDirection(Vector3 dir)
     {
-        if (playerPivot != null)
-        {
-            playerPivot.rotation = Quaternion.LookRotation(dir);
-        }
-        else
-        {
-            transform.rotation = Quaternion.LookRotation(dir);
-        }
+        if (dir == Vector3.zero) return;
+
+        Transform target = (playerPivot != null) ? playerPivot : transform;
+        Quaternion targetRot = Quaternion.LookRotation(dir);
+
+        target.rotation = Quaternion.Slerp(target.rotation, targetRot, Time.deltaTime * ROT_INTERPOLATION_VALUE);
     }
 
     public void ResetVerticalVelocity()
@@ -114,5 +114,5 @@ public abstract class Actor : MonoBehaviour
     public virtual Vector3 GetActionDir() { return Vector3.zero; }
 
     public virtual void SendMovePacket(float h, float v) { }
-    public virtual void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default) {}
+    public virtual void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default) { }
 }

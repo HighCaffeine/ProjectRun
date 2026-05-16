@@ -5,6 +5,8 @@ using UnityEngine.Rendering.Universal;
 
 public class PlayerActor : Actor
 {
+    private const float MOVE_ACCEL_VALUE = 10f;
+
     private Camera cam;
 
     const float CAMERA_SHAKE = 1.0f;
@@ -95,12 +97,12 @@ public class PlayerActor : Actor
 
         if (IsLocal)
         {
-            h = 0f; v = 0f;
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || animator.GetCurrentAnimatorStateInfo(0).IsName("Move"))
+            if (sm.currentState is IdleState || sm.currentState is MoveState)
             {
                 CheckActionIntent();
                 HandleInput();
             }
+
             ApplyWind();
         }
 
@@ -530,20 +532,26 @@ public class PlayerActor : Actor
     public bool is2p = false;
     private void HandleInput()
     {
+        float targetH = 0f;
+        float targetV = 0f;
+
         if (!Is2p)
         {
-            if (Input.GetKey(KeyCode.W)) v += 1f;
-            if (Input.GetKey(KeyCode.A)) h -= 1f;
-            if (Input.GetKey(KeyCode.S)) v -= 1f;
-            if (Input.GetKey(KeyCode.D)) h += 1f;
+            if (Input.GetKey(KeyCode.W)) targetV += 1f;
+            if (Input.GetKey(KeyCode.S)) targetV -= 1f;
+            if (Input.GetKey(KeyCode.A)) targetH -= 1f;
+            if (Input.GetKey(KeyCode.D)) targetH += 1f;
         }
         else
         {
-            if (Input.GetKey(KeyCode.UpArrow)) v += 1f;
-            if (Input.GetKey(KeyCode.DownArrow)) v -= 1f;
-            if (Input.GetKey(KeyCode.LeftArrow)) h -= 1f;
-            if (Input.GetKey(KeyCode.RightArrow)) h += 1f;
+            if (Input.GetKey(KeyCode.UpArrow)) targetV += 1f;
+            if (Input.GetKey(KeyCode.DownArrow)) targetV -= 1f;
+            if (Input.GetKey(KeyCode.LeftArrow)) targetH -= 1f;
+            if (Input.GetKey(KeyCode.RightArrow)) targetH += 1f;
         }
+
+        h = Mathf.MoveTowards(h, targetH, Time.deltaTime * MOVE_ACCEL_VALUE);
+        v = Mathf.MoveTowards(v, targetV, Time.deltaTime * MOVE_ACCEL_VALUE);
     }
 
     public override Vector3 GetMovementDirection()
