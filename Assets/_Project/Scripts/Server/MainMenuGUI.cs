@@ -21,11 +21,6 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
     private bool isSceneLoading = false;
 
-    void Awake()
-    {
-        Application.targetFrameRate = 60;
-    }
-
     void Start()
     {
         if (connectionPanel != null) connectionPanel.SetActive(true);

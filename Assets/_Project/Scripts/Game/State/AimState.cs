@@ -96,9 +96,12 @@ public class AimState : IState
             Transform targetTransform = gimmick != null ? gimmick.transform : (targetActor != null ? targetActor.transform : null);
             if (targetTransform == null) continue;
 
-            Vector3 dirToTarget = targetTransform.position - actor.transform.position;
-            float distance = dirToTarget.magnitude;
-            float angle = Vector3.Angle(searchForward, dirToTarget);
+            Vector3 closestPoint = hit.ClosestPoint(actor.transform.position);
+
+            float distance = Vector3.Distance(actor.transform.position, closestPoint);
+
+            Vector3 dirToCenter = targetTransform.position - actor.transform.position;
+            float angle = Vector3.Angle(searchForward, dirToCenter);
 
             if (angle <= maxAngle && distance <= maxDistance)
             {

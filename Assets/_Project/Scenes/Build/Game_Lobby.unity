@@ -17767,7 +17767,7 @@ MonoBehaviour:
   anchorPosition: 0
   textColor: {r: 0, g: 1, b: 0.0333333, a: 1}
   targetFrameRate: 60
-  vSync: 0
+  vSync: 1
 --- !u!114 &423868198
 MonoBehaviour:
   m_ObjectHideFlags: 0
