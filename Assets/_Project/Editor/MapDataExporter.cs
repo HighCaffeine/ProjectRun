@@ -141,12 +141,21 @@ public class MapDataExporter : Editor
                         if (!gd.properties.ContainsKey(keyStr)) gd.properties.Add(keyStr, prop.value);
                     }
 
-                    Transform startPivot = child.Find("StartPos");
-                    Transform endPivot = child.Find("EndPos");
-                    if (startPivot != null && endPivot != null)
+                    Platform platform = child.GetComponent<Platform>();
+                    if (platform != null)
                     {
-                        gd.start_pos = new _Vector3(startPivot.position);
-                        gd.end_pos = new _Vector3(endPivot.position);
+                        if (platform.startPos != null) gd.start_pos = new _Vector3(platform.startPos.position);
+                        if (platform.endPos != null) gd.end_pos = new _Vector3(platform.endPos.position);
+                    }
+                    else
+                    {
+                        Transform startPivot = child.Find("StartPos");
+                        Transform endPivot = child.Find("EndPos");
+                        if (startPivot != null && endPivot != null)
+                        {
+                            gd.start_pos = new _Vector3(startPivot.position);
+                            gd.end_pos = new _Vector3(endPivot.position);
+                        }
                     }
 
                     exportData.gimmicks.Add(gd);

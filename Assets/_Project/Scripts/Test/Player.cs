@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
 
     [Header("Calibration Settings")]
     [SerializeField] private float snapThreshold = 5.0f; // 이 이상 벌어지면 강제 텔레포트
-    [SerializeField] private float lerpSpeed = 15.0f;    // 타 플레이어 부드러운 이동 속도
+    [SerializeField] private float lerpSpeed = 10.0f;    // 타 플레이어 부드러운 이동 속도
 
     public string Name => this.name;
     public long ID => this.id;
@@ -197,33 +197,22 @@ public class Player : MonoBehaviour
         // transform.position = new Vector3(transform.position.x, lerpY, transform.position.z);
     }
     private void ProcessRemoteMovement()
-{
-    Vector3 targetPos = serverPos;
-    float dist = Vector3.Distance(transform.position, targetPos);
-
-    if (dist > snapThreshold * 2f)
     {
-        actor.SetControllerActive(false);
-        transform.position = targetPos;
-        actor.SetControllerActive(true);
-        transform.rotation = serverRot;
-        return;
-    }
+        Vector3 targetPos = serverPos;
+        float dist = Vector3.Distance(transform.position, targetPos);
 
-    Vector3 delta = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * lerpSpeed) - transform.position;
-    
-    CharacterController cc = actor.GetComponent<CharacterController>();
-    if (cc != null && cc.enabled) 
-    {
-        cc.Move(delta);
-    }
-    else 
-    {
-        transform.position += delta;
-    }
+        if (dist > snapThreshold * 2f)
+        {
+            actor.SetControllerActive(false);
+            transform.position = targetPos;
+            actor.SetControllerActive(true);
+            transform.rotation = serverRot;
+            return;
+        }
 
-    transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
-}
+        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * lerpSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
+    }
 
     private IEnumerator RemoteVisualRoutine(byte actionType)
     {

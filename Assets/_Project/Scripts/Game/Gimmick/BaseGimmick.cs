@@ -28,6 +28,11 @@ public abstract class BaseGimmick : MonoBehaviour
     protected virtual void Awake()
     {
         stat = GetComponent<GimmickStat>();
+        GimmickInfo info = GetComponent<GimmickInfo>();
+        if (info != null)
+        {
+            gimmickUID = info.gimmick_id;
+        }
     }
 
     public abstract void Execute(P_GimmickInteractNtf ntf);

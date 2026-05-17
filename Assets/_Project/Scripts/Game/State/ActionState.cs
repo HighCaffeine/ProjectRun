@@ -33,6 +33,11 @@ public class ActionState : IState
 
         if (!actor.IsLocal) return;
 
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+        {
+            actor.SendStateChange(actionType);
+        }
+
         actor.lastSkillUseTime = Time.time;
 
         if (actionType == eState.Push)

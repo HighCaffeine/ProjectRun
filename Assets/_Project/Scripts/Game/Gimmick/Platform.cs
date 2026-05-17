@@ -5,8 +5,8 @@ using UnityEngine;
 public class Platform : BaseGimmick
 {
     [Header("이동 설정")]
-    [SerializeField] private Transform startPos;
-    [SerializeField] private Transform endPos;
+    public Transform startPos;
+    public Transform endPos;
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float waitTimeAtSide = 0.5f;
     [SerializeField] private List<PlayerActor> players = new List<PlayerActor>();
@@ -27,6 +27,7 @@ public class Platform : BaseGimmick
     {
         lastPos = transform.position;
 
+        gimmickInfo = GetComponent<GimmickInfo>();
         ParseGimmickProperties();
 
         if (activationType == 0)
@@ -123,6 +124,7 @@ public class Platform : BaseGimmick
         }
     }
 
+    // Platform.cs
     private void OnTriggerEnter(Collider other)
     {
         PlayerActor actor = other.GetComponent<PlayerActor>();
@@ -130,8 +132,12 @@ public class Platform : BaseGimmick
         {
             if (!players.Contains(actor)) players.Add(actor);
 
+            // 🚨 1번 체크포인트: 내 클라이언트가 발판을 '1초 대기용'으로 인식하고 있는지 확인!
+            Debug.Log($"<color=yellow>[발판 디버그]</color> 트리거 밟음! ActivationType: {activationType}, isMoving: {isMoving}");
+
             if (activationType == 1 && !isMoving)
             {
+                Debug.Log("<color=green>[발판 디버그]</color> 서버로 1번(출발 타이머 시작) 패킷 발송 완료!");
                 P_GimmickInteractReq req = new P_GimmickInteractReq
                 {
                     activeUUID = LocalPlayerInfo.ID,

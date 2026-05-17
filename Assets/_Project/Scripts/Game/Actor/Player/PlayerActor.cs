@@ -125,7 +125,7 @@ public class PlayerActor : Actor
 
         bool isOnPlatform = (platformDelta.sqrMagnitude > 0.00001f);
 
-        if (sm.currentState is ActionState || sm.currentState is KnockbackState)
+        if (sm.currentState is KnockbackState)
         {
             verticalVelocity = 0f;
         }
@@ -229,20 +229,20 @@ public class PlayerActor : Actor
     {
         if (sm.currentState is KnockbackState) return;
 
-        if (sm.currentState is ActionState)
-        {
-            if (IsLocal)
-            {
-                verticalVelocity = 0f;
-                return;
-            }
+        // if (sm.currentState is ActionState)
+        // {
+        //     if (IsLocal)
+        //     {
+        //         verticalVelocity = 0f;
+        //         return;
+        //     }
 
-            if (controller.isGrounded)
-            {
-                verticalVelocity = -2f;
-                return;
-            }
-        }
+        //     if (controller.isGrounded)
+        //     {
+        //         verticalVelocity = -2f;
+        //         return;
+        //     }
+        // }
 
         if (controller.isGrounded && verticalVelocity < 0)
         {
