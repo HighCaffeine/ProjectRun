@@ -147,6 +147,7 @@ public class ActorManager : GenericSingleton<ActorManager>
         List<string> keys = new List<string>(actors.Keys);
         foreach (var id in keys)
         {
+            Debug.Log($"{mapID}_{newIndex}");
             spawnPoints[id] = $"{mapID}_{newIndex}";
         }
     }

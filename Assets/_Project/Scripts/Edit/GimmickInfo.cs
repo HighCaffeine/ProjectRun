@@ -29,7 +29,7 @@ public enum eGimmickPropKey
     MoveSpeed = 3,      // 이동 플랫폼 등의 속도 수치
     WaitTime = 4,       // 목표지점 도달 후 대기 시간 수치
     ActivationType = 5, // 0 상시 작동, 1 밟은 때 작동
-    spawnGimmickKey = 6  // eGimmickKey에 해당하는 기믹이 스폰됨 
+    SpawnGimmickKey = 6  // eGimmickKey에 해당하는 기믹이 스폰됨 
 }
 
 [Serializable]
