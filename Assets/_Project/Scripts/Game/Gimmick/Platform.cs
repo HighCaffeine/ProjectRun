@@ -223,10 +223,10 @@ public class Platform : BaseGimmick
             StartCoroutine(MoveTo(targetSyncPos));
         }
 
-        // [ActivationType 1: 밟으면 이동] 1초 타이머가 끝난 후 서버가 준 목적지로 이동 명령 (state == 2)
-        if (activationType == 1 && ntf.state == 2)
+
+        if (activationType == 1 && ntf.state == (byte)eGimmickState.TriggerMove)
         {
-            Vector3 targetSyncPos = ntf.targetPos.ToVector3(); // 서버가 연산해서 준 endPos 좌표
+            Vector3 targetSyncPos = ntf.targetPos.ToVector3();
             StopAllCoroutines();
             StartCoroutine(MovableTriggeredRoutine(targetSyncPos));
         }
