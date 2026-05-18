@@ -4,7 +4,7 @@ public class NextZone : MonoBehaviour
 {
     [Header("텔레포트 설정")]
     public int targetMapID = 1;
-    public int targetSectorIndex;
+    public int targetMapStartIndex;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -13,13 +13,13 @@ public class NextZone : MonoBehaviour
         if (actor != null && actor.IsLocal)
         {
             DungeonPointManager.Instance.currentMapID = targetMapID;
-            DungeonPointManager.Instance.currentSectorIndex = targetSectorIndex;
+            DungeonPointManager.Instance.currentSectorIndex = targetMapStartIndex;
 
-            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetMapID, targetSectorIndex);
+            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetMapID, targetMapStartIndex);
 
             Debug.Log(destPos);
 
-            actor.OnUpdatePoint?.Invoke(actor.name, targetSectorIndex);
+            actor.OnUpdatePoint?.Invoke(actor.name, targetMapStartIndex);
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Offline_Test)
             {
@@ -29,12 +29,12 @@ public class NextZone : MonoBehaviour
             {
                 actor.transform.position = destPos;
                 actor.GetComponent<Player>().SetPos(destPos);
-                Debug.Log($"[Debug] 로컬 모드: {targetSectorIndex}번 구역으로 강제 이동");
+                Debug.Log($"[Debug] 로컬 모드: {targetMapStartIndex}번 구역으로 강제 이동");
                 return;
             }
 
             // mapID와 sectorIndex를 하나의 float으로 인코딩
-            float encodedValue = (targetMapID * 100) + targetSectorIndex;
+            float encodedValue = (targetMapID * 100) + targetMapStartIndex;
 
             P_GimmickInteractReq req = new P_GimmickInteractReq
             {
@@ -47,7 +47,7 @@ public class NextZone : MonoBehaviour
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-            Debug.Log($"[System] Map{targetMapID}_Sector{targetSectorIndex}번 구역으로 이동 요청 (encoded: {encodedValue})");
+            Debug.Log($"[System] Map{targetMapID}_Sector{targetMapStartIndex}번 구역으로 이동 요청 (encoded: {encodedValue})");
         }
     }
 }

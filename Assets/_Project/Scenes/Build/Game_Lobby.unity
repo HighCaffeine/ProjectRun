@@ -17781,7 +17781,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActorManager
   localID: 
-  spawnDelay: 5
+  spawnDelay: 1
   deadUIPrefab: {fileID: 0}
   p1: {fileID: 0}
   p2: {fileID: 0}
@@ -20432,9 +20432,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1729710446}
     m_Modifications:
+    - target: {fileID: 2318033729297883589, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.3294702
+      objectReference: {fileID: 0}
+    - target: {fileID: 2318033729297883589, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.42494613
+      objectReference: {fileID: 0}
+    - target: {fileID: 5079462173814747027, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7804982004013231584, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
       propertyPath: m_LocalPosition.x
@@ -20474,6 +20486,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7832428658429555722, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8431093958552346366, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8547748613472876625, guid: 0dc142e64c99ebb4f9ec753d2680ca44, type: 3}

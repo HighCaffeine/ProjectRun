@@ -4,7 +4,7 @@ public class CheckpointTrigger : BaseGimmick
 {
     [Header("저장할 구역 설정")]
     public int targetMapID;
-    public int targetSectorIndex;
+    public int targetSpawnIndex;
 
     private bool isActivated = false;
 
@@ -20,17 +20,17 @@ public class CheckpointTrigger : BaseGimmick
 
             // 로컬 즉시 적용
             DungeonPointManager.Instance.currentMapID = targetMapID;
-            DungeonPointManager.Instance.currentSectorIndex = targetSectorIndex;
-            ActorManager.Instance.UpdateAllSpawnPoints(targetMapID, targetSectorIndex);
+            DungeonPointManager.Instance.currentSectorIndex = targetSpawnIndex;
+            ActorManager.Instance.UpdateAllSpawnPoints(targetMapID, targetSpawnIndex);
 
-            Debug.Log($"<color=yellow>[Checkpoint]</color> Map {targetMapID} - Sector {targetSectorIndex} 체크포인트 설정");
+            Debug.Log($"<color=yellow>[Checkpoint]</color> Map {targetMapID} - Sector {targetSpawnIndex} 체크포인트 설정");
 
             // 서버 모드일 경우 패킷 전송
             if (Client.IS_SERVER_PLAY && GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 // mapID와 sectorIndex를 하나의 float으로 인코딩
                 // 예: mapID를 100의 자리로, sectorIndex를 1의 자리로
-                float encodedValue = (targetMapID * 100) + targetSectorIndex;
+                float encodedValue = (targetMapID * 100) + targetSpawnIndex;
 
                 P_GimmickInteractReq req = new P_GimmickInteractReq
                 {
@@ -42,7 +42,7 @@ public class CheckpointTrigger : BaseGimmick
                     param = encodedValue // 예: 0_1 -> 1, 1_2 -> 102
                 };
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-                Debug.Log($"[Checkpoint] 서버로 체크포인트 패킷 전송: {encodedValue} (Map{targetMapID}_Sector{targetSectorIndex})");
+                Debug.Log($"[Checkpoint] 서버로 체크포인트 패킷 전송: {encodedValue} (Map{targetMapID}_Sector{targetSpawnIndex})");
             }
         }
     }

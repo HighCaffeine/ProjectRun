@@ -15,9 +15,10 @@ public enum eGimmickKey : byte
     MovePlatform = 8,
     Wind = 9,
     NextZone = 10,
-    Checkpoint = 11,      // 🚨 서버와 맞춤 (추가됨)
-    BreakableObj = 12,    // 🚨 11 -> 12번으로 밀려남
-    Count = 13            // 🚨 Gimmick_Count와 맞춤
+    Checkpoint = 11,      
+    BreakableObj = 12,   
+    Bomb = 13,
+    Count = 14            
 }
 
 public enum eGimmickPropKey
@@ -27,7 +28,8 @@ public enum eGimmickPropKey
     IsBombOnly = 2,     // 1.0f 면 폭탄으로만 파괴 가능
     MoveSpeed = 3,      // 이동 플랫폼 등의 속도 수치
     WaitTime = 4,       // 목표지점 도달 후 대기 시간 수치
-    ActivationType = 5  // 0 상시 작동, 1 밟은 때 작동
+    ActivationType = 5, // 0 상시 작동, 1 밟은 때 작동
+    spawnGimmickKey = 6  // eGimmickKey에 해당하는 기믹이 스폰됨 
 }
 
 [Serializable]

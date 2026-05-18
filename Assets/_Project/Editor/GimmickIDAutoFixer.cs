@@ -14,6 +14,7 @@ public class GimmickAutoFixer : Editor
 
         if (gimmick is BreakableWall) return eGimmickKey.BreakableWall; // 넉백 벽
         if (gimmick is BreakableObj) return eGimmickKey.BreakableObj;   // 평타 항아리
+        if (gimmick is Bomb) return eGimmickKey.Bomb;
         return eGimmickKey.BreakableWall;
     }
 

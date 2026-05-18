@@ -21,7 +21,7 @@ public struct MapData
 
 public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 {
-    [Header("던전 구역(Sector) 데이터")]
+    [Header("던전 구역(Map) 데이터")]
     [Tooltip("0번: 던전 시작 구역 / 1~N번: 다음 기믹 구역")]
     public List<MapData> mapDataList = new List<MapData>();
 
