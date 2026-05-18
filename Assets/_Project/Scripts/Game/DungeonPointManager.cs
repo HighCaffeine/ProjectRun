@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 // 구역(Sector) 단위로 데이터를 묶어서 관리하는 구조체
@@ -12,20 +11,15 @@ public struct DungeonSector
     // public int requiredGimmickID; 
 }
 
-[Serializable]
-public struct MapData
-{
-    public int mapID;
-    public DungeonSector[] sectors;
-}
-
 public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 {
     [Header("던전 구역(Sector) 데이터")]
     [Tooltip("0번: 던전 시작 구역 / 1~N번: 다음 기믹 구역")]
-    public List<MapData> mapDataList = new List<MapData>();
+    public DungeonSector[] sectors;
 
-    public int currentMapID = 1;
+    public int mapID;
+
+
     public int currentSectorIndex = 0;
 
     private new void Awake()
@@ -34,35 +28,32 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
     }
 
     // 특정 구역의 스폰 좌표를 반환하는 함수
-    public Vector3 GetSpawnPosition(int mapID, int sectorIndex)
+    public Vector3 GetSpawnPosition(int sectorIndex)
     {
-        MapData mapData = mapDataList.Find(m => m.mapID == mapID);
-
-        if (mapData.sectors == null || sectorIndex < 0 || sectorIndex >= mapData.sectors.Length)
+        if (sectors == null || sectorIndex < 0 || sectorIndex >= sectors.Length)
         {
-            Debug.LogError($"[DungeonPointManager] Map {mapID}의 {sectorIndex}번 구역을 찾을 수 없습니다!");
+            Debug.LogError($"[DungeonPointManager] {sectorIndex}번 구역 데이터를 찾을 수 없습니다!");
             return Vector3.zero;
         }
-        return mapData.sectors[sectorIndex].spawnPoint.position;
+        return sectors[sectorIndex].spawnPoint.position;
     }
 
     public void MoveToNextSector()
     {
-        MapData mapData = mapDataList.Find(m => m.mapID == currentMapID);
-
-        if (currentSectorIndex + 1 >= mapData.sectors.Length)
+        if (currentSectorIndex + 1 >= sectors.Length)
         {
-            Debug.Log("[Dungeon] 맵의 마지막 구역입니다.");
-            UiManager.Instance.ShowResult();
+            Debug.Log("[Dungeon] 마지막 구역입니다.");
+            UiManager.Instance.ShowResult(); 
             return;
         }
 
         currentSectorIndex++;
 
-        Vector3 spawnPos = GetSpawnPosition(currentMapID, currentSectorIndex);
-        Debug.Log($"[Dungeon] 다음 구역 이동: Map {currentMapID} - Sector {currentSectorIndex}");
+        Vector3 spawnPos = GetSpawnPosition(currentSectorIndex);
 
-        ActorManager.Instance.UpdateAllSpawnPoints(currentMapID, currentSectorIndex);
-        ActorManager.Instance.MoveAllPlayersToSector(currentMapID, currentSectorIndex);
+        Debug.Log($"[Dungeon] 다음 구역 이동: {currentSectorIndex}");
+
+        ActorManager.Instance.UpdateAllSpawnPoints(currentSectorIndex);
+        ActorManager.Instance.MoveAllPlayersToSector(currentSectorIndex);
     }
 }

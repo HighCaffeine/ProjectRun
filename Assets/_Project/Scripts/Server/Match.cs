@@ -112,7 +112,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.ROOM_NEW_USER_NTF:
                 {
                     P_RoomNewUserNotify roomNewUserNotify = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-                    Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, 0) : Vector3.zero;
+                    Vector3 pos = DungeonPointManager.Instance != null ? DungeonPointManager.Instance.GetSpawnPosition(0) : Vector3.zero;
                     AddPlayer(roomNewUserNotify.userUUID, roomNewUserNotify.userName, pos);
                     //Debug.Log($"Player {roomNewUserNotify.userName} has joined");
                     break;
@@ -305,16 +305,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
-                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone)
+                    if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone) // 예외 처리용
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
                         {
-                            // float에서 mapID와 sectorIndex 디코딩
-                            int encodedValue = (int)ntf.param;
-                            int mapID = encodedValue / 100;
-                            int nextSpawnIndex = encodedValue % 100;
+                            int nextSpawnIndex = (int)ntf.param;
+                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(nextSpawnIndex);
 
-                            Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(mapID, nextSpawnIndex);
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
                             if (controller != null) controller.enabled = false;
 
@@ -328,9 +325,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             {
                                 pActor.ignoreServerPosTimer = 0.5f;
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
+                                //ActorManager.Instance.OnPlayerDeadTestSpawn(pActor.gameObject.name,)
                             }
-
-                            Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
                         }
                         break;
                     }
@@ -373,15 +369,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         {
                             Vector3 respawnPos = ntf.respawnPos.ToVector3();
 
-                            PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
-                            if (pActor != null)
-                            {
-                                pActor.PlayerDead(respawnPos, ActorManager.Instance.spawnDelay);
-                            }
+                            CharacterController cc = targetPlayer.GetComponent<CharacterController>();
+                            if (cc != null) cc.enabled = false;
 
-                            targetPlayer.SetPos(respawnPos);
+                            targetPlayer.transform.position = respawnPos;
+                            targetPlayer.SetPos(respawnPos); // Player 보정 클래스 위치도 덮어쓰기
 
-                            Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
+                            if (cc != null) cc.enabled = true;
+
+                            Debug.Log($"[System] 다른 유저({ntf.userUUID})가 부활 위치로 강제 이동됨");
                         }
                     }
                     break;
@@ -638,7 +634,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     {
         if (DungeonPointManager.Instance == null) return;
 
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, sectorIndex);
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(sectorIndex);
         Player p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
 
         if (Client.IS_SERVER_PLAY)

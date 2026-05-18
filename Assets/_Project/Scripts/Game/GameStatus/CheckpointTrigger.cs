@@ -19,9 +19,9 @@ public class CheckpointTrigger : BaseGimmick
             isActivated = true;
 
             // 로컬 즉시 적용
-            DungeonPointManager.Instance.currentMapID = targetMapID;
+            //DungeonPointManager.Instance.currentMapID = targetMapID;
             DungeonPointManager.Instance.currentSectorIndex = targetSectorIndex;
-            ActorManager.Instance.UpdateAllSpawnPoints(targetMapID, targetSectorIndex);
+            //ActorManager.Instance.UpdateAllSpawnPoints(targetMapID, targetSectorIndex);
 
             Debug.Log($"<color=yellow>[Checkpoint]</color> Map {targetMapID} - Sector {targetSectorIndex} 체크포인트 설정");
 
@@ -58,9 +58,9 @@ public class CheckpointTrigger : BaseGimmick
             int mapID = encodedValue / 100;
             int sectorIndex = encodedValue % 100;
 
-            DungeonPointManager.Instance.currentMapID = mapID;
+            //DungeonPointManager.Instance.currentMapID = mapID;
             DungeonPointManager.Instance.currentSectorIndex = sectorIndex;
-            ActorManager.Instance.UpdateAllSpawnPoints(mapID, sectorIndex);
+            //ActorManager.Instance.UpdateAllSpawnPoints(mapID, sectorIndex);
 
             Debug.Log($"<color=cyan>[Checkpoint NTF]</color> 모든 플레이어 스폰 포인트 갱신: Map{mapID}_Sector{sectorIndex}");
         }

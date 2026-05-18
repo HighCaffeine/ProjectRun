@@ -30,7 +30,7 @@ public class PlayerActor : Actor
 
     public void PushParticle()
     {
-        attackEffectPivot.localRotation = playerPivot.localRotation;
+        attackEffectPivot.localRotation = playerPivot.localRotation; 
         pushParticle.Stop(); pushParticle.Play();
     }
 
@@ -73,11 +73,11 @@ public class PlayerActor : Actor
 
         base.Start();
 
-
+       
         ActorManager.Instance.AddPlayer(this);
-
+        
         PullIndicator.gameObject.SetActive(false);
-        PushIndicator.gameObject.SetActive(false);
+        PushIndicator.gameObject.SetActive(false);   
         fallDeathCount = 0; pushCount = 0; pullCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
@@ -106,7 +106,7 @@ public class PlayerActor : Actor
 
         sm.Update();
 
-        if (IsLocal)
+        if (IsLocal) 
         {
             ApplyMovement();
             HandleNetworkSync();
@@ -126,7 +126,7 @@ public class PlayerActor : Actor
         }
         else if (isOnPlatform)
         {
-            verticalVelocity = -0.1f;
+            verticalVelocity = -0.1f; 
         }
         else
         {
@@ -137,7 +137,7 @@ public class PlayerActor : Actor
         controller.Move((finalMove * Mathf.Min(Time.deltaTime, 0.1f)) + platformDelta);
 
         horizontalMove = Vector3.zero;
-
+        
         platformDelta = Vector3.zero;
     }
 
@@ -353,7 +353,7 @@ public class PlayerActor : Actor
             newState = (byte)stateCode,
             targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
             powerOrTime = param,
-
+            
             isPull = isPull ? (byte)1 : (byte)0,
             casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z }
         };
@@ -376,7 +376,7 @@ public class PlayerActor : Actor
     }
     public void PlayerDead(Vector3 pos, float spawnDelay)
     {
-
+        
         if (isDead || !controller) return;
 
         isDead = true;
@@ -393,17 +393,17 @@ public class PlayerActor : Actor
         StartCoroutine(RespawnAfterDelay(spawnDelay));
         fallDeathCount++;
         Debug.Log(gameObject.name + "Die" + fallDeathCount);
-
+        
     }
     IEnumerator RespawnAfterDelay(float delay)
     {
-        yield return new WaitForSecondsRealtime(delay);
+        yield return new WaitForSeconds(delay);
         controller.enabled = true;
         verticalVelocity = 0f;
         isDead = false;
         playerPivot.gameObject.SetActive(true);
 
-        if (IsLocal)
+        if (IsLocal) 
         {
             SendMovePacket(0f, 0f);
         }
@@ -569,17 +569,17 @@ public class PlayerActor : Actor
         sendTimer += Time.deltaTime;
         if (sendTimer >= Actor.sendInterval)
         {
-            bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.001f;
+        bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.001f;
 
-            if (HasMoveIntent() || sm.currentState is KnockbackState || (controller != null && !controller.isGrounded) || isPositionChanged)
-            {
-                SendMovePacket(h, v);
-
-                lastSentPos = transform.position;
-                sendTimer = 0f;
-            }
+        if (HasMoveIntent() || sm.currentState is KnockbackState || (controller != null && !controller.isGrounded) || isPositionChanged)
+        {
+            SendMovePacket(h, v);
+            
+            lastSentPos = transform.position; 
+            sendTimer = 0f;
         }
     }
+}
 
     public override bool CheckActionIntent()
     {
@@ -597,8 +597,8 @@ public class PlayerActor : Actor
 
     public void AniTimer()
     {
-        PushIndicator.gameObject.SetActive(false);
-        PullIndicator.gameObject.SetActive(false);
+       PushIndicator.gameObject.SetActive(false);
+       PullIndicator.gameObject.SetActive(false);
     }
 }
 
