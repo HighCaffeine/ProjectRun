@@ -34,11 +34,23 @@ public class FractureObject : MonoBehaviour
     private float randomImpulse = 3f;
     [SerializeField]
     private float torqueImpulse = 2f;
+    [SerializeField]
+    private float directionalImpulse = 8f;
+    [SerializeField]
+    private float directionalRandomImpulse = 3f;
+    [SerializeField]
+    private float directionalUpwardImpulse = 1f;
 
     [SerializeField]
     private Material outsideMaterial;
     [SerializeField]
     private Material insideMaterial;
+    [SerializeField]
+    private bool breakAfterStartForTest = false;
+    [SerializeField]
+    private float testBreakDelay = 3f;
+    [SerializeField]
+    private Vector3 testBreakDirection = Vector3.left;
 
 
 
@@ -57,22 +69,37 @@ public class FractureObject : MonoBehaviour
     private void Start()
     {
         PrepareFracture();
+
+        if (breakAfterStartForTest)
+        {
+            StartCoroutine(BreakAfterDelayForTest());
+        }
     }
 
-    // private void OnCollisionEnter(Collision collision)
-    // {
-    //     Debug.Log("충돌 감지: " + collision.gameObject.name);
-    //     if (isBroken) return;
+    /* private void OnCollisionEnter(Collision collision)
+     {
+         Debug.Log("충돌 감지: " + collision.gameObject.name);
+         if (isBroken) return;
 
-    //     float impactForce = collision.impulse.magnitude;
-    //     if (impactForce >= breakForce)
-    //     {
-    //         Break(collision.relativeVelocity);
-    //     }
-    // }
+         float impactForce = collision.impulse.magnitude;
+         if (impactForce >= breakForce)
+         {
+             Break(collision.relativeVelocity);
+         }
+     }*/
 
 
     public void Break(Vector3 impactVelocity = default)
+    {
+        BreakInternal(impactVelocity, Vector3.zero, false);
+    }
+
+    public void BreakToDirection(Vector3 launchDirection, Vector3 impactVelocity = default)
+    {
+        BreakInternal(impactVelocity, launchDirection, true);
+    }
+
+    private void BreakInternal(Vector3 impactVelocity, Vector3 launchDirection, bool useDirection)
     {
         if (isBroken) return;
         isBroken = true;
@@ -82,9 +109,18 @@ public class FractureObject : MonoBehaviour
 
         if (chunksRoot != null)
         {
+            chunksRoot.transform.SetParent(null, true);
             chunksRoot.SetActive(true);
-            Debug.Log("난 터짐");
-            ExplodeChunksFromCenter(impactVelocity);
+            Debug.Log("FractureObject break");
+
+            if (useDirection)
+            {
+                ExplodeChunksToDirection(launchDirection, impactVelocity);
+            }
+            else
+            {
+                ExplodeChunksFromCenter(impactVelocity);
+            }
 
             if (destroyDelay > 0f)
             {
@@ -123,9 +159,12 @@ public class FractureObject : MonoBehaviour
 
         // 조각 부모 오브젝트
         chunksRoot = new GameObject($"{name}_Chunks");
-        chunksRoot.transform.SetParent(transform);
+        chunksRoot.transform.SetParent(transform, false);
         chunksRoot.transform.localPosition = Vector3.zero;
         chunksRoot.transform.localRotation = Quaternion.identity;
+        chunksRoot.transform.localScale = Vector3.one;
+
+        float worldVolumeScale = GetWorldVolumeScale();
 
         for (int i = 0; i < chunks.Count; i++)
         {
@@ -133,15 +172,16 @@ public class FractureObject : MonoBehaviour
             chunk.name = $"{name}_Chunk_{i}";
 
             var obj = new GameObject($"Chunk_{i}");
-            obj.transform.SetParent(chunksRoot.transform);
+            obj.transform.SetParent(chunksRoot.transform, false);
             obj.transform.localPosition = Vector3.zero;
             obj.transform.localRotation = Quaternion.identity;
+            obj.transform.localScale = Vector3.one;
 
             obj.AddComponent<MeshFilter>().mesh = chunk;
             obj.AddComponent<MeshRenderer>().materials = new[] { outerMat, innerMat };
 
             var rigde = obj.AddComponent<Rigidbody>();
-            rigde.mass = Mathf.Max(minChunkMass, MeshVolume(chunk) * density);
+            rigde.mass = Mathf.Max(minChunkMass, MeshVolume(chunk) * worldVolumeScale * density);
 
             var mc = obj.AddComponent<MeshCollider>();
             mc.sharedMesh = chunk;
@@ -216,7 +256,7 @@ public class FractureObject : MonoBehaviour
         {
             return null;
         }
-        
+
         var shell = new Mesh();
         shell.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         shell.vertices = vertices.ToArray();
@@ -240,7 +280,7 @@ public class FractureObject : MonoBehaviour
         return distanceToSurface <= thickness;
     }
 
-    private static void AddCopiedVertex( int index, Vector3[] srcVertices, Vector3[] srcNormals, Vector2[] srcUvs, List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, bool flipNormal)
+    private static void AddCopiedVertex(int index, Vector3[] srcVertices, Vector3[] srcNormals, Vector2[] srcUvs, List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, bool flipNormal)
     {
         Vector3 normal = srcNormals != null && srcNormals.Length > index ? srcNormals[index] : Vector3.up;
         vertices.Add(srcVertices[index]);
@@ -280,6 +320,46 @@ public class FractureObject : MonoBehaviour
             rig.AddTorque(Random.onUnitSphere * torqueImpulse * rig.mass, ForceMode.Impulse);
         }
     }
+    private void ExplodeChunksToDirection(Vector3 launchDirection, Vector3 impactVelocity)
+    {
+        if (chunksRoot == null)
+        {
+            return;
+        }
+
+        launchDirection.y = 0f;
+        if (launchDirection.sqrMagnitude < 0.0001f)
+        {
+            launchDirection = transform.forward;
+        }
+        launchDirection.Normalize();
+
+        foreach (var rig in chunksRoot.GetComponentsInChildren<Rigidbody>())
+        {
+            foreach (var joint in rig.GetComponents<Joint>())
+            {
+                Destroy(joint);
+            }
+
+            rig.isKinematic = false;
+            rig.WakeUp();
+
+            Vector3 randomDirection = Random.insideUnitSphere;
+            randomDirection.y = Mathf.Abs(randomDirection.y);
+
+            Vector3 impulse = launchDirection * directionalImpulse
+                + randomDirection * directionalRandomImpulse
+                + Vector3.up * directionalUpwardImpulse;
+
+            if (impactVelocity != Vector3.zero)
+            {
+                impulse += impactVelocity * 0.5f;
+            }
+
+            rig.AddForce(impulse * rig.mass, ForceMode.Impulse);
+            rig.AddTorque(Random.onUnitSphere * torqueImpulse * rig.mass, ForceMode.Impulse);
+        }
+    }
     private Mesh ToLocalMesh(Mesh src)
     {
         var dst = new Mesh();
@@ -311,6 +391,12 @@ public class FractureObject : MonoBehaviour
         return Mathf.Abs(vol);
     }
 
+    private float GetWorldVolumeScale()
+    {
+        Vector3 scale = transform.lossyScale;
+        return Mathf.Abs(scale.x * scale.y * scale.z);
+    }
+
     private IEnumerator DestroyChunks()
     {
         yield return new WaitForSeconds(destroyDelay);
@@ -319,4 +405,11 @@ public class FractureObject : MonoBehaviour
             Destroy(chunksRoot);
         }
     }
+
+    private IEnumerator BreakAfterDelayForTest()
+    {
+        yield return new WaitForSeconds(testBreakDelay);
+        BreakToDirection(testBreakDirection);
+    }
+
 }

@@ -96,8 +96,24 @@ public class ActionState : IState
                     param = pushForce
                 };
 
-                Debug.Log($"[ActionState] 기믹 패킷 전송 state={req.state}, gimmickID={req.gimmickID}, destPos={destPos}");
-Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+                if (targetGimmick.gimmickType == eGimmickType.Breakable)
+                {
+                    FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
+                    if (fracture != null)
+                    {
+                        Vector3 forward = actor.GetForward();
+                        forward.y = 0f;
+                        if (forward.sqrMagnitude < 0.0001f)
+                        {
+                            forward = actor.transform.forward;
+                            forward.y = 0f;
+                        }
+
+                        Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
+
+                        fracture.BreakToDirection(leftDir);
+                    }
+                }
 
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
             }
@@ -110,7 +126,25 @@ Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
                 }
                 else if (targetGimmick.gimmickType == eGimmickType.Breakable)
                 {
-                    targetGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
+                    FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
+                    if (fracture != null)
+                    {
+                        Vector3 forward = actor.GetForward();
+                        forward.y = 0f;
+                        if (forward.sqrMagnitude < 0.0001f)
+                        {
+                            forward = actor.transform.forward;
+                            forward.y = 0f;
+                        }
+
+                        Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
+
+                        fracture.BreakToDirection(leftDir);
+                    }
+                    else
+                    {
+                        targetGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
+                    }
                 }
             }
         }

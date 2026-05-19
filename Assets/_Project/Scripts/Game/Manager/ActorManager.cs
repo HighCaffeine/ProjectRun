@@ -30,38 +30,31 @@ public class ActorManager : GenericSingleton<ActorManager>
 
         return null;
     }
-    public void OnPlayerDead(string name)
+   public void OnPlayerDead(string name)
+{
+    if (!actors.ContainsKey(name)) return;
+
+    bool isLocal = (name == localID);
+
+    int currentMap = DungeonPointManager.Instance.currentMapID;
+    int currentSector = DungeonPointManager.Instance.currentSectorIndex;
+    Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(currentMap, currentSector);
+
+    foreach (var kvp in actors)
     {
-        if (!actors.ContainsKey(name)) return;
-
-        bool isLocal = (name == localID);
-
-        string spawnInfo = spawnPoints[name];
-        string[] split = spawnInfo.Split('_');
-        int mapLevel = int.Parse(split[0]);
-        int spawnIndex = int.Parse(split[1]);
-
-        // 새로 바뀐 다중 맵 스폰 로직 적용
-        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(mapLevel, spawnIndex);
-
-        // 모든 플레이어를 같이 죽이고 부활시킴
-        foreach (var kvp in actors)
+        PlayerActor teammate = kvp.Value;
+        if (!teammate.isDead)
         {
-            PlayerActor teammate = kvp.Value;
-
-            // 아직 안 죽은 팀원도 강제로 데스 처리
-            if (!teammate.isDead)
-            {
-                teammate.PlayerDead(spawnPos, spawnDelay);
-            }
-        }
-
-        if (isLocal)
-        {
-            SendPlayerDeadPacket(name, spawnPos);
-            ShowDeadUI(spawnDelay);
+            teammate.PlayerDead(spawnPos, spawnDelay);
         }
     }
+
+    if (isLocal)
+    {
+        SendPlayerDeadPacket(name, spawnPos);
+        ShowDeadUI(spawnDelay);
+    }
+}
 
     public void AddPlayer(PlayerActor actor)
     {

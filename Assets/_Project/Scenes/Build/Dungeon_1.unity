@@ -219,7 +219,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FractureObject
   siteCount: 15
   seed: -1
-  surfaceOnly: 0
+  surfaceOnly: 1
   shellThickness: 0.05
   addBackFaces: 1
   breakForce: 10
@@ -229,8 +229,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &30449011
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,6 +490,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3351580480265844984, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351580480265844984, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: gimmickUID
       value: 1093
       objectReference: {fileID: 0}
@@ -513,7 +523,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 8.250004
+      value: 26.000004
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -559,14 +569,13 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Gimmick
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 5868675889424353274, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8617950924638035591, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1070828469}
+      addedObject: {fileID: 1070828475}
   m_SourcePrefab: {fileID: 100100000, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
 --- !u!4 &61242543 stripped
 Transform:
@@ -948,8 +957,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &105121075
 GameObject:
   m_ObjectHideFlags: 0
@@ -1009,7 +1024,7 @@ Transform:
   m_GameObject: {fileID: 116430886}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -43.62082, y: -6, z: 47.196716}
+  m_LocalPosition: {x: -36.12082, y: -6, z: 47.196716}
   m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1197,8 +1212,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &150822957
 GameObject:
   m_ObjectHideFlags: 0
@@ -1708,8 +1729,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1001 &234552039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2157,8 +2184,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &311368010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2183,8 +2216,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &311368011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2209,8 +2248,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1001 &323517211
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2236,6 +2281,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3351580480265844984, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3351580480265844984, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: gimmickUID
       value: 1092
       objectReference: {fileID: 0}
@@ -2244,8 +2293,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.375
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2253,7 +2314,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.9583334
       objectReference: {fileID: 0}
     - target: {fileID: 4691480648841344118, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2302,7 +2363,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8617950924638035591, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 846514883}
+      addedObject: {fileID: 846514889}
   m_SourcePrefab: {fileID: 100100000, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
 --- !u!4 &323517212 stripped
 Transform:
@@ -2397,8 +2458,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &333599628
 GameObject:
   m_ObjectHideFlags: 0
@@ -2829,7 +2896,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1894011095801328357, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
       propertyPath: gimmick_id
@@ -2865,7 +2932,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3979507861862966672, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
       propertyPath: m_Layer
-      value: 8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6492811558293272256, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
       propertyPath: endPos
@@ -3748,6 +3815,26 @@ PrefabInstance:
       propertyPath: gimmick_type
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
+      propertyPath: properties.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
+      propertyPath: properties.Array.data[0].key
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
+      propertyPath: properties.Array.data[1].key
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
+      propertyPath: properties.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3937983903223963566, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
+      propertyPath: properties.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3979507861862966672, guid: a9f9cd2d3d3d32a4db75487a2039fcc7, type: 3}
       propertyPath: m_Name
       value: MovePlatform
@@ -4020,7 +4107,7 @@ Transform:
   m_GameObject: {fileID: 541669143}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -30.372242, y: 25.852783, z: -5.7592354}
+  m_LocalPosition: {x: -30.372242, y: 25.852783, z: -14.009235}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4758,8 +4845,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &615865637
 GameObject:
   m_ObjectHideFlags: 0
@@ -5408,8 +5501,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &691237248
 GameObject:
   m_ObjectHideFlags: 0
@@ -5802,8 +5901,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &745368965
 GameObject:
   m_ObjectHideFlags: 0
@@ -6539,7 +6644,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8617950924638035591, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
   m_PrefabInstance: {fileID: 323517211}
   m_PrefabAsset: {fileID: 0}
---- !u!143 &846514883
+--- !u!143 &846514889
 CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6558,7 +6663,7 @@ CharacterController:
   m_Enabled: 1
   serializedVersion: 3
   m_Height: 0.9999999
-  m_Radius: 0.5
+  m_Radius: 0.5000038
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
@@ -6910,8 +7015,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1001 &898196483
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14342,7 +14453,7 @@ PrefabInstance:
       addedObject: {fileID: 935920337}
     - targetCorrespondingSourceObject: {fileID: 1997083690692084080, guid: 6ef166730cf26ef4a97718a9bd24f7b4, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 935920346}
+      addedObject: {fileID: 935920352}
     - targetCorrespondingSourceObject: {fileID: 3552647334684051914, guid: 6ef166730cf26ef4a97718a9bd24f7b4, type: 3}
       insertIndex: -1
       addedObject: {fileID: 103671186}
@@ -14626,7 +14737,7 @@ MonoBehaviour:
   gimmick_id: 1033
   gimmick_type: 12
   properties: []
---- !u!114 &935920346
+--- !u!114 &935920352
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14638,10 +14749,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52acf9da14dde6b4e8a1b02c22eef64e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FractureObject
-  siteCount: 15
+  siteCount: 4
   seed: -1
-  surfaceOnly: 0
-  shellThickness: 0.05
+  surfaceOnly: 1
+  shellThickness: 0.4
   addBackFaces: 1
   breakForce: 10
   density: 1
@@ -14650,8 +14761,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
-  outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
-  insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  directionalImpulse: 15
+  directionalRandomImpulse: 5
+  directionalUpwardImpulse: 3
+  outsideMaterial: {fileID: 2100000, guid: d8da653cdfd8faa4893509a931342057, type: 2}
+  insideMaterial: {fileID: 2100000, guid: d8da653cdfd8faa4893509a931342057, type: 2}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!4 &940046204 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3875562610555011403, guid: 6ef166730cf26ef4a97718a9bd24f7b4, type: 3}
@@ -15466,8 +15583,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &1062954914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15507,8 +15630,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &1062954916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15548,8 +15677,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &1062954918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15691,33 +15826,31 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8617950924638035591, guid: 93e6f390d66038d47846da8e191a2ed5, type: 3}
   m_PrefabInstance: {fileID: 61242542}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &1070828469
-Rigidbody:
+--- !u!143 &1070828475
+CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1070828457}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.0000001
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1076439786
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15962,8 +16095,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &1130888864
 GameObject:
   m_ObjectHideFlags: 0
@@ -16781,8 +16920,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &1240328218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16837,8 +16982,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!114 &1251132089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16863,8 +17014,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &1254921587
 GameObject:
   m_ObjectHideFlags: 0
@@ -18934,8 +19091,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 8c92261c98d157148b70be0b36f02fd7, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &1624669360 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3999323553655692487, guid: 6ef166730cf26ef4a97718a9bd24f7b4, type: 3}
@@ -21187,8 +21350,14 @@ MonoBehaviour:
   explosionImpulse: 8
   randomImpulse: 3
   torqueImpulse: 2
+  directionalImpulse: 8
+  directionalRandomImpulse: 3
+  directionalUpwardImpulse: 1
   outsideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
   insideMaterial: {fileID: 239378781582670930, guid: 5fab314649a599148a688e5c5481c1c5, type: 3}
+  breakAfterStartForTest: 0
+  testBreakDelay: 3
+  testBreakDirection: {x: -1, y: 0, z: 0}
 --- !u!1 &1889002362
 GameObject:
   m_ObjectHideFlags: 0
@@ -23396,7 +23565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8390769556861452719, guid: 688bfd677bd7f7b4fb4ae3ecafb1b2be, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

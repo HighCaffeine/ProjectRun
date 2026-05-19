@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 하나의 평면(Plane)으로 Mesh를 두 개로 자르는 유틸리티.
+/// 잘린 단면(캡)을 삼각형 팬으로 채워 닫힌 메쉬를 만듭니다.
+/// </summary>
 public static class MeshSlicer
 {
     // 버텍스 하나를 표현하는 내부 구조체
@@ -11,7 +15,12 @@ public static class MeshSlicer
         public Vector2 uv;
     }
 
-    public static bool Slice(Mesh mesh, Plane plane, out Mesh posMesh, out Mesh negMesh)
+    /// <summary>
+    /// mesh를 plane으로 잘라 윗조각(positive)과 아랫조각(negative)을 반환합니다.
+    /// 실패하면 null 반환.
+    /// </summary>
+    public static bool Slice(Mesh mesh, Plane plane,
+        out Mesh posMesh, out Mesh negMesh)
     {
         posMesh = null;
         negMesh = null;
@@ -21,10 +30,12 @@ public static class MeshSlicer
         var uvs       = mesh.uv;
         var triangles = mesh.triangles;
 
+        // UV가 없을 경우 기본값 채우기
         if (uvs == null || uvs.Length != vertices.Length)
             uvs = new Vector2[vertices.Length];
 
-        var sides = new bool[vertices.Length]; 
+        // 각 버텍스가 plane의 양쪽 어느 쪽인지 분류
+        var sides = new bool[vertices.Length]; // true = positive side
         for (int i = 0; i < vertices.Length; i++)
             sides[i] = plane.GetSide(vertices[i]);
 
@@ -33,7 +44,10 @@ public static class MeshSlicer
         var posTris  = new List<int>();
         var negTris  = new List<int>();
 
-        var capVerts = new List<Vector3>(); 
+        // 단면(캡) 버텍스 수집용 (순서 있는 루프를 만들기 위해 Dictionary 사용)
+        var capVerts = new List<Vector3>(); // 교차점들
+
+        // 각 삼각형을 분류하며 잘린 경우 새 버텍스 생성
         for (int i = 0; i < triangles.Length; i += 3)
         {
             int i0 = triangles[i], i1 = triangles[i+1], i2 = triangles[i+2];
@@ -74,13 +88,17 @@ public static class MeshSlicer
         if (capVerts.Count >= 3)
         {
             Vector3 capNormal = plane.normal;
-            FillCap(capVerts, capNormal, posVerts, posTris, negVerts, negTris);
+            FillCap(capVerts, capNormal,
+                posVerts, posTris,
+                negVerts, negTris);
         }
 
         posMesh = BuildMesh(posVerts, posTris);
         negMesh = BuildMesh(negVerts, negTris);
         return true;
     }
+
+    // ── 내부 헬퍼 ────────────────────────────────────────────────
 
     private static VertexData MakeVertex(Vector3[] v, Vector3[] n, Vector2[] u, int idx)
         => new VertexData
@@ -98,6 +116,10 @@ public static class MeshSlicer
         tris.Add(start); tris.Add(start+1); tris.Add(start+2);
     }
 
+    /// <summary>
+    /// 삼각형을 평면으로 잘라 pos/neg 양쪽에 조각을 추가합니다.
+    /// s0/s1/s2 = 각 버텍스가 positive side인지
+    /// </summary>
     private static void SliceTriangle(
         Plane plane,
         VertexData v0, VertexData v1, VertexData v2,
@@ -106,6 +128,8 @@ public static class MeshSlicer
         List<VertexData> negVerts, List<int> negTris,
         List<Vector3> capVerts)
     {
+        // "홀로 떨어진" 버텍스가 한 쪽에 1개, 나머지 2개가 반대쪽인 경우로 정규화
+        // 순서를 맞춰서 항상 v_alone이 pos 혹은 neg 한 쪽에 혼자 있도록 함
         VertexData va, vb, vc;
         bool alone;
 
@@ -155,7 +179,12 @@ public static class MeshSlicer
         normal   = Vector3.Lerp(a.normal,   b.normal,   t).normalized,
         uv       = Vector2.Lerp(a.uv,       b.uv,       t)
     };
- private static void FillCap(
+
+    /// <summary>
+    /// 캡 버텍스들로 단면을 채웁니다. (컨벡스 폴리곤을 팬 삼각형으로)
+    /// pos 쪽에는 normal 방향, neg 쪽에는 반대 방향 노말
+    /// </summary>
+    private static void FillCap(
         List<Vector3> capVerts,
         Vector3 capNormal,
         List<VertexData> posVerts, List<int> posTris,
@@ -183,6 +212,7 @@ public static class MeshSlicer
             return angleA.CompareTo(angleB);
         });
 
+        // 중복 제거 (교차점이 2개씩 들어오므로)
         var unique = new List<Vector3>();
         foreach (var p in sorted)
         {
