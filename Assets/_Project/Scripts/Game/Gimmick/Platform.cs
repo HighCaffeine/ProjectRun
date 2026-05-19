@@ -132,7 +132,6 @@ public class Platform : BaseGimmick
         {
             if (!players.Contains(actor)) players.Add(actor);
 
-            // 🚨 1번 체크포인트: 내 클라이언트가 발판을 '1초 대기용'으로 인식하고 있는지 확인!
             Debug.Log($"<color=yellow>[발판 디버그]</color> 트리거 밟음! ActivationType: {activationType}, isMoving: {isMoving}");
 
             if (activationType == 1 && !isMoving)

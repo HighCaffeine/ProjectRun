@@ -6,7 +6,8 @@ public enum eGimmickState : byte
     On_Activate = 1, // 켜짐, 작동, 활성화, 열림
     Sync = 2,        // 지속적인 물리/좌표 동기화 (시소, 이동 플랫폼 등)
     Restore = 3,     // 다시 초기 위치로 돌아가야 하는 상태
-    TriggerMove = 4
+    TriggerMove = 4,
+    Push = 5,
 }
 
 public enum eGimmickType

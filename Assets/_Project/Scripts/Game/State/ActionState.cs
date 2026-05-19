@@ -91,10 +91,13 @@ public class ActionState : IState
                     activeUUID = LocalPlayerInfo.ID,
                     gimmickID = targetGimmick.gimmickUID,
                     gimmickKey = (byte)targetGimmick.gimmickType,
-                    state = 3, // 3 = 기믹 오브젝트 밀기/당기기 규약
+                    state = (byte)eGimmickState.Push, // 3 = 기믹 오브젝트 밀기/당기기 규약
                     targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-                    param = pushForce * pow
+                    param = pushForce
                 };
+
+                Debug.Log($"[ActionState] 기믹 패킷 전송 state={req.state}, gimmickID={req.gimmickID}, destPos={destPos}");
+Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
 
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
             }
