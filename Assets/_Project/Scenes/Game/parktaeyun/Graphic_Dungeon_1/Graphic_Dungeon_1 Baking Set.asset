@@ -30,7 +30,7 @@ MonoBehaviour:
       rayOriginBias: -0.001
       collisionMask:
         serializedVersion: 2
-        m_Bits: 4294967179
+        m_Bits: 4294966411
   m_SceneGUIDs:
   - 85ccb568842b91442a234476b4d482ec
   obsoleteScenesToNotBake: []
@@ -70,14 +70,14 @@ MonoBehaviour:
       m_Values: []
     m_Asset: {fileID: 0}
   chunkSizeInBricks: 128
-  maxCellPosition: {x: 2, y: 1, z: 1}
-  minCellPosition: {x: -1, y: -1, z: -1}
+  maxCellPosition: {x: 0, y: 0, z: 0}
+  minCellPosition: {x: 0, y: -1, z: -1}
   globalBounds:
-    m_Center: {x: 1093.5, y: 0, z: 0}
-    m_Extent: {x: 3280.5, y: 2187, z: 2187}
+    m_Center: {x: 364.5, y: 0, z: 0}
+    m_Extent: {x: 364.5, y: 729, z: 729}
   bakedSimplificationLevels: 4
   bakedMinDistanceBetweenProbes: 9
-  bakedProbeOcclusion: 1
+  bakedProbeOcclusion: 0
   bakedSkyOcclusionValue: 0
   bakedSkyShadingDirectionValue: 0
   bakedProbeOffset: {x: 0, y: 0, z: 0}
@@ -87,11 +87,11 @@ MonoBehaviour:
     y: 0
     z: 0
     w: 0
-  maxSHChunkCount: 16
+  maxSHChunkCount: 1
   L0ChunkSize: 65536
   L1ChunkSize: 32768
   L2TextureChunkSize: 32768
-  ProbeOcclusionChunkSize: 32768
+  ProbeOcclusionChunkSize: 0
   sharedValidityMaskChunkSize: 8192
   sharedSkyOcclusionL0L1ChunkSize: 0
   sharedSkyShadingDirectionIndicesChunkSize: 0
@@ -114,7 +114,7 @@ MonoBehaviour:
   minRendererVolumeSize: 9
   skyOcclusion: 0
   skyOcclusionBakingSamples: 2048
-  skyOcclusionBakingBounces: 2
+  skyOcclusionBakingBounces: 1
   skyOcclusionAverageAlbedo: 0.6
   skyOcclusionBackFaceCulling: 0
   skyOcclusionShadingDirection: 0
@@ -127,5 +127,5 @@ MonoBehaviour:
     - hasProbeVolume: 1
       bakeScene: 1
       bounds:
-        m_Center: {x: 1093.5, y: 0, z: 0}
-        m_Extent: {x: 3280.5, y: 2187, z: 2187}
+        m_Center: {x: 364.5, y: 0, z: 0}
+        m_Extent: {x: 364.5, y: 729, z: 729}
