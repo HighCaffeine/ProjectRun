@@ -11,6 +11,9 @@ public class MapEditorVer2 : EditorWindow
     private GameObject FallingPlatformPrefab;
     private GameObject seesawPrefab;
     private GameObject movableObjectPrefab;
+    private GameObject breakableObjectPrefab;
+    private GameObject breakableWallPrefab;
+    private GameObject bombObjectPrefab;
 
     [Header("배치 환경 설정")]
     private Transform customParent;  // 생성될 기믹 그룹들이 들어갈 맵 내 부모 폴더
@@ -31,6 +34,9 @@ public class MapEditorVer2 : EditorWindow
         FallingPlatformPrefab = LoadPrefab("MapEditor_FallingPlatform");
         seesawPrefab = LoadPrefab("MapEditor_seesaw");
         movableObjectPrefab = LoadPrefab("MapEditor_movable");
+        breakableObjectPrefab = LoadPrefab("MapEditor_breakableObj");
+        breakableWallPrefab = LoadPrefab("MapEditor_breakableWall");
+        bombObjectPrefab = LoadPrefab("MapEditor_bomb");
 
         useSnap = EditorPrefs.GetBool("MapEditor_useSnap", true);
         snapSize = EditorPrefs.GetFloat("MapEditor_snapSize", 1.0f);
@@ -51,6 +57,9 @@ public class MapEditorVer2 : EditorWindow
         SavePrefab("MapEditor_FallingPlatform", FallingPlatformPrefab);
         SavePrefab("MapEditor_seesaw", seesawPrefab);
         SavePrefab("MapEditor_movable", movableObjectPrefab);
+        SavePrefab("MapEditor_breakableObj", breakableObjectPrefab);
+        SavePrefab("MapEditor_breakableWall", breakableWallPrefab);
+        SavePrefab("MapEditor_bomb", bombObjectPrefab);
 
         EditorPrefs.SetBool("MapEditor_useSnap", useSnap);
         EditorPrefs.SetFloat("MapEditor_snapSize", snapSize);
@@ -95,12 +104,15 @@ public class MapEditorVer2 : EditorWindow
         // ----------------------------------------------------
         GUILayout.Label("1. 기믹 프리팹 등록", EditorStyles.boldLabel);
 
-        triggerPrefab = (GameObject)EditorGUILayout.ObjectField("스위치/발판 (Trigger)", triggerPrefab, typeof(GameObject), false);
-        bridgePrefab = (GameObject)EditorGUILayout.ObjectField("다리 (Bridge)", bridgePrefab, typeof(GameObject), false);
-        MovePlatformPrefab = (GameObject)EditorGUILayout.ObjectField("이동 발판 (Platform)", MovePlatformPrefab, typeof(GameObject), false);
-        FallingPlatformPrefab = (GameObject)EditorGUILayout.ObjectField("무너지는 발판 (Falling)", FallingPlatformPrefab, typeof(GameObject), false);
-        seesawPrefab = (GameObject)EditorGUILayout.ObjectField("시소 (Seesaw)", seesawPrefab, typeof(GameObject), false);
-        movableObjectPrefab = (GameObject)EditorGUILayout.ObjectField("밀당 오브젝트 (Movable)", movableObjectPrefab, typeof(GameObject), false);
+        bridgePrefab = (GameObject)EditorGUILayout.ObjectField("1. 다리 (Bridge)", bridgePrefab, typeof(GameObject), false);
+        MovePlatformPrefab = (GameObject)EditorGUILayout.ObjectField("2. 이동 발판 (Platform)", MovePlatformPrefab, typeof(GameObject), false);
+        FallingPlatformPrefab = (GameObject)EditorGUILayout.ObjectField("3. 무너지는 발판 (Falling)", FallingPlatformPrefab, typeof(GameObject), false);
+        movableObjectPrefab = (GameObject)EditorGUILayout.ObjectField("4. 밀당 오브젝트 (Movable)", movableObjectPrefab, typeof(GameObject), false);
+        breakableObjectPrefab = (GameObject)EditorGUILayout.ObjectField("5. 파괴가능 오브젝트 (Breakable)", breakableObjectPrefab, typeof(GameObject), false);
+        breakableWallPrefab = (GameObject)EditorGUILayout.ObjectField("6. 파괴가능 벽 (BreakableWall)", breakableWallPrefab, typeof(GameObject), false);
+        bombObjectPrefab = (GameObject)EditorGUILayout.ObjectField("7. 폭탄 (Bomb)", bombObjectPrefab, typeof(GameObject), false);
+        //triggerPrefab = (GameObject)EditorGUILayout.ObjectField("8. 스위치/발판 (Trigger)", triggerPrefab, typeof(GameObject), false);
+        //seesawPrefab = (GameObject)EditorGUILayout.ObjectField("시소 (Seesaw)", seesawPrefab, typeof(GameObject), false);
 
         GUILayout.Space(20);
         DrawHorizontalLine();
@@ -112,19 +124,14 @@ public class MapEditorVer2 : EditorWindow
         GUILayout.Label("2. 기믹 세트 원클릭 배치", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("버튼을 누르면 [그룹 폴더 + 기믹 + 스위치] 세트로 생성", MessageType.Info);
 
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("다리 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(bridgePrefab, eGimmickKey.Bridge, true);
-        if (GUILayout.Button("이동 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(MovePlatformPrefab, eGimmickKey.MovePlatform, true);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("무너지는 발판 세트 설치", GUILayout.Height(30))) PlaceGimmickSet(FallingPlatformPrefab, eGimmickKey.FallingPlatform, true);
-
-        //시소와 밀당 오브젝트는 트리거가 필요 없기 떄문에 false
-        if (GUILayout.Button("시소 설치", GUILayout.Height(30))) PlaceGimmickSet(seesawPrefab, eGimmickKey.SeeSaw, false);
-        GUILayout.EndHorizontal();
-
-        if (GUILayout.Button("밀당 오브젝트 설치", GUILayout.Height(30))) PlaceGimmickSet(movableObjectPrefab, eGimmickKey.MovableObject, false);
+        GimmickButtonGUI("01.다리 세트 설치", 30, bridgePrefab, eGimmickKey.Bridge, true);
+        GimmickButtonGUI("02.이동 발판 세트 설치", 30, MovePlatformPrefab, eGimmickKey.MovePlatform, true);
+        GimmickButtonGUI("03.무너지는 발판 세트 설치", 30, FallingPlatformPrefab, eGimmickKey.FallingPlatform, true);
+        //GimmickButtonGUI("04.시소 설치", 30, seesawPrefab, eGimmickKey.SeeSaw, true);
+        GimmickButtonGUI("04.밀당 오브젝트 설치", 30, movableObjectPrefab, eGimmickKey.MovableObject, true);
+        GimmickButtonGUI("05.부서지는 오브젝트 설치", 30, breakableObjectPrefab, eGimmickKey.BreakableObj, true);
+        GimmickButtonGUI("06.부서지는 벽 설치", 30, breakableWallPrefab, eGimmickKey.BreakableWall, true);
+        GimmickButtonGUI("07.폭탄 설치", 30, bombObjectPrefab, eGimmickKey.Bomb, true);
 
         GUILayout.Space(20);
         DrawHorizontalLine();
@@ -143,9 +150,7 @@ public class MapEditorVer2 : EditorWindow
         GUI.backgroundColor = Color.white;
     }
 
-    // ----------------------------------------------------
-    // 핵심 로직 구현부
-    // ----------------------------------------------------
+    //기믹 생성 및 처리 
 
     // private int GetUniqueGimmickID()
     // {
@@ -164,6 +169,13 @@ public class MapEditorVer2 : EditorWindow
 
     //     return newID;
     // }
+
+    private void GimmickButtonGUI(string info, int height, GameObject prefab, eGimmickKey eGimmickKey, bool autoCreateTrigger)
+    {
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(info, GUILayout.Height(height))) PlaceGimmickSet(prefab, eGimmickKey, autoCreateTrigger); 
+        GUILayout.EndHorizontal();
+    }
 
     private int GetNextGlobalGimmickUID()
     {
@@ -186,6 +198,10 @@ public class MapEditorVer2 : EditorWindow
         if (gimmick is Platform) return eGimmickKey.MovePlatform;
         if (gimmick is SeesawTrigger) return eGimmickKey.SeeSaw;
         if (gimmick is MovableGimmick) return eGimmickKey.MovableObject;
+        if (gimmick is BreakableObj) return eGimmickKey.BreakableObj;
+        if (gimmick is BreakableWall) return eGimmickKey.BreakableWall;
+        if (gimmick is Bomb) return eGimmickKey.Bomb;
+
         return eGimmickKey.BreakableWall; // 기본값
     }
 

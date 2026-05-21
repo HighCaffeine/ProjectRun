@@ -495,6 +495,12 @@ public class PlayerActor : Actor
     //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt); // byte[] 말고 pkt 직접
     // }
 
+    public void ForceSendMovePacket()
+{
+    // 기존 SendMovePacket 로직을 타이머 무시하고 즉시 호출
+    SendMovePacket(h, v);
+}
+
 
     public override void SendMovePacket(float axisH, float axisV)
     {

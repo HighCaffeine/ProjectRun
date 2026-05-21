@@ -25,7 +25,7 @@ public class Platform : BaseGimmick
 
     private void Start()
     {
-        lastPos = transform.position;
+        lastPos = TargetTransform.position;
 
         gimmickInfo = GetComponent<GimmickInfo>();
         ParseGimmickProperties();
@@ -41,7 +41,7 @@ public class Platform : BaseGimmick
         else
         {
             isMoving = false;
-            transform.position = startPos.position;
+            TargetTransform.position = startPos.position;
         }
     }
 
@@ -86,7 +86,7 @@ public class Platform : BaseGimmick
 
     private void LateUpdate()
     {
-        Vector3 delta = transform.position - lastPos;
+        Vector3 delta = TargetTransform.position - lastPos;
 
         if (delta == Vector3.zero) return;
 
@@ -94,7 +94,7 @@ public class Platform : BaseGimmick
         {
             PlayerActor p = players[i];
 
-            if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(transform.position, p.transform.position) > 15f)
+            if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(TargetTransform.position, p.transform.position) > 15f)
             {
                 players.RemoveAt(i);
                 continue;
@@ -105,7 +105,7 @@ public class Platform : BaseGimmick
                 p.SetPlatformDelta(delta);
             }
         }
-        lastPos = transform.position;
+        lastPos = TargetTransform.position;
     }
 
     public void AddPlayer(PlayerActor actor)
@@ -143,7 +143,7 @@ public class Platform : BaseGimmick
                     gimmickID = gimmickUID,
                     gimmickKey = (byte)eGimmickKey.MovePlatform,
                     state = 1, // 1: On_Activate
-                    targetPos = new P_PacketVector3 { x = transform.position.x, y = transform.position.y, z = transform.position.z },
+                    targetPos = new P_PacketVector3 { x = TargetTransform.position.x, y = TargetTransform.position.y, z = TargetTransform.position.z },
                     param = 0f
                 };
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
@@ -162,9 +162,9 @@ public class Platform : BaseGimmick
         float syncTimer = 0f;
         const float SYNC_INTERVAL = 0.5f;
 
-        while (Vector3.Distance(transform.position, target) > 0.01f)
+        while (Vector3.Distance(TargetTransform.position, target) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
+            TargetTransform.position = Vector3.MoveTowards(TargetTransform.position, target, moveSpeed * Time.deltaTime);
 
             if (activationType == 0 && GameManager.Instance.isHost)
             {
@@ -179,7 +179,7 @@ public class Platform : BaseGimmick
             yield return null;
         }
 
-        transform.position = target;
+        TargetTransform.position = target;
     }
 
     private void SendSyncPacket(Vector3 target)
@@ -209,7 +209,7 @@ public class Platform : BaseGimmick
         {
             StopAllCoroutines();
             isMoving = false;
-            transform.position = startPos.position;
+            TargetTransform.position = startPos.position;
             lastPos = startPos.position;
             return;
         }
@@ -229,5 +229,16 @@ public class Platform : BaseGimmick
             StopAllCoroutines();
             StartCoroutine(MovableTriggeredRoutine(targetSyncPos));
         }
+    }
+
+    public void OnDrawGizmos()
+    {
+        if (startPos == null || endPos == null) return;
+
+        Gizmos.color = Color.red;  
+        Gizmos.DrawLine(startPos.position, endPos.position);    
+        
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(endPos.position, TargetTransform.localScale); 
     }
 }

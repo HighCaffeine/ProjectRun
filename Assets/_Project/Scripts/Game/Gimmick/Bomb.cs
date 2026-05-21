@@ -28,12 +28,12 @@ public class Bomb : BaseGimmick
     {
         if (explosionEffect != null)
         {
-            Instantiate(explosionEffect, transform.position, Quaternion.identity);
+            Instantiate(explosionEffect, TargetTransform.position, Quaternion.identity);
         }
 
         if (GameManager.Instance.isHost)
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, radius, LayerMask.GetMask("Actionable"));
+            Collider[] hits = Physics.OverlapSphere(TargetTransform.position, radius, LayerMask.GetMask("Actionable"));
             
             List<int> hitGimmickIDs = new List<int>();
 
@@ -54,7 +54,7 @@ public class Bomb : BaseGimmick
                                 gimmickID = targetGimmick.gimmickUID,
                                 gimmickKey = (byte)targetGimmick.gimmickType,
                                 state = 3, // 밀기/타격 프로토콜
-                                targetPos = new P_PacketVector3 { x = transform.position.x, y = transform.position.y, z = transform.position.z },
+                                targetPos = new P_PacketVector3 { x = TargetTransform.position.x, y = TargetTransform.position.y, z = TargetTransform.position.z },
                                 param = force
                             };
 
@@ -66,7 +66,7 @@ public class Bomb : BaseGimmick
             Debug.Log($"<color=red>[Bomb]</color> 호스트 폭발 판정 완료. {hitGimmickIDs.Count}개 타격");
         }
 
-        Destroy(gameObject);
+        Destroy(TargetTransform.gameObject);
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)
@@ -77,6 +77,6 @@ public class Bomb : BaseGimmick
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, radius);   
+        Gizmos.DrawWireSphere(TargetTransform.position, radius);   
     }
 }

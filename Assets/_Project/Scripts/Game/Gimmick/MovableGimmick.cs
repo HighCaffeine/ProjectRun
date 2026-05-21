@@ -22,7 +22,7 @@ public class MovableGimmick : BaseGimmick
     private IEnumerator MoveRoutine(Vector3 destPos)
     {
         isMoving = true;
-        Vector3 startPos = transform.position;
+        Vector3 startPos = TargetTransform.position;
         float timer = 0f;
         float duration = 0.25f;
 
@@ -31,11 +31,11 @@ public class MovableGimmick : BaseGimmick
             timer += Time.deltaTime;
             float t = timer / duration;
             float smooth = 1f - (1f - t) * (1f - t);
-            transform.position = Vector3.Lerp(startPos, destPos, smooth);
+            TargetTransform.position = Vector3.Lerp(startPos, destPos, smooth);
             yield return null;
         }
 
-        transform.position = destPos;
+        TargetTransform.position = destPos;
         isMoving = false;
     }
 }

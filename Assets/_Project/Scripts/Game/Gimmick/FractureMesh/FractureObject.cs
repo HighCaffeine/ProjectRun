@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(Collider))]
 public class FractureObject : MonoBehaviour
 {
+    private BaseGimmick gimmick;
+
     [SerializeField]
     [Range(2, 50)]
     private int siteCount = 15;
@@ -53,7 +52,6 @@ public class FractureObject : MonoBehaviour
     private Vector3 testBreakDirection = Vector3.left;
 
 
-
     private bool isBroken = false;
     private GameObject chunksRoot;
     private MeshRenderer renderer;
@@ -62,8 +60,10 @@ public class FractureObject : MonoBehaviour
 
     private void Awake()
     {
-        renderer = GetComponent<MeshRenderer>();
-        collider = GetComponent<Collider>();
+        gimmick = GetComponent<BaseGimmick>();
+
+        renderer = gimmick.TargetTransform.GetComponentInChildren<MeshRenderer>();
+        collider = gimmick.TargetTransform.GetComponentInChildren<Collider>();
     }
 
     private void Start()
@@ -75,19 +75,6 @@ public class FractureObject : MonoBehaviour
             StartCoroutine(BreakAfterDelayForTest());
         }
     }
-
-    /* private void OnCollisionEnter(Collision collision)
-     {
-         Debug.Log("충돌 감지: " + collision.gameObject.name);
-         if (isBroken) return;
-
-         float impactForce = collision.impulse.magnitude;
-         if (impactForce >= breakForce)
-         {
-             Break(collision.relativeVelocity);
-         }
-     }*/
-
 
     public void Break(Vector3 impactVelocity = default)
     {
@@ -104,8 +91,8 @@ public class FractureObject : MonoBehaviour
         if (isBroken) return;
         isBroken = true;
 
-        renderer.enabled = false;
-        collider.enabled = false;
+        if (renderer != null) renderer.enabled = false;
+        if (collider != null) collider.enabled = false;
 
         if (chunksRoot != null)
         {
@@ -131,7 +118,7 @@ public class FractureObject : MonoBehaviour
 
     private void PrepareFracture()
     {
-        var mf = GetComponent<MeshFilter>();
+        var mf = gimmick.TargetTransform.GetComponentInChildren<MeshFilter>();
         if (mf == null || mf.sharedMesh == null)
         {
             return;
@@ -142,8 +129,7 @@ public class FractureObject : MonoBehaviour
         // Voronoi 파쇄
         List<Mesh> chunks = VoronoiFracture.Fracture(localMesh, siteCount, seed);
 
-        if (surfaceOnly)
-            chunks = KeepOuterShellChunks(chunks, localMesh.bounds, shellThickness, addBackFaces);
+        if (surfaceOnly) chunks = KeepOuterShellChunks(chunks, localMesh.bounds, shellThickness, addBackFaces);
 
         if (chunks.Count == 0)
         {
@@ -162,7 +148,7 @@ public class FractureObject : MonoBehaviour
         chunksRoot.transform.SetParent(transform, false);
         chunksRoot.transform.localPosition = Vector3.zero;
         chunksRoot.transform.localRotation = Quaternion.identity;
-        chunksRoot.transform.localScale = Vector3.one;
+        chunksRoot.transform.localScale = transform.parent.transform.localScale;
 
         float worldVolumeScale = GetWorldVolumeScale();
 
@@ -203,8 +189,7 @@ public class FractureObject : MonoBehaviour
         foreach (var chunk in chunks)
         {
             Mesh shell = KeepOuterShell(chunk, sourceBounds, safeThickness, addBackFaces);
-            if (shell != null && shell.vertexCount > 0 && shell.triangles.Length > 0)
-                result.Add(shell);
+            if (shell != null && shell.vertexCount > 0 && shell.triangles.Length > 0) result.Add(shell);
         }
 
         return result;
@@ -229,8 +214,7 @@ public class FractureObject : MonoBehaviour
             int i2 = srcTriangles[i + 2];
             Vector3 center = (srcVertices[i0] + srcVertices[i1] + srcVertices[i2]) / 3f;
 
-            if (!IsNearBoundsSurface(center, sourceBounds, thickness))
-                continue;
+            if (!IsNearBoundsSurface(center, sourceBounds, thickness)) continue;
 
             int start = vertices.Count;
             AddCopiedVertex(i0, srcVertices, srcNormals, srcUvs, vertices, normals, uvs, false);

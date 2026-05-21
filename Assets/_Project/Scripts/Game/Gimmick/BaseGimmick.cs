@@ -27,6 +27,13 @@ public abstract class BaseGimmick : MonoBehaviour
 
     public GimmickStat stat { get; protected set; }
 
+    public GameObject targetObject;
+
+    public Transform TargetTransform 
+    {
+        get { return targetObject != null ? targetObject.transform : this.transform; }
+    }
+
     protected virtual void Awake()
     {
         stat = GetComponent<GimmickStat>();

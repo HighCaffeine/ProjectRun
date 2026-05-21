@@ -22,7 +22,7 @@ public class ReMovePlatform : BaseGimmick
 
     private void Awake()
     {
-        platform = GetComponentInChildren<MeshRenderer>().gameObject;
+        platform = TargetTransform.gameObject;
         visual = platform.transform;
 
         originWorldPos = transform.position;   
@@ -165,5 +165,20 @@ public class ReMovePlatform : BaseGimmick
         // 물리 충돌 다시 켜기
         var col = platform.GetComponent<Collider>();
         if (col != null) col.enabled = true;
+    }
+
+    private Vector3 gizmos_dest;
+
+    private void OnDrawGizmos()
+    {
+        if (platform == null) return;
+
+        Gizmos.color = Color.red;
+
+        gizmos_dest = TargetTransform != null ? TargetTransform.position - (Vector3.up * fallDistance) : transform.position - (Vector3.up * fallDistance);
+        Gizmos.DrawLine(platform.transform.position, gizmos_dest);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(gizmos_dest, TargetTransform.localScale);
     }
 }

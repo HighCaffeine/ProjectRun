@@ -124,7 +124,6 @@ GameObject:
   - component: {fileID: 2467475936570381323}
   - component: {fileID: 2006925426434831470}
   - component: {fileID: 2222348174113028222}
-  - component: {fileID: 499727534663797948}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -225,20 +224,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &499727534663797948
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2942696775326941503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b1ed30b20b4c954c986f8be7cec3c26, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PressurePlate
-  wall: {fileID: 0}
-  bridge: {fileID: 396481858821266432}
 --- !u!1 &6310689223476281785
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,6 +302,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b3b32a06c68d7b4e97e13c1d32e5765, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bridge
-  pivot: {fileID: 8088715986771837481}
+  gimmickUID: 0
+  gimmickType: 0
+  targetObject: {fileID: 0}
+  pivot:
+  - {fileID: 0}
   closeAngle: 45
   speed: 2

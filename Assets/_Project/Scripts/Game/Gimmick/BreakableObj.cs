@@ -33,6 +33,7 @@ public class BreakableObj : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
+        Debug.Log($"<color=cyan>[패킷 수신]</color> 기믹 UID: {gimmickUID}, State: {ntf.state}");
         if (ntf.state == 99)
         {
             Break(ntf.activeUUID);
@@ -54,7 +55,7 @@ public class BreakableObj : BaseGimmick
 
         if (spawnGimmickKey == (int)eGimmickKey.Bomb && bombPrefab != null)
         {
-            GameObject bombObj = Instantiate(bombPrefab, transform.position, Quaternion.identity);
+            GameObject bombObj = Instantiate(bombPrefab, TargetTransform.position, Quaternion.identity);
             Bomb bombScript = bombObj.GetComponent<Bomb>();
             if (bombScript != null) bombScript.InitBomb(bombRadius, bombForce);
         }
