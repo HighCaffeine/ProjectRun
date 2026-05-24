@@ -128,4 +128,14 @@ public class ReMovePlatform : BaseGimmick
         var col = platform.GetComponent<Collider>();
         if (col != null) col.enabled = true;
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Vector3 targetPos = transform.position - (Vector3.up * fallDistance);
+        Gizmos.DrawLine(transform.position, targetPos);
+
+        Gizmos.color = Color.magenta;
+        Gizmos.DrawWireCube(targetPos, Vector3.one * TargetTransform.localScale.x);
+    }
 }

@@ -1,63 +1,53 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class BreakableObj : BaseGimmick
 {
-    [Header("스폰 설정")]
-    public GameObject bombPrefab;   
+    public enum InteractMode { Push, Pull, All }
 
-    private GimmickInfo gimmickInfo;
-    private int spawnGimmickKey = 0;
-    private float bombRadius = 5f;
-    private float bombForce = 10f;
+    [Header("상호작용 설정")]
+    public InteractMode interactMode = InteractMode.All;
+
+    [Header("스폰 설정")]
+    public GameObject spawnPrefab;
 
     private FractureObject fractureObj;
 
     private void Start()
     {
         fractureObj = GetComponent<FractureObject>();
-        gimmickInfo = GetComponent<GimmickInfo>();
-        
-        if (gimmickInfo != null)
-        {
-            foreach (var prop in gimmickInfo.properties)
-            {
-                if (prop.key.ToString() == "SpawnGimmickKey" || (int)prop.key == (int)eGimmickPropKey.SpawnGimmickKey)
-                    spawnGimmickKey = (int)prop.value;
-                
-                if (prop.key.ToString() == "Radius") bombRadius = prop.value;
-                if (prop.key.ToString() == "Force") bombForce = prop.value;
-            }
-        }
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        Debug.Log($"<color=cyan>[패킷 수신]</color> 기믹 UID: {gimmickUID}, State: {ntf.state}");
         if (ntf.state == 99)
         {
-            Break(ntf.activeUUID);
+            BreakObject(ntf.activeUUID);
         }
     }
 
-    private void Break(long attackerUUID)
+    private void BreakObject(long attackerUUID)
     {
-        Vector3 pushDir = Vector3.left; 
+        Vector3 pushDir = Vector3.left;
         if (Match.Instance.Players.TryGetValue(attackerUUID, out Player attacker))
         {
-            pushDir = -attacker.transform.right; 
+            pushDir = -attacker.transform.right;
         }
 
+        // 본체 파쇄 연출
         if (fractureObj != null)
         {
-            fractureObj.Break(pushDir * 15f); 
+            fractureObj.BreakToDirection(pushDir);
         }
 
-        if (spawnGimmickKey == (int)eGimmickKey.Bomb && bombPrefab != null)
+        // 프리팹 스폰
+        if (spawnPrefab != null)
         {
-            GameObject bombObj = Instantiate(bombPrefab, TargetTransform.position, Quaternion.identity);
-            Bomb bombScript = bombObj.GetComponent<Bomb>();
-            if (bombScript != null) bombScript.InitBomb(bombRadius, bombForce);
+            GameObject spawned = Instantiate(spawnPrefab, TargetTransform.position, Quaternion.identity);
+            Bomb bomb = spawned.GetComponent<Bomb>();
+            if (bomb != null)
+            {
+                bomb.InitBomb(bomb.radius, bomb.force);
+            }
         }
     }
 }

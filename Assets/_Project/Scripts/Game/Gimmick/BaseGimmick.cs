@@ -14,7 +14,8 @@ public enum eGimmickType
 {
     NONE = 0,
     Movable,    // 밀거나 당길 수 있는 기믹
-    Breakable   // 부서지기만 하는 기믹 (항아리, 벽 등)
+    Breakable,  // 부서지기만 하는 기믹 (항아리, 벽 등)
+    Bomb,
 }
 
 public abstract class BaseGimmick : MonoBehaviour
@@ -29,7 +30,7 @@ public abstract class BaseGimmick : MonoBehaviour
 
     public GameObject targetObject;
 
-    public Transform TargetTransform 
+    public Transform TargetTransform
     {
         get { return targetObject != null ? targetObject.transform : this.transform; }
     }

@@ -13,21 +13,21 @@ public class BreakableWall : BaseGimmick
     {
         if (ntf.state == 99)
         {
-            Break(ntf.activeUUID);
+            BreakWall(ntf.activeUUID);
         }
     }
 
-    private void Break(long attackerUUID)
+    private void BreakWall(long attackerUUID)
     {
-        Vector3 pushDir = Vector3.left; 
+        Vector3 pushDir = Vector3.left;
         if (Match.Instance.Players.TryGetValue(attackerUUID, out Player attacker))
         {
-            pushDir = -attacker.transform.right; 
+            pushDir = -attacker.transform.right;
         }
 
         if (fractureObj != null)
         {
-            fractureObj.Break(pushDir * 15f); 
+            fractureObj.BreakToDirection(pushDir);
         }
     }
 }

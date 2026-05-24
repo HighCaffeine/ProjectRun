@@ -114,7 +114,7 @@ public class Platform : BaseGimmick
             yield return StartCoroutine(MoveTo(currentTargetPos));
             isMoving = false;
 
-            yield return new WaitForSeconds(waitTimeAtSide);
+            yield return new WaitForSeconds(waitTime);
 
             currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
 

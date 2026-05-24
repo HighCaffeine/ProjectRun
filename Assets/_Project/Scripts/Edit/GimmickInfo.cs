@@ -33,6 +33,7 @@ public enum eGimmickPropKey
     SpawnGimmickKey = 6,    // eGimmickKey에 해당하는 기믹이 스폰됨 
     MonsterType = 7,        // 소환할 몬스터 타입 (MonsterSpawnArea에만 사용됨)
     AssignMonsterID = 8,    // 소환할 몬스터 ID
+    Damage = 9,             // 상호작용으로 서버에 보낼 데미지 수치
 }
 
 
