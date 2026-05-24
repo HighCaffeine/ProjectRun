@@ -148,7 +148,7 @@ public class FractureObject : MonoBehaviour
         chunksRoot.transform.SetParent(transform, false);
         chunksRoot.transform.localPosition = Vector3.zero;
         chunksRoot.transform.localRotation = Quaternion.identity;
-        chunksRoot.transform.localScale = transform.parent.transform.localScale;
+        chunksRoot.transform.localScale = gimmick.TargetTransform.localScale;
 
         float worldVolumeScale = GetWorldVolumeScale();
 

@@ -428,78 +428,11 @@ public class PlayerActor : Actor
         }
     }
 
-    // 상태 머신이 호출, 확정 좌표 패킷 전송
-    // public void SendMovePacket(float axisH, float axisV)
-    // {
-    //     curPos.Set(transform.position);
-    //     curRot.Set(transform.rotation);
-
-    //     P_PlayerMovement pkt = new P_PlayerMovement
-    //     {
-    //         userUUID = LocalPlayerInfo.ID,
-    //         inputSeq = ++inputSeq,
-    //         currentPos = curPos,
-    //         currentRot = curRot,
-    //         axisH = axisH,
-    //         axisV = axisV
-    //     };
-    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt);
-    // }
-
-    // public void SendMovePacket(float axisH, float axisV)
-    // {
-    //     P_PacketVector3 sendPos = new P_PacketVector3();
-    //     sendPos.Set(transform.position);
-
-    //     P_PacketQuaternion sendRot = new P_PacketQuaternion();
-    //     sendRot.Set(transform.rotation);
-
-    //     P_PlayerMovement pkt = new P_PlayerMovement
-    //     {
-    //         userUUID = LocalPlayerInfo.ID,
-    //         inputSeq = ++inputSeq,
-    //         currentPos = sendPos,
-    //         currentRot = sendRot,
-    //         axisH = axisH,
-    //         axisV = axisV
-    //     };
-
-    //     // 직접 직렬화해서 바이트 값 비교
-    //     byte[] dataOld = SerializePlayerMovement(pkt); // 됐던 함수
-    //     byte[] dataNew = PacketSerializer.Serialize(pkt); // 새 함수
-
-    //     Debug.Log($"[비교] Old: {dataOld.Length}bytes [{string.Join(",", dataOld)}]");
-    //     Debug.Log($"[비교] New: {dataNew.Length}bytes [{string.Join(",", dataNew)}]");
-    // }
-
-
-
-    // public void SendMovePacket(float axisH, float axisV)
-    // {
-    //     P_PacketVector3 sendPos = new P_PacketVector3();
-    //     sendPos.Set(transform.position);
-
-    //     P_PacketQuaternion sendRot = new P_PacketQuaternion();
-    //     sendRot.Set(transform.rotation);
-
-    //     P_PlayerMovement pkt = new P_PlayerMovement
-    //     {
-    //         userUUID = LocalPlayerInfo.ID,
-    //         inputSeq = ++inputSeq,
-    //         currentPos = sendPos,
-    //         currentRot = sendRot,
-    //         axisH = axisH,
-    //         axisV = axisV
-    //     };
-
-    //     Client.UDP.SendPacket2(E_PACKET.PLAYER_MOVEMENT, pkt); // byte[] 말고 pkt 직접
-    // }
 
     public void ForceSendMovePacket()
-{
-    // 기존 SendMovePacket 로직을 타이머 무시하고 즉시 호출
-    SendMovePacket(h, v);
-}
+    {
+        SendMovePacket(h, v);
+    }
 
 
     public override void SendMovePacket(float axisH, float axisV)

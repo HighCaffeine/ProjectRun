@@ -96,6 +96,14 @@ public class MapDataExporter : Editor
 
             info.gimmick_id = autoGimmickId;
             usedIds.Add(autoGimmickId);
+            EditorUtility.SetDirty(info);
+
+            BaseGimmick baseGimmick = info.GetComponent<BaseGimmick>();
+            if (baseGimmick != null)
+            {
+                baseGimmick.gimmickUID = autoGimmickId;
+                EditorUtility.SetDirty(baseGimmick);
+            }
 
             EditorUtility.SetDirty(info);
             Debug.Log($"<color=cyan>[Export ID 발급]</color> '{info.gameObject.name}'에 새 ID 할당 -> {autoGimmickId}");

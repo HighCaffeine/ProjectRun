@@ -14,6 +14,7 @@ public class MapEditorVer2 : EditorWindow
     private GameObject breakableObjectPrefab;
     private GameObject breakableWallPrefab;
     private GameObject bombObjectPrefab;
+    private GameObject monsterSpawnAreaPrefab;
 
     [Header("배치 환경 설정")]
     private Transform customParent;  // 생성될 기믹 그룹들이 들어갈 맵 내 부모 폴더
@@ -37,6 +38,7 @@ public class MapEditorVer2 : EditorWindow
         breakableObjectPrefab = LoadPrefab("MapEditor_breakableObj");
         breakableWallPrefab = LoadPrefab("MapEditor_breakableWall");
         bombObjectPrefab = LoadPrefab("MapEditor_bomb");
+        monsterSpawnAreaPrefab = LoadPrefab("MapEditor_monsterSpawnArea");
 
         useSnap = EditorPrefs.GetBool("MapEditor_useSnap", true);
         snapSize = EditorPrefs.GetFloat("MapEditor_snapSize", 1.0f);
@@ -60,6 +62,7 @@ public class MapEditorVer2 : EditorWindow
         SavePrefab("MapEditor_breakableObj", breakableObjectPrefab);
         SavePrefab("MapEditor_breakableWall", breakableWallPrefab);
         SavePrefab("MapEditor_bomb", bombObjectPrefab);
+        SavePrefab("MapEditor_monsterSpawnArea", monsterSpawnAreaPrefab);
 
         EditorPrefs.SetBool("MapEditor_useSnap", useSnap);
         EditorPrefs.SetFloat("MapEditor_snapSize", snapSize);
@@ -111,8 +114,11 @@ public class MapEditorVer2 : EditorWindow
         breakableObjectPrefab = (GameObject)EditorGUILayout.ObjectField("5. 파괴가능 오브젝트 (Breakable)", breakableObjectPrefab, typeof(GameObject), false);
         breakableWallPrefab = (GameObject)EditorGUILayout.ObjectField("6. 파괴가능 벽 (BreakableWall)", breakableWallPrefab, typeof(GameObject), false);
         bombObjectPrefab = (GameObject)EditorGUILayout.ObjectField("7. 폭탄 (Bomb)", bombObjectPrefab, typeof(GameObject), false);
+        monsterSpawnAreaPrefab = (GameObject)EditorGUILayout.ObjectField("8. 몬스터 스폰 구역 (MonsterSpawn)", monsterSpawnAreaPrefab, typeof(GameObject), false);
+
         //triggerPrefab = (GameObject)EditorGUILayout.ObjectField("8. 스위치/발판 (Trigger)", triggerPrefab, typeof(GameObject), false);
         //seesawPrefab = (GameObject)EditorGUILayout.ObjectField("시소 (Seesaw)", seesawPrefab, typeof(GameObject), false);
+
 
         GUILayout.Space(20);
         DrawHorizontalLine();
@@ -132,6 +138,7 @@ public class MapEditorVer2 : EditorWindow
         GimmickButtonGUI("05.부서지는 오브젝트 설치", 30, breakableObjectPrefab, eGimmickKey.BreakableObj, true);
         GimmickButtonGUI("06.부서지는 벽 설치", 30, breakableWallPrefab, eGimmickKey.BreakableWall, true);
         GimmickButtonGUI("07.폭탄 설치", 30, bombObjectPrefab, eGimmickKey.Bomb, true);
+        GimmickButtonGUI("08.몬스터 스폰 구역 설치", 30, monsterSpawnAreaPrefab, eGimmickKey.MonsterSpawnArea, false);
 
         GUILayout.Space(20);
         DrawHorizontalLine();
@@ -147,6 +154,15 @@ public class MapEditorVer2 : EditorWindow
         {
             GenerateTriggerForSelectedGimmick();
         }
+
+        GUILayout.Label("4. 몬스터 스폰 트리거 생성", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("하이라키에서 선택한 모든 MonsterSpawnArea를 한 번에 트리거에 등록", MessageType.Info);
+
+        if (GUILayout.Button("선택한 MonsterSpawnArea용 트리거 생성", GUILayout.Height(40)))
+        {
+            GenerateMonsterSpawnTrigger();
+        }
+
         GUI.backgroundColor = Color.white;
     }
 
@@ -173,7 +189,7 @@ public class MapEditorVer2 : EditorWindow
     private void GimmickButtonGUI(string info, int height, GameObject prefab, eGimmickKey eGimmickKey, bool autoCreateTrigger)
     {
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(info, GUILayout.Height(height))) PlaceGimmickSet(prefab, eGimmickKey, autoCreateTrigger); 
+        if (GUILayout.Button(info, GUILayout.Height(height))) PlaceGimmickSet(prefab, eGimmickKey, autoCreateTrigger);
         GUILayout.EndHorizontal();
     }
 
@@ -201,6 +217,7 @@ public class MapEditorVer2 : EditorWindow
         if (gimmick is BreakableObj) return eGimmickKey.BreakableObj;
         if (gimmick is BreakableWall) return eGimmickKey.BreakableWall;
         if (gimmick is Bomb) return eGimmickKey.Bomb;
+        if (gimmick is MonsterSpawnArea) return eGimmickKey.MonsterSpawnArea;
 
         return eGimmickKey.BreakableWall; // 기본값
     }
@@ -396,8 +413,90 @@ public class MapEditorVer2 : EditorWindow
         Debug.Log($"<color=green>[MapEditor]</color> 보조 스위치가 생성");
     }
 
+    private void GenerateMonsterSpawnTrigger()
+    {
+        // 하이라키에서 선택한 모든 오브젝트 가져오기
+        GameObject[] selectedObjects = Selection.gameObjects;
 
+        if (selectedObjects.Length == 0)
+        {
+            Debug.LogWarning("[MapEditor] 선택한 오브젝트가 없습니다.");
+            return;
+        }
 
+        // MonsterSpawnArea만 필터링
+        List<MonsterSpawnArea> spawnAreas = new List<MonsterSpawnArea>();
+
+        foreach (GameObject obj in selectedObjects)
+        {
+            MonsterSpawnArea area = obj.GetComponentInChildren<MonsterSpawnArea>();
+            if (area != null)
+            {
+                spawnAreas.Add(area);
+            }
+        }
+
+        if (spawnAreas.Count == 0)
+        {
+            Debug.LogWarning("[MapEditor] 선택한 오브젝트 중 MonsterSpawnArea가 없습니다.");
+            return;
+        }
+
+        // 트리거 생성
+        GameObject triggerObj;
+        Vector3 avgPos = Vector3.zero;
+
+        // 선택한 스폰 구역들의 중심 위치 계산
+        foreach (var area in spawnAreas)
+        {
+            avgPos += area.transform.position;
+        }
+        avgPos /= spawnAreas.Count;
+        avgPos.y = ApplySnap(avgPos.y + 0.1f);
+        avgPos.x = ApplySnap(avgPos.x);
+        avgPos.z = ApplySnap(avgPos.z - 3f); // 약간 앞쪽에 배치
+
+        if (triggerPrefab != null)
+        {
+            triggerObj = (GameObject)PrefabUtility.InstantiatePrefab(triggerPrefab);
+            triggerObj.transform.position = avgPos;
+        }
+        else
+        {
+            triggerObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            triggerObj.transform.position = avgPos;
+            triggerObj.transform.localScale = new Vector3(2f, 0.1f, 2f);
+            triggerObj.GetComponent<Collider>().isTrigger = true;
+        }
+
+        triggerObj.name = $"MonsterSpawnTrigger_{spawnAreas.Count}Areas";
+
+        if (customParent != null)
+        {
+            triggerObj.transform.SetParent(customParent);
+        }
+
+        // GimmickTrigger 컴포넌트 추가 및 설정
+        GimmickTrigger triggerComp = triggerObj.GetComponentInChildren<GimmickTrigger>();
+        if (triggerComp == null) triggerComp = triggerObj.AddComponent<GimmickTrigger>();
+
+        triggerComp.targetGimmicks.Clear();
+
+        // 선택한 모든 MonsterSpawnArea를 targetGimmicks에 추가
+        foreach (var area in spawnAreas)
+        {
+            TargetGimmickInfo info = new TargetGimmickInfo();
+            info.gimmickID = area.gimmickUID;
+            info.gimmickKey = eGimmickKey.MonsterSpawnArea;
+
+            triggerComp.targetGimmicks.Add(info);
+        }
+
+        Undo.RegisterCreatedObjectUndo(triggerObj, "Create Monster Spawn Trigger");
+        Selection.activeGameObject = triggerObj;
+
+        Debug.Log($"<color=green>[MapEditor]</color> 몬스터 스폰 트리거 생성 ({spawnAreas.Count}개 구역 등록)");
+    }
 
     private void DrawHorizontalLine(int height = 1)
     {

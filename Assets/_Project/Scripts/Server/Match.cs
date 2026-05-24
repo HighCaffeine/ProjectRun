@@ -23,7 +23,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     public Transform cameraPivot;
 
     private Dictionary<int, BaseGimmick> _gimmickCache = new Dictionary<int, BaseGimmick>();
-
+    public Dictionary<int, MonsterActor> _monsterCache = new Dictionary<int, MonsterActor>();
 
     void Awake()
     {
@@ -305,6 +305,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
+
+                    Debug.Log($"<color=yellow>[GIMMICK RAW]</color> 수신된 ID: {ntf.gimmickID}, State: {ntf.state}");
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone)
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
@@ -348,7 +350,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     else
                     {
-                        //Debug.LogWarning($"[GIMMICK] ID {ntf.gimmickID} 캐시에 없음! 등록된 키: {string.Join(", ", _gimmickCache.Keys)}");
+                        Debug.LogError($"<color=red>[GIMMICK 에러]</color> ID {ntf.gimmickID} 없음");
                     }
 
                     // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
@@ -503,6 +505,26 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     TradeManager.Instance.CloseTradeWindow(msg);
                 }
                 break;
+            case E_PACKET.MONSTER_MOVEMENT:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterMovement>(packet.data);
+                    if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
+                    {
+                        targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion());
+                    }
+                    break;
+                }
+
+            case E_PACKET.MONSTER_DEAD_NTF:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterDeadNtf>(packet.data);
+                    if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
+                    {
+                        targetMonster.ExecuteMonsterDead(pkt.hitDirection.ToVector3());
+                        _monsterCache.Remove(pkt.monsterID);
+                    }
+                    break;
+                }
             default:
                 break;
 

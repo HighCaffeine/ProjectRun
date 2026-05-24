@@ -2,19 +2,19 @@ using UnityEngine;
 
 public class AimState : IState
 {
-    private PlayerActor actor;
+    private Actor actor;
     private eState actionType;
 
     private float maxDistance;
     private float maxAngle;
 
     private BaseGimmick currentTargetGimmick;
-    private PlayerActor currentTargetPlayer;
+    private Actor currentTargetActor;
 
     private static Collider[] hitBuffer = new Collider[20];
     private static int targetLayerMask = -1;
 
-    public AimState(PlayerActor actor, eState type)
+    public AimState(Actor actor, eState type)
     {
         this.actor = actor;
         this.actionType = type;
@@ -33,71 +33,89 @@ public class AimState : IState
 
     public void Enter()
     {
-        if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player");
+        if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player", "Monster");
     }
 
     public void Execute()
     {
-        Vector3 aimDir = actor.Is2p ? actor.GetForward() : actor.GetActionDir();
+        Vector3 aimDir = Vector3.forward;
 
-        // 조준 방향 실시간 바라보기
-        actor.LookAtDirection(aimDir, true);
-
-        // 타겟팅 점수 계산
-        FindBestTarget(aimDir);
-
-        // 대상에게 선 긋기 시각화
-        if (currentTargetGimmick != null)
+        if (actor is PlayerActor pActor)
         {
-            actor.DrawAimLine(currentTargetGimmick.transform.position);
-        }
-        else if (currentTargetPlayer != null)
-        {
-            actor.DrawAimLine(currentTargetPlayer.transform.position);
+            aimDir = pActor.Is2p ? pActor.GetForward() : pActor.GetActionDir();
         }
         else
         {
-            actor.DrawAimLine(actor.transform.position + aimDir * maxDistance); // 타겟이 없으면 허공에 사거리만큼 긋기
+            aimDir = actor.GetMovementDirection(); // 몬스터의 경우 타겟 방향
+        }
+
+        actor.LookAtDirection(aimDir, true);
+        FindBestTarget(aimDir);
+
+        // 플레이어일 경우에만 조준선 시각화
+        if (actor is PlayerActor playerVisual)
+        {
+            if (currentTargetGimmick != null)
+            {
+                playerVisual.DrawAimLine(currentTargetGimmick.transform.position);
+            }
+            else if (currentTargetActor != null)
+            {
+                playerVisual.DrawAimLine(currentTargetActor.transform.position);
+            }
+            else
+            {
+                playerVisual.DrawAimLine(playerVisual.transform.position + aimDir * maxDistance);
+            }
         }
 
         bool isReleased = false;
 
-        isReleased = (actionType == eState.Push && Input.GetMouseButtonUp(0)) || (actionType == eState.Pull && Input.GetMouseButtonUp(1));
+        // 몬스터는 즉시 액션으로 전환, 플레이어는 마우스 버튼 뗄 때 전환
+        if (actor is PlayerActor)
+        {
+            isReleased = (actionType == eState.Push && Input.GetMouseButtonUp(0)) || (actionType == eState.Pull && Input.GetMouseButtonUp(1));
+        }
+        else
+        {
+            isReleased = true;
+        }
 
         if (isReleased)
         {
-            // 확정된 타겟들을 들고 ActionState로 전환
-            actor.sm.ChangeState(new ActionState(actor, actionType, currentTargetPlayer, currentTargetGimmick));
+            actor.sm.ChangeState(new ActionState(actor, actionType, currentTargetActor, currentTargetGimmick));
         }
     }
 
     public void Exit()
     {
-        actor.HideAimLine(); // 상태를 벗어나면 선 지우기
+        if (actor is PlayerActor pActor)
+        {
+            pActor.HideAimLine();
+        }
     }
 
     private void FindBestTarget(Vector3 searchForward)
     {
-        currentTargetPlayer = null;
+        currentTargetActor = null;
         currentTargetGimmick = null;
 
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, maxDistance, hitBuffer, targetLayerMask);
-        float bestScore = float.MaxValue; // 점수가 낮을수록 1순위 타겟
+        float bestScore = float.MaxValue;
 
         for (int i = 0; i < hitCount; i++)
         {
             Collider hit = hitBuffer[i];
 
             BaseGimmick gimmick = hit.GetComponentInParent<BaseGimmick>();
-            PlayerActor targetActor = hit.GetComponentInParent<PlayerActor>();
+            Actor targetEntity = hit.GetComponentInParent<Actor>();
 
-            if (targetActor != null && targetActor == actor) continue;
+            if (targetEntity != null && targetEntity == actor) continue;
 
-            Transform targetTransform = gimmick != null ? gimmick.transform : (targetActor != null ? targetActor.transform : null);
+            Transform targetTransform = gimmick != null ? gimmick.transform : (targetEntity != null ? targetEntity.transform : null);
             if (targetTransform == null) continue;
 
             Vector3 closestPoint = hit.ClosestPoint(actor.transform.position);
-
             float distance = Vector3.Distance(actor.transform.position, closestPoint);
 
             Vector3 dirToCenter = targetTransform.position - actor.transform.position;
@@ -114,11 +132,11 @@ public class AimState : IState
                     if (gimmick != null)
                     {
                         currentTargetGimmick = gimmick;
-                        currentTargetPlayer = null;
+                        currentTargetActor = null;
                     }
-                    else if (targetActor != null)
+                    else if (targetEntity != null)
                     {
-                        currentTargetPlayer = targetActor;
+                        currentTargetActor = targetEntity;
                         currentTargetGimmick = null;
                     }
                 }

@@ -73,6 +73,14 @@ public enum E_PACKET
     TRADE_CONFIRM = 318,        // A,B -> Server: 최종 교환 버튼
     TRADE_RESULT = 319,         // Server -> A, B: 거래 성공/실패 결과
     TRADE_CONFIRM_NTF = 320,
+
+
+    // 몬스터 동기화 패킷
+    MONSTER_SPAWN_NTF = 401,
+    MONSTER_MOVEMENT = 402,
+    MONSTER_STATE_NTF = 403,
+    MONSTER_DEAD_REQ = 404,
+    MONSTER_DEAD_NTF = 405,
 }
 
 
@@ -565,5 +573,48 @@ public struct P_TradeResult
 {
     [MarshalAs(UnmanagedType.I1)]
     public bool isSuccess;
+}
+#endregion
+
+#region Moster Sync Packet
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_MonsterSpawnNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int monsterID;
+    [MarshalAs(UnmanagedType.I4)] public int monsterType;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 spawnPos;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion spawnRot;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_MonsterMovement
+{
+    [MarshalAs(UnmanagedType.I4)] public int monsterID;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_MonsterStateNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int monsterID;
+    [MarshalAs(UnmanagedType.I1)] public byte newState;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
+    [MarshalAs(UnmanagedType.R4)] public float param;
+    [MarshalAs(UnmanagedType.I1)] public byte isPull;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_MonsterDeadReq
+{
+    [MarshalAs(UnmanagedType.I4)] public int monsterID;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_MonsterDeadNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int monsterID;
+    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 hitDirection;
 }
 #endregion

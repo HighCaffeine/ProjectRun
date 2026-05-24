@@ -1,9 +1,8 @@
 using UnityEngine;
-using Unity.Cinemachine;
 
 public class KnockbackState : IState
 {
-    private PlayerActor actor;
+    private Actor actor;
     private Vector3 knockbackDir;
 
     private float initialPower;
@@ -22,7 +21,7 @@ public class KnockbackState : IState
 
     private static Collider[] wallHitBuffer = new Collider[5];
 
-    public KnockbackState(PlayerActor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
+    public KnockbackState(Actor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
     {
         this.actor = actor;
         this.knockbackDir = dir.normalized;
@@ -49,15 +48,23 @@ public class KnockbackState : IState
 
         logDivisor = Mathf.Log(1 + K);
 
-        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, isPull: isPull, casterPos: casterPos);
-        actor.StartCoroutine(actor.HitStopRoutine());
-        actor.SetVerticalVelocity(3.0f);
-
-        eState actionType = isPull ? eState.Pull : eState.Push;
+        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, targetUUID: 0, isPull: isPull, casterPos: casterPos);
         actor.animator.SetTrigger("Knockback");
-        actor.PlayTravelSpark(actionType);
 
-        actor.ignoreServerPosTimer = DURATION + 0.5f;
+        // 플레이어 및 몬스터 분기 처리
+        if (actor is PlayerActor pActor)
+        {
+            pActor.StartCoroutine(pActor.HitStopRoutine());
+            pActor.SetVerticalVelocity(3.0f);
+
+            eState actionType = isPull ? eState.Pull : eState.Push;
+            pActor.PlayTravelSpark(actionType);
+            pActor.ignoreServerPosTimer = DURATION + 0.5f;
+        }
+        else if (actor is MonsterActor monster)
+        {
+            monster.monsterState = MonsterState.Knockback;
+        }
     }
 
     public void Execute()
@@ -65,7 +72,7 @@ public class KnockbackState : IState
         timer += Time.deltaTime;
         float t = timer / DURATION;
         float logValue = Mathf.Log(1f + K * t) / logDivisor;
-        
+
         float smooth = isPull ? 1f - ((1f - logValue) * (1f - logValue)) : logValue;
 
         if (actor.IsLocal)
@@ -98,10 +105,11 @@ public class KnockbackState : IState
             }
         }
 
+        // 벽 충돌 체크 (기믹 트리거)
         int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, 0.6f, wallHitBuffer);
         for (int i = 0; i < hitCount; i++)
         {
-            if (wallHitBuffer[i].CompareTag("Breakable"))
+            if (wallHitBuffer[i] != null && wallHitBuffer[i].CompareTag("Breakable"))
             {
                 if (actor.IsLocal)
                 {
@@ -111,22 +119,24 @@ public class KnockbackState : IState
                         gimmick.ProcessInteract(actor.gameObject);
                     }
                 }
-
                 wallHitBuffer[i].gameObject.SetActive(false);
             }
         }
 
         if (timer >= DURATION)
         {
-            actor.PlayBrakeParticles();
+            if (actor is PlayerActor pActor) pActor.PlayBrakeParticles();
             actor.sm.ChangeState(new IdleState(actor));
         }
     }
 
     public void Exit()
     {
-        if (actor.trailRenderer != null) actor.trailRenderer.emitting = false;
-        actor.StopTravelSpark();
+        if (actor is PlayerActor pActor)
+        {
+            if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = false;
+            pActor.StopTravelSpark();
+        }
         actor.SendMovePacket(0f, 0f);
     }
 }

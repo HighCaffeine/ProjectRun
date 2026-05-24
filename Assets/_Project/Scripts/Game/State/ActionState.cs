@@ -7,20 +7,19 @@ public class ActionState : IState
     private Actor actor;
     private eState actionType;
     private float timer;
-    private const float CAST_TIME = 0.7f; // 후딜레이
+    private const float CAST_TIME = 0.2f; // 후딜레이
 
-    private float pushForce = 100f;      // 최대 밀쳐내는 힘
-    private float pow = 2f;  // 계수
+    private float pushForce = 100f;
+    private float pow = 2f;
 
-    // AimState에서 받아온 확정 타겟
-    private PlayerActor targetPlayer;
+    private Actor targetActor;
     private BaseGimmick targetGimmick;
 
-    public ActionState(Actor actor, eState type, PlayerActor targetPlayer = null, BaseGimmick targetGimmick = null)
+    public ActionState(Actor actor, eState type, Actor targetActor = null, BaseGimmick targetGimmick = null)
     {
         this.actor = actor;
         this.actionType = type;
-        this.targetPlayer = targetPlayer;
+        this.targetActor = targetActor;
         this.targetGimmick = targetGimmick;
 
         pushForce = (actionType == eState.Push) ? (5f * pow) : (3f * pow);
@@ -40,20 +39,24 @@ public class ActionState : IState
 
         actor.lastSkillUseTime = Time.time;
 
-        if (actionType == eState.Push)
+        // 플레이어 전용 시각 효과 분리
+        if (actor is PlayerActor pActor)
         {
-            ((PlayerActor)actor).PushParticle();
-            ((PlayerActor)actor).PushIndicator.gameObject.SetActive(true);
-        }
-        else
-        {
-            ((PlayerActor)actor).PullIndicator.gameObject.SetActive(true);
+            if (actionType == eState.Push)
+            {
+                pActor.PushParticle();
+                pActor.PushIndicator.gameObject.SetActive(true);
+            }
+            else
+            {
+                pActor.PullIndicator.gameObject.SetActive(true);
+            }
         }
 
-        // [플레이어 타겟 처리]
-        if (targetPlayer != null)
+        // 액터 타겟 처리 (플레이어 / 몬스터)
+        if (targetActor != null)
         {
-            Vector3 dirToTarget = targetPlayer.transform.position - actor.transform.position;
+            Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
             float minDistance = dirToTarget.magnitude;
 
             float finalDistance = (actionType == eState.Push) ? pushForce : Mathf.Max(0f, minDistance - 1.5f);
@@ -63,16 +66,16 @@ public class ActionState : IState
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
-                Player p = targetPlayer.GetComponent<Player>();
-                actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, p.ID, actionType == eState.Pull, actor.transform.position);
+                Player p = targetActor.GetComponent<Player>();
+                long targetID = (p != null) ? p.ID : 0; // 몬스터면 ID 0으로 처리
+                actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetID, actionType == eState.Pull, actor.transform.position);
             }
             else
             {
-                targetPlayer.sm.ChangeState(new KnockbackState(targetPlayer, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
+                targetActor.sm.ChangeState(new KnockbackState(targetActor, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
             }
         }
-        // [기믹 오브젝트 타겟 처리]
-        else if (targetGimmick != null)
+        else if (targetGimmick != null) // 기믹 오브젝트 타겟 처리
         {
             Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
             Vector3 pushDir = dirToTarget.normalized;
@@ -86,12 +89,14 @@ public class ActionState : IState
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
+                byte stateToSend = (targetGimmick.gimmickType == eGimmickType.Breakable) ? (byte)99 : (byte)eGimmickState.Push;
+
                 P_GimmickInteractReq req = new P_GimmickInteractReq
                 {
-                    activeUUID = LocalPlayerInfo.ID,
+                    activeUUID = LocalPlayerInfo.ID, // 호스트가 연산
                     gimmickID = targetGimmick.gimmickUID,
                     gimmickKey = (byte)targetGimmick.gimmickType,
-                    state = (byte)eGimmickState.Push, // 3 = 기믹 오브젝트 밀기/당기기 규약
+                    state = stateToSend,
                     targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
                     param = pushForce
                 };
@@ -108,9 +113,7 @@ public class ActionState : IState
                             forward = actor.transform.forward;
                             forward.y = 0f;
                         }
-
                         Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
-
                         fracture.BreakToDirection(leftDir);
                     }
                 }
@@ -121,7 +124,6 @@ public class ActionState : IState
             {
                 if (targetGimmick.gimmickType == eGimmickType.Movable)
                 {
-                    // 필요 시 자식 클래스로 캐스팅해서 밀기 연출 진행
                     ((MovableGimmick)targetGimmick).StartMove(destPos);
                 }
                 else if (targetGimmick.gimmickType == eGimmickType.Breakable)
@@ -131,14 +133,9 @@ public class ActionState : IState
                     {
                         Vector3 forward = actor.GetForward();
                         forward.y = 0f;
-                        if (forward.sqrMagnitude < 0.0001f)
-                        {
-                            forward = actor.transform.forward;
-                            forward.y = 0f;
-                        }
-
+                        if (forward.sqrMagnitude < 0.0001f) forward = actor.transform.forward;
+                        forward.y = 0f;
                         Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
-
                         fracture.BreakToDirection(leftDir);
                     }
                     else
@@ -153,7 +150,6 @@ public class ActionState : IState
     public void Execute()
     {
         timer += Time.deltaTime;
-
         if (timer >= CAST_TIME)
         {
             actor.sm.ChangeState(new IdleState(actor));
@@ -162,6 +158,9 @@ public class ActionState : IState
 
     public void Exit()
     {
-        ((PlayerActor)actor).InvokeSSaGay();
+        if (actor is PlayerActor pActor)
+        {
+            pActor.InvokeSSaGay();
+        }
     }
 }
