@@ -17,6 +17,8 @@ public abstract class Actor : MonoBehaviour
     public const float sendInterval = 0.1f;
     //
 
+    public int pushDamage = 1;
+
     public bool isDead = false;
 
     public StateMachine sm = new StateMachine();

@@ -105,28 +105,95 @@ public class KnockbackState : IState
             }
         }
 
-        // 벽 충돌 체크 (기믹 트리거)
-        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, 0.6f, wallHitBuffer);
-        for (int i = 0; i < hitCount; i++)
-        {
-            if (wallHitBuffer[i] != null && wallHitBuffer[i].CompareTag("Breakable"))
-            {
-                if (actor.IsLocal)
-                {
-                    GimmickTrigger gimmick = wallHitBuffer[i].GetComponent<GimmickTrigger>();
-                    if (gimmick != null)
-                    {
-                        gimmick.ProcessInteract(actor.gameObject);
-                    }
-                }
-                wallHitBuffer[i].gameObject.SetActive(false);
-            }
-        }
+        // 벽 충돌 체크 (BreakableWall 연동)
+        CheckWallCollision();
 
         if (timer >= DURATION)
         {
             if (actor is PlayerActor pActor) pActor.PlayBrakeParticles();
             actor.sm.ChangeState(new IdleState(actor));
+        }
+    }
+
+    private void CheckWallCollision()
+    {
+        int hitCount = Physics.OverlapSphereNonAlloc(actor.transform.position, 0.6f, wallHitBuffer);
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            if (wallHitBuffer[i] == null) continue;
+
+            // Breakable 태그 확인
+            if (wallHitBuffer[i].CompareTag("Breakable"))
+            {
+                if (actor.IsLocal)
+                {
+                    ProcessBreakableWallHit(wallHitBuffer[i]);
+                }
+            }
+        }
+    }
+
+    private void ProcessBreakableWallHit(Collider hitCollider)
+    {
+        BaseGimmick gimmick = hitCollider.GetComponentInParent<BaseGimmick>();
+
+        if (gimmick == null)
+        {
+            // 레거시 GimmickTrigger 처리 지원
+            GimmickTrigger gimmickTrigger = hitCollider.GetComponent<GimmickTrigger>();
+            if (gimmickTrigger != null)
+            {
+                gimmickTrigger.ProcessInteract(actor.gameObject);
+                hitCollider.gameObject.SetActive(false);
+            }
+            return;
+        }
+
+        // BreakableWall만 처리
+        if (gimmick.gimmickType == eGimmickType.Breakable)
+        {
+            BreakableWall breakableWall = gimmick as BreakableWall;
+            if (breakableWall != null)
+            {
+                SendBreakableWallHitPacket(breakableWall);
+
+                hitCollider.gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void SendBreakableWallHitPacket(BreakableWall wall)
+    {
+        if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+        {
+            P_GimmickInteractReq req = new P_GimmickInteractReq
+            {
+                activeUUID = LocalPlayerInfo.ID,
+                gimmickID = wall.gimmickUID,
+                gimmickKey = (byte)wall.gimmickType,
+                state = (byte)eGimmickState.Push,
+                targetPos = new P_PacketVector3
+                {
+                    x = actor.transform.position.x,
+                    y = actor.transform.position.y,
+                    z = actor.transform.position.z
+                },
+                param = 1f
+            };
+
+            Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+            Debug.Log($"<color=yellow>[KnockbackState]</color> BreakableWall 충돌 패킷 전송 - GimmickID: {wall.gimmickUID}");
+        }
+        else
+        {
+            FractureObject fracture = wall.GetComponent<FractureObject>();
+            if (fracture != null)
+            {
+                Vector3 hitDir = knockbackDir;
+                hitDir.y = 0f;
+                fracture.BreakToDirection(hitDir.normalized);
+            }
         }
     }
 

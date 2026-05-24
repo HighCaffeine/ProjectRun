@@ -91,7 +91,6 @@ public class ActionState : IState
         Vector3 destPos = targetGimmick.transform.position + (pushDir * moveDist);
         destPos.y = targetGimmick.transform.position.y;
 
-        // ★ BreakableObj Push/Pull 모드 필터링 ★
         if (targetGimmick.gimmickType == eGimmickType.Breakable)
         {
             BreakableObj breakable = targetGimmick as BreakableObj;
@@ -104,8 +103,7 @@ public class ActionState : IState
 
                 if (!canInteract)
                 {
-                    Debug.Log($"<color=yellow>[ActionState]</color> 설정된 방향과 달라 BreakableObj 상호작용 무시됨");
-                    return; // 설정과 다르면 서버로 패킷 안 보냄! (데미지 안 들어감)
+                    return;
                 }
             }
         }
@@ -131,7 +129,7 @@ public class ActionState : IState
             gimmickKey = (byte)targetGimmick.gimmickType,
             state = stateToSend,
             targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-            param = pushForce // 일반 공격은 액션 파워 전달
+            param = actor.pushDamage
         };
 
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);

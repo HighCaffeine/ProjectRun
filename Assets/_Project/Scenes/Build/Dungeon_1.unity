@@ -262,7 +262,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &61006617
 Transform:
   m_ObjectHideFlags: 0
@@ -1110,6 +1110,174 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 20425710547190957, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1012
+      objectReference: {fileID: 0}
+    - target: {fileID: 69932198504861203, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1039
+      objectReference: {fileID: 0}
+    - target: {fileID: 74336663514761797, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 78120170267774067, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1007
+      objectReference: {fileID: 0}
+    - target: {fileID: 82645178386705810, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1019
+      objectReference: {fileID: 0}
+    - target: {fileID: 105949335505902546, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: CheckpointTrigger_1005
+      objectReference: {fileID: 0}
+    - target: {fileID: 150276225248058547, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1021
+      objectReference: {fileID: 0}
+    - target: {fileID: 263237871859282619, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1017
+      objectReference: {fileID: 0}
+    - target: {fileID: 269324312690148302, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 289799920399026841, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1016
+      objectReference: {fileID: 0}
+    - target: {fileID: 359561876641156180, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1012
+      objectReference: {fileID: 0}
+    - target: {fileID: 377218871144363956, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1051
+      objectReference: {fileID: 0}
+    - target: {fileID: 402216734959770101, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1013
+      objectReference: {fileID: 0}
+    - target: {fileID: 424927771357564361, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 428550655971063924, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1061
+      objectReference: {fileID: 0}
+    - target: {fileID: 460651603551194389, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1002
+      objectReference: {fileID: 0}
+    - target: {fileID: 532853785515303238, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1059
+      objectReference: {fileID: 0}
+    - target: {fileID: 543292222511055511, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1057
+      objectReference: {fileID: 0}
+    - target: {fileID: 667868149561398214, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1053
+      objectReference: {fileID: 0}
+    - target: {fileID: 689980946520395806, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 733021417959074754, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1042
+      objectReference: {fileID: 0}
+    - target: {fileID: 742442405200071857, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1028
+      objectReference: {fileID: 0}
+    - target: {fileID: 794436865315590010, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1002
+      objectReference: {fileID: 0}
+    - target: {fileID: 824958721177110508, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1050
+      objectReference: {fileID: 0}
+    - target: {fileID: 846365665888618305, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 906639987739223101, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1041
+      objectReference: {fileID: 0}
+    - target: {fileID: 920976336899854179, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1029
+      objectReference: {fileID: 0}
+    - target: {fileID: 1020873714508094999, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1035
+      objectReference: {fileID: 0}
+    - target: {fileID: 1058960816679726231, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1030
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087632435113678724, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226455502984314776, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1027
+      objectReference: {fileID: 0}
+    - target: {fileID: 1362335913219264537, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1054
+      objectReference: {fileID: 0}
+    - target: {fileID: 1385483481688972154, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1056
+      objectReference: {fileID: 0}
+    - target: {fileID: 1392098712889389929, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1031
+      objectReference: {fileID: 0}
+    - target: {fileID: 1410705661468408090, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1051
+      objectReference: {fileID: 0}
+    - target: {fileID: 1501108069079646111, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1021
+      objectReference: {fileID: 0}
+    - target: {fileID: 1564020653835859267, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1018
+      objectReference: {fileID: 0}
+    - target: {fileID: 1601240885845395703, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1017
+      objectReference: {fileID: 0}
+    - target: {fileID: 1629568740703257598, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1033
+      objectReference: {fileID: 0}
+    - target: {fileID: 1644363022000596664, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1038
+      objectReference: {fileID: 0}
+    - target: {fileID: 1660901441995275049, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1045
+      objectReference: {fileID: 0}
+    - target: {fileID: 1729043266622611275, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1049
+      objectReference: {fileID: 0}
     - target: {fileID: 1748597590576697752, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1150,9 +1318,857 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1763876604825252585, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1048
+      objectReference: {fileID: 0}
+    - target: {fileID: 1775366557688612174, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1056
+      objectReference: {fileID: 0}
+    - target: {fileID: 1782913739812787400, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 1797857511564725030, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 1818791774809837280, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1037
+      objectReference: {fileID: 0}
+    - target: {fileID: 1832978068180770202, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 1881161968205927436, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1015
+      objectReference: {fileID: 0}
+    - target: {fileID: 1894555271497540836, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: MovableGimmick_1063
+      objectReference: {fileID: 0}
+    - target: {fileID: 1922793948074668730, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1023
+      objectReference: {fileID: 0}
+    - target: {fileID: 1924881973938704346, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1016
+      objectReference: {fileID: 0}
+    - target: {fileID: 2022050086467864066, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1014
+      objectReference: {fileID: 0}
+    - target: {fileID: 2155875827416091506, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1044
+      objectReference: {fileID: 0}
+    - target: {fileID: 2175342017701186168, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1048
+      objectReference: {fileID: 0}
+    - target: {fileID: 2202050512838667429, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1011
+      objectReference: {fileID: 0}
+    - target: {fileID: 2203847496244574308, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1010
+      objectReference: {fileID: 0}
+    - target: {fileID: 2280665222752707556, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1059
+      objectReference: {fileID: 0}
+    - target: {fileID: 2333357839621206658, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1044
+      objectReference: {fileID: 0}
+    - target: {fileID: 2354572596327545910, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1064
+      objectReference: {fileID: 0}
+    - target: {fileID: 2387033077406483356, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1011
+      objectReference: {fileID: 0}
+    - target: {fileID: 2399666069002049315, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1005
+      objectReference: {fileID: 0}
+    - target: {fileID: 2415397128126169074, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1014
+      objectReference: {fileID: 0}
+    - target: {fileID: 2458113121148778933, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1065
+      objectReference: {fileID: 0}
+    - target: {fileID: 2550141508052183214, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1050
+      objectReference: {fileID: 0}
+    - target: {fileID: 2565489157624124382, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1013
+      objectReference: {fileID: 0}
+    - target: {fileID: 2601783542390920856, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1021
+      objectReference: {fileID: 0}
+    - target: {fileID: 2640192979281548752, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 2677859785577151678, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1056
+      objectReference: {fileID: 0}
+    - target: {fileID: 2733818418963237657, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1048
+      objectReference: {fileID: 0}
+    - target: {fileID: 2745121150126944614, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 2763869261600324797, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1043
+      objectReference: {fileID: 0}
+    - target: {fileID: 2822378644894164921, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1019
+      objectReference: {fileID: 0}
+    - target: {fileID: 2892378327590722970, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2892533663260087356, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1035
+      objectReference: {fileID: 0}
+    - target: {fileID: 2899879784018398387, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1018
+      objectReference: {fileID: 0}
+    - target: {fileID: 2909239224888241074, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1052
+      objectReference: {fileID: 0}
+    - target: {fileID: 2933324036908032387, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1047
+      objectReference: {fileID: 0}
+    - target: {fileID: 2967913445929758208, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1040
+      objectReference: {fileID: 0}
+    - target: {fileID: 3010533876414124839, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1020
+      objectReference: {fileID: 0}
+    - target: {fileID: 3083118770798396744, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1029
+      objectReference: {fileID: 0}
+    - target: {fileID: 3144330633060224128, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1004
+      objectReference: {fileID: 0}
+    - target: {fileID: 3180297998970642921, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1042
+      objectReference: {fileID: 0}
+    - target: {fileID: 3252120646581762308, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: CheckpointTrigger_1045
+      objectReference: {fileID: 0}
+    - target: {fileID: 3266459394463870388, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1004
+      objectReference: {fileID: 0}
+    - target: {fileID: 3285800875736650368, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1053
+      objectReference: {fileID: 0}
+    - target: {fileID: 3292239218592648554, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 3297746474303473978, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1009
+      objectReference: {fileID: 0}
+    - target: {fileID: 3317500790928594597, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1044
+      objectReference: {fileID: 0}
+    - target: {fileID: 3352148644038947808, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1020
+      objectReference: {fileID: 0}
+    - target: {fileID: 3411375792539978678, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 3441551540258964064, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1013
+      objectReference: {fileID: 0}
+    - target: {fileID: 3445923952857135816, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1060
+      objectReference: {fileID: 0}
+    - target: {fileID: 3489324036166962575, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1066
+      objectReference: {fileID: 0}
+    - target: {fileID: 3521661261560540307, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1038
+      objectReference: {fileID: 0}
+    - target: {fileID: 3573949062291560725, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1031
+      objectReference: {fileID: 0}
+    - target: {fileID: 3598460241733326176, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1049
+      objectReference: {fileID: 0}
+    - target: {fileID: 3805061988953221686, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1053
+      objectReference: {fileID: 0}
+    - target: {fileID: 3812713237347228210, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1054
+      objectReference: {fileID: 0}
+    - target: {fileID: 3844555956048260564, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1010
+      objectReference: {fileID: 0}
+    - target: {fileID: 3859020321819668791, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1030
+      objectReference: {fileID: 0}
+    - target: {fileID: 3880742267596950241, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: MovableGimmick_1008
+      objectReference: {fileID: 0}
+    - target: {fileID: 3911368167098355281, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 3960953965119356444, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1050
+      objectReference: {fileID: 0}
+    - target: {fileID: 3973534933113482651, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1055
+      objectReference: {fileID: 0}
+    - target: {fileID: 3974314966895162180, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1003
+      objectReference: {fileID: 0}
+    - target: {fileID: 4019280544450835777, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1028
+      objectReference: {fileID: 0}
+    - target: {fileID: 4025332630934859995, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: CheckpointTrigger_1001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4031076328973524530, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1066
+      objectReference: {fileID: 0}
+    - target: {fileID: 4071097124331023284, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1014
+      objectReference: {fileID: 0}
+    - target: {fileID: 4071753725973423758, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1011
+      objectReference: {fileID: 0}
+    - target: {fileID: 4108110829674967348, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1052
+      objectReference: {fileID: 0}
+    - target: {fileID: 4147646270712869737, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1016
+      objectReference: {fileID: 0}
+    - target: {fileID: 4172898411637629250, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 4173904292442338387, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1037
+      objectReference: {fileID: 0}
+    - target: {fileID: 4179582720294484839, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1057
+      objectReference: {fileID: 0}
+    - target: {fileID: 4181541338585627334, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1058
+      objectReference: {fileID: 0}
+    - target: {fileID: 4268959628626736110, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1033
+      objectReference: {fileID: 0}
+    - target: {fileID: 4269967972624261588, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1026
+      objectReference: {fileID: 0}
+    - target: {fileID: 4302123509657863064, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1022
+      objectReference: {fileID: 0}
+    - target: {fileID: 4329575392149003815, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1015
+      objectReference: {fileID: 0}
+    - target: {fileID: 4368955486862653585, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1023
+      objectReference: {fileID: 0}
+    - target: {fileID: 4392382951108487886, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1025
+      objectReference: {fileID: 0}
+    - target: {fileID: 4399952235318650770, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1047
+      objectReference: {fileID: 0}
+    - target: {fileID: 4418835881983397347, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1025
+      objectReference: {fileID: 0}
+    - target: {fileID: 4439813698408679227, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1042
+      objectReference: {fileID: 0}
+    - target: {fileID: 4450229472308837725, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1012
+      objectReference: {fileID: 0}
+    - target: {fileID: 4480448585532984139, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1017
+      objectReference: {fileID: 0}
+    - target: {fileID: 4536199551975317063, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1040
+      objectReference: {fileID: 0}
+    - target: {fileID: 4719328459777106004, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1009
+      objectReference: {fileID: 0}
+    - target: {fileID: 4757600171822563332, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1064
+      objectReference: {fileID: 0}
+    - target: {fileID: 4769290386157670114, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1035
+      objectReference: {fileID: 0}
+    - target: {fileID: 4772329067820006214, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1025
+      objectReference: {fileID: 0}
+    - target: {fileID: 4824934392687665302, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1046
+      objectReference: {fileID: 0}
+    - target: {fileID: 4831303730610711765, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1012
+      objectReference: {fileID: 0}
+    - target: {fileID: 4859383290107204518, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1060
+      objectReference: {fileID: 0}
+    - target: {fileID: 4881021015974471275, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1039
+      objectReference: {fileID: 0}
+    - target: {fileID: 4909415658686368062, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1059
+      objectReference: {fileID: 0}
+    - target: {fileID: 4950780527366370959, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1036
+      objectReference: {fileID: 0}
+    - target: {fileID: 4986903334889588920, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1027
+      objectReference: {fileID: 0}
+    - target: {fileID: 5006329693753948745, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1020
+      objectReference: {fileID: 0}
+    - target: {fileID: 5012401082504278108, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1026
+      objectReference: {fileID: 0}
+    - target: {fileID: 5067520162080665683, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 5077961027799441356, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1051
+      objectReference: {fileID: 0}
+    - target: {fileID: 5115775884742523629, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1028
+      objectReference: {fileID: 0}
     - target: {fileID: 5159807667501182406, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
       propertyPath: m_Name
       value: LevelTest (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5222313366976786151, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 5235573675041378938, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1023
+      objectReference: {fileID: 0}
+    - target: {fileID: 5248143389139675682, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: CheckpointTrigger_1027
+      objectReference: {fileID: 0}
+    - target: {fileID: 5303222444588720386, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5326225627994831891, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1055
+      objectReference: {fileID: 0}
+    - target: {fileID: 5532619871483529493, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1032
+      objectReference: {fileID: 0}
+    - target: {fileID: 5532684175744768640, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 5617830534658399622, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1039
+      objectReference: {fileID: 0}
+    - target: {fileID: 5619280368363097183, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1022
+      objectReference: {fileID: 0}
+    - target: {fileID: 5666311992996387847, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1066
+      objectReference: {fileID: 0}
+    - target: {fileID: 5710785449596758249, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1003
+      objectReference: {fileID: 0}
+    - target: {fileID: 5717159995902625949, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1031
+      objectReference: {fileID: 0}
+    - target: {fileID: 5746629665791764804, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1058
+      objectReference: {fileID: 0}
+    - target: {fileID: 5889894042495404055, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1062
+      objectReference: {fileID: 0}
+    - target: {fileID: 5904058821389576426, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1007
+      objectReference: {fileID: 0}
+    - target: {fileID: 5911551077371763835, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1034
+      objectReference: {fileID: 0}
+    - target: {fileID: 5930765435456091945, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1040
+      objectReference: {fileID: 0}
+    - target: {fileID: 5934171778054378434, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1043
+      objectReference: {fileID: 0}
+    - target: {fileID: 5936477053714042433, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1063
+      objectReference: {fileID: 0}
+    - target: {fileID: 6008601168721566647, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024288557674445884, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1004
+      objectReference: {fileID: 0}
+    - target: {fileID: 6072371765932863815, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1054
+      objectReference: {fileID: 0}
+    - target: {fileID: 6097201530063907464, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1032
+      objectReference: {fileID: 0}
+    - target: {fileID: 6133570959070149684, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1062
+      objectReference: {fileID: 0}
+    - target: {fileID: 6138698342364519588, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1018
+      objectReference: {fileID: 0}
+    - target: {fileID: 6148461542018261978, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1061
+      objectReference: {fileID: 0}
+    - target: {fileID: 6191454764879883975, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1008
+      objectReference: {fileID: 0}
+    - target: {fileID: 6231604946620887051, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1047
+      objectReference: {fileID: 0}
+    - target: {fileID: 6238022786447292986, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1052
+      objectReference: {fileID: 0}
+    - target: {fileID: 6249394816375968680, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1058
+      objectReference: {fileID: 0}
+    - target: {fileID: 6264551378239348027, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1018
+      objectReference: {fileID: 0}
+    - target: {fileID: 6287787330653685160, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 6327049164116004591, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1005
+      objectReference: {fileID: 0}
+    - target: {fileID: 6383119604879584565, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1043
+      objectReference: {fileID: 0}
+    - target: {fileID: 6426742503639291993, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1030
+      objectReference: {fileID: 0}
+    - target: {fileID: 6473868862980911597, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6478152692414694586, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1010
+      objectReference: {fileID: 0}
+    - target: {fileID: 6490632761114634329, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512022719273973344, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1049
+      objectReference: {fileID: 0}
+    - target: {fileID: 6519252164153452184, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1037
+      objectReference: {fileID: 0}
+    - target: {fileID: 6550726839462314298, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1036
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574227110636606556, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1008
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574728081865071249, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1048
+      objectReference: {fileID: 0}
+    - target: {fileID: 6679600873834706138, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1063
+      objectReference: {fileID: 0}
+    - target: {fileID: 6706576098600749390, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6747773239856640872, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1006
+      objectReference: {fileID: 0}
+    - target: {fileID: 6801357137732431294, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1064
+      objectReference: {fileID: 0}
+    - target: {fileID: 6822840815327224586, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1044
+      objectReference: {fileID: 0}
+    - target: {fileID: 6848251945811614482, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: CheckpointTrigger_1065
+      objectReference: {fileID: 0}
+    - target: {fileID: 6848403695246468875, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 6906320139199400333, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1015
+      objectReference: {fileID: 0}
+    - target: {fileID: 6928953551378730323, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1041
+      objectReference: {fileID: 0}
+    - target: {fileID: 6997939609249107615, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7047895397482993403, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 7114055316494630052, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1036
+      objectReference: {fileID: 0}
+    - target: {fileID: 7116139113376651146, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1014
+      objectReference: {fileID: 0}
+    - target: {fileID: 7199482821224272974, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1064
+      objectReference: {fileID: 0}
+    - target: {fileID: 7224694898191705209, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1038
+      objectReference: {fileID: 0}
+    - target: {fileID: 7276439802306980541, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1046
+      objectReference: {fileID: 0}
+    - target: {fileID: 7286701349128869061, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1043
+      objectReference: {fileID: 0}
+    - target: {fileID: 7334621759802991406, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 7346440477535460789, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1029
+      objectReference: {fileID: 0}
+    - target: {fileID: 7380563608012346566, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1056
+      objectReference: {fileID: 0}
+    - target: {fileID: 7428264588253258159, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1019
+      objectReference: {fileID: 0}
+    - target: {fileID: 7432319839396786778, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 7474839407394842132, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1002
+      objectReference: {fileID: 0}
+    - target: {fileID: 7490608226045681512, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1037
+      objectReference: {fileID: 0}
+    - target: {fileID: 7588088379176968898, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1003
+      objectReference: {fileID: 0}
+    - target: {fileID: 7612014046329187510, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1065
+      objectReference: {fileID: 0}
+    - target: {fileID: 7635558443309949322, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 7657711773181121143, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1055
+      objectReference: {fileID: 0}
+    - target: {fileID: 7717794956684411850, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1052
+      objectReference: {fileID: 0}
+    - target: {fileID: 7775267173745272772, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1001
+      objectReference: {fileID: 0}
+    - target: {fileID: 7778260391995755003, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1047
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779183921763714676, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1022
+      objectReference: {fileID: 0}
+    - target: {fileID: 7813439942083245965, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1006
+      objectReference: {fileID: 0}
+    - target: {fileID: 7901591012590134557, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1007
+      objectReference: {fileID: 0}
+    - target: {fileID: 7930952972297618892, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1004
+      objectReference: {fileID: 0}
+    - target: {fileID: 7998757708910422688, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1024
+      objectReference: {fileID: 0}
+    - target: {fileID: 8212360420456016181, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 8255972547244236963, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1032
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276942709656908141, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1031
+      objectReference: {fileID: 0}
+    - target: {fileID: 8291220908789790239, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1062
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297949999389976055, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1066
+      objectReference: {fileID: 0}
+    - target: {fileID: 8312868677814184433, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1061
+      objectReference: {fileID: 0}
+    - target: {fileID: 8359960004503115344, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1034
+      objectReference: {fileID: 0}
+    - target: {fileID: 8385835332636296675, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1055
+      objectReference: {fileID: 0}
+    - target: {fileID: 8395825066226490681, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1028
+      objectReference: {fileID: 0}
+    - target: {fileID: 8483812560925906532, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1050
+      objectReference: {fileID: 0}
+    - target: {fileID: 8608358619267524616, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1026
+      objectReference: {fileID: 0}
+    - target: {fileID: 8613951834832536142, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1053
+      objectReference: {fileID: 0}
+    - target: {fileID: 8648412158439262636, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1026
+      objectReference: {fileID: 0}
+    - target: {fileID: 8675195765434979913, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1041
+      objectReference: {fileID: 0}
+    - target: {fileID: 8718844380653643277, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1046
+      objectReference: {fileID: 0}
+    - target: {fileID: 8738232738464797471, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1057
+      objectReference: {fileID: 0}
+    - target: {fileID: 8767183240357195982, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1059
+      objectReference: {fileID: 0}
+    - target: {fileID: 8800309555246590608, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1033
+      objectReference: {fileID: 0}
+    - target: {fileID: 8814224973907106321, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1060
+      objectReference: {fileID: 0}
+    - target: {fileID: 8848388512994630417, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1016
+      objectReference: {fileID: 0}
+    - target: {fileID: 8911057082778220867, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1006
+      objectReference: {fileID: 0}
+    - target: {fileID: 8931341291803977276, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1051
+      objectReference: {fileID: 0}
+    - target: {fileID: 8952360309180263668, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: BreakableObj_1034
+      objectReference: {fileID: 0}
+    - target: {fileID: 9021523595909897089, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
+    - target: {fileID: 9036873381818475315, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: targetGimmicks.Array.data[0].gimmickID
+      value: 1017
+      objectReference: {fileID: 0}
+    - target: {fileID: 9052198601328784447, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: Platform_1009
+      objectReference: {fileID: 0}
+    - target: {fileID: 9094504824272953243, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1039
+      objectReference: {fileID: 0}
+    - target: {fileID: 9108575441531340390, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: m_Name
+      value: ReMovePlatform_1057
+      objectReference: {fileID: 0}
+    - target: {fileID: 9183599285836657094, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmickUID
+      value: 1045
+      objectReference: {fileID: 0}
+    - target: {fileID: 9200938923145872054, guid: 2f58a777b1a4a4f40aaa6fc5788d7d50, type: 3}
+      propertyPath: gimmick_id
+      value: 1025
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
