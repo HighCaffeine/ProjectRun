@@ -93,6 +93,31 @@ public class PlayerActor : Actor
         }
     }
 
+    public void TEST_ResetToStage1()
+    {
+        DungeonPointManager.Instance.currentMapID = 0;
+        DungeonPointManager.Instance.currentSectorIndex = 0;
+
+        Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(0, 0);
+
+        OnUpdatePoint?.Invoke(gameObject.name, 0);
+
+        float encodedValue = (0 * 100) + 0;
+
+        P_GimmickInteractReq req = new P_GimmickInteractReq
+        {
+            activeUUID = LocalPlayerInfo.ID,
+            gimmickID = 999,
+            gimmickKey = (byte)eGimmickKey.NextZone,
+            state = 2,
+            targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
+            param = encodedValue // 예: 1_2 -> 102
+        };
+
+        Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+        Debug.Log($"[System] Map{0}_Sector{0}번 구역으로 이동 요청 (encoded: {encodedValue})");
+    }
+
     void Update()
     {
         if (isDead || controller == null || !controller.enabled) return;
@@ -100,6 +125,8 @@ public class PlayerActor : Actor
 
         if (IsLocal)
         {
+            if (Input.GetKeyDown(KeyCode.R)) TEST_ResetToStage1();
+
             if (sm.currentState is IdleState || sm.currentState is MoveState)
             {
                 CheckActionIntent();
