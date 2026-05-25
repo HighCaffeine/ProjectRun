@@ -8,7 +8,7 @@ public class BreakableObj : BaseGimmick
     public InteractMode interactMode = InteractMode.All;
 
     [Header("스폰 설정")]
-    public GameObject spawnPrefab;
+    public BaseGimmick spawnPrefab;
 
     private FractureObject fractureObj;
 
@@ -42,7 +42,7 @@ public class BreakableObj : BaseGimmick
         // 프리팹 스폰
         if (spawnPrefab != null)
         {
-            GameObject spawned = Instantiate(spawnPrefab, TargetTransform.position, Quaternion.identity);
+            GameObject spawned = Instantiate(spawnPrefab.gameObject, TargetTransform.position, Quaternion.identity);
             Bomb bomb = spawned.GetComponent<Bomb>();
             if (bomb != null)
             {

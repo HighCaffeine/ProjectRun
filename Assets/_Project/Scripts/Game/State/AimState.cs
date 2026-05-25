@@ -57,7 +57,7 @@ public class AimState : IState
         {
             if (currentTargetGimmick != null)
             {
-                playerVisual.DrawAimLine(currentTargetGimmick.transform.position);
+                playerVisual.DrawAimLine(currentTargetGimmick.TargetTransform.position);
             }
             else if (currentTargetActor != null)
             {
@@ -112,7 +112,7 @@ public class AimState : IState
 
             if (targetEntity != null && targetEntity == actor) continue;
 
-            Transform targetTransform = gimmick != null ? gimmick.transform : (targetEntity != null ? targetEntity.transform : null);
+            Transform targetTransform = gimmick != null ? gimmick.TargetTransform : (targetEntity != null ? targetEntity.transform : null);
             if (targetTransform == null) continue;
 
             Vector3 closestPoint = hit.ClosestPoint(actor.transform.position);
@@ -124,6 +124,11 @@ public class AimState : IState
             if (angle <= maxAngle && distance <= maxDistance)
             {
                 float score = distance + (angle * 0.5f);
+
+                if (targetEntity != null)
+                {
+                    score -= 100f; 
+                }
 
                 if (score < bestScore)
                 {

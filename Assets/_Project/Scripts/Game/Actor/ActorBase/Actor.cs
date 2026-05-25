@@ -35,6 +35,7 @@ public abstract class Actor : MonoBehaviour
 
     public virtual bool IsLocal => false;
     public virtual bool Is2p => false;
+    public virtual float PushMulti => 1.0f;
     // ���¸ӽ� ��
     public float h { protected set; get; }
     public float v { protected set; get; }

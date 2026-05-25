@@ -518,13 +518,53 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.MONSTER_DEAD_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterDeadNtf>(packet.data);
+                    
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
-                        targetMonster.ExecuteMonsterDead(pkt.hitDirection.ToVector3());
+                        Players.TryGetValue(pkt.userUUID, out Player p);
+                        Vector3 dir = targetMonster.transform.position - p.transform.position;
+
+                        targetMonster.ExecuteMonsterDead(dir);
                         _monsterCache.Remove(pkt.monsterID);
                     }
                     break;
                 }
+                case E_PACKET.MONSTER_STATE_NTF:
+                {
+                    var statePkt = UnsafeCode.ByteArrayToStructure<P_MonsterStateNtf>(packet.data);
+
+                    if (_monsterCache.TryGetValue(statePkt.monsterID, out MonsterActor actor))
+                    {
+                        if (actor == null) break;
+
+                        //5번의 경우 스킵 X
+                        if (actor.IsLocal && statePkt.newState != 5) break;
+
+                        switch (statePkt.newState)
+                        {
+                            case 0: actor.sm.ChangeState(new IdleState(actor)); break;
+                            case 1: actor.sm.ChangeState(new MoveState(actor)); break;
+                            case 2: actor.sm.ChangeState(new ActionState(actor, eState.Push)); break; // 밀기
+                            //case 3: actor.sm.ChangeState(new ActionState(actor, eState.Pull)); break; // 당기기
+                            case 5:
+                                if (Time.time - actor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
+                                {
+                                    break;
+                                }
+
+                                actor.lastKnockbackTime = Time.time;
+
+                                bool pullFlag = (statePkt.isPull == 1);
+                                Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+
+                                actor.sm.ChangeState(new KnockbackState(actor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos));
+
+                                break;
+                        }
+                    }
+                    break;
+                }
+                break;
             default:
                 break;
 
@@ -616,6 +656,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
                 ActorManager.Instance.p1 = pActor;
+
+                CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
+                co.SetPlayer(pActor.transform);
             }
             else // 리모트 플레이어
             {

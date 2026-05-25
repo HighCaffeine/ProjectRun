@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using System.Collections;
-using UnityEngine.Rendering.Universal;
 
 public class PlayerActor : Actor
 {
@@ -11,8 +10,9 @@ public class PlayerActor : Actor
 
     const float CAMERA_SHAKE = 1.0f;
 
-    [Header("밀치기 힘 배율")][SerializeField] private float pushMulti = 1.0f;
-    public float PushMulti => pushMulti;
+    public override float PushMulti => pushMulti; 
+
+    public float pushMulti = 1.0f; 
 
     public LayerMask targetLayer;
 
@@ -295,17 +295,23 @@ public class PlayerActor : Actor
 
     private Vector3 GetMouseDir()
     {
-        Vector3 playerScreenPos = cam.WorldToScreenPoint(transform.position);
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 
-        Vector3 mousePos = Input.mousePosition;
-        mousePos.z = playerScreenPos.z;
+        Plane groundPlane = new Plane(Vector3.up, new Vector3(0, transform.position.y, 0));
 
-        Vector3 mouseWorldPos = cam.ScreenToWorldPoint(mousePos);
-        Vector3 dir = mouseWorldPos - transform.position;
+        if (groundPlane.Raycast(ray, out float enter))
+        {
+            Vector3 hitPoint = ray.GetPoint(enter);
 
-        dir.y = 0;
+            Vector3 dir = hitPoint - transform.position;
+            dir.y = 0;
+            
+            return dir.normalized;
+        }
 
-        return dir.normalized;
+        Vector3 fallbackDir = transform.forward;
+        fallbackDir.y = 0;
+        return fallbackDir.normalized;
     }
 
     public void DrawAimLine(Vector3 targetPos)

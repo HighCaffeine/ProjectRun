@@ -589,6 +589,7 @@ public struct P_MonsterSpawnNtf
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_MonsterMovement
 {
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
     [MarshalAs(UnmanagedType.I4)] public int monsterID;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
@@ -608,13 +609,14 @@ public struct P_MonsterStateNtf
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_MonsterDeadReq
 {
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
     [MarshalAs(UnmanagedType.I4)] public int monsterID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_MonsterDeadNtf
 {
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
     [MarshalAs(UnmanagedType.I4)] public int monsterID;
-    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 hitDirection;
 }
 #endregion

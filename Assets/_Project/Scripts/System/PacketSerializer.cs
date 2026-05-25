@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Unity.Collections;
 using UnityEngine;
 
 public static class PacketSerializer
@@ -26,6 +27,9 @@ public static class PacketSerializer
             case P_TradeLock p: return SerializeTradeLock(p);
             case P_TradeConfirm p: return SerializeTradeConfirm(p);
             case P_SceneSyncReq _: return new byte[] { 0 };
+            case P_MonsterStateNtf p : return SerializeMonsterStateNtf(p);
+            case P_MonsterDeadReq p : return SerializeMonsterDeadReq(p);
+            case P_MonsterMovement p : return SerializeMonsterMovement(p);
             default:
                 Debug.LogError($"[PacketSerializer] 미등록 패킷: {packet.GetType().Name}");
                 return new byte[0];
@@ -188,6 +192,46 @@ public static class PacketSerializer
         return new byte[] { p.isConfirmed ? (byte)1 : (byte)0 };
     }
 
+    static byte[] SerializeMonsterStateNtf(P_MonsterStateNtf p)
+    {
+       var buf = new byte[42]; //4+1+12+4+1+12
+       int o = 0;
+       Write(buf, ref o, p.monsterID);
+       buf[o++] = p.newState;
+       Write(buf, ref o, p.targetDir.x);
+       Write(buf, ref o, p.targetDir.y);
+       Write(buf, ref o, p.targetDir.z);
+       Write(buf, ref o, p.param);
+       buf[o++] = p.isPull;
+       Write(buf, ref o, p.casterPos.x);
+       Write(buf, ref o, p.casterPos.y);
+       Write(buf, ref o, p.casterPos.z);      
+       return buf;
+    }
+
+    static byte[] SerializeMonsterDeadReq(P_MonsterDeadReq p)
+    {
+        var buf = new byte[4]; //4
+        int o = 0;
+        Write(buf, ref o, p.userUUID);
+        Write(buf, ref o, p.monsterID);
+        return buf;
+    }
+
+    static byte[] SerializeMonsterMovement(P_MonsterMovement p)
+    {
+        var buf  = new byte[32]; //4+12+16
+        int o = 0;
+        Write(buf, ref o, p.monsterID);
+        Write(buf, ref o, p.currentPos.x);
+        Write(buf, ref o, p.currentPos.y);
+        Write(buf, ref o, p.currentPos.z);
+        Write(buf, ref o, p.currentRot.x);
+        Write(buf, ref o, p.currentRot.y);
+        Write(buf, ref o, p.currentRot.z);
+        Write(buf, ref o, p.currentRot.w);
+        return buf;
+    }
     // ── 헬퍼 ───────────────────────────────────────────────
 
     static void Write(byte[] buf, ref int o, long v)

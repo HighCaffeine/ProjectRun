@@ -55,12 +55,14 @@ public class ActionState : IState
         if (targetActor != null)
         {
             Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
+            dirToTarget.y = 0f;
             float minDistance = dirToTarget.magnitude;
 
             float finalDistance = (actionType == eState.Push) ? pushForce : Mathf.Max(0f, minDistance - 1.5f);
             Vector3 knockbackDir = dirToTarget.normalized;
 
             if (actionType == eState.Pull) knockbackDir = -knockbackDir;
+            finalDistance *= actor.PushMulti;
 
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
@@ -129,7 +131,7 @@ public class ActionState : IState
             gimmickKey = (byte)targetGimmick.gimmickType,
             state = stateToSend,
             targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-            param = actor.pushDamage
+            param = pushForce
         };
 
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);

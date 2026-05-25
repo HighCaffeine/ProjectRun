@@ -28,6 +28,7 @@ public class MonsterActor : Actor
 
     [SerializeField]
     private float recoveryTime = 5f;
+    [SerializeField] private float heightOffset = 1.5f;
     public MonsterState monsterState = MonsterState.Normal;
 
     private Coroutine stunCoroutine;
@@ -84,24 +85,45 @@ public class MonsterActor : Actor
 
         if (IsLocal)
         {
-            // 호스트만 타겟 탐색, 상태 머신 업데이트, 네트워크 패킷 전송
             UpdateTarget();
-            sm.Update();
-            if (!(sm.currentState is KnockbackState))
+
+            const float HEIGHT_EPSILON = 0.05f;
+
+            if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
             {
-                TryChangeToActionState();
+                UpdateHeight();
             }
+            else
+            {
+                sm.Update();
+                ApplyMovement();
+
+                if (!(sm.currentState is KnockbackState))
+                {
+                    TryChangeToActionState();
+                }
+            }
+
             HandleNetworkSync();
         }
         else
         {
-            // 서버에서 수신한 좌표로 위치 동기화 및 로컬 상태 업데이트
             ProcessRemoteMovement();
             sm.Update();
         }
 
-        ApplyMovement();
         UpdateMaterialByState();
+    }
+
+    private void UpdateHeight()
+    {
+        if (currentTarget == null || controller == null) return;
+        
+        float targetY = currentTarget.transform.position.y + heightOffset;
+        float nextY = Mathf.MoveTowards(transform.position.y, targetY, 2f * Time.deltaTime);
+        float deltaY = nextY - transform.position.y;
+
+        controller.Move(Vector3.up * deltaY);
     }
 
     private void UpdateTarget()
@@ -287,6 +309,7 @@ public class MonsterActor : Actor
 
         P_MonsterMovement pkt = new P_MonsterMovement
         {
+            userUUID = LocalPlayerInfo.ID,
             monsterID = this.monsterID,
             currentPos = new P_PacketVector3 { x = transform.position.x, y = transform.position.y, z = transform.position.z },
             currentRot = new P_PacketQuaternion { x = transform.rotation.x, y = transform.rotation.y, z = transform.rotation.z, w = transform.rotation.w }
@@ -295,10 +318,9 @@ public class MonsterActor : Actor
         Client.UDP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
     }
 
-    // 상태 변경 및 공격 패킷 전송 (ActionState 등에서 호출)
     public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
     {
-        if (!IsLocal) return; // 호스트만 몬스터의 상태 변화를 서버로 전송할 수 있습니다.
+        if (!IsLocal) return;
 
         P_MonsterStateNtf pkt = new P_MonsterStateNtf
         {

@@ -39,7 +39,7 @@ public class ReMovePlatform : BaseGimmick
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Player"))
         {

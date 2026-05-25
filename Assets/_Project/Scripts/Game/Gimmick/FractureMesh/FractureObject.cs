@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
+[RequireComponent(typeof(Collider))]
 public class FractureObject : MonoBehaviour
 {
-    private BaseGimmick gimmick;
-
     [SerializeField]
     [Range(2, 50)]
     private int siteCount = 15;
@@ -52,6 +53,7 @@ public class FractureObject : MonoBehaviour
     private Vector3 testBreakDirection = Vector3.left;
 
 
+
     private bool isBroken = false;
     private GameObject chunksRoot;
     private MeshRenderer renderer;
@@ -60,10 +62,8 @@ public class FractureObject : MonoBehaviour
 
     private void Awake()
     {
-        gimmick = GetComponent<BaseGimmick>();
-
-        renderer = gimmick.TargetTransform.GetComponentInChildren<MeshRenderer>();
-        collider = gimmick.TargetTransform.GetComponentInChildren<Collider>();
+        renderer = GetComponentInChildren<MeshRenderer>();
+        collider = GetComponentInChildren<Collider>();
     }
 
     private void Start()
@@ -75,6 +75,19 @@ public class FractureObject : MonoBehaviour
             StartCoroutine(BreakAfterDelayForTest());
         }
     }
+
+    /* private void OnCollisionEnter(Collision collision)
+     {
+         Debug.Log("충돌 감지: " + collision.gameObject.name);
+         if (isBroken) return;
+
+         float impactForce = collision.impulse.magnitude;
+         if (impactForce >= breakForce)
+         {
+             Break(collision.relativeVelocity);
+         }
+     }*/
+
 
     public void Break(Vector3 impactVelocity = default)
     {
@@ -91,14 +104,14 @@ public class FractureObject : MonoBehaviour
         if (isBroken) return;
         isBroken = true;
 
-        if (renderer != null) renderer.enabled = false;
-        if (collider != null) collider.enabled = false;
+        renderer.enabled = false;
+        collider.enabled = false;
 
         if (chunksRoot != null)
         {
             chunksRoot.transform.SetParent(null, true);
             chunksRoot.SetActive(true);
-            Debug.Log("FractureObject break");
+            IgnorePlayerCollisionsForChunks();
 
             if (useDirection)
             {
@@ -118,7 +131,7 @@ public class FractureObject : MonoBehaviour
 
     private void PrepareFracture()
     {
-        var mf = gimmick.TargetTransform.GetComponentInChildren<MeshFilter>();
+        var mf = GetComponentInChildren<MeshFilter>();
         if (mf == null || mf.sharedMesh == null)
         {
             return;
@@ -129,7 +142,8 @@ public class FractureObject : MonoBehaviour
         // Voronoi 파쇄
         List<Mesh> chunks = VoronoiFracture.Fracture(localMesh, siteCount, seed);
 
-        if (surfaceOnly) chunks = KeepOuterShellChunks(chunks, localMesh.bounds, shellThickness, addBackFaces);
+        if (surfaceOnly)
+            chunks = KeepOuterShellChunks(chunks, localMesh.bounds, shellThickness, addBackFaces);
 
         if (chunks.Count == 0)
         {
@@ -148,7 +162,7 @@ public class FractureObject : MonoBehaviour
         chunksRoot.transform.SetParent(transform, false);
         chunksRoot.transform.localPosition = Vector3.zero;
         chunksRoot.transform.localRotation = Quaternion.identity;
-        chunksRoot.transform.localScale = gimmick.TargetTransform.localScale;
+        chunksRoot.transform.localScale = Vector3.one * mf.transform.localScale.x;
 
         float worldVolumeScale = GetWorldVolumeScale();
 
@@ -189,7 +203,8 @@ public class FractureObject : MonoBehaviour
         foreach (var chunk in chunks)
         {
             Mesh shell = KeepOuterShell(chunk, sourceBounds, safeThickness, addBackFaces);
-            if (shell != null && shell.vertexCount > 0 && shell.triangles.Length > 0) result.Add(shell);
+            if (shell != null && shell.vertexCount > 0 && shell.triangles.Length > 0)
+                result.Add(shell);
         }
 
         return result;
@@ -214,7 +229,8 @@ public class FractureObject : MonoBehaviour
             int i2 = srcTriangles[i + 2];
             Vector3 center = (srcVertices[i0] + srcVertices[i1] + srcVertices[i2]) / 3f;
 
-            if (!IsNearBoundsSurface(center, sourceBounds, thickness)) continue;
+            if (!IsNearBoundsSurface(center, sourceBounds, thickness))
+                continue;
 
             int start = vertices.Count;
             AddCopiedVertex(i0, srcVertices, srcNormals, srcUvs, vertices, normals, uvs, false);
@@ -271,6 +287,43 @@ public class FractureObject : MonoBehaviour
         normals.Add(flipNormal ? -normal : normal);
         uvs.Add(srcUvs != null && srcUvs.Length > index ? srcUvs[index] : Vector2.zero);
     }
+
+    private void IgnorePlayerCollisionsForChunks()
+    {
+        if (chunksRoot == null)
+        {
+            return;
+        }
+
+        Collider[] chunkColliders = chunksRoot.GetComponentsInChildren<Collider>();
+        PlayerActor[] players = FindObjectsByType<PlayerActor>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        foreach (Collider chunkCollider in chunkColliders)
+        {
+            if (chunkCollider == null)
+            {
+                continue;
+            }
+
+            foreach (PlayerActor player in players)
+            {
+                if (player == null)
+                {
+                    continue;
+                }
+
+                Collider[] playerColliders = player.GetComponentsInChildren<Collider>();
+                foreach (Collider playerCollider in playerColliders)
+                {
+                    if (playerCollider != null)
+                    {
+                        Physics.IgnoreCollision(chunkCollider, playerCollider, true);
+                    }
+                }
+            }
+        }
+    }
+
     private void ExplodeChunksFromCenter(Vector3 impactVelocity)
     {
         if (chunksRoot == null)

@@ -118,10 +118,10 @@ public class Platform : BaseGimmick
 
             currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
 
-            if (activationType == 1 && currentTargetPos == endPos.position)
-            {
-                break;
-            }
+            // if (activationType == 1 && currentTargetPos == endPos.position)
+            // {
+            //     //break;
+            // }
         }
     }
 
@@ -133,11 +133,6 @@ public class Platform : BaseGimmick
             yield return null;
         }
         TargetTransform.position = target;
-
-        if (activationType == 1 && target == startPos.position)
-        {
-            hasTriggered = false;
-        }
     }
 
     private void SendSyncPacket(Vector3 target)
