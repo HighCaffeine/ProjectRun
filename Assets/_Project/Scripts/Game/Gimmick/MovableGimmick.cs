@@ -7,9 +7,12 @@ public class MovableGimmick : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
+        Debug.Log($"[MovableGimmick Execute] state={ntf.state}, targetPos={ntf.targetPos}");
+        
         // 목표 좌표(ntf.targetPos)로 이동!
         if (!isMoving) StartCoroutine(MoveRoutine(ntf.targetPos.ToVector3()));
     }
+
 
     public void StartMove(Vector3 destPos)
     {
@@ -19,7 +22,7 @@ public class MovableGimmick : BaseGimmick
     private IEnumerator MoveRoutine(Vector3 destPos)
     {
         isMoving = true;
-        Vector3 startPos = transform.position;
+        Vector3 startPos = TargetTransform.position;
         float timer = 0f;
         float duration = 0.25f;
 
@@ -28,11 +31,11 @@ public class MovableGimmick : BaseGimmick
             timer += Time.deltaTime;
             float t = timer / duration;
             float smooth = 1f - (1f - t) * (1f - t);
-            transform.position = Vector3.Lerp(startPos, destPos, smooth);
+            TargetTransform.position = Vector3.Lerp(startPos, destPos, smooth);
             yield return null;
         }
 
-        transform.position = destPos;
+        TargetTransform.position = destPos;
         isMoving = false;
     }
 }

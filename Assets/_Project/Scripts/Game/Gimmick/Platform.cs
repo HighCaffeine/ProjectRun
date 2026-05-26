@@ -5,130 +5,139 @@ using UnityEngine;
 public class Platform : BaseGimmick
 {
     [Header("이동 설정")]
-    [SerializeField] private Transform startPos;
-    [SerializeField] private Transform endPos;
+    public Transform startPos;
+    public Transform endPos;
     [SerializeField] private float moveSpeed = 3f;
     [SerializeField] private float waitTimeAtSide = 0.5f;
     [SerializeField] private List<PlayerActor> players = new List<PlayerActor>();
 
     private Vector3 lastPos;
     private Vector3 currentTargetPos;
+    private bool isMoving = false;
+    private bool hasTriggered = false; // 무한 왕복 전환 체크용
 
+    private GimmickInfo gimmickInfo;
+    private int activationType = 0;
+    private float waitTime = 0f;
 
     public void SetStartPos(GameObject start) { startPos = start.transform; }
     public void SetEndPos(GameObject end) { endPos = end.transform; }
 
     private void Start()
     {
-        lastPos = transform.position;
+        lastPos = TargetTransform.position;
+        gimmickInfo = GetComponent<GimmickInfo>();
+        ParseGimmickProperties();
 
-        if (GameManager.Instance.isHost)
+        if (activationType == 0)
         {
-            currentTargetPos = endPos.position;
-            StartCoroutine(HostMoveLoop());
+            if (GameManager.Instance.isHost)
+            {
+                currentTargetPos = endPos.position;
+                StartCoroutine(HostMoveLoop());
+            }
+        }
+        else
+        {
+            isMoving = false;
+            TargetTransform.position = startPos.position;
         }
     }
 
-    private IEnumerator HostMoveLoop()
+    private void ParseGimmickProperties()
     {
-        while (true)
+        if (gimmickInfo == null) return;
+        foreach (var prop in gimmickInfo.properties)
         {
-            //출발 전 목표위치 전송
-            P_GimmickInteractReq req = new P_GimmickInteractReq
-            {
-                activeUUID = LocalPlayerInfo.ID,
-                gimmickID = gimmickUID,
-                gimmickKey = (byte)eGimmickKey.MovePlatform,
-                state = (byte)eGimmickState.Sync,
-                targetPos = new P_PacketVector3 { x = currentTargetPos.x, y = currentTargetPos.y, z = currentTargetPos.z },
-                param = moveSpeed
-            };
-            Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-
-            // 본인 플랫폼 이동
-            yield return StartCoroutine(MoveTo(currentTargetPos));
-
-            // 목적지 설정, 대기
-            currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
-            yield return new WaitForSeconds(waitTimeAtSide);
+            if (prop.key == eGimmickPropKey.ActivationType) activationType = (int)prop.value;
+            if (prop.key == eGimmickPropKey.WaitTime) waitTime = prop.value;
+            if (prop.key == eGimmickPropKey.MoveSpeed) moveSpeed = prop.value;
         }
     }
 
     private void LateUpdate()
     {
-        Vector3 delta = transform.position - lastPos;
-
+        Vector3 delta = TargetTransform.position - lastPos;
         if (delta == Vector3.zero) return;
 
         for (int i = players.Count - 1; i >= 0; i--)
         {
             PlayerActor p = players[i];
-
-            if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(transform.position, p.transform.position) > 15f)
+            if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(TargetTransform.position, p.transform.position) > 15f)
             {
                 players.RemoveAt(i);
                 continue;
             }
-
-            if (p.IsLocal)
-            {
-                p.SetPlatformDelta(delta);
-            }
+            if (p.IsLocal) p.SetPlatformDelta(delta);
         }
-        lastPos = transform.position;
+        lastPos = TargetTransform.position;
     }
 
     public void AddPlayer(PlayerActor actor)
     {
         if (actor == null) return;
-        if (!players.Contains(actor)) players.Add(actor);
+        if (actor != null && actor.IsLocal)
+        {
+            if (!players.Contains(actor)) players.Add(actor);
+
+            // 트리거 방식이고 아직 한 번도 발동 안 했다면 서버에 알림
+            if (activationType == 1 && !hasTriggered)
+            {
+                P_GimmickInteractReq req = new P_GimmickInteractReq
+                {
+                    activeUUID = LocalPlayerInfo.ID,
+                    gimmickID = gimmickUID,
+                    gimmickKey = (byte)eGimmickKey.MovePlatform,
+                    state = 1, // On_Activate
+                    targetPos = new P_PacketVector3 { x = TargetTransform.position.x, y = TargetTransform.position.y, z = TargetTransform.position.z },
+                    param = 0f
+                };
+                Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+            }
+        }
     }
 
     public void RemovePlayer(PlayerActor actor)
     {
-        if (actor == null) return;
-        if (players.Contains(actor))
-        {
-            actor.SetPlatformDelta(Vector3.zero);
-            players.Remove(actor);
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        PlayerActor actor = other.GetComponent<PlayerActor>();
-        if (actor != null && actor.IsLocal && !players.Contains(actor)) players.Add(actor);
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        PlayerActor actor = other.GetComponent<PlayerActor>();
         if (actor != null && actor.IsLocal && players.Contains(actor)) players.Remove(actor);
+    }
+
+
+    private IEnumerator HostMoveLoop()
+    {
+        if (activationType == 1) yield return new WaitForSeconds(waitTime);
+
+        while (true)
+        {
+            SendSyncPacket(currentTargetPos);
+            isMoving = true;
+            yield return StartCoroutine(MoveTo(currentTargetPos));
+            isMoving = false;
+
+            yield return new WaitForSeconds(waitTime);
+
+            currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
+
+            if (activationType == 1 && currentTargetPos == endPos.position)
+            {
+                break;
+            }
+        }
     }
 
     IEnumerator MoveTo(Vector3 target)
     {
-        float syncTimer = 0f;
-        const float SYNC_INTERVAL = 0.5f; // 0.5초마다 현재 상태 재전송
-
-        while (Vector3.Distance(transform.position, target) > 0.01f)
+        while (Vector3.Distance(TargetTransform.position, target) > 0.01f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, moveSpeed * Time.deltaTime);
-
-            if (GameManager.Instance.isHost)
-            {
-                syncTimer += Time.deltaTime;
-                if (syncTimer >= SYNC_INTERVAL)
-                {
-                    syncTimer = 0f;
-                    SendSyncPacket(target); // 현재 목표 위치 재전송
-                }
-            }
-
+            TargetTransform.position = Vector3.MoveTowards(TargetTransform.position, target, moveSpeed * Time.deltaTime);
             yield return null;
         }
+        TargetTransform.position = target;
 
-        transform.position = target;
+        if (activationType == 1 && target == startPos.position)
+        {
+            hasTriggered = false;
+        }
     }
 
     private void SendSyncPacket(Vector3 target)
@@ -147,13 +156,32 @@ public class Platform : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
+        //처음 밟았을 때 트리거
+        if (activationType == 1 && ntf.state == 1 && !hasTriggered)
+        {
+            hasTriggered = true;
+            if (GameManager.Instance.isHost)
+            {
+                currentTargetPos = endPos.position;
+                StartCoroutine(HostMoveLoop());     // 호스트가 컨트롤
+            }
+        }
+
+        //호스트가 동기화
         if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost)
         {
             Vector3 targetSyncPos = ntf.targetPos.ToVector3();
-            // float syncSpeed = ntf.param; // 필요시 속도 동기화
-
             StopAllCoroutines();
-            StartCoroutine(MoveTo(targetSyncPos)); // 호스트가 지시한 목표로 이동 시작
+            StartCoroutine(MoveTo(targetSyncPos));
         }
+    }
+
+    public void OnDrawGizmos()
+    {
+        if (startPos == null || endPos == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(startPos.position, endPos.position);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(endPos.position, TargetTransform.localScale);
     }
 }

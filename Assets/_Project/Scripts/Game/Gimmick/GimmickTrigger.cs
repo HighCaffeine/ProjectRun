@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public struct TargetGimmickInfo
 {
     public int gimmickID;
-    public GimmickKey gimmickKey;
+    public eGimmickKey gimmickKey;
 }
 
 public class GimmickTrigger : MonoBehaviour
@@ -31,7 +31,7 @@ public class GimmickTrigger : MonoBehaviour
 
     public void ProcessInteract(GameObject otherObj)
     {
-        if (isOneTimeUse && isTriggered) 
+        if (isOneTimeUse && isTriggered)
         {
             return;
         }
@@ -44,7 +44,6 @@ public class GimmickTrigger : MonoBehaviour
             {
                 if (actor.IsLocal)
                 {
-                    Debug.Log("<color=green>[GimmickTrigger]</color> 2단계 통과: 내 캐릭터(IsLocal) 확인!");
                     isTriggered = true;
 
                     if (Client.IS_SERVER_PLAY || GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)

@@ -10,14 +10,14 @@ public class MapModuleGrid : MonoBehaviour
     public Color gridColor = new Color(0f, 1f, 0f, 0.3f);
 
     [Header("자동 스냅 기능")]
-    public bool enableAutoSnap = true;                  // 켜두면 자식 오브젝트들이 Cell에 맞춰짐
+    public bool enableAutoSnap = false;                  // 켜두면 자식 오브젝트들이 Cell에 맞춰짐
 
     [Header("Y축 스냅 설정")]
     public bool enableSnapY = false;
     public float snapStepY = 0.5f;
 
     [Header("Nav 추출")]
-    public bool includeNavMesh = true;
+    public bool includeNavMesh = false;
 
     void Update()
     {
@@ -64,7 +64,7 @@ public class MapModuleGrid : MonoBehaviour
         }
     }
 
-    void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         // 전체 추출 영역 테두리
         Gizmos.color = Color.green;
