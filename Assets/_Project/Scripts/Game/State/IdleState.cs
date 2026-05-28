@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 public class IdleState : IState
 {
     public Actor actor;
@@ -12,24 +9,39 @@ public class IdleState : IState
 
     public void Enter()
     {
-        actor.SendMovePacket(0f, 0f);
-        actor.SendStateChange(eState.Idle);
+        SendStopMovePacket();
+        SendIdleState();
     }
 
     public void Execute()
     {
-        if (!actor.IsLocal) return;
-
-        //if (actor.CheckActionIntent()) return;
-
-        if (actor.HasMoveIntent())
-        {
-            actor.sm.ChangeState(new MoveState(actor));
-        }
+        TryChangeToMoveState();
     }
 
     public void Exit()
     {
-        //현재 상태에서 초기화 해야 할 것들 idle에서는 따로 x
+        ClearIdleState();
+    }
+
+    private void SendStopMovePacket()
+    {
+        actor.SendMovePacket(0f, 0f);
+    }
+
+    private void SendIdleState()
+    {
+        actor.SendStateChange(eState.Idle);
+    }
+
+    private void TryChangeToMoveState()
+    {
+        if (!actor.IsLocal) return;
+        if (!actor.HasMoveIntent()) return;
+
+        actor.sm.ChangeState(new MoveState(actor));
+    }
+
+    private void ClearIdleState()
+    {
     }
 }

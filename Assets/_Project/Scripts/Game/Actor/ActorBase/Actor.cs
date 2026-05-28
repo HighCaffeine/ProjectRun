@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public enum AniState { Idle, Move, Dead, Count };
 
@@ -41,6 +42,13 @@ public abstract class Actor : MonoBehaviour
     protected float gravity = -20f;
     protected float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
+    [Header("Aiming Indicator")]
+    public LineRenderer aimLine;
+
+    [SerializeField]
+    protected bool usegravity = true;
+
+    public BaseGimmick currentMovableGround;
     #region �׼� ��Ÿ�� ����
     public float lastSkillUseTime = -999f;
     public const float SKILL_COOLDOWN = 1.0f;
@@ -48,7 +56,27 @@ public abstract class Actor : MonoBehaviour
     public const float KNOCKBACK_IMMUNE_TIME = 1.0f;
     #endregion
 
-    public Vector3 GetForward() { return playerPivot.forward; }
+    public Vector3 GetForward()
+    {
+        Transform forwardPivot = playerPivot != null ? playerPivot : transform;
+        return forwardPivot.forward;
+    }
+
+    public void SetControllerActive(bool isActive)
+    {
+        if (controller != null) controller.enabled = isActive;
+    }
+
+    public void SetVerticalVelocity(float velocity)
+    {
+        verticalVelocity = velocity;
+    }
+
+    public virtual void OnActionStateEnter(eState actionType) { }
+    public virtual void OnActionStateExit(eState actionType) { }
+    public virtual void OnKnockbackStateEnter(eState actionType, float duration) { }
+    public virtual void OnKnockbackStateComplete() { }
+    public virtual void OnKnockbackStateExit() { }
 
     protected virtual void Start()
     {
@@ -75,16 +103,25 @@ public abstract class Actor : MonoBehaviour
     {
         if (controller == null || !controller.enabled) return;
 
-        if (controller.isGrounded && verticalVelocity < 0)
+        if (usegravity)
         {
-            verticalVelocity = -0.5f;
+
+
+            if (controller.isGrounded && verticalVelocity < 0)
+            {
+                verticalVelocity = -0.5f;
+            }
+            else
+            {
+                verticalVelocity += gravity * Time.deltaTime;
+            }
+
+            if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
         }
         else
         {
-            verticalVelocity += gravity * Time.deltaTime;
+            verticalVelocity = 0f;
         }
-
-        if (verticalVelocity < maxVerticalVelocity) verticalVelocity = maxVerticalVelocity;
 
         Vector3 moveDelta = (horizontalMove + Vector3.up * verticalVelocity) * Time.deltaTime;
 
@@ -117,7 +154,14 @@ public abstract class Actor : MonoBehaviour
     {
         verticalVelocity = 0f;
     }
-
+    public virtual void DrawAimLine(Vector3 targetPos)
+    {
+        if (aimLine == null) return;
+        aimLine.enabled = true;
+        // 가슴 높이(y + 1f)에서부터 목표물까지 선을 그림
+        aimLine.SetPosition(0, transform.position + Vector3.up * 1f);
+        aimLine.SetPosition(1, targetPos + Vector3.up * 1f);
+    }
     public virtual Vector3 GetActionDir() { return Vector3.zero; }
 
     public virtual void SendMovePacket(float h, float v) { }

@@ -15,7 +15,8 @@ public enum eGimmickType
     Breakable   // 부서지기만 하는 기믹 (항아리, 벽 등)
 }
 
-public abstract class BaseGimmick : MonoBehaviour
+public abstract class 
+    BaseGimmick : MonoBehaviour
 {
     [Header("Base Gimmick Info")]
     public int gimmickUID; // 모든 기믹이 공통으로 가지는 ID

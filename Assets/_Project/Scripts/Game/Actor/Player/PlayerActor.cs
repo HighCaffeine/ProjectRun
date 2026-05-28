@@ -30,8 +30,6 @@ public class PlayerActor : Actor
     public ParticleSystem pushParticle;
     public Transform attackEffectPivot;
 
-    [Header("Aiming Indicator")]
-    public LineRenderer aimLine;
 
     public void PushParticle()
     {
@@ -45,10 +43,17 @@ public class PlayerActor : Actor
     public ParticleSystem[] brakeParticle;
 
 
+    private const float MOVABLE_GROUND_CHECK_EXTRA_DISTANCE = 0.35f;
+
     private Vector3 platformDelta;
+    private readonly RaycastHit[] movableGroundHits = new RaycastHit[4];
+
     private Vector3 windDir;
     private float windPower;
     private bool isInWind;
+
+    public bool IsOnMovable => currentMovableGround != null;
+    public BaseGimmick CurrentMovableGround => currentMovableGround;
 
     #region 플레이어 통계
     public int fallDeathCount = 0;
@@ -56,7 +61,6 @@ public class PlayerActor : Actor
     public int pullCount = 0;
     #endregion
     public void SetController(CharacterController cc) => this.controller = cc;
-    public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
     public void SetPlayerPivot(Transform pivot) => this.playerPivot = pivot;
 
     public Transform mainCam { get; private set; }
@@ -75,7 +79,7 @@ public class PlayerActor : Actor
             currentPos = new P_PacketVector3(),
             currentRot = new P_PacketQuaternion()
         };
-
+        usegravity = true;
         base.Start();
 
 
@@ -95,7 +99,14 @@ public class PlayerActor : Actor
 
     void Update()
     {
-        if (isDead || controller == null || !controller.enabled) return;
+        if (isDead || controller == null || !controller.enabled)
+        {
+            ClearMovableGroundState();
+            return;
+        }
+
+        UpdateMovableGroundState();
+
         if (sm.currentState == null) return;
 
         if (IsLocal)
@@ -225,6 +236,42 @@ public class PlayerActor : Actor
     {
         platformDelta = delta;
     }
+
+    private void UpdateMovableGroundState()
+    {
+        currentMovableGround = null;
+
+        Bounds bounds = controller.bounds;
+        Vector3 origin = bounds.center;
+        float checkDistance = bounds.extents.y + MOVABLE_GROUND_CHECK_EXTRA_DISTANCE;
+        int hitCount = Physics.RaycastNonAlloc(
+            origin,
+            Vector3.down,
+            movableGroundHits,
+            checkDistance,
+            Physics.DefaultRaycastLayers,
+            QueryTriggerInteraction.Ignore);
+
+        float closestDistance = float.MaxValue;
+        for (int i = 0; i < hitCount; i++)
+        {
+            RaycastHit hit = movableGroundHits[i];
+            if (hit.collider == null) continue;
+            if (hit.collider.transform == transform || hit.collider.transform.IsChildOf(transform)) continue;
+
+            BaseGimmick gimmick = hit.collider.GetComponentInParent<BaseGimmick>();
+            if (gimmick == null || gimmick.gimmickType != eGimmickType.Movable) continue;
+            if (hit.distance >= closestDistance) continue;
+
+            closestDistance = hit.distance;
+            currentMovableGround = gimmick;
+        }
+    }
+
+    private void ClearMovableGroundState()
+    {
+        currentMovableGround = null;
+    }
     private void ApplyGravity()
     {
         if (sm.currentState is KnockbackState) return;
@@ -281,14 +328,7 @@ public class PlayerActor : Actor
         return dir.normalized;
     }
 
-    public void DrawAimLine(Vector3 targetPos)
-    {
-        if (aimLine == null) return;
-        aimLine.enabled = true;
-        // 가슴 높이(y + 1f)에서부터 목표물까지 선을 그림
-        aimLine.SetPosition(0, transform.position + Vector3.up * 1f);
-        aimLine.SetPosition(1, targetPos + Vector3.up * 1f);
-    }
+    
 
     public void HideAimLine()
     {
@@ -303,8 +343,6 @@ public class PlayerActor : Actor
             if (p != null) p.Play();
         }
     }
-    public void SetVerticalVelocity(float velocity) => verticalVelocity = velocity;
-
     public IEnumerator HitStopRoutine(float duration = 0.05f)
     {
         Time.timeScale = 0.05f;
@@ -353,6 +391,42 @@ public class PlayerActor : Actor
                 p.Stop();
             }
         }
+    }
+
+    public override void OnActionStateEnter(eState actionType)
+    {
+        if (actionType == eState.Push)
+        {
+            PushParticle();
+            PushIndicator.gameObject.SetActive(true);
+            return;
+        }
+
+        PullIndicator.gameObject.SetActive(true);
+    }
+
+    public override void OnActionStateExit(eState actionType)
+    {
+        InvokeSSaGay();
+    }
+
+    public override void OnKnockbackStateEnter(eState actionType, float duration)
+    {
+        StartCoroutine(HitStopRoutine());
+        SetVerticalVelocity(3.0f);
+        PlayTravelSpark(actionType);
+        ignoreServerPosTimer = duration + 0.5f;
+    }
+
+    public override void OnKnockbackStateComplete()
+    {
+        PlayBrakeParticles();
+    }
+
+    public override void OnKnockbackStateExit()
+    {
+        if (trailRenderer != null) trailRenderer.emitting = false;
+        StopTravelSpark();
     }
 
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }

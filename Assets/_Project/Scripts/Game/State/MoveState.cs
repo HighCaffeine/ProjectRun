@@ -7,31 +7,57 @@ public class MoveState : IState
 
     public void Enter()
     {
-        actor.animator.SetBool("Move", true);
-        actor.SendStateChange(eState.Move);
+        SetMoveAnimation(true);
+        SendMoveState();
     }
 
     public void Execute()
     {
+        UpdateMovement();
+    }
+
+    public void Exit()
+    {
+        SetMoveAnimation(false);
+        SendStopMovePacket();
+    }
+
+    private void SetMoveAnimation(bool isMove)
+    {
+        actor.animator.SetBool("Move", isMove);
+    }
+
+    private void SendMoveState()
+    {
+        actor.SendStateChange(eState.Move);
+    }
+
+    private void UpdateMovement()
+    {
         if (!actor.IsLocal) return;
+        if (TryReturnToIdle()) return;
 
-        //if (actor.CheckActionIntent()) return;
+        MoveActor();
+    }
 
-        if (!actor.HasMoveIntent())
-        {
-            actor.sm.ChangeState(new IdleState(actor));
-            return;
-        }
+    private bool TryReturnToIdle()
+    {
+        if (actor.HasMoveIntent()) return false;
 
+        actor.sm.ChangeState(new IdleState(actor));
+        return true;
+    }
+
+    private void MoveActor()
+    {
         Vector3 moveDir = actor.GetMovementDirection();
 
         actor.LookAtDirection(moveDir);
         actor.Move(moveDir, actor.MoveSpeed);
     }
 
-    public void Exit()
+    private void SendStopMovePacket()
     {
-        actor.animator.SetBool("Move", false);
         actor.SendMovePacket(0f, 0f);
     }
 }
