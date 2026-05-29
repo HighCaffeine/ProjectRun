@@ -4,30 +4,31 @@ public class KnockbackState : IState
 {
     private Actor actor;
     private Vector3 knockbackDir;
+    private bool isPull;
+    private Vector3 casterPos;
+    private float latencyOffset = 0f;
+
 
     private float initialPower;
     private float timer;
     private const float DURATION = 0.25f;
-
-    private bool isPull;
-    private Vector3 casterPos;
     private const float STOP_DISTANCE = 0.5f * 0.5f;
 
     private const float K = 10f;
     private float logDivisor;
-
     private Vector3 startPos;
     private Vector3 targetPos;
 
     private static Collider[] wallHitBuffer = new Collider[5];
 
-    public KnockbackState(Actor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos)
+    public KnockbackState(Actor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos, float latency = 0f)
     {
         this.actor = actor;
         this.knockbackDir = dir.normalized;
         this.initialPower = power;
         this.isPull = isPull;
         this.casterPos = casterPos;
+        this.latencyOffset = latency;
     }
 
     public void Enter()
@@ -65,6 +66,8 @@ public class KnockbackState : IState
         {
             monster.monsterState = MonsterState.Knockback;
         }
+
+        timer = latencyOffset;
     }
 
     public void Execute()
@@ -179,7 +182,8 @@ public class KnockbackState : IState
                     y = actor.transform.position.y,
                     z = actor.transform.position.z
                 },
-                param = 1f
+                param = 1f,
+                timestamp = NetworkTimeManager.Instance.GetServerTime()
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);

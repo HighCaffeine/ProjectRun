@@ -8,7 +8,7 @@ public enum eGimmickState : byte
     Restore = 3,     // 다시 초기 위치로 돌아가야 하는 상태
     TriggerMove = 4,
     Push = 5,
-    BomB = 6,
+    Bomb = 6,
 }
 
 public enum eGimmickType

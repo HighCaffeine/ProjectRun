@@ -3,6 +3,10 @@ using UnityEngine;
 
 public enum E_PACKET
 {
+    SYS_TIME_SYNC_REQ = 101,
+    SYS_TIME_SYNC_RES = 102,
+
+
     LOGIN_REQUEST = 201, // LOGIN_REQ = 201,
     LOGIN_RESPONSE = 202, // LOGIN_RES = 202,
 
@@ -83,6 +87,22 @@ public enum E_PACKET
     MONSTER_DEAD_NTF = 405,
 }
 
+#region Server Unix Time Sync
+// 시간 동기화 요청 패킷
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_TimeSyncReq
+{
+    [MarshalAs(UnmanagedType.I8)] public long clientTimestamp;
+}
+
+// 시간 동기화 패킷
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_TimeSyncRes
+{
+    [MarshalAs(UnmanagedType.I8)] public long clientTimestamp;
+    [MarshalAs(UnmanagedType.I8)] public long serverTimestamp;
+}
+#endregion
 
 
 #region Login Packet
@@ -279,6 +299,7 @@ public struct P_PlayerStatusNtf
     [MarshalAs(UnmanagedType.R4)] public float param;
     [MarshalAs(UnmanagedType.I1)] public byte isPull;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
+    [MarshalAs(UnmanagedType.I8)] public long timestamp;
 
 }
 #endregion
@@ -314,6 +335,7 @@ public struct P_GimmickInteractReq
     [MarshalAs(UnmanagedType.I1)] public byte state;                    // 0:Off, 1:On 등 상태값
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos; // 이동할 목표 좌표 or 밀려날 방향
     [MarshalAs(UnmanagedType.R4)] public float param;                   // 추가 데이터 (속도, 밀어내는 힘 등)
+    [MarshalAs(UnmanagedType.I8)] public long timestamp;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -325,6 +347,7 @@ public struct P_GimmickInteractNtf
     [MarshalAs(UnmanagedType.I1)] public byte state;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
     [MarshalAs(UnmanagedType.R4)] public float param;
+    [MarshalAs(UnmanagedType.I8)] public long timestamp;
 }
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerDeadReq
@@ -344,17 +367,6 @@ public struct P_PlayerDeadNtf
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_RoomHostNtf { [MarshalAs(UnmanagedType.I8)] public long hostUUID; }
-
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct P_PlayerStateNtf
-{
-    [MarshalAs(UnmanagedType.I8)] public long userUUID;
-    [MarshalAs(UnmanagedType.I1)] public byte newState;
-    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;
-    [MarshalAs(UnmanagedType.R4)] public float powerOrTime;
-    [MarshalAs(UnmanagedType.I1)] public byte isPull;
-    [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
-}
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_PlayerReadyRequest

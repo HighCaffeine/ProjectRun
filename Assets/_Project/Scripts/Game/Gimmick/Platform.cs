@@ -13,6 +13,8 @@ public class Platform : BaseGimmick
 
     private Vector3 lastPos;
     private Vector3 currentTargetPos;
+    private Vector3 expectPos;
+    private Vector3 targetSyncPos;
     private bool isMoving = false;
     private bool hasTriggered = false; // 무한 왕복 전환 체크용
 
@@ -63,12 +65,27 @@ public class Platform : BaseGimmick
         for (int i = players.Count - 1; i >= 0; i--)
         {
             PlayerActor p = players[i];
+
             if (p == null || !p.gameObject.activeInHierarchy || Vector3.Distance(TargetTransform.position, p.transform.position) > 15f)
             {
                 players.RemoveAt(i);
                 continue;
             }
-            if (p.IsLocal) p.SetPlatformDelta(delta);
+
+            if (p.IsLocal)
+            {
+                p.SetPlatformDelta(delta);
+            }
+            else
+            {
+                p.transform.position += delta;
+
+                Player playerComp = p.GetComponent<Player>();
+                if (playerComp != null)
+                {
+                    playerComp.ServerPos += delta;
+                }
+            }
         }
         lastPos = TargetTransform.position;
     }
@@ -90,7 +107,8 @@ public class Platform : BaseGimmick
                     gimmickKey = (byte)eGimmickKey.MovePlatform,
                     state = 1, // On_Activate
                     targetPos = new P_PacketVector3 { x = TargetTransform.position.x, y = TargetTransform.position.y, z = TargetTransform.position.z },
-                    param = 0f
+                    param = 0f,
+                    timestamp = NetworkTimeManager.Instance.GetServerTime()
                 };
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
             }
@@ -144,30 +162,57 @@ public class Platform : BaseGimmick
             gimmickKey = (byte)eGimmickKey.MovePlatform,
             state = (byte)eGimmickState.Sync,
             targetPos = new P_PacketVector3 { x = target.x, y = target.y, z = target.z },
-            param = moveSpeed
+            param = moveSpeed,
+            timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
     }
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        //처음 밟았을 때 트리거
+        // 처음 밟았을 때 호스트가 제어권 획득 (기존 로직 유지)
         if (activationType == 1 && ntf.state == 1 && !hasTriggered)
         {
             hasTriggered = true;
             if (GameManager.Instance.isHost)
             {
                 currentTargetPos = endPos.position;
-                StartCoroutine(HostMoveLoop());     // 호스트가 컨트롤
+                StartCoroutine(HostMoveLoop());
             }
+            return;
         }
 
-        //호스트가 동기화
+        // 리모트 클라이언트는 호스트가 보낸 Sync 패킷을 기반으로 위치 보간
         if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost)
         {
-            Vector3 targetSyncPos = ntf.targetPos.ToVector3();
+            targetSyncPos = ntf.targetPos.ToVector3();
+
+            long hostSendTime = ntf.timestamp;
+            long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
+
+            float latency = Mathf.Max(0f, (myCurrentTime - hostSendTime) / 1000f);
+
+            expectPos = Vector3.MoveTowards(TargetTransform.position, targetSyncPos, moveSpeed * latency);
+
             StopAllCoroutines();
-            StartCoroutine(MoveTo(targetSyncPos));
+            StartCoroutine(SyncMoveRoutine());
+        }
+    }
+
+    private IEnumerator SyncMoveRoutine()
+    {
+        // 1. 디싱크로 인해 위치가 튀는 걸 방지하기 위해 예측 위치(expectedPos)로 빠르게 보간
+        while (Vector3.Distance(TargetTransform.position, expectPos) > 0.05f)
+        {
+            TargetTransform.position = Vector3.Lerp(TargetTransform.position, expectPos, Time.deltaTime * 15f);
+            yield return null;
+        }
+
+        // 2. 예측 위치에 도달하면 최종 목표 지점까지 정상 속도로 이동
+        while (Vector3.Distance(TargetTransform.position, targetSyncPos) > 0.01f)
+        {
+            TargetTransform.position = Vector3.MoveTowards(TargetTransform.position, targetSyncPos, moveSpeed * Time.deltaTime);
+            yield return null;
         }
     }
 

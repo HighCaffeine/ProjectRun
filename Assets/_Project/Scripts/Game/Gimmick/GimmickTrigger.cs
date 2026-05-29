@@ -57,7 +57,8 @@ public class GimmickTrigger : MonoBehaviour
                                 gimmickKey = (byte)target.gimmickKey,
                                 state = (byte)eGimmickState.On_Activate,
                                 targetPos = new P_PacketVector3(),
-                                param = 0f
+                                param = 0f,
+                                timestamp = NetworkTimeManager.Instance.GetServerTime()
                             };
                             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
                             Debug.Log($"<color=cyan>[GimmickTrigger]</color> {target.gimmickID}번 기믹 REQ 패킷");

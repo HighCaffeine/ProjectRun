@@ -1110,6 +1110,7 @@ GameObject:
   m_Component:
   - component: {fileID: 457328803}
   - component: {fileID: 457328804}
+  - component: {fileID: 457328805}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1147,6 +1148,18 @@ MonoBehaviour:
   currentMode: 1
   isHost: 0
   playerDashAnchor: {fileID: 0}
+--- !u!114 &457328805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457328802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 924f6f66df916724aa502e0e8b95092c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NetworkTimeManager
 --- !u!1 &545138507
 GameObject:
   m_ObjectHideFlags: 0

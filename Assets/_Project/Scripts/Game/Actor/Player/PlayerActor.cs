@@ -10,9 +10,9 @@ public class PlayerActor : Actor
 
     const float CAMERA_SHAKE = 1.0f;
 
-    public override float PushMulti => pushMulti; 
+    public override float PushMulti => pushMulti;
 
-    public float pushMulti = 1.0f; 
+    public float pushMulti = 1.0f;
 
     public LayerMask targetLayer;
 
@@ -111,7 +111,8 @@ public class PlayerActor : Actor
             gimmickKey = (byte)eGimmickKey.NextZone,
             state = 2,
             targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-            param = encodedValue // 예: 1_2 -> 102
+            param = encodedValue, // 예: 1_2 -> 102
+            timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
 
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
@@ -305,7 +306,7 @@ public class PlayerActor : Actor
 
             Vector3 dir = hitPoint - transform.position;
             dir.y = 0;
-            
+
             return dir.normalized;
         }
 
@@ -393,22 +394,26 @@ public class PlayerActor : Actor
     // 상태 변경 패킷 전송용 함수
     public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
     {
+        if (GameManager.Instance == null) return;
         if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
         if (!Client.IS_SERVER_PLAY || !IsLocal) return;
         if (Client.TCP == null) return;
 
         long finalUUID = (targetUUID == 0) ? LocalPlayerInfo.ID : targetUUID;
 
-        P_PlayerStateNtf pkt = new P_PlayerStateNtf
+        P_PlayerStatusNtf pkt = new P_PlayerStatusNtf
         {
             userUUID = finalUUID,
             newState = (byte)stateCode,
             targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
-            powerOrTime = param,
-
+            param = param,
             isPull = isPull ? (byte)1 : (byte)0,
-            casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z }
+            casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z },
+
+            timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
+
+        Debug.Log($"[SendStateChange] 현재 모드: {GameManager.Instance.currentMode}, 상태: {stateCode}");
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }

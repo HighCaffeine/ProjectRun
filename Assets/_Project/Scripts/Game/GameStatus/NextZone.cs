@@ -43,7 +43,8 @@ public class NextZone : MonoBehaviour
                 gimmickKey = (byte)eGimmickKey.NextZone,
                 state = 2,
                 targetPos = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z },
-                param = encodedValue // 예: 1_2 -> 102
+                param = encodedValue, // 예: 1_2 -> 102
+                timestamp = NetworkTimeManager.Instance.GetServerTime()
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);

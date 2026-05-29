@@ -90,7 +90,8 @@ public class Bomb : BaseGimmick
                             gimmickKey = (byte)targetGimmick.gimmickType,
                             state = (byte)eGimmickState.Push,
                             targetPos = new P_PacketVector3 { x = TargetTransform.position.x, y = TargetTransform.position.y, z = TargetTransform.position.z },
-                            param = force
+                            param = force,
+                            timestamp = NetworkTimeManager.Instance.GetServerTime()
                         };
 
                         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);

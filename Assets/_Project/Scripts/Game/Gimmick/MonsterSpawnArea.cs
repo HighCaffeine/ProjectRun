@@ -32,7 +32,8 @@ public class MonsterSpawnArea : BaseGimmick
                 gimmickKey = (byte)this.gimmickType,
                 state = 1, // 1 = 활성화 (스폰 작동)
                 targetPos = new P_PacketVector3 { x = 0, y = 0, z = 0 },
-                param = 0f
+                param = 0f,
+                timestamp = NetworkTimeManager.Instance.GetServerTime()
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
@@ -50,29 +51,24 @@ public class MonsterSpawnArea : BaseGimmick
 
     private void SpawnAllMonsters()
     {
-        foreach (var data in spawnList)
+        for (int i = 0; i < spawnList.Count; i++)
         {
+            var data = spawnList[i];
             if (data.monsterPrefab != null)
             {
-                // 지정된 위치에 몬스터 프리팹 생성
                 GameObject obj = Instantiate(data.monsterPrefab, transform.position, transform.rotation);
                 MonsterActor monster = obj.GetComponent<MonsterActor>();
 
                 if (monster != null)
                 {
-                    // 몬스터 초기화 (ID, 초기 좌표 할당)
-                    monster.InitMonster(data.assignMonsterID, transform.position, transform.rotation);
-
-                    // Match 매니저의 몬스터 캐시에 등록하여 이후 패킷 통신에 활용
-                    if (Match.Instance != null)
-                    {
-                        Match.Instance._monsterCache[data.assignMonsterID] = monster;
-                    }
+                    // 기믹 ID 1086 -> 108600, 108601 순으로 할당
+                    int generatedMonsterID = (this.gimmickUID * 100) + i;
+                    monster.InitMonster(generatedMonsterID, transform.position, transform.rotation);
                 }
             }
         }
 
-        Debug.Log($"<color=green>[MonsterSpawnArea]</color> 구역({gimmickUID}) 작동! {spawnList.Count}마리 몬스터 일괄 스폰 완료.");
+        Debug.Log($"<color=green>[MonsterSpawnArea]</color> ({gimmickUID}) : {spawnList.Count}마리 몬스터 스폰");
     }
 
     private void OnDrawGizmos()

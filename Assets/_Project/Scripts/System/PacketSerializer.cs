@@ -9,11 +9,11 @@ public static class PacketSerializer
     {
         switch (packet)
         {
+            case P_TimeSyncReq p: return SerializeUnixTimeSync(p);
             case P_LoginReq p: return SerializeLoginReq(p);
             case P_RoomEnterRequest p: return SerializeRoomEnterRequest(p);
             case P_PlayerMovement p: return SerializePlayerMovement(p);
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
-            case P_PlayerStateNtf p: return SerializePlayerStateNtf(p);
             case P_DungeonEscapeReq p: return new byte[] { p.dummy };
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
             case P_PlayerDeadReq p: return SerializePlayerDeadReq(p);
@@ -27,9 +27,9 @@ public static class PacketSerializer
             case P_TradeLock p: return SerializeTradeLock(p);
             case P_TradeConfirm p: return SerializeTradeConfirm(p);
             case P_SceneSyncReq _: return new byte[] { 0 };
-            case P_MonsterStateNtf p : return SerializeMonsterStateNtf(p);
-            case P_MonsterDeadReq p : return SerializeMonsterDeadReq(p);
-            case P_MonsterMovement p : return SerializeMonsterMovement(p);
+            case P_MonsterStateNtf p: return SerializeMonsterStateNtf(p);
+            case P_MonsterDeadReq p: return SerializeMonsterDeadReq(p);
+            case P_MonsterMovement p: return SerializeMonsterMovement(p);
             default:
                 Debug.LogError($"[PacketSerializer] 미등록 패킷: {packet.GetType().Name}");
                 return new byte[0];
@@ -37,6 +37,14 @@ public static class PacketSerializer
     }
 
     // ── 직렬화 함수들 ──────────────────────────────────────
+
+    static byte[] SerializeUnixTimeSync(P_TimeSyncReq p)
+    {
+        var buf = new byte[8];
+        int o = 0;
+        Write(buf, ref o, p.clientTimestamp);
+        return buf;
+    }
 
     static byte[] SerializeLoginReq(P_LoginReq p)
     {
@@ -75,23 +83,19 @@ public static class PacketSerializer
 
     static byte[] SerializePlayerStatus(P_PlayerStatusNtf p)
     {
-        return new byte[0];
-    }
-
-    static byte[] SerializePlayerStateNtf(P_PlayerStateNtf p)
-    {
-        var buf = new byte[38]; // 8+1+12+4+1+12
+        var buf = new byte[46]; //8+1+12+4+1+12+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         buf[o++] = p.newState;
         Write(buf, ref o, p.targetDir.x);
         Write(buf, ref o, p.targetDir.y);
         Write(buf, ref o, p.targetDir.z);
-        Write(buf, ref o, p.powerOrTime);
+        Write(buf, ref o, p.param);
         buf[o++] = p.isPull;
         Write(buf, ref o, p.casterPos.x);
         Write(buf, ref o, p.casterPos.y);
         Write(buf, ref o, p.casterPos.z);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
 
@@ -102,7 +106,7 @@ public static class PacketSerializer
 
     static byte[] SerializeGimmickInteractReq(P_GimmickInteractReq p)
     {
-        var buf = new byte[30]; // 8+4+1+1+12+4
+        var buf = new byte[38]; // 8+4+1+1+12+4+8
         int o = 0;
         Write(buf, ref o, p.activeUUID);
         Write(buf, ref o, p.gimmickID);
@@ -112,6 +116,7 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetPos.y);
         Write(buf, ref o, p.targetPos.z);
         Write(buf, ref o, p.param);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
 
@@ -194,19 +199,19 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterStateNtf(P_MonsterStateNtf p)
     {
-       var buf = new byte[42]; //4+1+12+4+1+12
-       int o = 0;
-       Write(buf, ref o, p.monsterID);
-       buf[o++] = p.newState;
-       Write(buf, ref o, p.targetDir.x);
-       Write(buf, ref o, p.targetDir.y);
-       Write(buf, ref o, p.targetDir.z);
-       Write(buf, ref o, p.param);
-       buf[o++] = p.isPull;
-       Write(buf, ref o, p.casterPos.x);
-       Write(buf, ref o, p.casterPos.y);
-       Write(buf, ref o, p.casterPos.z);      
-       return buf;
+        var buf = new byte[42]; //4+1+12+4+1+12
+        int o = 0;
+        Write(buf, ref o, p.monsterID);
+        buf[o++] = p.newState;
+        Write(buf, ref o, p.targetDir.x);
+        Write(buf, ref o, p.targetDir.y);
+        Write(buf, ref o, p.targetDir.z);
+        Write(buf, ref o, p.param);
+        buf[o++] = p.isPull;
+        Write(buf, ref o, p.casterPos.x);
+        Write(buf, ref o, p.casterPos.y);
+        Write(buf, ref o, p.casterPos.z);
+        return buf;
     }
 
     static byte[] SerializeMonsterDeadReq(P_MonsterDeadReq p)
@@ -220,7 +225,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterMovement(P_MonsterMovement p)
     {
-        var buf  = new byte[32]; //4+12+16
+        var buf = new byte[32]; //4+12+16
         int o = 0;
         Write(buf, ref o, p.monsterID);
         Write(buf, ref o, p.currentPos.x);

@@ -16,9 +16,16 @@ public class Player : MonoBehaviour
     [SerializeField] private bool isMoving;
     [SerializeField] private uint lastProcessedSeq = 0;
 
+
     [Header("Calibration Settings")]
     [SerializeField] private float snapThreshold = 5.0f; // 이 이상 벌어지면 강제 텔레포트
     [SerializeField] private float lerpSpeed = 10.0f;    // 타 플레이어 부드러운 이동 속도
+
+    public Vector3 ServerPos
+    {
+        get => serverPos;
+        set => serverPos = value;
+    }
 
     public string Name => this.name;
     public long ID => this.id;

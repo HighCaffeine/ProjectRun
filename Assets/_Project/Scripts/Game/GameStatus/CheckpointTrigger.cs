@@ -39,7 +39,8 @@ public class CheckpointTrigger : BaseGimmick
                     gimmickKey = (byte)eGimmickKey.Checkpoint,
                     state = (byte)eGimmickState.On_Activate,
                     targetPos = new P_PacketVector3(),
-                    param = encodedValue // 예: 0_1 -> 1, 1_2 -> 102
+                    param = encodedValue, // 예: 0_1 -> 1, 1_2 -> 102
+                    timestamp = NetworkTimeManager.Instance.GetServerTime()
                 };
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
                 Debug.Log($"[Checkpoint] 서버로 체크포인트 패킷 전송: {encodedValue} (Map{targetMapID}_Sector{targetSpawnIndex})");

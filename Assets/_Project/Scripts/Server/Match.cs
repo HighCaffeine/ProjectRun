@@ -104,6 +104,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         string msg = string.Empty;
         switch ((E_PACKET)packetId)
         {
+            case E_PACKET.SYS_TIME_SYNC_RES:
+                {
+                    var resPkt = UnsafeCode.ByteArrayToStructure<P_TimeSyncRes>(packet.data);
+
+                    if (NetworkTimeManager.Instance != null)
+                    {
+                        NetworkTimeManager.Instance.OnReceiveTimeSyncResponse(resPkt.clientTimestamp, resPkt.serverTimestamp);
+                    }
+                    break;
+                }
+
             case E_PACKET.ROOM_ENTER_RESPONSE:
                 P_RoomEnterResponse roomEnterResponse = UnsafeCode.ByteArrayToStructure<P_RoomEnterResponse>(packet.data);
                 //Debug.Log($"ROOM_ENTER_RESPONSE result={roomEnterResponse.result}");
@@ -267,13 +278,27 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                                     break;
                                 }
 
-                                pActor.lastKnockbackTime = Time.time;
+                                // 지연시간 검사
+                                long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
+                                float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
 
-                                bool pullFlag = (statePkt.isPull == 1);
+                                if (latency > 0.5f)
+                                {
+                                    break;
+                                }
+
                                 Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+                                float currentDist = Vector3.Distance(pActor.transform.position, cPos);
+                                float maxValidRange = (statePkt.isPull == 1) ? 15.0f : 5.0f;
+                                bool pullFlag = (statePkt.isPull == 1);
 
-                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos));
+                                if (currentDist > maxValidRange)
+                                {
+                                    break;
+                                }
 
+                                pActor.lastKnockbackTime = Time.time;
+                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
                                 break;
                             case 6:
                                 if (pActor.ignoreServerPosTimer > 0) return;
@@ -518,7 +543,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.MONSTER_DEAD_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterDeadNtf>(packet.data);
-                    
+
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
                         Players.TryGetValue(pkt.userUUID, out Player p);
@@ -529,7 +554,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     break;
                 }
-                case E_PACKET.MONSTER_STATE_NTF:
+            case E_PACKET.MONSTER_STATE_NTF:
                 {
                     var statePkt = UnsafeCode.ByteArrayToStructure<P_MonsterStateNtf>(packet.data);
 
@@ -683,7 +708,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 rb.isKinematic = true;
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 ActorManager.Instance.p2 = pActor;
+
             }
+
+            Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
+            pActor.isLocal = local;
 
             Player player = playerObj.GetComponent<Player>();
             if (player == null) player = playerObj.AddComponent<Player>();

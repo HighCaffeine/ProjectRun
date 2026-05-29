@@ -77,6 +77,11 @@ public class MonsterActor : Actor
         serverPos = pos; transform.position = pos;
         serverRot = rot; transform.rotation = rot;
         monsterID = id;
+
+        if (Match.Instance != null)
+        {
+            Match.Instance._monsterCache[this.monsterID] = this;
+        }
     }
 
     private void Update()
@@ -118,7 +123,7 @@ public class MonsterActor : Actor
     private void UpdateHeight()
     {
         if (currentTarget == null || controller == null) return;
-        
+
         float targetY = currentTarget.transform.position.y + heightOffset;
         float nextY = Mathf.MoveTowards(transform.position.y, targetY, 2f * Time.deltaTime);
         float deltaY = nextY - transform.position.y;
@@ -196,6 +201,11 @@ public class MonsterActor : Actor
         if (monsterState == MonsterState.Dead) return;
 
         monsterState = MonsterState.Dead;
+
+        if (Match.Instance != null && Match.Instance._monsterCache.ContainsKey(monsterID))
+        {
+            Match.Instance._monsterCache.Remove(monsterID);
+        }
 
         FractureObject fractureObject = GetComponent<FractureObject>();
         if (fractureObject != null)

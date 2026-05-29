@@ -60,7 +60,8 @@ public class SeesawTrigger : BaseGimmick
                     gimmickKey = (byte)eGimmickKey.SeeSaw,
                     state = (byte)eGimmickState.Sync,
                     targetPos = new P_PacketVector3(),
-                    param = 0f
+                    param = 0f,
+                    timestamp = NetworkTimeManager.Instance.GetServerTime()
                 };
                 req.targetPos.Set(boardRb.transform.eulerAngles);
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
