@@ -26,7 +26,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
         if (connectionPanel != null) connectionPanel.SetActive(true);
         if (loginPanel != null) loginPanel.SetActive(false);
 
-        // 이전 접속 IP/Port
+        // 이전 접속 IP
         string savedIP = PlayerPrefs.GetString("ServerIP", "127.0.0.1");
         IPInputManager.Instance.SetIP(savedIP);
 
@@ -48,10 +48,10 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
         try
         {
-            Client.Connect(parsedIp.ToString(), 11021, 5025);
+            Client.Connect(parsedIp.ToString(), 11020, 5025);
 
             Client.TCP.AddPacketReceiver(this);
-            Debug.Log($"[Network] 서버 연결 성공 (IP: {parsedIp})");
+            Debug.Log($"[Network] 로비 서버(11020) 연결 성공 (IP: {parsedIp})");
 
             PlayerPrefs.SetString("ServerIP", parsedIp.ToString());
 
@@ -81,17 +81,16 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
         P_LoginReq loginReq = default;
         loginReq.userID = inputName;
-        loginReq.userPW = inputName;
+        loginReq.userPW = inputName; // 더미
 
         Client.TCP.SendPacket2(E_PACKET.LOGIN_REQUEST, loginReq);
-        Debug.Log($"[Client] 로그인 요청 전송: {inputName}");
+        Debug.Log($"[Client] 로비로 로그인 요청 전송: {inputName}");
     }
 
     // 패킷 수신 처리
     public unsafe void OnPacketReceived(Packet packet)
     {
         ushort packetId = packet.pbase.packet_id;
-        Debug.Log($"[Client] Packet Received: ID = {packetId}, Size = {packet.pbase.length}");
 
         switch ((E_PACKET)packetId)
         {
@@ -99,18 +98,23 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                 try
                 {
                     P_LoginRes loginRes = UnsafeCode.ByteArrayToStructure<P_LoginRes>(packet.data);
-                    Debug.Log($"[Client] Login Result: {loginRes.result}");
 
-                    // 씬 로딩 중복 호출 방지
-                    if (isSceneLoading)
+                    if (loginRes.result == 0) // 성공
                     {
-                        Debug.LogWarning("씬 중복 로딩 처리 차단");
-                        return;
-                    }
-                    isSceneLoading = true;
+                        Debug.Log("<color=cyan>[Client] 로그인 성공! Main_Lobby 씬으로 이동합니다.</color>");
+                        LocalPlayerInfo.ID = loginRes.result;
 
-                    LocalPlayerInfo.ID = loginRes.result;
-                    SceneManager.LoadSceneAsync("Game_Lobby");
+                        // 씬 중복 로딩 방지
+                        if (isSceneLoading) return;
+                        isSceneLoading = true;
+
+                        SceneManager.LoadSceneAsync("Main_Lobby");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[Client] 로그인 실패. ErrorCode: {loginRes.result}");
+                        joinButton.interactable = true; // 실패 시 버튼 다시 활성화
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -126,7 +130,5 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
         {
             Client.TCP.RemovePacketReceiver(this);
         }
-
-        //if (AkUnitySoundEngine.IsInitialized()) AkUnitySoundEngine.Term();
     }
 }

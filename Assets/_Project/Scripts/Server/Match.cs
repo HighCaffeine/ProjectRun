@@ -420,19 +420,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     GameManager.Instance.Invoke("LoadLobby", 10.0f);
                     break;
                 }
-            case E_PACKET.MOVE_PATH_RESPONSE:
-                P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
+            // case E_PACKET.MOVE_PATH_RESPONSE:
+            //     P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
 
-                if (PathVisualizer.Instance != null)
-                {
-                    PathVisualizer.Instance.OnReceivePathPacket(movePath.path_count, movePath.path);
-                    Debug.Log($"MOVE_PATH_RESPONSE pathCount={movePath.path_count}");
-                    for (int i = 0; i < movePath.path_count; i++)
-                    {
-                        Debug.Log($"MOVE_PATH_RESPONSE path[{i}]=({movePath.path[i]})");
-                    }
-                }
-                break;
+            //     if (PathVisualizer.Instance != null)
+            //     {
+            //         PathVisualizer.Instance.OnReceivePathPacket(movePath.path_count, movePath.path);
+            //         Debug.Log($"MOVE_PATH_RESPONSE pathCount={movePath.path_count}");
+            //         for (int i = 0; i < movePath.path_count; i++)
+            //         {
+            //             Debug.Log($"MOVE_PATH_RESPONSE path[{i}]=({movePath.path[i]})");
+            //         }
+            //     }
+            //     break;
             case E_PACKET.INVENTORY_INFO:
                 var invenInfo = UnsafeCode.ByteArrayToStructure<P_InventoryInfo>(packet.data);
                 Inventory.Instance.SetInventory(invenInfo.itemIDs);

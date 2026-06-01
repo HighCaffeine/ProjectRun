@@ -22,8 +22,8 @@ TagManager:
   - Character
   - TargetedMesh
   - TargetedObjMesh
-  - 
-  - 
+  - UI_Character
+  - UI_Effect
   - 
   - 
   - 

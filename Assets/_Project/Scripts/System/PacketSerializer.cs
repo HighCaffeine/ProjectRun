@@ -12,6 +12,8 @@ public static class PacketSerializer
             case P_TimeSyncReq p: return SerializeUnixTimeSync(p);
             case P_LoginReq p: return SerializeLoginReq(p);
             case P_RoomEnterRequest p: return SerializeRoomEnterRequest(p);
+            case P_RoomListReq p: return new byte[] { p.dummy };
+            case P_RoomLeaveRequest p: return new byte[] { p.dummy };
             case P_PlayerMovement p: return SerializePlayerMovement(p);
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_DungeonEscapeReq p: return new byte[] { p.dummy };
@@ -40,9 +42,10 @@ public static class PacketSerializer
 
     static byte[] SerializeUnixTimeSync(P_TimeSyncReq p)
     {
-        var buf = new byte[8];
+        var buf = new byte[12];
         int o = 0;
         Write(buf, ref o, p.clientTimestamp);
+        Write(buf, ref o, p.currentPing);
         return buf;
     }
 
@@ -57,9 +60,10 @@ public static class PacketSerializer
 
     static byte[] SerializeRoomEnterRequest(P_RoomEnterRequest p)
     {
-        var buf = new byte[4];
+        var buf = new byte[36]; // 4 + 32
         int o = 0;
         Write(buf, ref o, p.roomNumber);
+        WriteString(buf, ref o, p.title, 32);
         return buf;
     }
 
