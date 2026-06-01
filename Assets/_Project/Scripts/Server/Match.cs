@@ -719,6 +719,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             if (player == null) player = playerObj.AddComponent<Player>();
             player.Init(pActor, playerName, id, local, spawnPos);
             Players.Add(id, player);
+            VliageUiManager.Instance.UpdatePlayerIDUI();
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
             return player;
         }
