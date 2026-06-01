@@ -200,7 +200,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     if (countdownText != null)
                     {
-                        countdownText.gameObject.SetActive(true);
+                        countdownText.transform.parent.gameObject.SetActive(true);
+                        //countdownText.gameObject.SetActive(true);
                         countdownText.text = pkt.remainSeconds.ToString();
                     }
                     break;
@@ -211,7 +212,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
                     if (countdownText != null)
                     {
-                        countdownText.gameObject.SetActive(false);
+                        countdownText.transform.parent.gameObject.SetActive(false);
                     }
                     break;
                 }
@@ -224,7 +225,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Players.Clear();
                     if (countdownText != null)
                     {
-                        countdownText.gameObject.SetActive(false);
+                        countdownText.transform.parent.gameObject.SetActive(false);
                     }
 
                     if (pkt.mapId == 0)
