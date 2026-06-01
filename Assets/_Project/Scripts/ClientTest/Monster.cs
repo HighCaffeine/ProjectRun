@@ -29,6 +29,15 @@ public class Monster : Actor
     [SerializeField] private Material stunnedMat;
 
     [SerializeField]private float heightOffset = 1f;
+
+
+    //ÈÄµô
+    [SerializeField]
+    private float attackCooldown = 1f;
+    private float lastAttackTime;
+
+
+
     public override Vector3 GetMovementDirection()
     {
         if (monsterState == MonsterState.Stunned) return Vector3.zero;
@@ -104,12 +113,16 @@ public class Monster : Actor
         if (!CanStartAction()) return;
         if (!CheckActionIntent()) return;
 
+        lastAttackTime = Time.time;
+
         sm.ChangeState(new ActionState(this, eState.Push, currentTarget));
-        Debug.Log("Monster changed to ActionState targeting player: " + currentTarget.name);
     }
 
     private bool CanStartAction()
     {
+        if (Time.time - lastAttackTime < attackCooldown)
+            return false;
+
         return sm.currentState is IdleState || sm.currentState is MoveState;
     }
     public PlayerActor GetRandomPlayerTarget()
@@ -245,5 +258,14 @@ public class Monster : Actor
 
         // transform.position = pos;
         controller.Move(Vector3.up* deltaY);
+    }
+
+    public void OnAttackHit()
+    {
+        Debug.Log(sm.currentState);
+        if (sm.currentState is ActionState actionState)
+        {
+            actionState.OnMonsterAttackHit();
+        }
     }
 }

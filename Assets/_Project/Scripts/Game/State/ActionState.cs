@@ -14,8 +14,9 @@ public class ActionState : IState
     private Actor targetActor;
     private BaseGimmick targetGimmick;
 
-    private const float ATTACK_TIME = 0.2f;
-    private bool attacked = false;
+    private const float ATTACK_TIME = 0.05f;
+    private bool attackStarted = false;
+    private bool hitProcessed = false;
     public ActionState(Actor actor, eState type, Actor targetActor = null, BaseGimmick targetGimmick = null)
     {
         this.actor = actor;
@@ -29,23 +30,26 @@ public class ActionState : IState
     public void Enter()
     {
         ResetTimer();
-        PlayActionAnimation();
         TrySendActionState();
         MarkSkillUseTime();
         PlayActionEffects();
-       
+        if (actor is PlayerActor)
+        {
+            PlayActionAnimation();
+            ProcessTarget();
+        }
     }
 
     public void Execute()
     {
         UpdateTimer();
 
-        if (!attacked && timer >= ATTACK_TIME)
+        if (!attackStarted && timer >= ATTACK_TIME && actor is Monster)
         {
-            attacked = true;
-            ProcessTarget();
+            attackStarted = true;
+            timer = 0f;
+            PlayActionAnimation();
         }
-
         TryReturnToIdle();
     }
     public void Exit()
@@ -243,6 +247,9 @@ public class ActionState : IState
 
     private void TryReturnToIdle()
     {
+        if (actor is Monster && !hitProcessed)
+            return;
+
         if (timer < CAST_TIME) return;
 
         actor.sm.ChangeState(new IdleState(actor));
@@ -251,5 +258,12 @@ public class ActionState : IState
     private void StopActionEffects()
     {
         actor.OnActionStateExit(actionType);
+    }
+
+    public void OnMonsterAttackHit()
+    {
+        if(hitProcessed) return;
+        hitProcessed =true;
+        ProcessTarget();
     }
 }
