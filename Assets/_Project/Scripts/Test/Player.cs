@@ -10,7 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] private bool isLocal;
 
     [Header("Sync Data")]
-    [SerializeField] private Vector3 serverPos;
+    public Vector3 serverPos;
     [SerializeField] private Quaternion serverRot;
     [SerializeField] private float currentSpeed = 5.0f;
     [SerializeField] private bool isMoving;

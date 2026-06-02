@@ -26,6 +26,8 @@ public enum E_PACKET : ushort
     ROOM_CHAR_SELECT_REQ = 211,
     ROOM_CHAR_SELECT_NTF = 212,
 
+    GAME_START_REQUEST = 215,
+
     MATCH_START_NTF = 220,
     ROOM_FULL_SYNC_NTF = 222,
     GAME_AUTH_REQUEST = 223,
@@ -150,6 +152,7 @@ public struct P_LoginReq
 public struct P_LoginRes
 {
     [MarshalAs(UnmanagedType.U2)] public ushort result;
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -191,6 +194,12 @@ public struct P_RoomCharSelectNtf
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GameStartReq
+{
+    [MarshalAs(UnmanagedType.I4)] public int roomNumber;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_RoomEnterRequest
 {
     [MarshalAs(UnmanagedType.I4)] public int roomNumber;
@@ -201,6 +210,7 @@ public struct P_RoomEnterRequest
 public struct P_RoomEnterResponse
 {
     [MarshalAs(UnmanagedType.I2)] public short result;
+    [MarshalAs(UnmanagedType.I4)] public int roomNum;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -59,7 +59,6 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
         joinConfirmButton.onClick.AddListener(RequestJoinRoom);
         joinCloseButton.onClick.AddListener(HidePopups);
 
-        // 방 액션 버튼 기능 연결
         roomLeaveButton.onClick.AddListener(RequestLeaveRoom);
         roomActionButton.onClick.AddListener(OnClickRoomAction);
 
@@ -73,7 +72,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
     void OnDestroy()
     {
         if (Client.TCP != null) Client.TCP.RemovePacketReceiver(this);
-        CancelInvoke(nameof(RequestRoomList));
+        StopLobbyPolling();
     }
 
     public void RequestRoomList()
@@ -89,6 +88,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
         joinRoomNameText.text = roomTitle;
         joinRoomPopup.SetActive(true);
     }
+
     public void ShowCreatePopup()
     {
         HidePopups();
@@ -110,7 +110,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
             inputTitle = $"{LocalPlayerInfo.Name}님의 방";
         }
 
-        pendingIsHost = true; // 방 생성이므로 호스트 예정
+        pendingIsHost = true;
 
         P_RoomEnterRequest req = new P_RoomEnterRequest { roomNumber = -1, title = inputTitle };
         Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, req);
@@ -121,13 +121,12 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
         if (selectedRoomNum == -1) return;
         joinConfirmButton.interactable = false;
 
-        pendingIsHost = false; // 참가를 눌렀으므로 게스트 예정
+        pendingIsHost = false;
 
         P_RoomEnterRequest req = new P_RoomEnterRequest { roomNumber = selectedRoomNum, title = "" };
         Client.TCP.SendPacket2(E_PACKET.ROOM_ENTER_REQUEST, req);
     }
 
-    // 방 나가기 요청
     private void RequestLeaveRoom()
     {
         P_RoomLeaveRequest req = new P_RoomLeaveRequest();
@@ -138,15 +137,15 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
     {
         if (myRoomIsHost)
         {
-            Debug.Log("[Lobby] 호스트가 게임 시작 요청 인게임 진입");
+            P_GameStartReq req = new P_GameStartReq { roomNumber = selectedRoomNum };
+            Client.TCP.SendPacket2(E_PACKET.GAME_START_REQUEST, req);
+            Debug.Log("[Lobby] 방장이 게임 시작을 요청");
         }
         else
         {
-            // 파티원인 경우 -> 준비 상태 토글
             isGuestReadyLocal = !isGuestReadyLocal;
             P_PlayerReadyRequest req = new P_PlayerReadyRequest { isReady = isGuestReadyLocal };
             Client.TCP.SendPacket2(E_PACKET.PLAYER_READY_REQUEST, req);
-
             roomActionText.text = isGuestReadyLocal ? "준비 취소" : "준비";
         }
     }
@@ -196,6 +195,8 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 {
                     isInsideRoom = true;
                     myRoomIsHost = pendingIsHost;
+                    selectedRoomNum = enterRes.roomNum;
+                    Debug.Log($"[Lobby] 방 입장 성공, roomNum={selectedRoomNum}");
 
                     HidePopups();
                     UpdateBottomUI();
@@ -215,22 +216,58 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                     isInsideRoom = false;
                     myRoomIsHost = false;
                     isGuestReadyLocal = false;
+                    selectedRoomNum = -1;
 
                     UpdateBottomUI();
                     RequestRoomList();
                 }
                 break;
+
+            case E_PACKET.MATCH_START_NTF:
+                {
+                    var startNtf = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);
+
+                    Debug.Log($"<color=magenta>[Handover] 게임 서버로 이동 포트: {startNtf.GameServerPort} Token: {startNtf.AuthToken}</color>");
+
+                    LocalPlayerInfo.AuthToken = startNtf.AuthToken;
+
+                    StopLobbyPolling();
+
+                    string serverDomain = "game.chungkang.local";
+                    string resolvedIP = ResolveDomain(serverDomain);
+
+                    Client.SafeDisconnectAndReconnect(resolvedIP, startNtf.GameServerPort, this);
+
+                    UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
+                    break;
+                }
+        }
+    }
+
+    private string ResolveDomain(string domain)
+    {
+        try
+        {
+            System.Net.IPAddress[] ips = System.Net.Dns.GetHostAddresses(domain);
+            return ips[0].ToString();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[Network] 도메인 파싱 실패, 로컬로 전환 Error: {ex.Message}");
+            return "127.0.0.1";
         }
     }
 
     private void UpdateRoomListUI(P_RoomListRes res)
     {
-        foreach (Transform child in roomListContent)
+        if (res.roomCount <= 0)
         {
-            Destroy(child.gameObject);
+            for (int i = 0; i < roomListContent.childCount; i++)
+            {
+                roomListContent.GetChild(i).gameObject.SetActive(false);
+            }
+            return;
         }
-
-        if (res.roomCount <= 0) return;
 
         var activeRooms = res.rooms.Take(res.roomCount)
             .OrderBy(r => r.isPlaying)
@@ -238,16 +275,38 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
             .ThenByDescending(r => r.maxUser - r.curUser)
             .ToList();
 
-        foreach (var roomInfo in activeRooms)
+        for (int i = 0; i < activeRooms.Count; i++)
         {
-            GameObject go = Instantiate(roomItemPrefab, roomListContent);
-            RoomListItem item = go.GetComponent<RoomListItem>();
-            item.Setup(roomInfo, this);
+            GameObject roomObj;
 
-            if (isInsideRoom && myRoomIsHost && roomInfo.title.Contains(LocalPlayerInfo.Name))
+            if (i < roomListContent.childCount)
             {
-                roomActionButton.interactable = (roomInfo.guestReadyState == 2);
+                roomObj = roomListContent.GetChild(i).gameObject;
+                roomObj.SetActive(true);
+            }
+            else
+            {
+                roomObj = Instantiate(roomItemPrefab, roomListContent);
+            }
+
+            RoomListItem item = roomObj.GetComponent<RoomListItem>();
+            item.Setup(activeRooms[i], this);
+
+            if (isInsideRoom && myRoomIsHost && activeRooms[i].roomNum == selectedRoomNum)
+            {
+                roomActionButton.interactable = (activeRooms[i].guestReadyState == 2);
             }
         }
+
+        for (int i = activeRooms.Count; i < roomListContent.childCount; i++)
+        {
+            roomListContent.GetChild(i).gameObject.SetActive(false);
+        }
+    }
+
+    public void StopLobbyPolling()
+    {
+        CancelInvoke(nameof(RequestRoomList));
+        Debug.Log("[Lobby] 로비 패킷 폴링 중단됨.");
     }
 }

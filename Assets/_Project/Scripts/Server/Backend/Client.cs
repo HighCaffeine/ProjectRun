@@ -37,6 +37,34 @@ public static unsafe class Client
         }
     }
 
+    public static void SafeDisconnectAndReconnect(string newIp, int newPort, IPacketReceiver currentReceiver)
+    {
+        // 1. TCP 소켓 재연결
+        if (TCP != null)
+        {
+            TCP.RemovePacketReceiver(currentReceiver);
+            TCP.Close();
+            TCP = null;
+        }
+
+        TCP = new NetworkClient(newIp, newPort, ProtocolType.Tcp);
+        TCP.OnDisconnect -= OnDisconnect;
+        TCP.OnDisconnect += OnDisconnect;
+        TCP.Start();
+
+        if (UDP != null)
+        {
+            UDP.RemovePacketReceiver(currentReceiver);
+            UDP.Close();
+            UDP = null;
+        }
+
+        UDP = new NetworkClient(newIp, newPort, ProtocolType.Udp);
+        UDP.Start();
+
+        Debug.Log($"<color=green>[Network] TCP & UDP -> {newIp}:{newPort} 로 재연결 완료!</color>");
+    }
+
     private static bool OnApplicationQuit()
     {
         Close();
