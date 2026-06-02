@@ -55,11 +55,11 @@ public class VliageUiManager : MonoBehaviour
 
     public void UpdateGoldText(int gold)
     {
-        userGoldText.text = $"º¸À¯ °ñµå : {gold}";
+        userGoldText.text = $" : {gold}";
     }
 
     public void UpdateDebtText(int gold)
     {
-        debtGoldText.text = $"ºú : {gold}";
+        debtGoldText.text = $": {gold}";
     }
 }

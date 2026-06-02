@@ -26,7 +26,6 @@ public class EscapeZone : MonoBehaviour
         PlayerActor actor = other.GetComponent<PlayerActor>();
         if (actor != null && actor.IsLocal)
         {
-            Debug.Log("[System] 준비 영역 진입");
             if (!escapePlayers.Contains(actor))
             {
                 escapePlayers.Add(actor);
