@@ -200,8 +200,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     if (countdownText != null)
                     {
-                        countdownText.transform.parent.gameObject.SetActive(true);
-                        //countdownText.gameObject.SetActive(true);
+                        countdownText.gameObject.SetActive(true);
                         countdownText.text = pkt.remainSeconds.ToString();
                     }
                     break;
@@ -212,7 +211,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
                     if (countdownText != null)
                     {
-                        countdownText.transform.parent.gameObject.SetActive(false);
+                        countdownText.gameObject.SetActive(false);
                     }
                     break;
                 }
@@ -225,7 +224,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     Players.Clear();
                     if (countdownText != null)
                     {
-                        countdownText.transform.parent.gameObject.SetActive(false);
+                        countdownText.gameObject.SetActive(false);
                     }
 
                     if (pkt.mapId == 0)
@@ -417,8 +416,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.DUNGEON_CLEAR_NTF:
                 {
                     Debug.Log("<color=cyan>[System] 던전 클리어</color>");
-
-                    GameManager.Instance.Invoke("LoadLobby", 10.0f);
+                    GameManager.Instance.DungeonClear();
+                    GameManager.Instance.LoadVillage();
                     break;
                 }
             // case E_PACKET.MOVE_PATH_RESPONSE:
@@ -681,9 +680,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
-                ActorManager.Instance.p1 = pActor;
+               
+                if (GameManager.Instance.isHost)
+                {
+                    ActorManager.Instance.p1 = pActor;
+                }
+                else
+                {
+                    ActorManager.Instance.p2 = pActor;
+                }
 
-                CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
+                    CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
             }
             else // 리모트 플레이어
@@ -708,7 +715,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 rb.useGravity = false;
                 rb.isKinematic = true;
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
-                ActorManager.Instance.p2 = pActor;
+
+                if (GameManager.Instance.isHost)
+                {
+                    ActorManager.Instance.p2 = pActor;
+                }
+                else
+                {
+                    ActorManager.Instance.p1 = pActor;
+                }
 
             }
 

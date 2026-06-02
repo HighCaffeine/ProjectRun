@@ -6,7 +6,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 {
     private Coroutine countdownCoroutine;
 
-    private float timer = 0f;
+    private long startTime;
 
     [Header("Timer")]
     [SerializeField] private TextMeshProUGUI timeText;
@@ -34,7 +34,8 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     private new void Awake()
     {
         base.Awake();
-        timer = 0f;
+        startTime = NetworkTimeManager.Instance.GetServerTime();
+        resultUIPanel.SetActive(false);
     }
 
     public void StartCount()
@@ -53,6 +54,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             StopCoroutine(countdownCoroutine);
             countdownCoroutine = null;
+
         }
     }
 
@@ -67,7 +69,6 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
             yield return new WaitForSeconds(1f);
 
-            timer++;
         }
     }
 
@@ -75,19 +76,22 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     {
         if (p1 == null && ActorManager.Instance != null)
         {
-            p1 = ActorManager.Instance.GetPlayer(false);
+            p1 = ActorManager.Instance.p1;
         }
 
         if (p2 == null && ActorManager.Instance != null)
         {
-            p2 = ActorManager.Instance.GetPlayer(true);
+            p2 = ActorManager.Instance.p2;
         }
     }
 
     private void UpdateTimerUI()
     {
-        int minutes = Mathf.FloorToInt(timer / 60);
-        int seconds = Mathf.FloorToInt(timer % 60);
+        long endTime = NetworkTimeManager.Instance.GetServerTime();
+        endTime = endTime - startTime;
+
+        int minutes = Mathf.FloorToInt(endTime / 60);
+        int seconds = Mathf.FloorToInt(endTime % 60);
 
         timeText.text = $"{minutes:00}:{seconds:00}";
     }

@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 54164710}
   - component: {fileID: 54164709}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Player2Uid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1131,7 +1131,7 @@ GameObject:
   - component: {fileID: 191823241}
   - component: {fileID: 191823240}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: Player1Uid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18281,7 +18281,7 @@ GameObject:
   - component: {fileID: 490649622}
   - component: {fileID: 490649621}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: DebtGoldText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19019,6 +19019,7 @@ Transform:
   - {fileID: 883445982}
   - {fileID: 1670311410}
   - {fileID: 792853533}
+  - {fileID: 1303734084}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &688262798
@@ -19588,8 +19589,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b6fdeb6794e396469ae8d671a2a9e93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VliageUiManager
-  player1IDUi: {fileID: 0}
-  player2IDUi: {fileID: 0}
+  player1IDUi: {fileID: 191823240}
+  player2IDUi: {fileID: 54164709}
+  dialoguePanel: {fileID: 1094298209}
+  resultWindow: {fileID: 1094298208}
+  userGoldText: {fileID: 1023979115}
+  debtGoldText: {fileID: 490649621}
 --- !u!1 &863259700
 GameObject:
   m_ObjectHideFlags: 0
@@ -20333,7 +20338,7 @@ GameObject:
   - component: {fileID: 1023979116}
   - component: {fileID: 1023979115}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: UserGoldText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20615,6 +20620,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4222241393875307483, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: dialogueManager
+      value: 
+      objectReference: {fileID: 1303734085}
     - target: {fileID: 7083554967630756265, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -20703,7 +20712,8 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3105889779589385127, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -20711,6 +20721,49 @@ PrefabInstance:
 --- !u!224 &1094298204 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7083554967630756265, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+  m_PrefabInstance: {fileID: 1094298203}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1094298205 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+  m_PrefabInstance: {fileID: 1094298203}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &1094298206 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3765421169302859992, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+  m_PrefabInstance: {fileID: 1094298203}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RawImage
+--- !u!114 &1094298207 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+  m_PrefabInstance: {fileID: 1094298203}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!95 &1094298208 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 4219578675274371500, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+  m_PrefabInstance: {fileID: 1094298203}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1094298209 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 881344733019813723, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
   m_PrefabInstance: {fileID: 1094298203}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1127101803
@@ -21071,7 +21124,7 @@ GameObject:
   - component: {fileID: 1178162590}
   - component: {fileID: 1178162589}
   m_Layer: 5
-  m_Name: DeptGold
+  m_Name: DebtGold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21659,6 +21712,56 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8840330596895213531, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
   m_PrefabInstance: {fileID: 2758576005105454324}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1303734083
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1303734084}
+  - component: {fileID: 1303734085}
+  m_Layer: 0
+  m_Name: DialogueManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1303734084
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303734083}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1778, y: 713, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 666025386}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1303734085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303734083}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db9e7cf95a242b442a97c76842561c37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
+  dialoguePanel: {fileID: 1094298209}
+  nameText: {fileID: 1094298207}
+  dialogueText: {fileID: 1094298205}
+  nextIcon: {fileID: 1094298206}
+  typingSpeed: 0.03
+  isDialogueActive: 0
 --- !u!1 &1378608090
 GameObject:
   m_ObjectHideFlags: 0
@@ -23820,8 +23923,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1178162588}
   - {fileID: 1896585290}
+  - {fileID: 1178162588}
   m_Father: {fileID: 1226570110}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1867149407

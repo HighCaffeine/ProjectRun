@@ -14,6 +14,14 @@ public class GameManager : GenericSingleton<GameManager>
     [Header("Test")]
     public Transform playerDashAnchor;
 
+    private static bool isDungeonCleared;
+
+    public static bool IsDungeonCleared
+    {
+        get { return isDungeonCleared; }
+        set { isDungeonCleared = value; }
+    }
+    private static long clearTime; 
     protected override void Awake()
     {
         base.Awake();
@@ -32,8 +40,41 @@ public class GameManager : GenericSingleton<GameManager>
         //if (UiManager.Instance != null) UiManager.Instance.StartCount();
     }
 
-    public void LoadLobby()
+    public void LoadVillage()
     {
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
+
+    }
+    public void DungeonClear()
+    {
+        isDungeonCleared = true;
+    }
+
+    public void GetClearTime(long DungeonClearTime)
+    {
+        clearTime = DungeonClearTime;
+    }
+
+    public void Calculate()
+    {
+        float clearMinutes = clearTime / 60f;
+
+        int baseGold = 1000;
+        int minGold = 300;
+
+        float extraTime = clearMinutes - 20f;
+
+        int calculatedGold = baseGold;
+
+        if (extraTime > 0)
+        {
+            int penaltyCount = Mathf.FloorToInt(extraTime / 2f);
+
+            calculatedGold -= penaltyCount * 100;
+        }
+
+        calculatedGold = Mathf.Max(calculatedGold, minGold);
+
+        GoldManager.Instance.ApplyResultGold(calculatedGold);
     }
 }
