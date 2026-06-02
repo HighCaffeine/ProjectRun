@@ -407,8 +407,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.DUNGEON_CLEAR_NTF:
                 {
                     Debug.Log("<color=cyan>[System] 던전 클리어</color>");
-
-                    GameManager.Instance.Invoke("LoadLobby", 10.0f);
+                    GameManager.Instance.DungeonClear();
+                    GameManager.Instance.LoadVillage();
                     break;
                 }
             // case E_PACKET.MOVE_PATH_RESPONSE:
@@ -671,9 +671,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
-                ActorManager.Instance.p1 = pActor;
+               
+                if (GameManager.Instance.isHost)
+                {
+                    ActorManager.Instance.p1 = pActor;
+                }
+                else
+                {
+                    ActorManager.Instance.p2 = pActor;
+                }
 
-                CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
+                    CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
             }
             else // 리모트 플레이어
@@ -698,7 +706,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 rb.useGravity = false;
                 rb.isKinematic = true;
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
-                ActorManager.Instance.p2 = pActor;
+
+                if (GameManager.Instance.isHost)
+                {
+                    ActorManager.Instance.p2 = pActor;
+                }
+                else
+                {
+                    ActorManager.Instance.p1 = pActor;
+                }
 
             }
 
@@ -709,6 +725,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             if (player == null) player = playerObj.AddComponent<Player>();
             player.Init(pActor, playerName, id, local, spawnPos);
             Players.Add(id, player);
+            VliageUiManager.Instance.UpdatePlayerIDUI();
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
             return player;
         }
