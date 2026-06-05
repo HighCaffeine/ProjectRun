@@ -125,4 +125,9 @@ public abstract class Actor : MonoBehaviour
 
     public virtual void SendMovePacket(float h, float v) { }
     public virtual void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default) { }
+
+    public virtual Vector3 GetPushDir()
+    {
+        return transform.forward;
+    }
 }

@@ -68,14 +68,23 @@ public class ActionState : IState
             }
             Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
             dirToTarget.y = 0f;
+
             float minDistance = dirToTarget.magnitude;
 
-            float finalDistance = (actionType == eState.Push) ? pushForce : Mathf.Max(0f, minDistance - 1.5f);
-            Vector3 knockbackDir = dirToTarget.normalized;
+            float finalDistance =(actionType == eState.Push) ? pushForce: Mathf.Max(0f, minDistance - 1.5f);
 
-            if (actionType == eState.Pull) knockbackDir = -knockbackDir;
+            Vector3 knockbackDir;
+
+            if (actionType == eState.Push)
+            {
+                knockbackDir = actor.GetPushDir();
+            }
+            else
+            {
+                knockbackDir = -dirToTarget.normalized;
+            }
+
             finalDistance *= actor.PushMulti;
-
             if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
             {
                 Player p = targetActor.GetComponent<Player>();

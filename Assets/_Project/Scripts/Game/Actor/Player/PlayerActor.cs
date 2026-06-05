@@ -620,5 +620,20 @@ public class PlayerActor : Actor
         PushIndicator.gameObject.SetActive(false);
         PullIndicator.gameObject.SetActive(false);
     }
+
+    public override Vector3 GetPushDir()
+    {
+        Vector3 dir = GetActionDir();
+
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            dir = transform.forward;
+            dir.y = 0f;
+        }
+
+        return dir.normalized;
+    }
 }
 
