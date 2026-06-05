@@ -131,7 +131,7 @@ public class PlayerActor : Actor
         {
             if (Input.GetKeyDown(KeyCode.R)) TEST_ResetToStage1();
 
-            if (sm.currentState is IdleState || sm.currentState is MoveState)
+            if (sm.currentState is IdleState || sm.currentState is MoveState || sm.currentState is AimState)
             {
                 CheckActionIntent();
                 HandleInput();
