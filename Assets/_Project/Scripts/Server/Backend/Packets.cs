@@ -53,6 +53,8 @@ public enum E_PACKET : ushort
 
     GIMMICK_INTERACT_REQ = 261,
     GIMMICK_INTERACT_NTF = 262,
+    GIMMICK_BULK_RESET_REQ = 263,
+    GIMMICK_BULK_RESET_NTF = 264,
 
     // --- 4. Game Flow & Dungeon State (270 ~ 299) ---
     PLAYER_READY_REQUEST = 271,
@@ -282,6 +284,7 @@ public struct P_MatchStartNtf
 public struct P_GameAuthReq
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string AuthToken;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)] public string userName;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -422,6 +425,13 @@ public struct P_GimmickInteractNtf
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetPos;
     [MarshalAs(UnmanagedType.R4)] public float param;
     [MarshalAs(UnmanagedType.I8)] public long timestamp;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_GimmickBulkResetReq
+{
+    [MarshalAs(UnmanagedType.I4)] public int count;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)] public int[] gimmickIDs;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -25,6 +25,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     private Dictionary<int, BaseGimmick> _gimmickCache = new Dictionary<int, BaseGimmick>();
     public Dictionary<int, MonsterActor> _monsterCache = new Dictionary<int, MonsterActor>();
 
+    //토큰 인증용
+    public static bool isServerAuthenticated = false;
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -47,10 +50,30 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
         else
         {
-            P_GameAuthReq authReq = new P_GameAuthReq();
-            authReq.AuthToken = LocalPlayerInfo.AuthToken;
-            Client.TCP.SendPacket2(E_PACKET.GAME_AUTH_REQUEST, authReq);
-            Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
+            if (isServerAuthenticated)
+            {
+                Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
+
+                if (DungeonPointManager.Instance != null)
+                {
+                    Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, 0);
+                    AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+                }
+                else
+                {
+                    AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
+                }
+            }
+            else // 최초 마을 접속 시에만 인증 요청
+            {
+                P_GameAuthReq authReq = new P_GameAuthReq();
+                authReq.AuthToken = LocalPlayerInfo.AuthToken;
+
+                authReq.userName = LocalPlayerInfo.Name;
+
+                Client.TCP.SendPacket2(E_PACKET.GAME_AUTH_REQUEST, authReq);
+                Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
+            }
         }
     }
 
@@ -99,6 +122,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 if (authRes.Result != 9999)
                 {
                     LocalPlayerInfo.ID = authRes.Result;
+
+                    isServerAuthenticated = true;
 
                     Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
 
@@ -238,8 +263,23 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         }
                         else
                         {
-                            // 다른 플레이어는 정상적으로 부드럽게 동기화
+                            // 위치/회전 보간 처리
                             player.OnSyncMovement(updatePkt);
+
+                            PlayerActor pActor = player.GetComponent<PlayerActor>();
+                            if (pActor != null && pActor.sm != null)
+                            {
+                                bool isMoving = updatePkt.isMoving || (Mathf.Abs(updatePkt.axisH) > 0.05f || Mathf.Abs(updatePkt.axisV) > 0.05f);
+
+                                if (!isMoving && !(pActor.sm.currentState is IdleState))
+                                {
+                                    pActor.sm.ChangeState(new IdleState(pActor));
+                                }
+                                else if (isMoving && !(pActor.sm.currentState is MoveState))
+                                {
+                                    pActor.sm.ChangeState(new MoveState(pActor));
+                                }
+                            }
                         }
                     }
                     break;
@@ -380,26 +420,53 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     // }
                     break;
                 }
+            case E_PACKET.GIMMICK_BULK_RESET_NTF:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_GimmickBulkResetReq>(packet.data);
+
+                    for (int i = 0; i < pkt.count; i++)
+                    {
+                        int targetID = pkt.gimmickIDs[i];
+                        if (_gimmickCache.TryGetValue(targetID, out BaseGimmick gimmick))
+                        {
+                            gimmick.ResetGimmick();
+                            Debug.Log($"[Gimmick] {targetID}번 기믹 초기화 완료");
+                        }
+                    }
+                    break;
+                }
+            // case E_PACKET.PLAYER_DEAD_NTF:
+            //     {
+            //         var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
+
+            //         if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
+            //         {
+            //             // 내 캐릭터는 ActorManager에서 이미 처리했으므로 리모트 유저만 처리
+            //             if (ntf.userUUID != LocalPlayerInfo.ID)
+            //             {
+            //                 Vector3 respawnPos = ntf.respawnPos.ToVector3();
+
+            //                 PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
+            //                 if (pActor != null)
+            //                 {
+            //                     pActor.PlayerDead(respawnPos, ActorManager.Instance.spawnDelay);
+            //                 }
+
+            //                 targetPlayer.SetPos(respawnPos);
+
+            //                 Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
+            //             }
+            //         }
+            //         break;
+            //     }
             case E_PACKET.PLAYER_DEAD_NTF:
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
-
                     if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
                     {
-                        // 내 캐릭터는 ActorManager에서 이미 처리했으므로 리모트 유저만 처리
                         if (ntf.userUUID != LocalPlayerInfo.ID)
                         {
-                            Vector3 respawnPos = ntf.respawnPos.ToVector3();
-
-                            PlayerActor pActor = targetPlayer.GetComponent<PlayerActor>();
-                            if (pActor != null)
-                            {
-                                pActor.PlayerDead(respawnPos, ActorManager.Instance.spawnDelay);
-                            }
-
-                            targetPlayer.SetPos(respawnPos);
-
-                            Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
+                            ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
                         }
                     }
                     break;
@@ -671,7 +738,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
-               
+
                 if (GameManager.Instance.isHost)
                 {
                     ActorManager.Instance.p1 = pActor;
@@ -681,7 +748,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     ActorManager.Instance.p2 = pActor;
                 }
 
-                    CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
+                CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
             }
             else // 리모트 플레이어
@@ -727,6 +794,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             Players.Add(id, player);
             VliageUiManager.Instance.UpdatePlayerIDUI();
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+
+            if (pActor != null && pActor.sm != null)
+            {
+                pActor.sm.ChangeState(new IdleState(pActor));
+            }
+
             return player;
         }
         catch (Exception e)
@@ -741,11 +814,24 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         if (DungeonPointManager.Instance == null) return;
 
         Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, sectorIndex);
-        Player p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+
+        Player p;
+
+        if (Players.ContainsKey(LocalPlayerInfo.ID))
+        {
+            p = Players[LocalPlayerInfo.ID];
+        }
+        else
+        {
+            p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+        }
+
+        if (p == null) return;
 
         if (Client.IS_SERVER_PLAY)
         {
             PlayerActor pActor = p.GetComponent<PlayerActor>();
+            if (pActor == null) return;
 
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);

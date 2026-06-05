@@ -90,6 +90,7 @@ public class RoomListItem : MonoBehaviour
             {
                 if (info.guestReadyState == 2)
                 {
+                    guestPlayerImage.gameObject.SetActive(true);
                     guestPlayerBlockImage.gameObject.SetActive(false);
                 }
                 else

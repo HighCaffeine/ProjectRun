@@ -186,6 +186,21 @@ public class ReMovePlatform : BaseGimmick
         transform.position = target;
     }
 
+    public override void ResetGimmick()
+    {
+        StopAllCoroutines();
+        isTriggered = false;
+        isRestoring = false;
+
+        // 위치 및 비주얼 초기화
+        TargetTransform.position = originWorldPos;
+        visual.localPosition = visualLocalPos;
+
+        // 콜라이더 다시 켜기
+        var col = platform.GetComponent<Collider>();
+        if (col != null) col.enabled = true;
+    }
+
     IEnumerator MoveUp(float duration)
     {
         float elapsed = 0f;

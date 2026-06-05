@@ -25,6 +25,16 @@ public class BreakableObj : BaseGimmick
         }
     }
 
+    public override void ResetGimmick()
+    {
+        if (fractureObj != null)
+        {
+            fractureObj.ResetFracture();
+        }
+
+        TargetTransform.gameObject.SetActive(true);
+    }
+
     private void BreakObject(long attackerUUID)
     {
         Vector3 pushDir = Vector3.left;

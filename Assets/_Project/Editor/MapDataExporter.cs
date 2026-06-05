@@ -120,6 +120,8 @@ public class MapDataExporter : Editor
 
         int totalGimmicksFound = 0;
 
+        HashSet<int> exportedIds = new HashSet<int>();
+
         // 각 Grid 순회
         foreach (MapModuleGrid grid in grids)
         {
@@ -130,6 +132,8 @@ public class MapDataExporter : Editor
 
             foreach (GimmickInfo info in allGimmicks)
             {
+                if (exportedIds.Contains(info.gimmick_id)) continue;
+
                 Transform child = info.transform;
                 string tag = child.tag;
 
@@ -139,7 +143,6 @@ public class MapDataExporter : Editor
                     GimmickData gd = new GimmickData();
                     gd.position = new _Vector3(child.position);
                     gd.rotation_y = (float)Math.Round(child.eulerAngles.y, 3);
-
                     gd.gimmick_id = info.gimmick_id;
                     gd.type = info.gimmick_type.ToString();
 
@@ -166,6 +169,7 @@ public class MapDataExporter : Editor
                         }
                     }
 
+                    exportedIds.Add(info.gimmick_id);
                     exportData.gimmicks.Add(gd);
                     totalGimmicksFound++;
                 }

@@ -129,6 +129,22 @@ public class FractureObject : MonoBehaviour
         }
     }
 
+    public void ResetFracture()
+    {
+        StopAllCoroutines();
+        isBroken = false;
+
+        if (renderer != null) renderer.enabled = true;
+        if (collider != null) collider.enabled = true;
+
+        if (chunksRoot != null)
+        {
+            Destroy(chunksRoot);
+        }
+
+        PrepareFracture();
+    }
+
     private void PrepareFracture()
     {
         var mf = GetComponentInChildren<MeshFilter>();

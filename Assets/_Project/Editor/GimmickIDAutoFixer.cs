@@ -15,8 +15,12 @@ public class GimmickAutoFixer : Editor
         if (gimmick is BreakableObj) return eGimmickKey.BreakableObj;
         if (gimmick is Bomb) return eGimmickKey.Bomb;
         if (gimmick is MonsterSpawnArea) return eGimmickKey.MonsterSpawnArea;
+        if (gimmick is CheckpointTrigger) return eGimmickKey.Checkpoint;
 
-        return eGimmickKey.BreakableWall;
+        GimmickInfo info = gimmick.GetComponent<GimmickInfo>();
+        if (info != null) return info.gimmick_type;
+
+        return eGimmickKey.NONE;
     }
 
     private static eGimmickType GetBaseGimmickType(BaseGimmick gimmick)

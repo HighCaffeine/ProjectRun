@@ -49,6 +49,7 @@ public class PlayerActor : Actor
     private Vector3 windDir;
     private float windPower;
     private bool isInWind;
+    private Player cachedPlayer;
 
     #region 플레이어 통계
     public int fallDeathCount = 0;
@@ -75,6 +76,8 @@ public class PlayerActor : Actor
             currentPos = new P_PacketVector3(),
             currentRot = new P_PacketQuaternion()
         };
+
+        cachedPlayer = GetComponent<Player>();
 
         base.Start();
 
@@ -136,6 +139,10 @@ public class PlayerActor : Actor
 
             ApplyWind();
         }
+        else
+        {
+            CheckRemoteAutoStop();
+        }
 
         sm.Update();
 
@@ -146,6 +153,18 @@ public class PlayerActor : Actor
         }
     }
 
+    private void CheckRemoteAutoStop()
+    {
+        if (cachedPlayer != null)
+        {
+            float dist = Vector3.Distance(transform.position, cachedPlayer.ServerPos);
+
+            if (dist < 0.05f && sm.currentState is MoveState)
+            {
+                sm.ChangeState(new IdleState(this));
+            }
+        }
+    }
 
     public override void ApplyMovement()
     {

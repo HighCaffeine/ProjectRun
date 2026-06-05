@@ -17,6 +17,8 @@ public class ActorManager : GenericSingleton<ActorManager>
     public PlayerActor p1 = null;
     public PlayerActor p2 = null;
 
+    private bool isDeadAllAlready = false;
+
     public PlayerActor GetPlayer(bool is2p)
     {
         foreach (var actor in actors.Values)
@@ -30,31 +32,57 @@ public class ActorManager : GenericSingleton<ActorManager>
 
         return null;
     }
-   public void OnPlayerDead(string name)
-{
-    if (!actors.ContainsKey(name)) return;
-
-    bool isLocal = (name == localID);
-
-    int currentMap = DungeonPointManager.Instance.currentMapID;
-    int currentSector = DungeonPointManager.Instance.currentSectorIndex;
-    Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(currentMap, currentSector);
-
-    foreach (var kvp in actors)
+    public void OnPlayerDead(string name)
     {
-        PlayerActor teammate = kvp.Value;
-        if (!teammate.isDead)
+        if (!actors.ContainsKey(name)) return;
+
+        if (isDeadAllAlready) return;
+        isDeadAllAlready = true;
+
+        bool isLocal = (name == localID);
+
+        int currentMap = DungeonPointManager.Instance.currentMapID;
+        int currentSector = DungeonPointManager.Instance.currentSectorIndex;
+        Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(currentMap, currentSector);
+
+        foreach (var kvp in actors)
         {
-            teammate.PlayerDead(spawnPos, spawnDelay);
+            PlayerActor teammate = kvp.Value;
+            if (!teammate.isDead)
+            {
+                teammate.PlayerDead(spawnPos, spawnDelay);
+            }
         }
+
+        ShowDeadUI(spawnDelay);
+
+        if (isLocal)
+        {
+            SendPlayerDeadPacket(name, spawnPos);
+        }
+
+        if (GameManager.Instance.isHost)
+        {
+            SectorGimmickManager[] managers = FindObjectsByType<SectorGimmickManager>(FindObjectsSortMode.None);
+            foreach (var mgr in managers)
+            {
+                if (mgr.sectorIndex == currentSector)
+                {
+                    mgr.RequestSectorReset();
+                    break;
+                }
+            }
+            Debug.Log($"<color=red>[ActorManager] 파티 전멸!</color> 방장이 섹터 {currentSector} 기믹 초기화를 요청합니다.");
+        }
+
+        // 부활 대기시간이 끝난 후 다시 죽을 수 있도록 플래그 해제
+        Invoke(nameof(ResetDeadState), spawnDelay + 0.5f);
     }
 
-    if (isLocal)
+    private void ResetDeadState()
     {
-        SendPlayerDeadPacket(name, spawnPos);
-        ShowDeadUI(spawnDelay);
+        isDeadAllAlready = false;
     }
-}
 
     public void AddPlayer(PlayerActor actor)
     {

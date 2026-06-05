@@ -170,7 +170,7 @@ public class Platform : BaseGimmick
 
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-        // 처음 밟았을 때 호스트가 제어권 획득 (기존 로직 유지)
+        // 처음 밟았을 때 호스트가 제어권 획득
         if (activationType == 1 && ntf.state == 1 && !hasTriggered)
         {
             hasTriggered = true;
@@ -201,18 +201,35 @@ public class Platform : BaseGimmick
 
     private IEnumerator SyncMoveRoutine()
     {
-        // 1. 디싱크로 인해 위치가 튀는 걸 방지하기 위해 예측 위치(expectedPos)로 빠르게 보간
+        // 디싱크로 인해 위치가 튀는 걸 방지하기 위해 예측 위치 보간
         while (Vector3.Distance(TargetTransform.position, expectPos) > 0.05f)
         {
             TargetTransform.position = Vector3.Lerp(TargetTransform.position, expectPos, Time.deltaTime * 15f);
             yield return null;
         }
 
-        // 2. 예측 위치에 도달하면 최종 목표 지점까지 정상 속도로 이동
+        // 예측 위치에 도달하면 최종 목표 지점까지 정상 속도로 이동
         while (Vector3.Distance(TargetTransform.position, targetSyncPos) > 0.01f)
         {
             TargetTransform.position = Vector3.MoveTowards(TargetTransform.position, targetSyncPos, moveSpeed * Time.deltaTime);
             yield return null;
+        }
+    }
+
+    public override void ResetGimmick()
+    {
+        StopAllCoroutines();
+
+        isMoving = false;
+        hasTriggered = false;
+
+        TargetTransform.position = startPos.position;
+        lastPos = TargetTransform.position;
+
+        if (activationType == 0 && GameManager.Instance.isHost)
+        {
+            currentTargetPos = endPos.position;
+            StartCoroutine(HostMoveLoop());
         }
     }
 

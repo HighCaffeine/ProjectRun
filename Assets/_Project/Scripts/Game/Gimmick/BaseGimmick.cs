@@ -45,6 +45,7 @@ public abstract class BaseGimmick : MonoBehaviour
             gimmickUID = info.gimmick_id;
         }
     }
+    public virtual void ResetGimmick() { }
 
     public abstract void Execute(P_GimmickInteractNtf ntf);
 }

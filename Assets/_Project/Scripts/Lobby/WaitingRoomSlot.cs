@@ -17,11 +17,13 @@ public class WaitingRoomSlot : MonoBehaviour
         hostImage.SetActive(false);
     }
 
-    public void SetUser(long uuid, string userName)
+    public void SetUser(long uuid, string userName, bool isReady = false, bool isHost = false)
     {
         userUUID = uuid;
         nameText.text = userName;
-        readyImage.SetActive(false); // 처음 들어오면 무조건 레디 해제 상태
+
+        readyImage.SetActive(isReady);
+        hostImage.SetActive(isHost);
     }
 
     public void SetReady(bool isReady)

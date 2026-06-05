@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.RenderGraphModule;
 
 public static class PacketSerializer
 {
@@ -20,6 +21,7 @@ public static class PacketSerializer
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
             case P_DungeonEscapeReq p: return new byte[] { p.dummy };
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
+            case P_GimmickBulkResetReq p: return SerializeGimmickBulkResetReq(p);
             case P_PlayerDeadReq p: return SerializePlayerDeadReq(p);
             case P_PlayerReadyRequest p: return SerializePlayerReadyRequest(p);
             case P_GameStartNtf p: return SerializeGameStartNtf(p);
@@ -79,9 +81,10 @@ public static class PacketSerializer
 
     static byte[] SerializeGameAuthReq(P_GameAuthReq p)
     {
-        var buf = new byte[64];
+        var buf = new byte[97];
         int o = 0;
         WriteString(buf, ref o, p.AuthToken, 64);
+        WriteString(buf, ref o, p.userName, 33);
         return buf;
     }
 
@@ -139,6 +142,23 @@ public static class PacketSerializer
         Write(buf, ref o, p.targetPos.z);
         Write(buf, ref o, p.param);
         Write(buf, ref o, p.timestamp);
+        return buf;
+    }
+
+    static byte[] SerializeGimmickBulkResetReq(P_GimmickBulkResetReq p)
+    {
+        int size = 4 + (20 * 4);
+        var buf = new byte[size];
+        int o = 0;
+
+        Write(buf, ref o, p.count);
+
+        for (int i = 0; i < 20; i++)
+        {
+            int gimmickID = (p.gimmickIDs != null && i < p.gimmickIDs.Length) ? p.gimmickIDs[i] : 0;
+            Write(buf, ref o, gimmickID);
+        }
+
         return buf;
     }
 

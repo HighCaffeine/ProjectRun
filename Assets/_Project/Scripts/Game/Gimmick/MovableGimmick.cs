@@ -4,11 +4,18 @@ using UnityEngine;
 public class MovableGimmick : BaseGimmick
 {
     private bool isMoving = false;
+    private Vector3 initialPos;
 
+
+    protected override void Awake()
+    {
+        base.Awake();
+        initialPos = TargetTransform.position;
+    }
     public override void Execute(P_GimmickInteractNtf ntf)
     {
         Debug.Log($"[MovableGimmick Execute] state={ntf.state}, targetPos={ntf.targetPos}");
-        
+
         if (!isMoving) StartCoroutine(MoveRoutine(ntf.targetPos.ToVector3()));
     }
 
@@ -16,6 +23,13 @@ public class MovableGimmick : BaseGimmick
     public void StartMove(Vector3 destPos)
     {
         if (!isMoving) StartCoroutine(MoveRoutine(destPos));
+    }
+
+    public override void ResetGimmick()
+    {
+        StopAllCoroutines();
+        isMoving = false;
+        TargetTransform.position = initialPos;
     }
 
     private IEnumerator MoveRoutine(Vector3 destPos)

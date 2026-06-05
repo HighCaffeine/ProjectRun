@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
+using System.Collections.Generic;
 
 public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
 {
@@ -18,6 +20,8 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
 
     private bool isMyReady = false;
     private long currentHostUUID = -1;
+
+    private Dictionary<long, bool> userReadyStates = new Dictionary<long, bool>();
 
     void Start()
     {
@@ -76,14 +80,20 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
                 var userInfo = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
                 if (userInfo.userUUID != LocalPlayerInfo.ID)
                 {
-                    otherSlot.SetUser(userInfo.userUUID, userInfo.userName);
+                    bool isReady = userReadyStates.ContainsKey(userInfo.userUUID) ? userReadyStates[userInfo.userUUID] : false;
+                    bool isHost = (userInfo.userUUID == currentHostUUID);
+
+                    otherSlot.SetUser(userInfo.userUUID, userInfo.userName, isReady, isHost);
                 }
                 break;
             case E_PACKET.ROOM_NEW_USER_NTF:
                 var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
                 if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
-                    otherSlot.SetUser(newUser.userUUID, newUser.userName);
+                    bool isReady = userReadyStates.ContainsKey(newUser.userUUID) ? userReadyStates[newUser.userUUID] : false;
+                    bool isHost = (newUser.userUUID == currentHostUUID);
+
+                    otherSlot.SetUser(newUser.userUUID, newUser.userName, isReady, isHost);
                 }
                 break;
             case E_PACKET.ROOM_LEAVE_USER_NTF:
@@ -94,16 +104,21 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
                 }
                 break;
             case E_PACKET.ROOM_READY_STATUS_NTF:
-                var readyStatus = UnsafeCode.ByteArrayToStructure<P_RoomReadyStatusNtf>(packet.data);
-                if (readyStatus.userUUID == otherSlot.userUUID)
                 {
-                    otherSlot.SetReady(readyStatus.isReady);
+                    var readyStatus = UnsafeCode.ByteArrayToStructure<P_RoomReadyStatusNtf>(packet.data);
+
+                    userReadyStates[readyStatus.userUUID] = readyStatus.isReady;
+
+                    if (readyStatus.userUUID == otherSlot.userUUID)
+                    {
+                        otherSlot.SetReady(readyStatus.isReady);
+                    }
+                    else if (readyStatus.userUUID == mySlot.userUUID)
+                    {
+                        mySlot.SetReady(readyStatus.isReady);
+                    }
+                    break;
                 }
-                else if (readyStatus.userUUID == mySlot.userUUID)
-                {
-                    mySlot.SetReady(readyStatus.isReady);
-                }
-                break;
             case E_PACKET.ROOM_HOST_NTF:
                 var hostNtf = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
                 currentHostUUID = hostNtf.hostUUID;
