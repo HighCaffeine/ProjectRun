@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 {
+    [SerializeField]
     private Coroutine countdownCoroutine;
 
     private long startTime;
@@ -28,16 +29,20 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     [Header("Result UI")]
     [SerializeField] private GameObject resultUIPanel;
 
-    private PlayerActor p1;
-    private PlayerActor p2;
+    [SerializeField] private PlayerActor p1;
+    [SerializeField] private PlayerActor p2;
 
     private new void Awake()
     {
         base.Awake();
-        startTime = NetworkTimeManager.Instance.GetServerTime();
         resultUIPanel.SetActive(false);
     }
 
+    private void Start()
+    {
+        startTime = NetworkTimeManager.Instance.GetServerTime();
+        StartCount();
+    }
     public void StartCount()
     {
         if (countdownCoroutine != null)
@@ -74,24 +79,22 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     private void FindPlayers()
     {
-        if (p1 == null && ActorManager.Instance != null)
-        {
-            p1 = ActorManager.Instance.p1;
-        }
+        if (p1 != null && p2 != null)
+            return;
 
-        if (p2 == null && ActorManager.Instance != null)
-        {
-            p2 = ActorManager.Instance.p2;
-        }
+        if (ActorManager.Instance == null)
+            return;
+
+        p1 ??= ActorManager.Instance.p1;
+        p2 ??= ActorManager.Instance.p2;
     }
 
     private void UpdateTimerUI()
     {
-        long endTime = NetworkTimeManager.Instance.GetServerTime();
-        endTime = endTime - startTime;
+        long elapsedMs = NetworkTimeManager.Instance.GetServerTime() - startTime;
 
-        int minutes = Mathf.FloorToInt(endTime / 60);
-        int seconds = Mathf.FloorToInt(endTime % 60);
+        int minutes = (int)(elapsedMs / 1000 / 60);
+        int seconds = (int)(elapsedMs / 1000 % 60);
 
         timeText.text = $"{minutes:00}:{seconds:00}";
     }

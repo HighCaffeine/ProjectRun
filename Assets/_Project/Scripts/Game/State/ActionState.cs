@@ -55,6 +55,17 @@ public class ActionState : IState
 
         if (targetActor != null)
         {
+            if (actor is PlayerActor player)
+            {
+                if (actionType == eState.Push)
+                {
+                    player.pushCount++;
+                }
+                else if (actionType == eState.Pull)
+                {
+                    player.pullCount++;
+                }
+            }
             Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
             dirToTarget.y = 0f;
             float minDistance = dirToTarget.magnitude;
@@ -276,7 +287,7 @@ public class ActionState : IState
         }
 
         return startPos + pushDir * pushDistance;
-    }
+    } 
 
     public void Execute()
     {

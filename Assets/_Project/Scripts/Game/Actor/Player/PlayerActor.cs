@@ -468,8 +468,6 @@ public class PlayerActor : Actor
         playerPivot.gameObject.SetActive(false);
         StartCoroutine(RespawnAfterDelay(spawnDelay));
         fallDeathCount++;
-        Debug.Log(gameObject.name + "Die" + fallDeathCount);
-
     }
     IEnumerator RespawnAfterDelay(float delay)
     {

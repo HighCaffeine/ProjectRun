@@ -19,6 +19,7 @@ public class EscapeZone : MonoBehaviour
         {
             isTriggered = true;
             diary.SetActive(true);
+            DungeonUiManager.Instance.ShowResult();
         }
     }
     private void OnTriggerEnter(Collider other)

@@ -15,20 +15,4 @@ public class TimeZone : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player") )
-        {
-
-            uiManager.StartCount();
-        }
-    }
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("³ª°¨");
-            uiManager.StopCount();
-        }
-    }
 }

@@ -46,10 +46,11 @@ public class VliageUiManager : MonoBehaviour
     {
         if (dialoguePanel.activeSelf)
         {
+            Debug.Log("∏Æ≈œµ ");
             return;
         }
-        GameManager.Instance.Calculate();
         dialoguePanel.SetActive(true);
+        GameManager.Instance.Calculate();
         resultWindow.Play("Open");
     }
 

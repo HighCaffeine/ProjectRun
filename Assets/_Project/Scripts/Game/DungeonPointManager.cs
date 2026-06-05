@@ -53,7 +53,6 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
         if (currentSectorIndex + 1 >= mapData.sectors.Length)
         {
             Debug.Log("[Dungeon] 맵의 마지막 구역입니다.");
-            UiManager.Instance.ShowResult();
             return;
         }
 
