@@ -1,9 +1,9 @@
 using TMPro;
 using UnityEngine;
 
-public class VliageUiManager : MonoBehaviour
+public class VillageUiManager : MonoBehaviour
 {
-    public static VliageUiManager Instance;
+    public static VillageUiManager Instance;
     public TextMeshProUGUI player1IDUi;
     public TextMeshProUGUI player2IDUi;
 

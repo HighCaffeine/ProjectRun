@@ -1,6 +1,9 @@
 using System.Collections;
 using TMPro;
+using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 {
@@ -32,16 +35,37 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     [SerializeField] private PlayerActor p1;
     [SerializeField] private PlayerActor p2;
 
+    [SerializeField] private GameObject settingPanel;
+
+    [SerializeField] private GameObject progress;
+    private Coroutine progressCoroutine;
+
     private new void Awake()
     {
+        Debug.Log("ddasdqawtr");
         base.Awake();
         resultUIPanel.SetActive(false);
+
     }
 
     private void Start()
     {
+        settingPanel.SetActive(false);
+        progress.SetActive(false);
+        Debug.Log("dd");
         startTime = NetworkTimeManager.Instance.GetServerTime();
         StartCount();
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleSetting();
+        }
+        if(Input.GetKeyDown(KeyCode.Tab))
+        {
+            ShowProgress();
+        }
     }
     public void StartCount()
     {
@@ -131,5 +155,40 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             resultUIPanel.SetActive(true);
         }
+    }
+
+    public void ToggleSetting()
+    {
+        if (settingPanel == null)
+            return;
+
+        settingPanel.SetActive(!settingPanel.activeSelf);
+    }
+    public void Exit()
+    {
+        P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
+
+        Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
+        Debug.Log("[System] 탈출 요청 패킷 전송 완료");   
+    }
+
+
+    public void ShowProgress()
+    {
+        if (progressCoroutine != null)
+        {
+            StopCoroutine(progressCoroutine);
+        }
+
+        progressCoroutine = StartCoroutine(ShowProgressRoutine());
+    }
+
+    private IEnumerator ShowProgressRoutine()
+    {
+        progress.SetActive(true);
+
+        yield return new WaitForSeconds(3f);
+
+        progress.SetActive(false);
     }
 }

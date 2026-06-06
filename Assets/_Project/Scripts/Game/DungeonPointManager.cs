@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 // 구역(Sector) 단위로 데이터를 묶어서 관리하는 구조체
 [Serializable]
@@ -28,6 +29,8 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
     public int currentMapID = 1;
     public int currentSectorIndex = 0;
 
+
+    [SerializeField] private ProGressUi proGressUi;
     private new void Awake()
     {
         base.Awake();
@@ -63,5 +66,13 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 
         ActorManager.Instance.UpdateAllSpawnPoints(currentMapID, currentSectorIndex);
         ActorManager.Instance.MoveAllPlayersToSector(currentMapID, currentSectorIndex);
+    }
+    public void SetCurrentMap(int mapID, int sectorIndex)
+    {
+        currentMapID = mapID;
+        currentSectorIndex = sectorIndex;
+
+        proGressUi.StageUpdate(mapID);
+        DungeonUiManager.Instance.ShowProgress();
     }
 }
