@@ -14,6 +14,7 @@ public static class PacketSerializer
             case P_LoginReq p: return SerializeLoginReq(p);
             case P_RoomEnterRequest p: return SerializeRoomEnterRequest(p);
             case P_RoomListReq p: return new byte[] { p.dummy };
+            case P_RoomCharSelectReq p: return SerializeCharacterSelectRequest(p);
             case P_RoomLeaveRequest p: return new byte[] { p.dummy };
             case P_GameStartReq p: return SerializeGameStartReq(p);
             case P_GameAuthReq p: return SerializeGameAuthReq(p);
@@ -71,6 +72,14 @@ public static class PacketSerializer
         return buf;
     }
 
+    static byte[] SerializeCharacterSelectRequest(P_RoomCharSelectReq p)
+    {
+        var buf = new byte[4];
+        int o = 0;
+        Write(buf, ref o, p.charID);
+        return buf;
+    }
+
     static byte[] SerializeGameStartReq(P_GameStartReq p)
     {
         var buf = new byte[4];
@@ -81,10 +90,11 @@ public static class PacketSerializer
 
     static byte[] SerializeGameAuthReq(P_GameAuthReq p)
     {
-        var buf = new byte[97];
+        var buf = new byte[101];
         int o = 0;
         WriteString(buf, ref o, p.AuthToken, 64);
         WriteString(buf, ref o, p.userName, 33);
+        Write(buf, ref o, p.characterID);
         return buf;
     }
 

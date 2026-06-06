@@ -7,6 +7,13 @@ using TMPro;
 
 public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
 {
+    [Header("UI Slots (대기방 UI용)")]
+    public LobbyPlayerInfoUI playerInfoUI; // 내 캐릭터 정보 및 스왑 UI
+
+    private long currentHostUUID = -1;
+    private Dictionary<long, bool> userReadyStates = new Dictionary<long, bool>();
+
+
     [Header("Room List UI")]
     [SerializeField] private Transform roomListContent;
     [SerializeField] private GameObject roomItemPrefab;
@@ -36,6 +43,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
     private bool myRoomIsHost = false;
     private bool isGuestReadyLocal = false;
     private bool pendingIsHost = false;
+
 
     void Start()
     {
@@ -173,6 +181,19 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 roomActionButton.interactable = true;
             }
         }
+
+        var playerInfoUI = FindObjectOfType<LobbyPlayerInfoUI>();
+        if (playerInfoUI != null)
+        {
+            if (isInsideRoom && !myRoomIsHost)
+            {
+                playerInfoUI.SetInteractable(false); // 게스트는 선택 불가
+            }
+            else
+            {
+                playerInfoUI.SetInteractable(true);  // 방장이나 로비 대기자는 선택 가능
+            }
+        }
     }
 
     public unsafe void OnPacketReceived(Packet packet)
@@ -191,24 +212,37 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 createConfirmButton.interactable = true;
                 joinConfirmButton.interactable = true;
 
-                if (enterRes.result == 0) // 입장/생성 성공
+                if (enterRes.result == 0)
                 {
                     isInsideRoom = true;
                     myRoomIsHost = pendingIsHost;
                     selectedRoomNum = enterRes.roomNum;
-                    Debug.Log($"[Lobby] 방 입장 성공, roomNum={selectedRoomNum}");
+
+                    P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = LocalPlayerInfo.CharacterID };
+                    Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
 
                     HidePopups();
                     UpdateBottomUI();
                     RequestRoomList();
                 }
-                else
-                {
-                    Debug.LogError($"[Lobby] 방 입장 실패 : {enterRes.result}");
-                    HidePopups();
-                }
                 break;
+            case E_PACKET.ROOM_HOST_NTF:
+                {
+                    var hostNtf = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
+                    currentHostUUID = hostNtf.hostUUID;
+                    Debug.Log($"[HostNTF] hostUUID={hostNtf.hostUUID}, myID={LocalPlayerInfo.ID}, match={LocalPlayerInfo.ID == currentHostUUID}");
+                    if (pendingIsHost)
+                    {
+                        myRoomIsHost = true;
+                    }
+                    else
+                    {
+                        myRoomIsHost = (LocalPlayerInfo.ID == currentHostUUID);
+                    }
 
+                    UpdateBottomUI();
+                    break;
+                }
             case E_PACKET.ROOM_LEAVE_RESPONSE:
                 var leaveRes = UnsafeCode.ByteArrayToStructure<P_RoomLeaveResponse>(packet.data);
                 if (leaveRes.result == 0)
@@ -222,6 +256,49 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                     RequestRoomList();
                 }
                 break;
+
+            case E_PACKET.ROOM_NEW_USER_NTF:
+                if (isInsideRoom && myRoomIsHost)
+                {
+                    int currentCharID = LocalPlayerInfo.CharacterID;
+                    P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = currentCharID };
+                    Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
+                    Debug.Log($"[Lobby] 게스트 입장 - 호스트 캐릭터 재전송: {currentCharID}");
+                }
+                break;
+            case E_PACKET.ROOM_USER_INFO_NTF:
+                {
+                    var userInfoNtf = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
+
+                    if (userInfoNtf.userUUID != LocalPlayerInfo.ID)
+                    {
+                        int forceCharID = (userInfoNtf.characterID == 0) ? 1 : 0;
+                        if (playerInfoUI != null) playerInfoUI.ForceSetCharacter(forceCharID);
+                        Debug.Log($"[Lobby] 상대 캐릭터={userInfoNtf.characterID}, 내 캐릭터 강제={forceCharID}");
+                    }
+                    break;
+                }
+            case E_PACKET.ROOM_CHAR_SELECT_NTF:
+                {
+                    var charNtf = UnsafeCode.ByteArrayToStructure<P_RoomCharSelectNtf>(packet.data);
+                    Debug.Log($"[Lobby] Char NTF userUUID={charNtf.userUUID}, myID={LocalPlayerInfo.ID}, isMe={charNtf.userUUID == LocalPlayerInfo.ID}");
+
+                    if (!isInsideRoom) break;
+
+                    if (charNtf.userUUID == LocalPlayerInfo.ID)
+                    {
+                        break;
+                    }
+
+                    if (!myRoomIsHost)
+                    {
+                        int forceCharID = (charNtf.charID == 0) ? 1 : 0;
+                        if (playerInfoUI != null) playerInfoUI.ForceSetCharacter(forceCharID);
+
+                        RequestRoomList();
+                    }
+                    break;
+                }
 
             case E_PACKET.MATCH_START_NTF:
                 {

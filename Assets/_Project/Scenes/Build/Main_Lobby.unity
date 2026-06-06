@@ -9091,6 +9091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 592c0669926914847b487fa154ae1e89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyRoomManager
+  playerInfoUI: {fileID: 7257527179478614413}
   roomListContent: {fileID: 1573387402}
   roomItemPrefab: {fileID: 5870121511302872951, guid: d573e24a09242dc48acd4b4bec6ec4cb, type: 3}
   refreshButton: {fileID: 1782752974}
@@ -12965,12 +12966,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23d7d62250fa6d141ab2d4382456de84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyPlayerInfoUI
-  characterRenderView: {fileID: 0}
+  characterRenderView: {fileID: 509186335}
   nicknameText: {fileID: 5355409930034653209}
   nicknameChangeInput: {fileID: 0}
+  changeCharacterButton: {fileID: 4361949811680616728}
   characterModels:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 875430783}
+  - {fileID: 1613975965}
 --- !u!1 &7612262269443325673
 GameObject:
   m_ObjectHideFlags: 0

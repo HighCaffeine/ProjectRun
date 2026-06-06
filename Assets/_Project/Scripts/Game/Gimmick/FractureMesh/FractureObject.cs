@@ -58,12 +58,19 @@ public class FractureObject : MonoBehaviour
     private GameObject chunksRoot;
     private MeshRenderer renderer;
     private Collider collider;
+    private MeshFilter originalMeshFilter;
 
 
     private void Awake()
     {
         renderer = GetComponentInChildren<MeshRenderer>();
         collider = GetComponentInChildren<Collider>();
+
+        originalMeshFilter = GetComponent<MeshFilter>();
+        if (originalMeshFilter == null)
+        {
+            originalMeshFilter = GetComponentInChildren<MeshFilter>();
+        }
     }
 
     private void Start()
@@ -139,6 +146,7 @@ public class FractureObject : MonoBehaviour
 
         if (chunksRoot != null)
         {
+            DestroyImmediate(chunksRoot);
             Destroy(chunksRoot);
         }
 
@@ -147,14 +155,12 @@ public class FractureObject : MonoBehaviour
 
     private void PrepareFracture()
     {
-        var mf = GetComponentInChildren<MeshFilter>();
-        if (mf == null || mf.sharedMesh == null)
+        if (originalMeshFilter == null || originalMeshFilter.sharedMesh == null)
         {
             return;
         }
 
-        Mesh localMesh = ToLocalMesh(mf.sharedMesh);
-
+        Mesh localMesh = ToLocalMesh(originalMeshFilter.sharedMesh);
         // Voronoi 파쇄
         List<Mesh> chunks = VoronoiFracture.Fracture(localMesh, siteCount, seed);
 
@@ -178,7 +184,7 @@ public class FractureObject : MonoBehaviour
         chunksRoot.transform.SetParent(transform, false);
         chunksRoot.transform.localPosition = Vector3.zero;
         chunksRoot.transform.localRotation = Quaternion.identity;
-        chunksRoot.transform.localScale = Vector3.one * mf.transform.localScale.x;
+        chunksRoot.transform.localScale = Vector3.one * originalMeshFilter.transform.localScale.x;
 
         float worldVolumeScale = GetWorldVolumeScale();
 

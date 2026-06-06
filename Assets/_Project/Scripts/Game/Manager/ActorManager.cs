@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ActorManager : GenericSingleton<ActorManager>
 {
+    private SectorGimmickManager[] _sectorManagers;
+
 
     public Dictionary<string, PlayerActor> actors = new Dictionary<string, PlayerActor>();
     public Dictionary<string, string> spawnPoints = new Dictionary<string, string>();
@@ -35,11 +37,10 @@ public class ActorManager : GenericSingleton<ActorManager>
     public void OnPlayerDead(string name)
     {
         if (!actors.ContainsKey(name)) return;
-
         if (isDeadAllAlready) return;
         isDeadAllAlready = true;
 
-        bool isLocal = (name == localID);
+        bool isLocal = actors[name].IsLocal;
 
         int currentMap = DungeonPointManager.Instance.currentMapID;
         int currentSector = DungeonPointManager.Instance.currentSectorIndex;
@@ -48,40 +49,98 @@ public class ActorManager : GenericSingleton<ActorManager>
         foreach (var kvp in actors)
         {
             PlayerActor teammate = kvp.Value;
+            if (teammate == null || teammate.gameObject == null) continue;
             if (!teammate.isDead)
             {
                 teammate.PlayerDead(spawnPos, spawnDelay);
             }
         }
 
-        ShowDeadUI(spawnDelay);
-
         if (isLocal)
         {
             SendPlayerDeadPacket(name, spawnPos);
         }
 
-        if (GameManager.Instance.isHost)
+        Invoke(nameof(ResetDeadState), spawnDelay + 0.5f);
+    }
+
+    // public void RemovePlayer(string name)
+    // {
+    //     if (actors.TryGetValue(name, out PlayerActor targetActor))
+    //     {
+    //         actors.Remove(name);
+    //         spawnPoints.Remove(name);
+    //         if (p1 == targetActor) p1 = null;
+    //         if (p2 == targetActor) p2 = null;
+    //         ReassignRoles();
+    //     }
+    // }
+
+    public void RemovePlayer(string name)
+    {
+        if (actors.TryGetValue(name, out PlayerActor targetActor))
         {
-            SectorGimmickManager[] managers = FindObjectsByType<SectorGimmickManager>(FindObjectsSortMode.None);
-            foreach (var mgr in managers)
-            {
-                if (mgr.sectorIndex == currentSector)
-                {
-                    mgr.RequestSectorReset();
-                    break;
-                }
-            }
-            Debug.Log($"<color=red>[ActorManager] 파티 전멸!</color> 방장이 섹터 {currentSector} 기믹 초기화를 요청합니다.");
+            actors.Remove(name);
+            spawnPoints.Remove(name);
+
+            if (p1 == targetActor) p1 = null;
+            if (p2 == targetActor) p2 = null;
+
+            Debug.Log($"[ActorManager] {name} 퇴장 처리 완료.");
+        }
+    }
+
+    private void ReassignRoles()
+    {
+        // 먼저 모든 사람의 호스트 권한을 초기화
+        foreach (var actor in actors.Values)
+        {
+            if (actor != null) actor.isHost = false;
         }
 
-        // 부활 대기시간이 끝난 후 다시 죽을 수 있도록 플래그 해제
-        Invoke(nameof(ResetDeadState), spawnDelay + 0.5f);
+        // 딕셔너리에 남아있는 첫 번째 사람을 찾음
+        PlayerActor newHost = null;
+        foreach (var actor in actors.Values)
+        {
+            if (actor != null)
+            {
+                newHost = actor;
+                break;
+            }
+        }
+
+        // 새로운 호스트 지정 및 로컬 권한 동기화
+        if (newHost != null)
+        {
+            newHost.isHost = true; // 내부 동적 호스트 갱신
+
+            if (GameManager.Instance != null)
+            {
+                // 새로 방장이 된 사람이 내 화면의 로컬 캐릭터인지 체크해서 분기 권한 제어
+                GameManager.Instance.isHost = newHost.IsLocal;
+            }
+
+            Debug.Log($"[ActorManager] 호스트 변경 완료 -> 새로운 호스트: {newHost.gameObject.name} (여캐여부 P1:{newHost == p1})");
+        }
     }
 
     private void ResetDeadState()
     {
         isDeadAllAlready = false;
+    }
+
+    public void RequestGimmickReset()
+    {
+        int currentSector = DungeonPointManager.Instance.currentMapID;
+        SectorGimmickManager[] managers = FindObjectsByType<SectorGimmickManager>(FindObjectsSortMode.None);
+        foreach (var mgr in managers)
+        {
+            if (mgr.sectorIndex == currentSector)
+            {
+                mgr.RequestSectorReset();
+                break;
+            }
+        }
     }
 
     public void AddPlayer(PlayerActor actor)
@@ -115,11 +174,6 @@ public class ActorManager : GenericSingleton<ActorManager>
     }
 
 
-    void ShowDeadUI(float delay)
-    {
-        deadUIPrefab.GetComponent<ReSpawnTimer>().respawnTime = delay;
-        deadUIPrefab.SetActive(true);
-    }
 
     // public void OnPlayerDead(string name)
     // {
@@ -146,7 +200,7 @@ public class ActorManager : GenericSingleton<ActorManager>
 
     void SendPlayerDeadPacket(string id, Vector3 spawnPos)
     {
-        if (id != localID) return; // 내 캐릭터가 죽은 것만 서버에 보고
+        if (!actors.ContainsKey(id) || !actors[id].IsLocal) return;
 
         P_PlayerDeadReq req = new P_PlayerDeadReq();
         req.respawnPos = new P_PacketVector3 { x = spawnPos.x, y = spawnPos.y, z = spawnPos.z };

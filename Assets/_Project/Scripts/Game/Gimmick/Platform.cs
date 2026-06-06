@@ -22,6 +22,9 @@ public class Platform : BaseGimmick
     private int activationType = 0;
     private float waitTime = 0f;
 
+    private Vector3 startWorldPos;
+    private Vector3 endWorldPos;
+
     public void SetStartPos(GameObject start) { startPos = start.transform; }
     public void SetEndPos(GameObject end) { endPos = end.transform; }
 
@@ -31,18 +34,21 @@ public class Platform : BaseGimmick
         gimmickInfo = GetComponent<GimmickInfo>();
         ParseGimmickProperties();
 
+        startWorldPos = startPos.position;
+        endWorldPos = endPos.position;
+
         if (activationType == 0)
         {
             if (GameManager.Instance.isHost)
             {
-                currentTargetPos = endPos.position;
+                currentTargetPos = endWorldPos;
                 StartCoroutine(HostMoveLoop());
             }
         }
         else
         {
             isMoving = false;
-            TargetTransform.position = startPos.position;
+            TargetTransform.position = startWorldPos;
         }
     }
 
@@ -134,7 +140,7 @@ public class Platform : BaseGimmick
 
             yield return new WaitForSeconds(waitTime);
 
-            currentTargetPos = (currentTargetPos == endPos.position) ? startPos.position : endPos.position;
+            currentTargetPos = (currentTargetPos == endWorldPos) ? startWorldPos : endWorldPos;
 
             // if (activationType == 1 && currentTargetPos == endPos.position)
             // {
@@ -185,6 +191,7 @@ public class Platform : BaseGimmick
         // 리모트 클라이언트는 호스트가 보낸 Sync 패킷을 기반으로 위치 보간
         if (ntf.state == (byte)eGimmickState.Sync && !GameManager.Instance.isHost)
         {
+            if (activationType == 1 && !hasTriggered) return;
             targetSyncPos = ntf.targetPos.ToVector3();
 
             long hostSendTime = ntf.timestamp;
@@ -218,13 +225,30 @@ public class Platform : BaseGimmick
 
     public override void ResetGimmick()
     {
+        Debug.Log($"[Platform] {gimmickUID}번 리셋 호출됨! 이동 전 위치: {TargetTransform.position}");
+
         StopAllCoroutines();
 
         isMoving = false;
         hasTriggered = false;
+        players.Clear();
 
         TargetTransform.position = startPos.position;
         lastPos = TargetTransform.position;
+
+        Physics.SyncTransforms();
+
+        Debug.Log($"[Platform] {gimmickUID}번 시작 위치로 이동 완료! 현재 위치: {TargetTransform.position}");
+
+        Collider[] cols = GetComponentsInChildren<Collider>();
+        foreach (Collider c in cols)
+        {
+            if (c.isTrigger)
+            {
+                c.enabled = false;
+                c.enabled = true;
+            }
+        }
 
         if (activationType == 0 && GameManager.Instance.isHost)
         {

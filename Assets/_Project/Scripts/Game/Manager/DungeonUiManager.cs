@@ -34,7 +34,6 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     private new void Awake()
     {
         base.Awake();
-        startTime = NetworkTimeManager.Instance.GetServerTime();
         resultUIPanel.SetActive(false);
     }
 
@@ -44,6 +43,8 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             StopCoroutine(countdownCoroutine);
         }
+
+        startTime = NetworkTimeManager.Instance.GetServerTime();
 
         countdownCoroutine = StartCoroutine(TimeCount());
     }
@@ -87,33 +88,44 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     private void UpdateTimerUI()
     {
-        long endTime = NetworkTimeManager.Instance.GetServerTime();
-        endTime = endTime - startTime;
+        long elapsedTime = NetworkTimeManager.Instance.GetServerTime() - startTime;
 
-        int minutes = Mathf.FloorToInt(endTime / 60);
-        int seconds = Mathf.FloorToInt(endTime % 60);
+        if (elapsedTime < 0) elapsedTime = 0;
+
+        int minutes = (int)(elapsedTime / 60);
+        int seconds = (int)(elapsedTime % 60);
 
         timeText.text = $"{minutes:00}:{seconds:00}";
     }
 
     private void UpdatePlayerUI()
     {
+        // p1 (여캐) 업데이트
         if (p1 != null)
         {
-          //  player1DestroyText.text = p1.destroyObjectCount.ToString();
             player1PushText.text = p1.pushCount.ToString();
             player1PullText.text = p1.pullCount.ToString();
             player1FallText.text = p1.fallDeathCount.ToString();
-         //   player1FallKillText.text = p1.fallKillCount.ToString();
+        }
+        else
+        {
+            player1PushText.text = "-";
+            player1PullText.text = "-";
+            player1FallText.text = "-";
         }
 
+        // p2 (남캐) 업데이트
         if (p2 != null)
         {
-         //   player2DestroyText.text = p2.destroyObjectCount.ToString();
             player2PushText.text = p2.pushCount.ToString();
             player2PullText.text = p2.pullCount.ToString();
             player2FallText.text = p2.fallDeathCount.ToString();
-         //   player2FallKillText.text = p2.fallKillCount.ToString();
+        }
+        else
+        {
+            player2PushText.text = "-";
+            player2PullText.text = "-";
+            player2FallText.text = "-";
         }
     }
 

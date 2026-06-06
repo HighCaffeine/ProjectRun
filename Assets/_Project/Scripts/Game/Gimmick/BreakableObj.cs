@@ -27,14 +27,18 @@ public class BreakableObj : BaseGimmick
 
     public override void ResetGimmick()
     {
-        if (fractureObj != null)
+        if (fractureObj != null) fractureObj.ResetFracture();
+        TargetTransform.gameObject.SetActive(true);
+
+        Collider[] cols = GetComponentsInChildren<Collider>(true);
+        foreach (Collider col in cols)
         {
-            fractureObj.ResetFracture();
+            col.enabled = true;
+            col.gameObject.layer = LayerMask.NameToLayer("Actionable");
         }
 
-        TargetTransform.gameObject.SetActive(true);
+        gameObject.layer = LayerMask.NameToLayer("Actionable");
     }
-
     private void BreakObject(long attackerUUID)
     {
         Vector3 pushDir = Vector3.left;

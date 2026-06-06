@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
 {
+    public LobbyPlayerInfoUI playerInfoUI;
+
     [Header("UI Panels")]
     public GameObject lobbyPanel;       // 기존 방 목록 패널
     public GameObject waitingRoomPanel; // 현재 대기방 패널
@@ -46,8 +48,8 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
         mySlot.InitEmpty();
         otherSlot.InitEmpty();
 
-        // 내 정보 먼저 세팅
-        mySlot.SetUser(LocalPlayerInfo.ID, LocalPlayerInfo.Name);
+        mySlot.SetUser(LocalPlayerInfo.ID, LocalPlayerInfo.Name, LocalPlayerInfo.CharacterID);
+
         UpdateBottomButton();
     }
 
@@ -77,31 +79,43 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
         switch ((E_PACKET)packetId)
         {
             case E_PACKET.ROOM_USER_INFO_NTF:
-                var userInfo = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
-                if (userInfo.userUUID != LocalPlayerInfo.ID)
                 {
-                    bool isReady = userReadyStates.ContainsKey(userInfo.userUUID) ? userReadyStates[userInfo.userUUID] : false;
-                    bool isHost = (userInfo.userUUID == currentHostUUID);
+                    var userInfo = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
+                    if (userInfo.userUUID != LocalPlayerInfo.ID)
+                    {
+                        bool isReady = userReadyStates.ContainsKey(userInfo.userUUID) ? userReadyStates[userInfo.userUUID] : false;
+                        bool isHost = (userInfo.userUUID == currentHostUUID);
 
-                    otherSlot.SetUser(userInfo.userUUID, userInfo.userName, isReady, isHost);
+                        otherSlot.SetUser(userInfo.userUUID, userInfo.userName, userInfo.characterID, isReady, isHost);
+                    }
+                    break;
                 }
-                break;
             case E_PACKET.ROOM_NEW_USER_NTF:
-                var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-                if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
-                    bool isReady = userReadyStates.ContainsKey(newUser.userUUID) ? userReadyStates[newUser.userUUID] : false;
-                    bool isHost = (newUser.userUUID == currentHostUUID);
+                    var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
+                    if (newUser.userUUID != LocalPlayerInfo.ID)
+                    {
+                        bool isReady = userReadyStates.ContainsKey(newUser.userUUID) ? userReadyStates[newUser.userUUID] : false;
+                        bool isHost = (newUser.userUUID == currentHostUUID);
 
-                    otherSlot.SetUser(newUser.userUUID, newUser.userName, isReady, isHost);
+                        otherSlot.SetUser(newUser.userUUID, newUser.userName, newUser.characterID, isReady, isHost);
+                    }
+
+                    if (currentHostUUID == LocalPlayerInfo.ID)
+                    {
+                        P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = LocalPlayerInfo.CharacterID };
+                        Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
+                    }
+                    break;
                 }
-                break;
             case E_PACKET.ROOM_LEAVE_USER_NTF:
                 var leaveUser = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
                 if (leaveUser.userUUID == otherSlot.userUUID)
                 {
                     otherSlot.InitEmpty();
                 }
+
+                if (playerInfoUI != null) playerInfoUI.SetInteractable(true);
                 break;
             case E_PACKET.ROOM_READY_STATUS_NTF:
                 {
@@ -120,17 +134,36 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
                     break;
                 }
             case E_PACKET.ROOM_HOST_NTF:
-                var hostNtf = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
-                currentHostUUID = hostNtf.hostUUID;
+                {
+                    var hostNtf = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
+                    currentHostUUID = hostNtf.hostUUID;
 
-                mySlot.SetHost(mySlot.userUUID == currentHostUUID);
-                otherSlot.SetHost(otherSlot.userUUID == currentHostUUID);
-                UpdateBottomButton();
-                break;
+                    mySlot.SetHost(mySlot.userUUID == currentHostUUID);
+                    otherSlot.SetHost(otherSlot.userUUID == currentHostUUID);
+                    UpdateBottomButton();
+
+                    bool isHost = (mySlot.userUUID == currentHostUUID);
+                    if (playerInfoUI != null) playerInfoUI.SetInteractable(isHost);
+                    break;
+                }
             case E_PACKET.ROOM_LEAVE_RESPONSE:
                 waitingRoomPanel.SetActive(false);
                 lobbyPanel.SetActive(true);
                 FindObjectOfType<LobbyRoomManager>()?.RequestRoomList();
+                break;
+            case E_PACKET.ROOM_CHAR_SELECT_NTF:
+                var charNtf = UnsafeCode.ByteArrayToStructure<P_RoomCharSelectNtf>(packet.data);
+
+                if (charNtf.userUUID == currentHostUUID && currentHostUUID != LocalPlayerInfo.ID)
+                {
+                    int forceCharID = (charNtf.charID == 0) ? 1 : 0; // 방장이 0이면 난 1
+
+                    if (playerInfoUI != null)
+                    {
+                        playerInfoUI.ForceSetCharacter(forceCharID);
+                    }
+                    Debug.Log($"[Lobby] 방장이 {charNtf.charID}번, {forceCharID}번으로 자동 전환됨.");
+                }
                 break;
             case E_PACKET.MATCH_START_NTF:
                 var matchStart = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);

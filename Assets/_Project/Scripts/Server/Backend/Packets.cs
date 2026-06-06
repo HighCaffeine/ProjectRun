@@ -23,8 +23,8 @@ public enum E_PACKET : ushort
     ROOM_NEW_USER_NTF = 208,
     ROOM_USER_INFO_NTF = 209,
 
-    ROOM_CHAR_SELECT_REQ = 211,
-    ROOM_CHAR_SELECT_NTF = 212,
+    ROOM_CHAR_SELECT_REQ = 210,
+    ROOM_CHAR_SELECT_NTF = 211,
 
     GAME_START_REQUEST = 215,
 
@@ -167,6 +167,8 @@ public struct P_RoomInfo
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)] public string title;
     [MarshalAs(UnmanagedType.I4)] public int hostPing;
     [MarshalAs(UnmanagedType.I1)] public byte guestReadyState;
+    [MarshalAs(UnmanagedType.I4)] public int hostCharID;
+    [MarshalAs(UnmanagedType.I4)] public int guestCharID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -220,6 +222,7 @@ public struct P_RoomNewUserNotify
 {
     [MarshalAs(UnmanagedType.I8)] public long userUUID;
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)] public string userName;
+    [MarshalAs(UnmanagedType.I4)] public int characterID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -229,6 +232,7 @@ public struct P_RoomUserInfoNotify
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)] public string userName;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 position;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion rotation;
+    [MarshalAs(UnmanagedType.I4)] public int characterID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -285,6 +289,7 @@ public struct P_GameAuthReq
 {
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string AuthToken;
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 33)] public string userName;
+    [MarshalAs(UnmanagedType.I4)] public int characterID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

@@ -35,16 +35,11 @@ public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) ActorManager.Instance.OnPlayerDead(other.name);
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
         if (other.CompareTag("Player"))
         {
             PlayerActor actor = other.GetComponent<PlayerActor>();
-            // 이미 죽어서 공중에 떠 있는 상태가 아닐 때만 다시 죽임
-            if (actor != null && !actor.isDead)
+
+            if (actor != null && actor.IsLocal && !actor.isDead)
             {
                 ActorManager.Instance.OnPlayerDead(other.name);
             }

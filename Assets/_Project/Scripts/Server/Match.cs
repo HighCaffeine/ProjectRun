@@ -22,6 +22,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     public GameObject playerPrefab;
     public Transform cameraPivot;
 
+    private long _pendingHostUUID = -1;
+
     private Dictionary<int, BaseGimmick> _gimmickCache = new Dictionary<int, BaseGimmick>();
     public Dictionary<int, MonsterActor> _monsterCache = new Dictionary<int, MonsterActor>();
 
@@ -68,8 +70,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 P_GameAuthReq authReq = new P_GameAuthReq();
                 authReq.AuthToken = LocalPlayerInfo.AuthToken;
-
                 authReq.userName = LocalPlayerInfo.Name;
+                authReq.characterID = LocalPlayerInfo.CharacterID;
 
                 Client.TCP.SendPacket2(E_PACKET.GAME_AUTH_REQUEST, authReq);
                 Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
@@ -154,7 +156,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var userInfo = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
                 if (userInfo.userUUID != LocalPlayerInfo.ID)
                 {
-                    AddPlayer(userInfo.userUUID, userInfo.userName, userInfo.position.ToVector3());
+                    AddPlayer(userInfo.userUUID, userInfo.userName, userInfo.position.ToVector3(), userInfo.characterID);
                     Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
                 }
                 break;
@@ -187,22 +189,29 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     if (GameManager.Instance == null) break;
                     var hostPkt = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
 
-                    // 서버가 지정한 방장 UUID가 내 UUID와 같다면 나는 방장
                     GameManager.Instance.isHost = (hostPkt.hostUUID == LocalPlayerInfo.ID);
 
-                    Debug.Log($"[Room Host NTF]{hostPkt.hostUUID}");
-                    Debug.Log($"[Room Host NTF]{LocalPlayerInfo.ID}");
+                    foreach (var player in Players.Values)
+                    {
+                        PlayerActor pActor = player.GetComponent<PlayerActor>();
+                        if (pActor != null)
+                        {
+                            pActor.isHost = (player.GetID() == hostPkt.hostUUID);
+                        }
+                    }
 
                     if (GameManager.Instance.isHost)
                     {
-                        Debug.Log("[System] 호스트가 되었습니다");
-                        // TODO: UI 매니저 호출해서 [게임 시작] 버튼 활성화
+                        Debug.Log("[System] 방장이 되었습니다");
                     }
                     else
                     {
-                        Debug.Log($"[System]현재 방장 {hostPkt.hostUUID} ");
-                        // TODO: [게임 시작] 버튼 비활성화 (대기 상태)
+                        Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
                     }
+
+                    if (VliageUiManager.Instance != null)
+                        VliageUiManager.Instance.UpdatePlayerIDUI();
+
                     break;
                 }
 
@@ -462,12 +471,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.PLAYER_DEAD_NTF:
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
+
                     if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
                     {
-                        if (ntf.userUUID != LocalPlayerInfo.ID)
-                        {
-                            ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
-                        }
+                        ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
+                    }
+
+                    if (GameManager.Instance.isHost)
+                    {
+                        ActorManager.Instance.RequestGimmickReset();
                     }
                     break;
                 }
@@ -654,18 +666,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
     }
 
-    private Player AddPlayer(long id, string playerName, Vector3 spawnPos)
+    private Player AddPlayer(long id, string playerName, Vector3 spawnPos, int charID = -1)
     {
         if (Players == null || Players.ContainsKey(id)) return null;
 
+        int finalCharID = (id == LocalPlayerInfo.ID) ? LocalPlayerInfo.CharacterID : charID;
         bool local = LocalPlayerInfo.ID == id;
 
         GameObject playerObj;
 
         try
         {
-
-
             if (playerPrefab != null)
             {
                 playerObj = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
@@ -738,16 +749,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //if (rb != null) Destroy(rb);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
-
-                if (GameManager.Instance.isHost)
-                {
-                    ActorManager.Instance.p1 = pActor;
-                }
-                else
-                {
-                    ActorManager.Instance.p2 = pActor;
-                }
-
                 CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
             }
@@ -774,15 +775,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 rb.isKinematic = true;
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
-                if (GameManager.Instance.isHost)
-                {
-                    ActorManager.Instance.p2 = pActor;
-                }
-                else
-                {
-                    ActorManager.Instance.p1 = pActor;
-                }
-
+                pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
             }
 
             Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
@@ -791,8 +784,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             Player player = playerObj.GetComponent<Player>();
             if (player == null) player = playerObj.AddComponent<Player>();
             player.Init(pActor, playerName, id, local, spawnPos);
+
             Players.Add(id, player);
+            //AssignP1P2();
+            pActor.is2p = (finalCharID == 1);
+
+            if (finalCharID == 0) ActorManager.Instance.p1 = pActor; // 여캐는 무조건 P1
+            else ActorManager.Instance.p2 = pActor;
+
+            // if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
+            // else if (ActorManager.Instance.p2 == null) ActorManager.Instance.p2 = pActor;
+
             VliageUiManager.Instance.UpdatePlayerIDUI();
+
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
             if (pActor != null && pActor.sm != null)
@@ -809,6 +813,31 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
     }
 
+    // private void AssignP1P2()
+    // {
+    //     if (_pendingHostUUID < 0) return;
+    //     if (ActorManager.Instance == null) return;
+
+    //     ActorManager.Instance.p1 = null;
+    //     ActorManager.Instance.p2 = null;
+
+    //     foreach (var player in Players.Values)
+    //     {
+    //         PlayerActor actor = player.GetComponent<PlayerActor>();
+    //         if (actor == null) continue;
+
+    //         if (player.GetID() == _pendingHostUUID)
+    //         {
+    //             ActorManager.Instance.p1 = actor;
+    //         }
+    //         else
+    //         {
+    //             ActorManager.Instance.p2 = actor;
+    //         }
+    //     }
+
+    //     Debug.Log($"[AssignP1P2] p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+    // }
     public void SpawnLocalPlayer(int sectorIndex)
     {
         if (DungeonPointManager.Instance == null) return;
@@ -863,6 +892,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         if (Players != null && Players.TryGetValue(id, out Player player) && player != null)
         {
             Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
+
+            if (player.gameObject != null)
+            {
+                ActorManager.Instance.RemovePlayer(player.gameObject.name);
+            }
+
             Destroy(player.gameObject);
             Players.Remove(id);
         }

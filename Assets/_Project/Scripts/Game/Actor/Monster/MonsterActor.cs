@@ -82,6 +82,15 @@ public class MonsterActor : Actor
         {
             Match.Instance._monsterCache[this.monsterID] = this;
         }
+
+        if (!IsLocal)
+        {
+            CharacterController cc = GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
+
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb != null) rb.isKinematic = true;
+        }
     }
 
     private void Update()
@@ -114,7 +123,6 @@ public class MonsterActor : Actor
         else
         {
             ProcessRemoteMovement();
-            sm.Update();
         }
 
         UpdateMaterialByState();

@@ -85,22 +85,52 @@ public class ActionState : IState
     private void ProcessGimmickTarget()
     {
         Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
-        Vector3 pushDir = dirToTarget.normalized;
-        pushDir.y = 0;
-
-        // Pull일 경우 방향 반전
-        if (actionType == eState.Pull) pushDir = -pushDir;
-
-        float moveDist = (actionType == eState.Push) ? 3f : Mathf.Max(0f, dirToTarget.magnitude - 1.5f);
-        Vector3 destPos;
-
-        if (targetGimmick.gimmickType == eGimmickType.Movable)
+        Vector3 pushDir = Vector3.forward;
+        if (actor is PlayerActor pActor)
         {
-            destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, pushDir, moveDist);
+            pushDir = pActor.Is2p ? pActor.GetForward() : pActor.GetActionDir();
         }
         else
         {
-            destPos = targetGimmick.transform.position + (pushDir * moveDist);
+            pushDir = actor.transform.forward;
+        }
+        pushDir.y = 0;
+        pushDir.Normalize();
+
+        Vector3 destPos;
+        float moveDist;
+
+        if (actionType == eState.Pull)
+        {
+            // 플레이어 앞 1.5f 고정 지점으로 당겨옴, 오버슈트 방지
+            Vector3 pullDestPos = actor.transform.position + pushDir * 1.5f;
+            pullDestPos.y = targetGimmick.transform.position.y;
+
+            float pullDist = Vector3.Distance(targetGimmick.transform.position, pullDestPos);
+
+            if (targetGimmick.gimmickType == eGimmickType.Movable)
+            {
+                destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, -pushDir, pullDist);
+            }
+            else
+            {
+                destPos = pullDestPos;
+            }
+
+            moveDist = pullDist;
+        }
+        else // Push
+        {
+            moveDist = 3f;
+
+            if (targetGimmick.gimmickType == eGimmickType.Movable)
+            {
+                destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, pushDir, moveDist);
+            }
+            else
+            {
+                destPos = targetGimmick.transform.position + pushDir * moveDist;
+            }
         }
 
         destPos.y = targetGimmick.transform.position.y;
@@ -123,8 +153,10 @@ public class ActionState : IState
         {
             if (targetGimmick.gimmickType == eGimmickType.Movable)
             {
+                // Pull은 -pushDir(반전), Push는 pushDir 그대로
+                Vector3 sendDir = (actionType == eState.Pull) ? -pushDir : pushDir;
                 float scaledForce = (moveDist / 3.0f) * pushForce;
-                SendGimmickInteractPacket(pushDir * scaledForce);
+                SendGimmickInteractPacket(sendDir * scaledForce);
             }
             else
             {

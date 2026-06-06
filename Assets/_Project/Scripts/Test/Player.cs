@@ -9,6 +9,8 @@ public class Player : MonoBehaviour
     [SerializeField] private long id;
     [SerializeField] private bool isLocal;
 
+    public long GetID() => id;
+
     [Header("Sync Data")]
     public Vector3 serverPos;
     [SerializeField] private Quaternion serverRot;

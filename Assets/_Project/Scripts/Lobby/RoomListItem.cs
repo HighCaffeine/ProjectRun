@@ -17,6 +17,9 @@ public class RoomListItem : MonoBehaviour
     [SerializeField] private Image guestPlayerBlockImage;
     [SerializeField] private Image guestPlayerImage;
 
+    [Header("Character Portraits")]
+    [SerializeField] private Sprite[] portraitSprites;
+
     private Image hostSlotBox;
     private Image guestSlotBox;
 
@@ -71,6 +74,16 @@ public class RoomListItem : MonoBehaviour
             }
 
             //pingText.text = $"<color={pingColor}>{currentPing}ms</color>";
+        }
+
+        Debug.Log($"[RoomListItem] roomNum={info.roomNum}, hostCharID={info.hostCharID}, guestCharID={info.guestCharID}");
+        if (portraitSprites != null && portraitSprites.Length > 1)
+        {
+            if (hostPlayerImage != null)
+                hostPlayerImage.sprite = portraitSprites[info.hostCharID];
+
+            if (guestPlayerImage != null)
+                guestPlayerImage.sprite = portraitSprites[info.guestCharID];
         }
 
         if (hostPlayerBlockImage != null)

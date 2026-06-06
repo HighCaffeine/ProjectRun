@@ -4,6 +4,8 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
+    public bool isHost;
+
     private const float MOVE_ACCEL_VALUE = 10f;
 
     private Camera cam;
@@ -453,12 +455,15 @@ public class PlayerActor : Actor
     public void PlayerDead(Vector3 pos, float spawnDelay)
     {
 
-        if (isDead || !controller) return;
+        if (isDead) return;
 
         isDead = true;
 
         verticalVelocity = 0f;
-        controller.enabled = false;
+        if (controller != null)
+        {
+            controller.enabled = false;
+        }
 
         pos.y += 1.5f;
         transform.position = pos;
@@ -474,7 +479,13 @@ public class PlayerActor : Actor
     IEnumerator RespawnAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
-        controller.enabled = true;
+
+        Physics.SyncTransforms();
+
+        if (controller != null)
+        {
+            controller.enabled = true;
+        }
         verticalVelocity = 0f;
         isDead = false;
         playerPivot.gameObject.SetActive(true);
