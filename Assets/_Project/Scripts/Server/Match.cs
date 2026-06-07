@@ -873,6 +873,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             player.Init(pActor, playerName, id, local, spawnPos);
 
             Players.Add(id, player);
+
             //AssignP1P2();
             //pActor.is2p = (finalCharID == 1);
 

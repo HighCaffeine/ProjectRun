@@ -1,9 +1,9 @@
 using TMPro;
 using UnityEngine;
 
-public class VliageUiManager : MonoBehaviour
+public class VillageUiManager : MonoBehaviour
 {
-    public static VliageUiManager Instance;
+    public static VillageUiManager Instance;
     public TextMeshProUGUI player1IDUi;
     public TextMeshProUGUI player2IDUi;
 
@@ -13,6 +13,9 @@ public class VliageUiManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI userGoldText;
     [SerializeField] private TextMeshProUGUI debtGoldText;
+
+
+    [SerializeField] private GameObject deadPanel;
     private void Awake()
     {
         Instance = this;
@@ -46,10 +49,11 @@ public class VliageUiManager : MonoBehaviour
     {
         if (dialoguePanel.activeSelf)
         {
+            Debug.Log("∏Æ≈œµ ");
             return;
         }
-        GameManager.Instance.Calculate();
         dialoguePanel.SetActive(true);
+        GameManager.Instance.Calculate();
         resultWindow.Play("Open");
     }
 
@@ -62,4 +66,26 @@ public class VliageUiManager : MonoBehaviour
     {
         debtGoldText.text = $": {gold}";
     }
+
+    public void TutorialDialog()
+    {
+        DialogueManager.Instance.StartDialogue("TutorialText");
+    }
+
+    public void ShowDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(true);
+        }
+    }
+
+    public void HideDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(false);
+        }
+    }
 }
+    

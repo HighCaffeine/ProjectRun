@@ -27,6 +27,7 @@ public class EscapeZone : MonoBehaviour
             if (escapePlayers.Count < 2) return;
 
             isTriggered = true;
+
             Exit();
         }
         else

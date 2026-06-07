@@ -1,9 +1,13 @@
 using System.Collections;
 using TMPro;
+using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 {
+    [SerializeField]
     private Coroutine countdownCoroutine;
 
     private long startTime;
@@ -27,24 +31,54 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     [Header("Result UI")]
     [SerializeField] private GameObject resultUIPanel;
+    [SerializeField] private Animator diaryBG;
+    [SerializeField] private PlayerActor p1;
+    [SerializeField] private PlayerActor p2;
 
-    private PlayerActor p1;
-    private PlayerActor p2;
+    [SerializeField] private GameObject settingPanel;
+
+    [SerializeField] private GameObject progress;
+    private Coroutine progressCoroutine;
+
+
+    [SerializeField] private GameObject deadPanel;
 
     private new void Awake()
     {
         base.Awake();
         resultUIPanel.SetActive(false);
+
     }
 
+    private void Start()
+    {
+        settingPanel.SetActive(false);
+        progress.SetActive(false);
+        startTime = NetworkTimeManager.Instance.GetServerTime();
+        StartCount();
+    }
+    private void Update()
+    {
+        if (DungeonIntroController.Instance != null && DungeonIntroController.Instance.director.state == UnityEngine.Playables.PlayState.Playing)
+        {
+            return;
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleSetting();
+        }
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            ProGressUi.Instance.instage = true;
+            ShowProgress();
+        }
+    }
     public void StartCount()
     {
         if (countdownCoroutine != null)
         {
             StopCoroutine(countdownCoroutine);
         }
-
-        startTime = NetworkTimeManager.Instance.GetServerTime();
 
         countdownCoroutine = StartCoroutine(TimeCount());
     }
@@ -75,57 +109,44 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     private void FindPlayers()
     {
-        if (p1 == null && ActorManager.Instance != null)
-        {
-            p1 = ActorManager.Instance.p1;
-        }
+        if (p1 != null && p2 != null)
+            return;
 
-        if (p2 == null && ActorManager.Instance != null)
-        {
-            p2 = ActorManager.Instance.p2;
-        }
+        if (ActorManager.Instance == null)
+            return;
+
+        p1 ??= ActorManager.Instance.p1;
+        p2 ??= ActorManager.Instance.p2;
     }
 
     private void UpdateTimerUI()
     {
-        long elapsedTime = NetworkTimeManager.Instance.GetServerTime() - startTime;
+        long elapsedMs = NetworkTimeManager.Instance.GetServerTime() - startTime;
 
-        if (elapsedTime < 0) elapsedTime = 0;
-
-        int minutes = (int)(elapsedTime / 60);
-        int seconds = (int)(elapsedTime % 60);
+        int minutes = (int)(elapsedMs / 1000 / 60);
+        int seconds = (int)(elapsedMs / 1000 % 60);
 
         timeText.text = $"{minutes:00}:{seconds:00}";
     }
 
     private void UpdatePlayerUI()
     {
-        // p1 (ì—¬ìº) ì—…ë°ì´íŠ¸
         if (p1 != null)
         {
+            //  player1DestroyText.text = p1.destroyObjectCount.ToString();
             player1PushText.text = p1.pushCount.ToString();
             player1PullText.text = p1.pullCount.ToString();
             player1FallText.text = p1.fallDeathCount.ToString();
-        }
-        else
-        {
-            player1PushText.text = "-";
-            player1PullText.text = "-";
-            player1FallText.text = "-";
+            //   player1FallKillText.text = p1.fallKillCount.ToString();
         }
 
-        // p2 (ë‚¨ìº) ì—…ë°ì´íŠ¸
         if (p2 != null)
         {
+            //   player2DestroyText.text = p2.destroyObjectCount.ToString();
             player2PushText.text = p2.pushCount.ToString();
             player2PullText.text = p2.pullCount.ToString();
             player2FallText.text = p2.fallDeathCount.ToString();
-        }
-        else
-        {
-            player2PushText.text = "-";
-            player2PullText.text = "-";
-            player2FallText.text = "-";
+            //   player2FallKillText.text = p2.fallKillCount.ToString();
         }
     }
 
@@ -140,5 +161,68 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             resultUIPanel.SetActive(true);
         }
+    }
+
+    public void ToggleSetting()
+    {
+        if (settingPanel == null)
+            return;
+
+        settingPanel.SetActive(!settingPanel.activeSelf);
+    }
+    public void Exit()
+    {
+        P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
+
+        Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
+        Debug.Log("[System] Å»Ãâ ¿äÃ» ÆÐÅ¶ Àü¼Û ¿Ï·á");
+    }
+
+
+    public void ShowProgress()
+    {
+        if (progressCoroutine != null)
+        {
+            StopCoroutine(progressCoroutine);
+        }
+
+        progressCoroutine = StartCoroutine(ShowProgressRoutine());
+    }
+
+    private IEnumerator ShowProgressRoutine()
+    {
+        progress.SetActive(true);
+        yield return null;
+    }
+
+
+    public void ProGressDialog()
+    {
+        DialogueManager.Instance.StartDialogue("ProGressText");
+    }
+
+
+    public void ShowDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(true);
+        }
+    }
+
+    public void HideDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(false);
+        }
+    }
+
+    public void DiaryGather()
+    {
+        if (diaryBG == null)
+            return;
+
+        diaryBG.Play("Gather");
     }
 }

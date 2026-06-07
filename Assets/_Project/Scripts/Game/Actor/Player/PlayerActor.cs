@@ -136,7 +136,7 @@ public class PlayerActor : Actor
         {
             if (Input.GetKeyDown(KeyCode.R)) TEST_ResetToStage1();
 
-            if (sm.currentState is IdleState || sm.currentState is MoveState)
+            if (sm.currentState is IdleState || sm.currentState is MoveState || sm.currentState is AimState)
             {
                 CheckActionIntent();
                 HandleInput();
@@ -198,21 +198,7 @@ public class PlayerActor : Actor
         platformDelta = Vector3.zero;
     }
 
-    public bool CheckActionInput()
-    {
-        if (Is2p)
-        {
-            if (Input.GetKeyDown(KeyCode.F)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
-            if (Input.GetKeyDown(KeyCode.G)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
-            if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
-        }
-        return false;
-    }
-
+   
     private Vector3 CalculateWallSlide(Vector3 move)
     {
         if (move == Vector3.zero) return move;
@@ -476,11 +462,10 @@ public class PlayerActor : Actor
         playerPivot.gameObject.SetActive(false);
         StartCoroutine(RespawnAfterDelay(spawnDelay));
         fallDeathCount++;
-        Debug.Log(gameObject.name + "Die" + fallDeathCount);
-
     }
     IEnumerator RespawnAfterDelay(float delay)
     {
+        DeadPanelOn();
         yield return new WaitForSecondsRealtime(delay);
 
         Physics.SyncTransforms();
@@ -491,6 +476,7 @@ public class PlayerActor : Actor
         }
         verticalVelocity = 0f;
         isDead = false;
+        DeadPanelOff();
         playerPivot.gameObject.SetActive(true);
 
         if (IsLocal)
@@ -499,7 +485,29 @@ public class PlayerActor : Actor
         }
     }
 
-
+    void DeadPanelOn()
+    {
+        if (DungeonUiManager.Instance != null)
+        {
+            DungeonUiManager.Instance.ShowDeadPanel();
+        }
+        if (VillageUiManager.Instance != null)
+        {
+            VillageUiManager.Instance.ShowDeadPanel();
+        }
+    }
+    
+    void DeadPanelOff()
+    {
+        if (DungeonUiManager.Instance != null)
+        {
+            DungeonUiManager.Instance.HideDeadPanel();
+        }
+        if (VillageUiManager.Instance != null)
+        {
+            VillageUiManager.Instance.HideDeadPanel();
+        }
+    }
     public void ForceSendMovePacket()
     {
         SendMovePacket(h, v);
@@ -562,20 +570,11 @@ public class PlayerActor : Actor
         float targetH = 0f;
         float targetV = 0f;
 
-        if (!Is2p)
-        {
-            if (Input.GetKey(KeyCode.W)) targetV += 1f;
-            if (Input.GetKey(KeyCode.S)) targetV -= 1f;
-            if (Input.GetKey(KeyCode.A)) targetH -= 1f;
-            if (Input.GetKey(KeyCode.D)) targetH += 1f;
-        }
-        else
-        {
-            if (Input.GetKey(KeyCode.UpArrow)) targetV += 1f;
-            if (Input.GetKey(KeyCode.DownArrow)) targetV -= 1f;
-            if (Input.GetKey(KeyCode.LeftArrow)) targetH -= 1f;
-            if (Input.GetKey(KeyCode.RightArrow)) targetH += 1f;
-        }
+
+        if (Input.GetKey(KeyCode.W)) targetV += 1f;
+        if (Input.GetKey(KeyCode.S)) targetV -= 1f;
+        if (Input.GetKey(KeyCode.A)) targetH -= 1f;
+        if (Input.GetKey(KeyCode.D)) targetH += 1f;
 
         h = Mathf.MoveTowards(h, targetH, Time.deltaTime * MOVE_ACCEL_VALUE);
         v = Mathf.MoveTowards(v, targetV, Time.deltaTime * MOVE_ACCEL_VALUE);
@@ -649,6 +648,20 @@ public class PlayerActor : Actor
                 base.animator = characterModels[i].GetComponent<Animator>();
             }
         }
+    }
+    public override Vector3 GetPushDir()
+    {
+        Vector3 dir = GetActionDir();
+
+        dir.y = 0f;
+
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            dir = transform.forward;
+            dir.y = 0f;
+        }
+
+        return dir.normalized;
     }
 }
 

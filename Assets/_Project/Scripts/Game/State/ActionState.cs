@@ -131,6 +131,18 @@ public class ActionState : IState
 
         if (targetActor != null)
         {
+            if (actor is PlayerActor player)
+            {
+                if (actionType == eState.Push)
+                {
+                    player.pushCount++;
+                }
+                else if (actionType == eState.Pull)
+                {
+                    player.pullCount++;
+                }
+            }
+            
             ProcessActorTarget();
             return;
         }
@@ -353,7 +365,7 @@ public class ActionState : IState
         }
 
         return startPos + pushDir * pushDistance;
-    }
+    } 
 
     // ──────────────────────────────────────────────
     // Execute 헬퍼

@@ -11,7 +11,7 @@ public class GoldManager : GenericSingleton<GoldManager>
         set
         {
             userGold = value;
-            VliageUiManager.Instance.UpdateGoldText(userGold);
+            VillageUiManager.Instance.UpdateGoldText(userGold);
         }
     }
 
@@ -21,7 +21,7 @@ public class GoldManager : GenericSingleton<GoldManager>
         set
         {
             debtGold = value;
-            VliageUiManager.Instance.UpdateDebtText(debtGold);
+            VillageUiManager.Instance.UpdateDebtText(debtGold);
         }
     }
 
@@ -31,7 +31,7 @@ public class GoldManager : GenericSingleton<GoldManager>
         set
         {
             resultGold = value;
-            VliageUiManager.Instance.resultWindow.GetComponent<AniEvent>().gold = resultGold; 
+            VillageUiManager.Instance.resultWindow.GetComponent<AniEvent>().gold = resultGold; 
         }
     }
 

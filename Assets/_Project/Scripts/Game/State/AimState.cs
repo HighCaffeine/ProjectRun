@@ -50,6 +50,16 @@ public class AimState : IState
         }
 
         actor.LookAtDirection(aimDir, true);
+        if (actor.HasMoveIntent())
+        {
+            Vector3 moveDir = actor.GetMovementDirection();
+            actor.animator.SetBool("Move", true);
+            actor.Move(moveDir, actor.MoveSpeed* 0.6f);
+        }
+        else
+        {
+            actor.animator.SetBool("Move", false);
+        }
         FindBestTarget(aimDir);
 
         // 플레이어일 경우에만 조준선 시각화
@@ -93,6 +103,7 @@ public class AimState : IState
         {
             pActor.HideAimLine();
         }
+        actor.animator.SetBool("Move", false);
     }
 
     private void FindBestTarget(Vector3 searchForward)

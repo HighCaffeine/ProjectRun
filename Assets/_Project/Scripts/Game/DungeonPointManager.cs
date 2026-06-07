@@ -1,6 +1,9 @@
+using NUnit;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 // 구역(Sector) 단위로 데이터를 묶어서 관리하는 구조체
 [Serializable]
@@ -53,7 +56,6 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
         if (currentSectorIndex + 1 >= mapData.sectors.Length)
         {
             Debug.Log("[Dungeon] 맵의 마지막 구역입니다.");
-            UiManager.Instance.ShowResult();
             return;
         }
 
@@ -61,8 +63,13 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 
         Vector3 spawnPos = GetSpawnPosition(currentMapID, currentSectorIndex);
         Debug.Log($"[Dungeon] 다음 구역 이동: Map {currentMapID} - Sector {currentSectorIndex}");
-
+        SetCurrentMap(currentMapID);
         ActorManager.Instance.UpdateAllSpawnPoints(currentMapID, currentSectorIndex);
         ActorManager.Instance.MoveAllPlayersToSector(currentMapID, currentSectorIndex);
+    }
+    public void SetCurrentMap(int mapID)
+    {
+        ProGressUi.Instance.StageUpdate(mapID);
+        DungeonUiManager.Instance.ShowProgress();
     }
 }
