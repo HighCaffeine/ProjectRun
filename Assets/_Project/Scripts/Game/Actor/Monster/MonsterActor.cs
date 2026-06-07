@@ -310,7 +310,7 @@ public class MonsterActor : Actor
         sendTimer += Time.deltaTime;
         if (sendTimer >= Actor.sendInterval)
         {
-            bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.001f;
+            bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.05f;
 
             if (HasMoveIntent() || sm.currentState is KnockbackState || isPositionChanged)
             {
@@ -334,6 +334,7 @@ public class MonsterActor : Actor
         };
 
         Client.UDP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
+        //Client.TCP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
     }
 
     public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)

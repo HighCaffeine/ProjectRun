@@ -475,6 +475,7 @@ public struct P_MonsterMovement
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_MonsterStateNtf
 {
+    [MarshalAs(UnmanagedType.I8)] public long userUUID;
     [MarshalAs(UnmanagedType.I4)] public int monsterID;
     [MarshalAs(UnmanagedType.I1)] public byte newState;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 targetDir;

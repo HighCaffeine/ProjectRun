@@ -140,12 +140,24 @@ public class Platform : BaseGimmick
 
             yield return new WaitForSeconds(waitTime);
 
-            currentTargetPos = (currentTargetPos == endWorldPos) ? startWorldPos : endWorldPos;
+            // startPos에 도달했을 때 리셋
+            if (currentTargetPos == startWorldPos && activationType == 1)
+            {
+                P_GimmickInteractReq req = new P_GimmickInteractReq
+                {
+                    activeUUID = LocalPlayerInfo.ID,
+                    gimmickID = gimmickUID,
+                    gimmickKey = (byte)eGimmickKey.MovePlatform,
+                    state = (byte)eGimmickState.Restore,
+                    targetPos = new P_PacketVector3 { x = startWorldPos.x, y = startWorldPos.y, z = startWorldPos.z },
+                    param = 0f,
+                    timestamp = NetworkTimeManager.Instance.GetServerTime()
+                };
+                Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
+                yield break;
+            }
 
-            // if (activationType == 1 && currentTargetPos == endPos.position)
-            // {
-            //     //break;
-            // }
+            currentTargetPos = (currentTargetPos == endWorldPos) ? startWorldPos : endWorldPos;
         }
     }
 
@@ -185,6 +197,12 @@ public class Platform : BaseGimmick
                 currentTargetPos = endPos.position;
                 StartCoroutine(HostMoveLoop());
             }
+            return;
+        }
+
+        if (activationType == 1 && ntf.state == (byte)eGimmickState.Restore)
+        {
+            ResetGimmick();
             return;
         }
 

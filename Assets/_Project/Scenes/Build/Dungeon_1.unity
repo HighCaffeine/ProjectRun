@@ -60884,6 +60884,8 @@ PlayableDirector:
     value: {fileID: 1177291247}
   - key: {fileID: -54503155860801866, guid: 377475e2a0127444396a1a4ef7bb0694, type: 2}
     value: {fileID: 1763453152}
+  - key: {fileID: 8702592298678000717, guid: 377475e2a0127444396a1a4ef7bb0694, type: 2}
+    value: {fileID: 1548837740}
   m_ExposedReferences:
     m_References:
     - 817f0d42ce65f9647aca92c3af4d1414: {fileID: 1763453151}
@@ -151971,6 +151973,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   lastSkillUseTime: -999
   lastKnockbackTime: -999
+  isHost: 0
   pushMulti: 1.2
   targetLayer:
     serializedVersion: 2

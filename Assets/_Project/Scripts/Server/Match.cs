@@ -145,9 +145,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.ROOM_NEW_USER_NTF:
                 var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
+                Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
                 if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
-                    AddPlayer(newUser.userUUID, newUser.userName, Vector3.zero);
+                    AddPlayer(newUser.userUUID, newUser.userName, Vector3.zero, newUser.characterID);
                     Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
                 }
                 break;
@@ -209,8 +210,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
                     }
 
-                    if (VliageUiManager.Instance != null)
-                        VliageUiManager.Instance.UpdatePlayerIDUI();
+                    if (VliageUiManager.Instance != null) VliageUiManager.Instance.UpdatePlayerIDUI();
 
                     break;
                 }
@@ -603,6 +603,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.MONSTER_MOVEMENT:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterMovement>(packet.data);
+
+                    Debug.Log($"[MonsterMovement] monsterID={pkt.monsterID}, inCache={_monsterCache.ContainsKey(pkt.monsterID)}, cacheKeys={string.Join(",", _monsterCache.Keys)}");
+
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
                         targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion());
@@ -754,9 +757,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             }
             else // 리모트 플레이어
             {
-                //임시 테스트 is2p
-                pActor.is2p = true;
-
                 Collider[] existingCols = playerObj.GetComponents<Collider>();
                 foreach (var c in existingCols) Destroy(c);
                 Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
@@ -787,13 +787,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             Players.Add(id, player);
             //AssignP1P2();
-            pActor.is2p = (finalCharID == 1);
+            //pActor.is2p = (finalCharID == 1);
 
             if (finalCharID == 0) ActorManager.Instance.p1 = pActor; // 여캐는 무조건 P1
             else ActorManager.Instance.p2 = pActor;
 
-            // if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
-            // else if (ActorManager.Instance.p2 == null) ActorManager.Instance.p2 = pActor;
+            //if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
+            //else if (ActorManager.Instance.p2 == null) ActorManager.Instance.p2 = pActor;
 
             VliageUiManager.Instance.UpdatePlayerIDUI();
 
@@ -803,6 +803,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 pActor.sm.ChangeState(new IdleState(pActor));
             }
+
+            Debug.Log(
+    $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+            Debug.Log(
+            $"AddPlayer name={playerName} charID={finalCharID}");
 
             return player;
         }

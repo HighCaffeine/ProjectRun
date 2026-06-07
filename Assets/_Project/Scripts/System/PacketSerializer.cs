@@ -251,8 +251,9 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterStateNtf(P_MonsterStateNtf p)
     {
-        var buf = new byte[42]; //4+1+12+4+1+12
+        var buf = new byte[50]; //8+4+1+12+4+1+12
         int o = 0;
+        Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
         buf[o++] = p.newState;
         Write(buf, ref o, p.targetDir.x);
@@ -268,7 +269,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterDeadReq(P_MonsterDeadReq p)
     {
-        var buf = new byte[4]; //4
+        var buf = new byte[12]; //8+4
         int o = 0;
         Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
@@ -277,8 +278,9 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterMovement(P_MonsterMovement p)
     {
-        var buf = new byte[32]; //4+12+16
+        var buf = new byte[40]; //8+4+12+16
         int o = 0;
+        Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
         Write(buf, ref o, p.currentPos.x);
         Write(buf, ref o, p.currentPos.y);
