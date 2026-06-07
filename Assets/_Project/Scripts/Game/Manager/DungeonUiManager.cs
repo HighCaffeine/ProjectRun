@@ -31,7 +31,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     [Header("Result UI")]
     [SerializeField] private GameObject resultUIPanel;
-
+    [SerializeField] private Animator diaryBG;
     [SerializeField] private PlayerActor p1;
     [SerializeField] private PlayerActor p2;
 
@@ -59,7 +59,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     }
     private void Update()
     {
-        if(DungeonIntroController.Instance != null && DungeonIntroController.Instance.director.state == UnityEngine.Playables.PlayState.Playing)
+        if (DungeonIntroController.Instance != null && DungeonIntroController.Instance.director.state == UnityEngine.Playables.PlayState.Playing)
         {
             return;
         }
@@ -67,7 +67,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             ToggleSetting();
         }
-        if(Input.GetKeyDown(KeyCode.Tab) )
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             ProGressUi.Instance.instage = true;
             ShowProgress();
@@ -133,20 +133,20 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     {
         if (p1 != null)
         {
-          //  player1DestroyText.text = p1.destroyObjectCount.ToString();
+            //  player1DestroyText.text = p1.destroyObjectCount.ToString();
             player1PushText.text = p1.pushCount.ToString();
             player1PullText.text = p1.pullCount.ToString();
             player1FallText.text = p1.fallDeathCount.ToString();
-         //   player1FallKillText.text = p1.fallKillCount.ToString();
+            //   player1FallKillText.text = p1.fallKillCount.ToString();
         }
 
         if (p2 != null)
         {
-         //   player2DestroyText.text = p2.destroyObjectCount.ToString();
+            //   player2DestroyText.text = p2.destroyObjectCount.ToString();
             player2PushText.text = p2.pushCount.ToString();
             player2PullText.text = p2.pullCount.ToString();
             player2FallText.text = p2.fallDeathCount.ToString();
-         //   player2FallKillText.text = p2.fallKillCount.ToString();
+            //   player2FallKillText.text = p2.fallKillCount.ToString();
         }
     }
 
@@ -175,7 +175,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
 
         Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-        Debug.Log("[System] 탈출 요청 패킷 전송 완료");   
+        Debug.Log("[System] 탈출 요청 패킷 전송 완료");
     }
 
 
@@ -208,7 +208,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             deadPanel.SetActive(true);
         }
-    }   
+    }
 
     public void HideDeadPanel()
     {
@@ -216,5 +216,13 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         {
             deadPanel.SetActive(false);
         }
+    }
+
+    public void DiaryGather()
+    {
+        if (diaryBG == null)
+            return;
+
+        diaryBG.Play("Gather");
     }
 }

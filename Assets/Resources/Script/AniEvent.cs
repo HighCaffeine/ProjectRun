@@ -85,6 +85,13 @@ public class AniEvent : MonoBehaviour
         
         diaryBG.Play("Spread");
     }
+
+    public void DiaryClose()
+    {
+        if (diary == null)
+            return;
+        diary.Play("Close");
+    }
     public void PlayDiaryDimmed()
     {
         if(diaryDimmed == null) 

@@ -70156,6 +70156,7 @@ MonoBehaviour:
   player2FallText: {fileID: 1803787221}
   player2FallKillText: {fileID: 1803787220}
   resultUIPanel: {fileID: 1489266179}
+  diaryBG: {fileID: 0}
   p1: {fileID: 0}
   p2: {fileID: 0}
   settingPanel: {fileID: 2108060418}
@@ -71386,7 +71387,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1322249926370639694, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1467687299138682286, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
       propertyPath: m_Color.a
@@ -71519,7 +71520,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6892141700390192034, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1880594291}
   m_SourcePrefab: {fileID: 100100000, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
 --- !u!224 &1803787214 stripped
 RectTransform:
@@ -75611,6 +75615,35 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1268172685716536529, guid: b9de56e80e15f3a4d9cf8cdd1d6c5401, type: 3}
   m_PrefabInstance: {fileID: 1871995109}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1880594289 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6892141700390192034, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
+  m_PrefabInstance: {fileID: 1803787213}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1880594290 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6414166952019619725, guid: 004638f302b5eb2478da28d6eba2ded0, type: 3}
+  m_PrefabInstance: {fileID: 1803787213}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1880594291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1880594289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cfe6d80d4301084e8a8a7bf5d1e4ef1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AniEvent
+  moneyEffect: {fileID: 0}
+  gold: 0
+  stamp: {fileID: 0}
+  dialogueManager: {fileID: 0}
+  diaryDimmed: {fileID: 0}
+  diaryBG: {fileID: 0}
+  diary: {fileID: 1880594290}
 --- !u!43 &1882423377
 Mesh:
   m_ObjectHideFlags: 0
