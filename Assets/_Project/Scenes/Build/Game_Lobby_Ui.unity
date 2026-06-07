@@ -17545,75 +17545,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: aba41c1b3d6cf8b45ad30f7deb0e6275, type: 3}
   m_PrefabInstance: {fileID: 234806290}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &312726768
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 3637604745295841880, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4357494613103905100, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7898950515565763866, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_Name
-      value: ToonShaderTest
-      objectReference: {fileID: 0}
-    - target: {fileID: 7898950515565763866, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 8.959213
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.07902998
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.0753403
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.38240913
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0.9239931
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 855.034
-      objectReference: {fileID: 0}
-    - target: {fileID: 8274125665974329371, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e11cad2751eb10c409c7ea82aebc4cf2, type: 3}
 --- !u!1 &314274157
 GameObject:
   m_ObjectHideFlags: 0
@@ -18105,6 +18036,7 @@ MonoBehaviour:
   cameraDefaultPos: {fileID: 0}
   playerPrefab: {fileID: 7512768161361523997, guid: 2c01e932e27160f46bf50bfb7c6a5609, type: 3}
   cameraPivot: {fileID: 1980322080}
+  isRemoteSpawnAllowed: 0
 --- !u!4 &423868194
 Transform:
   m_ObjectHideFlags: 0
@@ -20621,10 +20553,42 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 994975202430445075, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 994975202430445075, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 24e9108eeec904c458eed000319593b3, type: 2}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -5968235118441240360, guid: 24e9108eeec904c458eed000319593b3, type: 2}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4222241393875307483, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: dialogueManager
       value: 
       objectReference: {fileID: 1303734085}
+    - target: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 7083554967630756265, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -25744,5 +25708,4 @@ SceneRoots:
   - {fileID: 1154136968}
   - {fileID: 1832259260}
   - {fileID: 1968220069}
-  - {fileID: 312726768}
   - {fileID: 1927505100}

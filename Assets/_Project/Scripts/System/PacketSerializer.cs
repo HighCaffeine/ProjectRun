@@ -20,7 +20,7 @@ public static class PacketSerializer
             case P_GameAuthReq p: return SerializeGameAuthReq(p);
             case P_PlayerMovement p: return SerializePlayerMovement(p);
             case P_PlayerStatusNtf p: return SerializePlayerStatus(p);
-            case P_DungeonEscapeReq p: return new byte[] { p.dummy };
+            case P_DungeonEscapeReq p: return SerializeDungeonEscapeReq(p);
             case P_GimmickInteractReq p: return SerializeGimmickInteractReq(p);
             case P_GimmickBulkResetReq p: return SerializeGimmickBulkResetReq(p);
             case P_PlayerDeadReq p: return SerializePlayerDeadReq(p);
@@ -136,7 +136,15 @@ public static class PacketSerializer
 
     static byte[] SerializeDungeonEscapeReq(P_DungeonEscapeReq p)
     {
-        return new byte[] { p.dummy };
+        var buf = new byte[24]; // 4 + 4 + 4 + 4 + 4 + 4
+        int o = 0;
+        Write(buf, ref o, p.p1Push);
+        Write(buf, ref o, p.p1Pull);
+        Write(buf, ref o, p.p1Fall);
+        Write(buf, ref o, p.p2Push);
+        Write(buf, ref o, p.p2Pull);
+        Write(buf, ref o, p.p2Fall);
+        return buf;
     }
 
     static byte[] SerializeGimmickInteractReq(P_GimmickInteractReq p)

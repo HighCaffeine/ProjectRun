@@ -41,6 +41,9 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
 
     [SerializeField] private GameObject deadPanel;
+                        
+    [SerializeField] private Button returnToVillageButton;
+    private P_DungeonClearNtf finalResultData;
 
     private new void Awake()
     {
@@ -149,18 +152,18 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         }
     }
 
-    public void ShowResult()
-    {
-        StopCount();
+    // public void ShowResult()
+    // {
+    //     StopCount();
 
-        UpdateTimerUI();
-        UpdatePlayerUI();
+    //     UpdateTimerUI();
+    //     UpdatePlayerUI();
 
-        if (resultUIPanel != null)
-        {
-            resultUIPanel.SetActive(true);
-        }
-    }
+    //     if (resultUIPanel != null)
+    //     {
+    //         resultUIPanel.SetActive(true);
+    //     }
+    // }
 
     public void ToggleSetting()
     {
@@ -223,5 +226,63 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
             return;
 
         diaryBG.Play("Gather");
+    }
+
+    public void SetFinalResult(P_DungeonClearNtf data)
+    {
+        finalResultData = data;
+    }
+
+    public void ShowResult()
+    {
+        StopCount();
+        FindPlayers(); // ← 강제로 한 번 더 탐색
+
+        int minutes = finalResultData.clearTimeSeconds / 60;
+        int seconds = finalResultData.clearTimeSeconds % 60;
+        timeText.text = $"{minutes:00}:{seconds:00}";
+
+        if (p1 != null)
+        {
+            player1PushText.text = finalResultData.p1Push.ToString();
+            player1PullText.text = finalResultData.p1Pull.ToString();
+            player1FallText.text = finalResultData.p1Fall.ToString();
+        }
+        if (p2 != null)
+        {
+            player2PushText.text = finalResultData.p2Push.ToString();
+            player2PullText.text = finalResultData.p2Pull.ToString();
+            player2FallText.text = finalResultData.p2Fall.ToString();
+        }
+
+        if (resultUIPanel != null)
+        {
+            resultUIPanel.SetActive(true);
+        }
+
+        if (returnToVillageButton != null)
+        {
+            returnToVillageButton.enabled = GameManager.Instance.isHost;
+        }
+    }
+
+    public void OnClick_ReturnToVillage()
+    {
+        if (!GameManager.Instance.isHost) return;
+
+        P_DungeonReturnVillageReq req = new P_DungeonReturnVillageReq();
+        Client.TCP.SendPacket2(E_PACKET.DUNGEON_RETURN_VILLAGE_REQ, req);
+    }
+
+    public void OnReceive_DungeonReturnVillageNtf()
+    {
+        EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+        if (escapeZone != null)
+            escapeZone.GoToVillage();
+        else
+        {
+            GameManager.Instance.DungeonClear();
+            GameManager.Instance.LoadVillage();
+        }
     }
 }

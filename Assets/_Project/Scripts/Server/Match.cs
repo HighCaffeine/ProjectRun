@@ -567,13 +567,40 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             //결과창 -> 컷씬
             case E_PACKET.DUNGEON_CLEAR_NTF:
             {
+                var clearPkt = UnsafeCode.ByteArrayToStructure<P_DungeonClearNtf>(packet.data);
+                
+                if (DungeonUiManager.Instance != null) 
+                {
+                    DungeonUiManager.Instance.SetFinalResult(clearPkt);
+                }
+
                 EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
                 if (escapeZone != null)
                 {
                     if (escapeZone.isFirstShowResult)
+                    {
                         escapeZone.OnActiveResult(); // 결과창 먼저
+                    }
                     else
+                    {
                         SceneCutsceneController.Instance.PlayCutscene(ECutsceneType.DungeonEscape); // 컷씬 먼저
+                    }
+                }
+                break;
+            }
+            case E_PACKET.DUNGEON_RETURN_VILLAGE_NTF:
+            {
+                var pkt = UnsafeCode.ByteArrayToStructure<P_DungeonReturnVillageNtf>(packet.data);
+
+                EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+                if (escapeZone != null)
+                {
+                    escapeZone.GoToVillage();
+                }
+                else
+                {
+                    GameManager.Instance.DungeonClear();
+                    GameManager.Instance.LoadVillage();
                 }
                 break;
             }
@@ -879,15 +906,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             if (finalCharID == 0)
             {
-                ActorManager.Instance.p1 = pActor; // 여캐는 무조건 P1
-                pActor.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
-                pActor.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
+                ActorManager.Instance.p1 = pActor;
             }
             else
             {
                 ActorManager.Instance.p2 = pActor;
-                pActor.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
-                pActor.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
             }
 
             //if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
