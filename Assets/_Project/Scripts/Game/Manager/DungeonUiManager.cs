@@ -191,4 +191,10 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         progress.SetActive(true);
         yield return null;
     }
+
+
+    public void ProGressDialog()
+    {
+        DialogueManager.Instance.StartDialogue("ProGressText");
+    }   
 }

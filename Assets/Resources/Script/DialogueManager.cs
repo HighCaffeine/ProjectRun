@@ -9,14 +9,16 @@ public enum DialogueState
     Typing,
     LineComplete
 }
-public class DialogueManager : MonoBehaviour
+public class DialogueManager : GenericSingleton<DialogueManager>
 {
     [Header("UI")]
-    [SerializeField] private GameObject dialoguePanel;
+    public GameObject dialoguePanel;
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text dialogueText;
-
     [SerializeField] private RawImage nextIcon;
+    [SerializeField] private RawImage portraitImage;
+    [SerializeField] private Texture[] portraits;
+
 
     [Header("Typing")]
     [SerializeField] private float typingSpeed = 0.03f;
@@ -58,6 +60,11 @@ public class DialogueManager : MonoBehaviour
         DialogueLine line = currentDialogue.lines[currentIndex];
 
         nameText.text = line.speaker;
+
+        if (line.portrait >= 0 &&line.portrait < portraits.Length)
+        {
+            portraitImage.texture = portraits[line.portrait];
+        }
 
         if (typingCoroutine != null)
             StopCoroutine(typingCoroutine);

@@ -1,0 +1,54 @@
+{
+  "lines": [
+    {
+      "speaker": "사채업자",
+      "text": "아무것도 모르는 듯하네요.",
+      "portrait": 5
+    },
+    {
+      "speaker": "사채업자",
+      "text": "그럴 줄은 알았지만요.",
+      "portrait": 4
+    },
+    {
+      "speaker": "사채업자",
+      "text": "W, A, S, D로 이동.",
+      "portrait": 0
+    },
+    {
+      "speaker": "사채업자",
+      "text": "생각보다 복잡하진 않죠?",
+      "portrait": 4
+    },
+    {
+      "speaker": "사채업자",
+      "text": "좌클릭은 밀치기.",
+      "portrait": 0
+    },
+    {
+      "speaker": "사채업자",
+      "text": "우클릭은 당기기.",
+      "portrait": 0
+    },
+    {
+      "speaker": "사채업자",
+      "text": "사람을 밀든, 끌어오든.",
+      "portrait": 2
+    },
+    {
+      "speaker": "사채업자",
+      "text": "그 결과까지 제가 책임지진 않아요.",
+      "portrait": 4
+    },
+    {
+      "speaker": "사채업자",
+      "text": "이 정도는 기억하실 수 있을 거예요.",
+      "portrait": 1
+    },
+    {
+      "speaker": "사채업자",
+      "text": "아마도.",
+      "portrait": 4
+    }
+  ]
+}

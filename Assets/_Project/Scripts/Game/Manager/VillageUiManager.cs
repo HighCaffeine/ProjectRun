@@ -63,4 +63,10 @@ public class VillageUiManager : MonoBehaviour
     {
         debtGoldText.text = $": {gold}";
     }
+
+    public void TutorialDialog()
+    {
+        DialogueManager.Instance.StartDialogue("TutorialText");
+    }
 }
+    
