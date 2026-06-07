@@ -167,7 +167,7 @@ public class WaitingRoomManager : MonoBehaviour, IPacketReceiver
                 break;
             case E_PACKET.MATCH_START_NTF:
                 var matchStart = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);
-                Debug.Log($"[Handover] 게임 서버로 이사갑니다! 포트: {matchStart.GameServerPort}, 토큰: {matchStart.AuthToken}");
+                Debug.Log($"[Handover] 게임 서버로 데이터 전송 포트: {matchStart.GameServerPort}, 토큰: {matchStart.AuthToken}");
 
                 // TODO: 로딩씬 띄우기 -> 로비 소켓 Disconnect -> 게임 서버 포트로 재접속 -> 토큰 전송
                 break;

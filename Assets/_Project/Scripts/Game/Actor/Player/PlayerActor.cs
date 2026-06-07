@@ -4,6 +4,9 @@ using System.Collections;
 
 public class PlayerActor : Actor
 {
+    [Header("0 : 여캐, 1 : 남캐")]
+    public GameObject[] characterModels;
+
     public bool isHost;
 
     private const float MOVE_ACCEL_VALUE = 10f;
@@ -632,6 +635,20 @@ public class PlayerActor : Actor
     {
         PushIndicator.gameObject.SetActive(false);
         PullIndicator.gameObject.SetActive(false);
+    }
+
+    public void InitCharacterModel(int charID)
+    {
+        for (int i = 0; i < characterModels.Length; i++)
+        {
+            bool isSelected = (i == charID);
+            characterModels[i].SetActive(isSelected);
+
+            if (isSelected)
+            {
+                base.animator = characterModels[i].GetComponent<Animator>();
+            }
+        }
     }
 }
 

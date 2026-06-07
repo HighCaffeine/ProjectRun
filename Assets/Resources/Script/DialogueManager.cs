@@ -118,7 +118,7 @@ public class DialogueManager : MonoBehaviour
     {
         currentIndex++;
 
-        // ¸¶Áö¸· ÁÙ±îÁö ¿Ï·á
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù±ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½
         if (currentIndex >= currentDialogue.lines.Count)
         {
             EndDialogue();

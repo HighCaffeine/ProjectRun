@@ -30,6 +30,45 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     //토큰 인증용
     public static bool isServerAuthenticated = false;
 
+#region 타임라인용 스폰 로직
+    public bool isRemoteSpawnAllowed = false; // 타임라인에서 허용하기 전까지는 false
+
+    private struct PendingPlayer
+    {
+        public long uuid;
+        public string name;
+        public Vector3 pos;
+        public int charID;
+    }
+
+    private List<PendingPlayer> _pendingPlayers = new List<PendingPlayer>();
+
+    public struct RoomMemberData
+    {
+        public long uuid;
+        public string name;
+        public int charID;
+    }
+
+    public static Dictionary<long, RoomMemberData> RoomMembersCache = new Dictionary<long, RoomMemberData>();
+
+    public void Signal_SpawnLocalPlayer(int sectorIndex)
+    {
+        SpawnLocalPlayer(sectorIndex);
+    }
+
+    public void Signal_SpawnRemotePlayers()
+    {
+        isRemoteSpawnAllowed = true;
+        foreach (var p in _pendingPlayers)
+        {
+            AddPlayer(p.uuid, p.name, p.pos, p.charID);
+            Debug.Log($"[Match] 유저 스폰 완료 ({p.name})");
+        }
+        _pendingPlayers.Clear();
+    }
+    #endregion
+
     void Awake()
     {
         Debug.Log("Match started");
@@ -56,15 +95,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
 
-                if (DungeonPointManager.Instance != null)
-                {
-                    Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, 0);
-                    AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
-                }
-                else
-                {
-                    AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
-                }
+                // if (DungeonPointManager.Instance != null)
+                // {
+                //     Vector3 spawnPos = DungeonPointManager.Instance.GetSpawnPosition(DungeonPointManager.Instance.currentMapID, 0);
+                //     AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+                // }
+                // else
+                // {
+                //     AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
+                // }
             }
             else // 최초 마을 접속 시에만 인증 요청
             {
@@ -129,7 +168,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
 
-                    AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
+                    //AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
                 }
                 else
                 {
@@ -148,7 +187,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
                 if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
-                    AddPlayer(newUser.userUUID, newUser.userName, Vector3.zero, newUser.characterID);
+                    RoomMembersCache[newUser.userUUID] = new RoomMemberData { uuid = newUser.userUUID, name = newUser.userName, charID = newUser.characterID };
+                    //AddPlayer(newUser.userUUID, newUser.userName, Vector3.zero, newUser.characterID);
+                    _pendingPlayers.Add(new PendingPlayer { 
+                        uuid = newUser.userUUID, 
+                        name = newUser.userName, 
+                        pos = Vector3.zero, 
+                        charID = newUser.characterID 
+                        });
+
                     Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
                 }
                 break;
@@ -157,7 +204,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var userInfo = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
                 if (userInfo.userUUID != LocalPlayerInfo.ID)
                 {
-                    AddPlayer(userInfo.userUUID, userInfo.userName, userInfo.position.ToVector3(), userInfo.characterID);
+                    RoomMembersCache[userInfo.userUUID] = new RoomMemberData { uuid = userInfo.userUUID, name = userInfo.userName, charID = userInfo.characterID };
+                    //AddPlayer(userInfo.userUUID, userInfo.userName, userInfo.position.ToVector3(), userInfo.characterID);
+                    _pendingPlayers.Add(new PendingPlayer { 
+                        uuid = userInfo.userUUID, 
+                        name = userInfo.userName, 
+                        pos = userInfo.position.ToVector3(), 
+                        charID = userInfo.characterID 
+                        });
+
                     Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
                 }
                 break;
@@ -183,6 +238,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.ROOM_LEAVE_USER_NTF:
                 var leaveUser = UnsafeCode.ByteArrayToStructure<P_RoomLeaveUserNotify>(packet.data);
                 RemovePlayer(leaveUser.userUUID);
+                _pendingPlayers.RemoveAll(p => p.uuid == leaveUser.userUUID);
+                RoomMembersCache.Remove(leaveUser.userUUID);
                 break;
 
             case E_PACKET.ROOM_HOST_NTF:
@@ -483,13 +540,43 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     break;
                 }
+            //컷신 -> 결과창
+            // case E_PACKET.DUNGEON_CLEAR_NTF:
+            // {
+            //     Debug.Log("<color=cyan>[System] 던전 클리어 NTF 수신</color>");
+
+            //     EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+
+            //     if (escapeZone != null && escapeZone.CutscenePlayed)
+            //     {
+            //         GameManager.Instance.DungeonClear();
+            //         GameManager.Instance.LoadVillage();
+            //     }
+            //     else
+            //     {
+            //         if (SceneCutsceneController.Instance != null)
+            //             SceneCutsceneController.Instance.PlayCutscene(ECutsceneType.DungeonEscape);
+            //         else
+            //         {
+            //             escapeZone?.OnActiveResult();
+            //         }
+            //     }
+            //     break;
+            // }
+
+            //결과창 -> 컷씬
             case E_PACKET.DUNGEON_CLEAR_NTF:
+            {
+                EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+                if (escapeZone != null)
                 {
-                    Debug.Log("<color=cyan>[System] 던전 클리어</color>");
-                    GameManager.Instance.DungeonClear();
-                    GameManager.Instance.LoadVillage();
-                    break;
+                    if (escapeZone.isFirstShowResult)
+                        escapeZone.OnActiveResult(); // 결과창 먼저
+                    else
+                        SceneCutsceneController.Instance.PlayCutscene(ECutsceneType.DungeonEscape); // 컷씬 먼저
                 }
+                break;
+            }
             // case E_PACKET.MOVE_PATH_RESPONSE:
             //     P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
 
@@ -789,8 +876,18 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             //AssignP1P2();
             //pActor.is2p = (finalCharID == 1);
 
-            if (finalCharID == 0) ActorManager.Instance.p1 = pActor; // 여캐는 무조건 P1
-            else ActorManager.Instance.p2 = pActor;
+            if (finalCharID == 0)
+            {
+                ActorManager.Instance.p1 = pActor; // 여캐는 무조건 P1
+                pActor.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+                pActor.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
+            }
+            else
+            {
+                ActorManager.Instance.p2 = pActor;
+                pActor.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+                pActor.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
+            }
 
             //if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
             //else if (ActorManager.Instance.p2 == null) ActorManager.Instance.p2 = pActor;
@@ -803,6 +900,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 pActor.sm.ChangeState(new IdleState(pActor));
             }
+
+            pActor.InitCharacterModel(finalCharID);
 
             Debug.Log(
     $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
@@ -858,6 +957,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         else
         {
             p = AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, spawnPos);
+        }
+
+        foreach (var member in RoomMembersCache.Values)
+        {
+            if (member.uuid != LocalPlayerInfo.ID && !Players.ContainsKey(member.uuid))
+            {
+                AddPlayer(member.uuid, member.name, spawnPos, member.charID);
+            }
         }
 
         if (p == null) return;

@@ -272,9 +272,18 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
 
                     if (userInfoNtf.userUUID != LocalPlayerInfo.ID)
                     {
-                        int forceCharID = (userInfoNtf.characterID == 0) ? 1 : 0;
-                        if (playerInfoUI != null) playerInfoUI.ForceSetCharacter(forceCharID);
-                        Debug.Log($"[Lobby] 상대 캐릭터={userInfoNtf.characterID}, 내 캐릭터 강제={forceCharID}");
+                        if (!myRoomIsHost && userInfoNtf.characterID == LocalPlayerInfo.CharacterID)
+                        {
+                            int oppositeCharID = (userInfoNtf.characterID == 0) ? 1 : 0;
+
+                            if (playerInfoUI != null) 
+                            {
+                                playerInfoUI.ForceSetCharacter(oppositeCharID, true);
+                            }
+
+                            P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = oppositeCharID };
+                            Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
+                        }
                     }
                     break;
                 }
@@ -293,7 +302,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                     if (!myRoomIsHost)
                     {
                         int forceCharID = (charNtf.charID == 0) ? 1 : 0;
-                        if (playerInfoUI != null) playerInfoUI.ForceSetCharacter(forceCharID);
+                        if (playerInfoUI != null) playerInfoUI.ForceSetCharacter(forceCharID, false);
 
                         RequestRoomList();
                     }

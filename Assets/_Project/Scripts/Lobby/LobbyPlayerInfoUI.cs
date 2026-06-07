@@ -35,13 +35,35 @@ public class LobbyPlayerInfoUI : MonoBehaviour
         if (changeCharacterButton != null) changeCharacterButton.interactable = isEnable;
     }
 
-    public void ForceSetCharacter(int charID)
+    public void ForceSetCharacter(int charID, bool isLocal = true)
+{
+    if (isLocal)
     {
-        characterModels[currentCharID].SetActive(false);
+        if (currentCharID >= 0 && currentCharID < characterModels.Length && characterModels[currentCharID] != null)
+        {
+            characterModels[currentCharID].SetActive(false);
+        }
+        
         currentCharID = charID;
         LocalPlayerInfo.CharacterID = currentCharID;
         UpdateCharacterModel();
     }
+    else
+    {
+        for (int i = 0; i < characterModels.Length; i++)
+        {
+            if (characterModels[i] != null)
+            {
+                characterModels[i].SetActive(false);
+            }
+        }
+        
+        if (charID >= 0 && charID < characterModels.Length && characterModels[charID] != null)
+        {
+            characterModels[charID].SetActive(true);
+        }
+    }
+}
 
     public void OnClickChangeCharacter()
     {
@@ -51,7 +73,7 @@ public class LobbyPlayerInfoUI : MonoBehaviour
         UpdateCharacterModel();
 
         var lobbyMgr = FindObjectOfType<LobbyRoomManager>();
-        if (lobbyMgr != null && lobbyMgr.isInsideRoom)
+        if (lobbyMgr != null /*&& lobbyMgr.isInsideRoom*/)
         {
             P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = currentCharID };
             Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
@@ -73,6 +95,7 @@ public class LobbyPlayerInfoUI : MonoBehaviour
 
     private void UpdateCharacterModel()
     {
+        Debug.Log($"<color=red>[DEBUG] 모델 업데이트 호출됨! 호출위치 스택 확인: </color>\n{System.Environment.StackTrace}");
         for (int i = 0; i < characterModels.Length; i++)
         {
             if (characterModels[i] != null)

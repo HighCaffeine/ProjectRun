@@ -35,6 +35,8 @@ public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
+        if (SceneCutsceneController.Instance != null && SceneCutsceneController.Instance.IsPlayingCutscene) return;
+
         if (other.CompareTag("Player"))
         {
             PlayerActor actor = other.GetComponent<PlayerActor>();
