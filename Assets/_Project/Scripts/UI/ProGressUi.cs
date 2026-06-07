@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AdaptivePerformance.Provider;
@@ -17,7 +18,7 @@ public class ProGressUi : GenericSingleton<ProGressUi>
 
     public bool instage = false;
 
-
+    public Action OnProgressFinished;
     private void OnEnable()
     {
         CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
@@ -97,6 +98,9 @@ public class ProGressUi : GenericSingleton<ProGressUi>
         }
 
         instage= false;
+
+        OnProgressFinished?.Invoke();
+        OnProgressFinished = null;
 
         gameObject.SetActive(false);
     }
