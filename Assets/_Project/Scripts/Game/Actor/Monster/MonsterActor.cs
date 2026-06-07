@@ -33,7 +33,7 @@ public class MonsterActor : Actor
 
     private Coroutine stunCoroutine;
 
-    [SerializeField] private MeshRenderer meshRenderer;
+    [SerializeField] private SkinnedMeshRenderer meshRenderer;
     [SerializeField] private Material normalMat;
     [SerializeField] private Material stunnedMat;
 
@@ -256,7 +256,7 @@ public class MonsterActor : Actor
     {
         if (meshRenderer == null)
         {
-            meshRenderer = GetComponentInChildren<MeshRenderer>();
+            meshRenderer = GetComponentInChildren<SkinnedMeshRenderer>();
         }
         Material[] mats = meshRenderer.materials;
 
