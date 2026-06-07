@@ -457,10 +457,12 @@ public class PlayerActor : Actor
     }
     IEnumerator RespawnAfterDelay(float delay)
     {
+        DeadPanelOn();
         yield return new WaitForSecondsRealtime(delay);
         controller.enabled = true;
         verticalVelocity = 0f;
         isDead = false;
+        DeadPanelOff();
         playerPivot.gameObject.SetActive(true);
 
         if (IsLocal)
@@ -469,7 +471,29 @@ public class PlayerActor : Actor
         }
     }
 
-
+    void DeadPanelOn()
+    {
+        if (DungeonUiManager.Instance != null)
+        {
+            DungeonUiManager.Instance.ShowDeadPanel();
+        }
+        if (VillageUiManager.Instance != null)
+        {
+            VillageUiManager.Instance.ShowDeadPanel();
+        }
+    }
+    
+    void DeadPanelOff()
+    {
+        if (DungeonUiManager.Instance != null)
+        {
+            DungeonUiManager.Instance.HideDeadPanel();
+        }
+        if (VillageUiManager.Instance != null)
+        {
+            VillageUiManager.Instance.HideDeadPanel();
+        }
+    }
     public void ForceSendMovePacket()
     {
         SendMovePacket(h, v);

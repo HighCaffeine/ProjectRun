@@ -13,6 +13,9 @@ public class VillageUiManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI userGoldText;
     [SerializeField] private TextMeshProUGUI debtGoldText;
+
+
+    [SerializeField] private GameObject deadPanel;
     private void Awake()
     {
         Instance = this;
@@ -67,6 +70,22 @@ public class VillageUiManager : MonoBehaviour
     public void TutorialDialog()
     {
         DialogueManager.Instance.StartDialogue("TutorialText");
+    }
+
+    public void ShowDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(true);
+        }
+    }
+
+    public void HideDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(false);
+        }
     }
 }
     

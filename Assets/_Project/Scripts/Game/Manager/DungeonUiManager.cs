@@ -40,6 +40,9 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     [SerializeField] private GameObject progress;
     private Coroutine progressCoroutine;
 
+
+    [SerializeField] private GameObject deadPanel;
+
     private new void Awake()
     {
         base.Awake();
@@ -196,5 +199,22 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     public void ProGressDialog()
     {
         DialogueManager.Instance.StartDialogue("ProGressText");
+    }
+
+
+    public void ShowDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(true);
+        }
     }   
+
+    public void HideDeadPanel()
+    {
+        if (deadPanel != null)
+        {
+            deadPanel.SetActive(false);
+        }
+    }
 }

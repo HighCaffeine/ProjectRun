@@ -60021,7 +60021,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 881344733019813723, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2055012034548677392, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_IsActive
@@ -61507,6 +61507,8 @@ GameObject:
   - component: {fileID: 1548779453}
   - component: {fileID: 1548779455}
   - component: {fileID: 1548779454}
+  - component: {fileID: 1548779457}
+  - component: {fileID: 1548779456}
   m_Layer: 5
   m_Name: DeadPanel
   m_TagString: Untagged
@@ -61571,6 +61573,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1548779452}
   m_CullTransparentMesh: 1
+--- !u!225 &1548779456
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548779452}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1548779457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548779452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6658a764ac27e4e4e8b8ef90426e2a7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fade
+  fadeDuration: 0.5
+  start: 0
+  end: 1
 --- !u!1 &1548837738
 GameObject:
   m_ObjectHideFlags: 0
@@ -70131,6 +70160,7 @@ MonoBehaviour:
   p2: {fileID: 0}
   settingPanel: {fileID: 2108060418}
   progress: {fileID: 1607763735}
+  deadPanel: {fileID: 1548779452}
 --- !u!4 &1745204260
 Transform:
   m_ObjectHideFlags: 0
@@ -152750,6 +152780,10 @@ PrefabInstance:
     - target: {fileID: 188716741084349474, guid: 4222e768b633fa14789f5feb6dc6cf7b, type: 3}
       propertyPath: m_Name
       value: Monster
+      objectReference: {fileID: 0}
+    - target: {fileID: 188716741084349474, guid: 4222e768b633fa14789f5feb6dc6cf7b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3595597417652243657, guid: 4222e768b633fa14789f5feb6dc6cf7b, type: 3}
       propertyPath: m_LocalPosition.x
