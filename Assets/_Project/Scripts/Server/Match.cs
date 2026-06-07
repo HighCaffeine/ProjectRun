@@ -267,7 +267,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
                     }
 
-                    if (VliageUiManager.Instance != null) VliageUiManager.Instance.UpdatePlayerIDUI();
+                    if (VillageUiManager.Instance != null) VillageUiManager.Instance.UpdatePlayerIDUI();
 
                     break;
                 }
@@ -893,7 +893,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             //if (ActorManager.Instance.p1 == null) ActorManager.Instance.p1 = pActor;
             //else if (ActorManager.Instance.p2 == null) ActorManager.Instance.p2 = pActor;
 
-            VliageUiManager.Instance.UpdatePlayerIDUI();
+            VillageUiManager.Instance.UpdatePlayerIDUI();
 
             Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 

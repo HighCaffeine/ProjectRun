@@ -18,7 +18,6 @@ public class AniEvent : MonoBehaviour
     private void Start()
     {
         StampOff();
-        DiaryOff();
         DiaryDimmedOff();
        /* if(diaryDimmed != null)
         {

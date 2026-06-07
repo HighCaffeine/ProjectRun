@@ -142,7 +142,7 @@ public class ActionState : IState
                     player.pullCount++;
                 }
             }
-            
+
             ProcessActorTarget();
             return;
         }
@@ -165,8 +165,16 @@ public class ActionState : IState
             ? pushForce
             : Mathf.Max(0f, minDistance - 1.5f);
 
-        Vector3 knockbackDir = dirToTarget.normalized;
+     Vector3 knockbackDir;
 
+        if (actionType == eState.Push)
+        {
+            knockbackDir = actor.GetPushDir();
+        }
+        else
+        {
+            knockbackDir = -dirToTarget.normalized;
+        }
         if (actionType == eState.Pull)
         {
             if (targetActor is Monster monster)
@@ -211,7 +219,7 @@ public class ActionState : IState
 
     private void ProcessGimmickTarget()
     {
-        Vector3 pushDir = GetPushDirection();
+        Vector3 pushDir = actor.GetPushDir();
 
         Vector3 destPos;
         float moveDist;

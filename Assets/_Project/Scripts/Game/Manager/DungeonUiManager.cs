@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,7 +58,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     }
     private void Update()
     {
-        if (DungeonIntroController.Instance != null && DungeonIntroController.Instance.director.state == UnityEngine.Playables.PlayState.Playing)
+        if (SceneCutsceneController.Instance != null && SceneCutsceneController.Instance._currentCutscene.director.state == UnityEngine.Playables.PlayState.Playing)
         {
             return;
         }
@@ -175,7 +174,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
 
         Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-        Debug.Log("[System] Å»Ãâ ¿äÃ» ÆÐÅ¶ Àü¼Û ¿Ï·á");
+        Debug.Log("[System] Å»ï¿½ï¿½ ï¿½ï¿½Ã» ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½");
     }
 
 

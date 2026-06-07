@@ -37,7 +37,7 @@ public class SceneCutsceneController : MonoBehaviour
     [Header("현재 씬에 존재하는 컷씬 데이터들")]
     public CutsceneData[] sceneCutscenes;
 
-    private CutsceneData _currentCutscene;
+    public CutsceneData _currentCutscene;
     private bool _isPlayingCutscene = false;
 
     public bool IsPlayingCutscene => _isPlayingCutscene;
@@ -132,6 +132,11 @@ public class SceneCutsceneController : MonoBehaviour
                 Debug.LogWarning("[Cutscene] EscapeZone을 찾을 수 없습니다.");
             }
             return;
+        }
+
+        if (_currentCutscene.cutsceneType == ECutsceneType.DungeonEnter)
+        {
+            DungeonPointManager.Instance.SetCurrentMap(DungeonPointManager.Instance.currentMapID); 
         }
 
         if (_currentCutscene.spawnAtEnd && Match.Instance != null)

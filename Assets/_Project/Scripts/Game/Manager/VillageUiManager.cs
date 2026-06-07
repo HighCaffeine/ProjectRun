@@ -26,6 +26,7 @@ public class VillageUiManager : MonoBehaviour
     {
         if (GameManager.IsDungeonCleared)
         {
+            GameManager.IsDungeonCleared =false;
             OnResult();
         }
     }
@@ -49,7 +50,6 @@ public class VillageUiManager : MonoBehaviour
     {
         if (dialoguePanel.activeSelf)
         {
-            Debug.Log("∏Æ≈œµ ");
             return;
         }
         dialoguePanel.SetActive(true);
@@ -59,12 +59,12 @@ public class VillageUiManager : MonoBehaviour
 
     public void UpdateGoldText(int gold)
     {
-        userGoldText.text = $" : {gold}";
+        userGoldText.text = $" {gold}";
     }
 
     public void UpdateDebtText(int gold)
     {
-        debtGoldText.text = $": {gold}";
+        debtGoldText.text = $"{gold}";
     }
 
     public void TutorialDialog()
