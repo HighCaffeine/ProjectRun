@@ -17,6 +17,8 @@ public class MonsterSpawnArea : BaseGimmick
 
     private bool isTriggered = false;
 
+    private List<GameObject> spawnedMonsters = new List<GameObject>();
+
     private void OnTriggerEnter(Collider other)
     {
         if (isTriggered) return;
@@ -57,22 +59,29 @@ public class MonsterSpawnArea : BaseGimmick
             if (data.monsterPrefab != null)
             {
                 GameObject obj = Instantiate(data.monsterPrefab, transform.position, transform.rotation);
-                MonsterActor monster = obj.GetComponent<MonsterActor>();
+                spawnedMonsters.Add(obj); // 추적용 리스트에 추가
 
+                MonsterActor monster = obj.GetComponent<MonsterActor>();
                 if (monster != null)
                 {
-                    // 기믹 ID 1086 -> 108600, 108601 순으로 할당
                     int generatedMonsterID = (this.gimmickUID * 100) + i;
                     monster.InitMonster(generatedMonsterID, transform.position, transform.rotation);
                 }
             }
         }
-
         Debug.Log($"<color=green>[MonsterSpawnArea]</color> ({gimmickUID}) : {spawnList.Count}마리 몬스터 스폰");
     }
     public override void ResetGimmick()
     {
         isTriggered = false;
+
+        // 스폰된 몬스터 오브젝트 제거
+        foreach (var obj in spawnedMonsters)
+        {
+            if (obj != null) Destroy(obj);
+        }
+        spawnedMonsters.Clear();
+
         Debug.Log($"[MonsterSpawnArea] {gimmickUID} 구역 트리거 초기화 완료");
     }
 
