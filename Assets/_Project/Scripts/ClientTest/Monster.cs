@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph;
 using UnityEngine;
 using UnityEngine.AdaptivePerformance.Provider;
 using UnityEngine.Rendering;
@@ -31,7 +30,7 @@ public class Monster : Actor
     [SerializeField]private float heightOffset = 1f;
 
 
-    //ÈÄµô
+    //ï¿½Äµï¿½
     [SerializeField]
     private float attackCooldown = 1f;
     private float lastAttackTime;
@@ -69,7 +68,7 @@ public class Monster : Actor
 
     protected new void Start()
     {
-        usegravity = false;
+        //usegravity = false;
         base.Start();
 
     }
@@ -265,7 +264,7 @@ public class Monster : Actor
         Debug.Log(sm.currentState);
         if (sm.currentState is ActionState actionState)
         {
-            actionState.OnMonsterAttackHit();
+            actionState.OnAttackHit();
         }
     }
 }

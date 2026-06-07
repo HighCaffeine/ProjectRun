@@ -2,14 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum MonsterState
-{
-    Normal,
-    Knockback,
-    Stunned,
-    Dead
-}
-
 public class MonsterActor : Actor
 {
     [Header("Monster Network Sync")]
@@ -93,41 +85,41 @@ public class MonsterActor : Actor
         }
     }
 
-    private void Update()
+private void Update()
+{
+    if (monsterState == MonsterState.Dead) return;
+
+    if (IsLocal)
     {
-        if (monsterState == MonsterState.Dead) return;
+        UpdateTarget();
 
-        if (IsLocal)
+        const float HEIGHT_EPSILON = 0.05f;
+
+        // 1. 높이 조절은 독립적으로 실행
+        if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
         {
-            UpdateTarget();
-
-            const float HEIGHT_EPSILON = 0.05f;
-
-            if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
-            {
-                UpdateHeight();
-            }
-            else
-            {
-                sm.Update();
-                ApplyMovement();
-
-                if (!(sm.currentState is KnockbackState))
-                {
-                    TryChangeToActionState();
-                }
-            }
-
-            HandleNetworkSync();
+            UpdateHeight();
         }
-        else
+        
+        // ★ 2. else를 지우고 무조건 상태머신과 이동을 실행하게 수정!
+        sm.Update();
+        ApplyMovement();
+
+        if (!(sm.currentState is KnockbackState))
         {
-            ProcessRemoteMovement();
+            TryChangeToActionState();
         }
 
-        UpdateMaterialByState();
+        HandleNetworkSync();
+    }
+    else
+    {
+        sm.Update(); // 게스트 애니메이션 업데이트
+        ProcessRemoteMovement(); // 게스트 위치 동기화
     }
 
+    UpdateMaterialByState();
+}
     private void UpdateHeight()
     {
         if (currentTarget == null || controller == null) return;
@@ -160,35 +152,38 @@ public class MonsterActor : Actor
         return sm.currentState is IdleState || sm.currentState is MoveState;
     }
 
-    public PlayerActor GetRandomPlayerTarget()
+    public PlayerActor GetClosestPlayerTarget()
+{
+    if (Match.Instance == null || Match.Instance.Players == null) return null;
+
+    PlayerActor closest = null;
+    float minDistance = float.MaxValue;
+
+    foreach (Player player in Match.Instance.Players.Values)
     {
-        if (Match.Instance == null || Match.Instance.Players == null)
+        if (player == null) continue;
+
+        PlayerActor actor = player.GetComponent<PlayerActor>();
+        if (actor == null || actor.isDead || !actor.gameObject.activeInHierarchy) continue;
+
+        float dist = Vector3.Distance(transform.position, actor.transform.position);
+        if (dist < minDistance)
         {
-            return null;
+            minDistance = dist;
+            closest = actor;
         }
-
-        List<PlayerActor> players = new List<PlayerActor>();
-
-        foreach (Player player in Match.Instance.Players.Values)
-        {
-            if (player == null) continue;
-
-            PlayerActor actor = player.GetComponent<PlayerActor>();
-            if (actor == null || actor.isDead || !actor.gameObject.activeInHierarchy) continue;
-
-            players.Add(actor);
-        }
-
-        if (players.Count == 0) return null;
-
-        return players[Random.Range(0, players.Count)];
     }
 
-    private void ChooseTarget()
-    {
-        if (currentTarget != null && !currentTarget.isDead) return;
-        currentTarget = GetRandomPlayerTarget();
-    }
+    return closest;
+}
+
+private void ChooseTarget()
+{
+    if (currentTarget != null && !currentTarget.isDead) return;
+    
+    // currentTarget = GetRandomPlayerTarget(); <-- 기존 로직 삭제
+    currentTarget = GetClosestPlayerTarget(); // ★ 가장 가까운 타겟으로 변경
+}
 
     // 사망 처리 동기화
     public void RequestMonsterDead(Transform player)
@@ -305,21 +300,25 @@ public class MonsterActor : Actor
         transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
     }
 
-    private void HandleNetworkSync()
-    {
-        sendTimer += Time.deltaTime;
-        if (sendTimer >= Actor.sendInterval)
-        {
-            bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.05f;
+    private Quaternion lastSentRot; 
 
-            if (HasMoveIntent() || sm.currentState is KnockbackState || isPositionChanged)
-            {
-                SendMovePacket(h, v);
-                lastSentPos = transform.position;
-                sendTimer = 0f;
-            }
+private void HandleNetworkSync()
+{
+    sendTimer += Time.deltaTime;
+    if (sendTimer >= Actor.sendInterval)
+    {
+        bool isPositionChanged = Vector3.Distance(transform.position, lastSentPos) > 0.05f;
+        bool isRotationChanged = Quaternion.Angle(transform.rotation, lastSentRot) > 5.0f; 
+
+        if (HasMoveIntent() || sm.currentState is KnockbackState || isPositionChanged || isRotationChanged)
+        {
+            SendMovePacket(h, v);
+            lastSentPos = transform.position;
+            lastSentRot = transform.rotation;
+            sendTimer = 0f;
         }
     }
+}
 
     public override void SendMovePacket(float axisH, float axisV)
     {

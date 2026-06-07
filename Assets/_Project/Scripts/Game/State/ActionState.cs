@@ -361,15 +361,24 @@ public class ActionState : IState
 
     private void UpdateTimer() => timer += Time.deltaTime;
 
-    private void TryReturnToIdle()
+private void TryReturnToIdle()
+{
+    if (actor is Monster && !hitProcessed)
     {
-        if (actor is Monster && !hitProcessed) return;
-
-        float castTime = (actor is Monster) ? CAST_TIME_MONSTER : CAST_TIME_PLAYER;
-        if (timer < castTime) return;
-
-        actor.sm.ChangeState(new IdleState(actor));
+        // ★ 추가된 안전장치: 애니메이션 이벤트가 누락됐어도 1.5초(여유 시간)가 지나면 강제로 Idle로 복귀
+        if (timer > CAST_TIME_MONSTER + 1.0f) 
+        {
+            Debug.LogWarning($"[ActionState] {actor.name}의 공격 애니메이션 이벤트(OnMonsterAttackHit)가 누락되었습니다! 강제로 Idle 전환합니다.");
+            actor.sm.ChangeState(new IdleState(actor));
+        }
+        return;
     }
+
+    float castTime = (actor is Monster) ? CAST_TIME_MONSTER : CAST_TIME_PLAYER;
+    if (timer < castTime) return;
+
+    actor.sm.ChangeState(new IdleState(actor));
+}
 
     // ──────────────────────────────────────────────
     // Exit 헬퍼
@@ -387,7 +396,7 @@ public class ActionState : IState
     // 외부 콜백 (Monster 애니메이션 이벤트 등)
     // ──────────────────────────────────────────────
 
-    public void OnMonsterAttackHit()
+    public void OnAttackHit()
     {
         if (hitProcessed) return;
         hitProcessed = true;
