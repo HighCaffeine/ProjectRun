@@ -193,21 +193,7 @@ public class PlayerActor : Actor
         platformDelta = Vector3.zero;
     }
 
-    public bool CheckActionInput()
-    {
-        if (Is2p)
-        {
-            if (Input.GetKeyDown(KeyCode.F)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
-            if (Input.GetKeyDown(KeyCode.G)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0)) { sm.ChangeState(new ActionState(this, eState.Push)); return true; }
-            if (Input.GetMouseButtonDown(1)) { sm.ChangeState(new ActionState(this, eState.Pull)); return true; }
-        }
-        return false;
-    }
-
+   
     private Vector3 CalculateWallSlide(Vector3 move)
     {
         if (move == Vector3.zero) return move;
@@ -546,20 +532,11 @@ public class PlayerActor : Actor
         float targetH = 0f;
         float targetV = 0f;
 
-        if (!Is2p)
-        {
-            if (Input.GetKey(KeyCode.W)) targetV += 1f;
-            if (Input.GetKey(KeyCode.S)) targetV -= 1f;
-            if (Input.GetKey(KeyCode.A)) targetH -= 1f;
-            if (Input.GetKey(KeyCode.D)) targetH += 1f;
-        }
-        else
-        {
-            if (Input.GetKey(KeyCode.UpArrow)) targetV += 1f;
-            if (Input.GetKey(KeyCode.DownArrow)) targetV -= 1f;
-            if (Input.GetKey(KeyCode.LeftArrow)) targetH -= 1f;
-            if (Input.GetKey(KeyCode.RightArrow)) targetH += 1f;
-        }
+
+        if (Input.GetKey(KeyCode.W)) targetV += 1f;
+        if (Input.GetKey(KeyCode.S)) targetV -= 1f;
+        if (Input.GetKey(KeyCode.A)) targetH -= 1f;
+        if (Input.GetKey(KeyCode.D)) targetH += 1f;
 
         h = Mathf.MoveTowards(h, targetH, Time.deltaTime * MOVE_ACCEL_VALUE);
         v = Mathf.MoveTowards(v, targetV, Time.deltaTime * MOVE_ACCEL_VALUE);

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-public class DungeonIntroController : MonoBehaviour
+public class DungeonIntroController : GenericSingleton<DungeonIntroController>
 {
     public PlayableDirector director;
 
@@ -10,6 +10,7 @@ public class DungeonIntroController : MonoBehaviour
 
     void Start()
     {
+        
         director.stopped += OnCutsceneFinished;
 
         foreach (var cam in cutsceneCameras)
@@ -31,6 +32,9 @@ public class DungeonIntroController : MonoBehaviour
         }
 
         Match.Instance.SpawnLocalPlayer(0); // 플레이어 스폰
+        DungeonPointManager.Instance.SetCurrentMap(DungeonPointManager.Instance.currentMapID); // UI 업데이트
+        Debug.Log("[DungeonIntroController] 컷씬 종료, 플레이어 스폰 및 UI 업데이트");
+        
     }
 
     void OnDestroy()

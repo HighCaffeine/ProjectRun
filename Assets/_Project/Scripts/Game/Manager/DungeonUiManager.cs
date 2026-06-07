@@ -42,7 +42,6 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
     private new void Awake()
     {
-        Debug.Log("ddasdqawtr");
         base.Awake();
         resultUIPanel.SetActive(false);
 
@@ -52,18 +51,22 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     {
         settingPanel.SetActive(false);
         progress.SetActive(false);
-        Debug.Log("dd");
         startTime = NetworkTimeManager.Instance.GetServerTime();
         StartCount();
     }
     private void Update()
     {
+        if(DungeonIntroController.Instance != null && DungeonIntroController.Instance.director.state == UnityEngine.Playables.PlayState.Playing)
+        {
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             ToggleSetting();
         }
-        if(Input.GetKeyDown(KeyCode.Tab))
+        if(Input.GetKeyDown(KeyCode.Tab) )
         {
+            ProGressUi.Instance.instage = true;
             ShowProgress();
         }
     }
@@ -186,9 +189,6 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
     private IEnumerator ShowProgressRoutine()
     {
         progress.SetActive(true);
-
-        yield return new WaitForSeconds(3f);
-
-        progress.SetActive(false);
+        yield return null;
     }
 }

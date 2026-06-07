@@ -15,8 +15,6 @@ public class NextZone : MonoBehaviour
             DungeonPointManager.Instance.currentMapID = targetMapID;
             DungeonPointManager.Instance.currentSectorIndex = targetMapStartIndex;
 
-            DungeonPointManager.Instance.SetCurrentMap(targetMapID, targetMapStartIndex);
-
             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetMapID, targetMapStartIndex);
 
             Debug.Log(destPos);

@@ -1,4 +1,6 @@
+using NUnit;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI.Table;
@@ -29,8 +31,6 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
     public int currentMapID = 1;
     public int currentSectorIndex = 0;
 
-
-    [SerializeField] private ProGressUi proGressUi;
     private new void Awake()
     {
         base.Awake();
@@ -63,16 +63,13 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
 
         Vector3 spawnPos = GetSpawnPosition(currentMapID, currentSectorIndex);
         Debug.Log($"[Dungeon] 다음 구역 이동: Map {currentMapID} - Sector {currentSectorIndex}");
-
+        SetCurrentMap(currentMapID);
         ActorManager.Instance.UpdateAllSpawnPoints(currentMapID, currentSectorIndex);
         ActorManager.Instance.MoveAllPlayersToSector(currentMapID, currentSectorIndex);
     }
-    public void SetCurrentMap(int mapID, int sectorIndex)
+    public void SetCurrentMap(int mapID)
     {
-        currentMapID = mapID;
-        currentSectorIndex = sectorIndex;
-
-        proGressUi.StageUpdate(mapID);
+        ProGressUi.Instance.StageUpdate(mapID);
         DungeonUiManager.Instance.ShowProgress();
     }
 }
