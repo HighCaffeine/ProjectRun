@@ -1,19 +1,26 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
 
 public class ActionState : IState
 {
     private Actor actor;
     private eState actionType;
     private float timer;
-    private const float CAST_TIME = 0.2f;
+
+    private const float CAST_TIME_PLAYER = 0.6f; 
+    private const float CAST_TIME_MONSTER = 0.7f;
+    private const float ATTACK_TIME = 0.05f;
+
+    private const float PLAYER_EFFECT_TIME = 0.15f; 
 
     private float pushForce = 100f;
     private float pow = 2f;
 
     private Actor targetActor;
     private BaseGimmick targetGimmick;
+
+    private bool attackStarted = false;
+    private bool hitProcessed = false;
+    private bool effectProcessed = false; 
 
     public ActionState(Actor actor, eState type, Actor targetActor = null, BaseGimmick targetGimmick = null)
     {
@@ -25,20 +32,80 @@ public class ActionState : IState
         pushForce = (actionType == eState.Push) ? (5f * pow) : (3f * pow);
     }
 
+    // ──────────────────────────────────────────────
+    // IState
+    // ──────────────────────────────────────────────
+
     public void Enter()
     {
-        timer = 0f;
-        actor.animator.SetTrigger((actionType == eState.Push) ? "Push" : "Pull");
+        ResetTimer();
+        TrySendActionState();
+        MarkSkillUseTime();
+        PlayActionEffects();
 
-        if (!actor.IsLocal) return;
-
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+        if (actor is PlayerActor)
         {
-            actor.SendStateChange(actionType);
+            PlayActionAnimation();
+        }
+    }
+
+    public void Execute()
+    {
+        UpdateTimer();
+
+        if (!effectProcessed && timer >= PLAYER_EFFECT_TIME && actor is PlayerActor)
+        {
+            effectProcessed = true;
+            ProcessTarget();
         }
 
-        //actor.lastSkillUseTime = Time.time;
+        // Monster는 ATTACK_TIME 후에 애니메이션 재생 + 히트 판정
+        if (!attackStarted && timer >= ATTACK_TIME && actor is Monster)
+        {
+            attackStarted = true;
+            timer = 0f;
+            PlayActionAnimation();
+        }
+
+        TryReturnToIdle();
+    }
+
+    public void Exit()
+    {
+        StopActionEffects();
+    }
+
+    // ──────────────────────────────────────────────
+    // Enter 헬퍼
+    // ──────────────────────────────────────────────
+
+    private void ResetTimer() => timer = 0f;
+
+    private void PlayActionAnimation()
+        => actor.animator.SetTrigger(GetActionTriggerName());
+
+    private string GetActionTriggerName()
+        => (actionType == eState.Push) ? "Push" : "Pull";
+
+    private void TrySendActionState()
+    {
+        if (!actor.IsLocal) return;
+        if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
+
+        actor.SendStateChange(actionType);
+    }
+
+    private void MarkSkillUseTime()
+    {
+        if (!actor.IsLocal) return;
+
+        // 서버 시간 기준으로 마지막 스킬 사용 시간 기록
         actor.lastSkillUseTime = NetworkTimeManager.Instance.GetServerTime();
+    }
+
+    private void PlayActionEffects()
+    {
+        if (!actor.IsLocal) return;
 
         if (actor is PlayerActor pActor)
         {
@@ -52,130 +119,172 @@ public class ActionState : IState
                 pActor.PullIndicator.gameObject.SetActive(true);
             }
         }
+    }
+
+    // ──────────────────────────────────────────────
+    // 타겟 처리
+    // ──────────────────────────────────────────────
+
+    private void ProcessTarget()
+    {
+        if (!actor.IsLocal) return;
 
         if (targetActor != null)
         {
-            Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
-            dirToTarget.y = 0f;
-            float minDistance = dirToTarget.magnitude;
-
-            float finalDistance = (actionType == eState.Push) ? pushForce : Mathf.Max(0f, minDistance - 1.5f);
-            Vector3 knockbackDir = dirToTarget.normalized;
-
-            if (actionType == eState.Pull) knockbackDir = -knockbackDir;
-            finalDistance *= actor.PushMulti;
-
-            if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
-            {
-                Player p = targetActor.GetComponent<Player>();
-                long targetID = (p != null) ? p.ID : 0;
-                actor.SendStateChange(eState.Knockback, knockbackDir, finalDistance, targetID, actionType == eState.Pull, actor.transform.position);
-            }
-            else
-            {
-                targetActor.sm.ChangeState(new KnockbackState(targetActor, knockbackDir, finalDistance, actionType == eState.Pull, actor.transform.position));
-            }
+            ProcessActorTarget();
+            return;
         }
-        else if (targetGimmick != null)
+
+        if (targetGimmick != null)
         {
             ProcessGimmickTarget();
         }
     }
 
+    // ── Actor 타겟 ──
+
+    private void ProcessActorTarget()
+    {
+        Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
+        dirToTarget.y = 0f;
+        float minDistance = dirToTarget.magnitude;
+
+        float finalDistance = (actionType == eState.Push)
+            ? pushForce
+            : Mathf.Max(0f, minDistance - 1.5f);
+
+        Vector3 knockbackDir = dirToTarget.normalized;
+
+        if (actionType == eState.Pull)
+        {
+            if (targetActor is Monster monster)
+            {
+                if (monster.monsterState == MonsterState.Stunned)
+                    monster.MonsterDead(actor.transform);
+                return;
+            }
+
+            knockbackDir = -knockbackDir;
+        }
+
+        finalDistance *= actor.PushMulti;
+
+        if (ShouldSendActorTargetPacket(out Player targetPlayer))
+        {
+            actor.SendStateChange(
+                eState.Knockback,
+                knockbackDir,
+                finalDistance,
+                targetPlayer.ID,
+                actionType == eState.Pull,
+                actor.transform.position);
+            return;
+        }
+
+        targetActor.sm.ChangeState(new KnockbackState(
+            targetActor, knockbackDir, finalDistance,
+            actionType == eState.Pull, actor.transform.position));
+    }
+
+    private bool ShouldSendActorTargetPacket(out Player targetPlayer)
+    {
+        targetPlayer = targetActor.GetComponent<Player>();
+
+        return actor is PlayerActor
+            && targetPlayer != null
+            && GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online;
+    }
+
+    // ── Gimmick 타겟 ──
+
     private void ProcessGimmickTarget()
     {
-        Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
-        Vector3 pushDir = Vector3.forward;
-        if (actor is PlayerActor pActor)
-        {
-            pushDir = pActor.Is2p ? pActor.GetForward() : pActor.GetActionDir();
-        }
-        else
-        {
-            pushDir = actor.transform.forward;
-        }
-        pushDir.y = 0;
-        pushDir.Normalize();
+        Vector3 pushDir = GetPushDirection();
 
         Vector3 destPos;
         float moveDist;
 
         if (actionType == eState.Pull)
         {
-            // 플레이어 앞 1.5f 고정 지점으로 당겨옴, 오버슈트 방지
             Vector3 pullDestPos = actor.transform.position + pushDir * 1.5f;
             pullDestPos.y = targetGimmick.transform.position.y;
 
-            float pullDist = Vector3.Distance(targetGimmick.transform.position, pullDestPos);
+            moveDist = Vector3.Distance(targetGimmick.transform.position, pullDestPos);
 
-            if (targetGimmick.gimmickType == eGimmickType.Movable)
-            {
-                destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, -pushDir, pullDist);
-            }
-            else
-            {
-                destPos = pullDestPos;
-            }
-
-            moveDist = pullDist;
+            destPos = (targetGimmick.gimmickType == eGimmickType.Movable)
+                ? GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, -pushDir, moveDist)
+                : pullDestPos;
         }
         else // Push
         {
             moveDist = 3f;
 
-            if (targetGimmick.gimmickType == eGimmickType.Movable)
-            {
-                destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, pushDir, moveDist);
-            }
-            else
-            {
-                destPos = targetGimmick.transform.position + pushDir * moveDist;
-            }
+            destPos = (targetGimmick.gimmickType == eGimmickType.Movable)
+                ? GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, pushDir, moveDist)
+                : targetGimmick.transform.position + pushDir * moveDist;
         }
 
         destPos.y = targetGimmick.transform.position.y;
 
         if (targetGimmick.gimmickType == eGimmickType.Breakable)
         {
-            BreakableObj breakable = targetGimmick as BreakableObj;
-            if (breakable != null)
-            {
-                bool canInteract = false;
-                if (breakable.interactMode == BreakableObj.InteractMode.All) canInteract = true;
-                else if (breakable.interactMode == BreakableObj.InteractMode.Push && actionType == eState.Push) canInteract = true;
-                else if (breakable.interactMode == BreakableObj.InteractMode.Pull && actionType == eState.Pull) canInteract = true;
-
-                if (!canInteract) return;
-            }
+            if (!CanInteractWithBreakable()) return;
         }
 
-        if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
+        if (ShouldSendGimmickPacket())
         {
-            if (targetGimmick.gimmickType == eGimmickType.Movable)
-            {
-                // Pull은 -pushDir(반전), Push는 pushDir 그대로
-                Vector3 sendDir = (actionType == eState.Pull) ? -pushDir : pushDir;
-                float scaledForce = (moveDist / 3.0f) * pushForce;
-                SendGimmickInteractPacket(sendDir * scaledForce);
-            }
-            else
-            {
-                SendGimmickInteractPacket(destPos);
-            }
+            SendGimmickInteractPacket(pushDir, moveDist, destPos);
+            return;
         }
-        else
-        {
-            ProcessGimmickLocal(destPos);
-        }
+
+        ApplyGimmickAction(destPos);
     }
 
-    private void SendGimmickInteractPacket(Vector3 targetData)
+    private Vector3 GetPushDirection()
     {
-        byte stateToSend = (byte)eGimmickState.Push;
+        Vector3 dir;
+
+        if (actor is PlayerActor pActor)
+            dir = pActor.Is2p ? pActor.GetForward() : pActor.GetActionDir();
+        else
+            dir = actor.transform.forward;
+
+        dir.y = 0f;
+        dir.Normalize();
+        return dir;
+    }
+
+    private bool CanInteractWithBreakable()
+    {
+        BreakableObj breakable = targetGimmick as BreakableObj;
+        if (breakable == null) return true;
+
+        return breakable.interactMode == BreakableObj.InteractMode.All
+            || (breakable.interactMode == BreakableObj.InteractMode.Push && actionType == eState.Push)
+            || (breakable.interactMode == BreakableObj.InteractMode.Pull && actionType == eState.Pull);
+    }
+
+    private bool ShouldSendGimmickPacket()
+        => actor is PlayerActor
+            && GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online;
+
+    private void SendGimmickInteractPacket(Vector3 pushDir, float moveDist, Vector3 destPos)
+    {
+        byte stateToSend;
+        P_PacketVector3 packetData;
 
         if (targetGimmick.gimmickType == eGimmickType.Movable)
         {
             stateToSend = 5;
+            Vector3 sendDir = (actionType == eState.Pull) ? -pushDir : pushDir;
+            float scaledForce = (moveDist / 3.0f) * pushForce;
+            Vector3 forceVec = sendDir * scaledForce;
+            packetData = new P_PacketVector3 { x = forceVec.x, y = forceVec.y, z = forceVec.z };
+        }
+        else
+        {
+            stateToSend = (byte)eGimmickState.Push;
+            packetData = new P_PacketVector3 { x = destPos.x, y = destPos.y, z = destPos.z };
         }
 
         P_GimmickInteractReq req = new P_GimmickInteractReq
@@ -184,7 +293,7 @@ public class ActionState : IState
             gimmickID = targetGimmick.gimmickUID,
             gimmickKey = (byte)targetGimmick.gimmickType,
             state = stateToSend,
-            targetPos = new P_PacketVector3 { x = targetData.x, y = targetData.y, z = targetData.z },
+            targetPos = packetData,
             param = pushForce,
             timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
@@ -192,116 +301,52 @@ public class ActionState : IState
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
     }
 
-    // private void ProcessGimmickTarget()
-    // {
-    //     Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
-    //     Vector3 pushDir = dirToTarget.normalized;
-    //     pushDir.y = 0;
-
-    //     if (actionType == eState.Pull) pushDir = -pushDir;
-
-    //     float moveDist = (actionType == eState.Push) ? 3f : (dirToTarget.magnitude - 1.5f);
-    //     Vector3 destPos;
-
-    //     if (targetGimmick.gimmickType == eGimmickType.Movable)
-    //     {
-    //         destPos = GetSafePushDestination(targetGimmick.transform.position, targetGimmick.TargetTransform.localScale, pushDir, moveDist);
-    //     }
-    //     else
-    //     {
-    //         destPos = targetGimmick.transform.position + (pushDir * moveDist);
-    //     }
-
-    //     destPos.y = targetGimmick.transform.position.y;
-
-    //     if (targetGimmick.gimmickType == eGimmickType.Breakable)
-    //     {
-    //         BreakableObj breakable = targetGimmick as BreakableObj;
-    //         if (breakable != null)
-    //         {
-    //             bool canInteract = false;
-    //             if (breakable.interactMode == BreakableObj.InteractMode.All) canInteract = true;
-    //             else if (breakable.interactMode == BreakableObj.InteractMode.Push && actionType == eState.Push) canInteract = true;
-    //             else if (breakable.interactMode == BreakableObj.InteractMode.Pull && actionType == eState.Pull) canInteract = true;
-
-    //             if (!canInteract)
-    //             {
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    //     if (GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
-    //     {
-    //         SendGimmickInteractPacket(destPos);
-    //     }
-    //     else
-    //     {
-    //         ProcessGimmickLocal(destPos);
-    //     }
-    // }
-
-    // private void SendGimmickInteractPacket(Vector3 destPos)
-    // {
-    //     Vector3 sendPos = destPos;
-
-    //     // Movable일 때는 destPos 대신 힘벡터 전송
-    //     if (targetGimmick.gimmickType == eGimmickType.Movable)
-    //     {
-    //         Vector3 dirToTarget = targetGimmick.transform.position - actor.transform.position;
-    //         Vector3 pushDir = dirToTarget.normalized;
-    //         pushDir.y = 0;
-    //         if (actionType == eState.Pull) pushDir = -pushDir;
-    //         sendPos = pushDir * pushForce; // 힘이 반영된 방향벡터
-    //     }
-
-    //     P_GimmickInteractReq req = new P_GimmickInteractReq
-    //     {
-    //         activeUUID = LocalPlayerInfo.ID,
-    //         gimmickID = targetGimmick.gimmickUID,
-    //         gimmickKey = (byte)targetGimmick.gimmickType,
-    //         state = (byte)eGimmickState.Push,
-    //         targetPos = new P_PacketVector3 { x = sendPos.x, y = sendPos.y, z = sendPos.z },
-    //         param = pushForce,
-    //         timestamp = NetworkTimeManager.Instance.GetServerTime()
-    //     };
-
-    //     Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-    // }
-
-    private void ProcessGimmickLocal(Vector3 destPos)
+    private void ApplyGimmickAction(Vector3 destPos)
     {
         if (targetGimmick.gimmickType == eGimmickType.Movable)
         {
             ((MovableGimmick)targetGimmick).StartMove(destPos);
+            return;
         }
-        else if (targetGimmick.gimmickType == eGimmickType.Breakable)
+
+        if (targetGimmick.gimmickType == eGimmickType.Breakable)
         {
-            FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
-            if (fracture != null)
-            {
-                Vector3 forward = actor.GetForward();
-                forward.y = 0f;
-                if (forward.sqrMagnitude < 0.0001f)
-                {
-                    forward = actor.transform.forward;
-                    forward.y = 0f;
-                }
-                Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
-                fracture.BreakToDirection(leftDir);
-            }
+            BreakTargetGimmick();
         }
     }
 
-    //movable 오브젝트가 이동하는 곳이 갈 수 있는 곳인지 확인
+    private void BreakTargetGimmick()
+    {
+        FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
+        if (fracture != null)
+        {
+            BreakFractureObject(fracture);
+            return;
+        }
+
+        targetGimmick.stat?.TakeDamage(1, eDamageType.PushPull);
+    }
+
+    private void BreakFractureObject(FractureObject fracture)
+    {
+        Vector3 forward = actor.GetForward();
+        forward.y = 0f;
+
+        if (forward.sqrMagnitude < 0.0001f)
+        {
+            forward = actor.transform.forward;
+            forward.y = 0f;
+        }
+
+        Vector3 leftDir = Vector3.Cross(forward.normalized, Vector3.up).normalized;
+        fracture.BreakToDirection(leftDir);
+    }
+
     private Vector3 GetSafePushDestination(Vector3 startPos, Vector3 targetExtents, Vector3 pushDir, float pushDistance)
     {
-        Vector3 extents = targetExtents;
-
-        // wall로 우선 지정, 3스테이지의 경우 Wall레이어의 빈 오브젝트 추가 필요함
         int wallLayer = LayerMask.GetMask("Wall");
 
-        if (Physics.BoxCast(startPos, extents, pushDir, out RaycastHit hit, Quaternion.identity, pushDistance, wallLayer))
+        if (Physics.BoxCast(startPos, targetExtents, pushDir, out RaycastHit hit, Quaternion.identity, pushDistance, wallLayer))
         {
             float safeDistance = Mathf.Max(0f, hit.distance - 0.05f);
             return startPos + pushDir * safeDistance;
@@ -310,20 +355,42 @@ public class ActionState : IState
         return startPos + pushDir * pushDistance;
     }
 
-    public void Execute()
+    // ──────────────────────────────────────────────
+    // Execute 헬퍼
+    // ──────────────────────────────────────────────
+
+    private void UpdateTimer() => timer += Time.deltaTime;
+
+    private void TryReturnToIdle()
     {
-        timer += Time.deltaTime;
-        if (timer >= CAST_TIME)
-        {
-            actor.sm.ChangeState(new IdleState(actor));
-        }
+        if (actor is Monster && !hitProcessed) return;
+
+        float castTime = (actor is Monster) ? CAST_TIME_MONSTER : CAST_TIME_PLAYER;
+        if (timer < castTime) return;
+
+        actor.sm.ChangeState(new IdleState(actor));
     }
 
-    public void Exit()
+    // ──────────────────────────────────────────────
+    // Exit 헬퍼
+    // ──────────────────────────────────────────────
+
+    private void StopActionEffects()
     {
         if (actor is PlayerActor pActor)
         {
             pActor.InvokeSSaGay();
         }
+    }
+
+    // ──────────────────────────────────────────────
+    // 외부 콜백 (Monster 애니메이션 이벤트 등)
+    // ──────────────────────────────────────────────
+
+    public void OnMonsterAttackHit()
+    {
+        if (hitProcessed) return;
+        hitProcessed = true;
+        ProcessTarget();
     }
 }
