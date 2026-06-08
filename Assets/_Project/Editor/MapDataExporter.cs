@@ -51,19 +51,19 @@ public class MapDataExporter : Editor
         // 선택 확인
         if (selectedObj == null)
         {
-            Debug.LogError("[Export] 오브젝트가 선택되지 않았습니다!");
+            //Debug.LogError("[Export] 오브젝트가 선택되지 않았습니다!");
             return;
         }
-        Debug.Log($"[Export] 선택된 오브젝트: {selectedObj.name}");
+        //Debug.Log($"[Export] 선택된 오브젝트: {selectedObj.name}");
 
         // MapModuleGrid 찾기
         MapModuleGrid[] grids = selectedObj.GetComponentsInChildren<MapModuleGrid>();
-        Debug.Log($"[Export] 찾은 MapModuleGrid 개수: {grids.Length}");
+        //Debug.Log($"[Export] 찾은 MapModuleGrid 개수: {grids.Length}");
 
         if (grids.Length == 0)
         {
-            Debug.LogError("[Export] MapModuleGrid 컴포넌트를 찾을 수 없습니다!");
-            Debug.Log($"[Export Tip] '{selectedObj.name}' 또는 그 자식에 MapModuleGrid 컴포넌트가 있는지 확인하세요.");
+            //Debug.LogError("[Export] MapModuleGrid 컴포넌트를 찾을 수 없습니다!");
+            //Debug.Log($"[Export Tip] '{selectedObj.name}' 또는 그 자식에 MapModuleGrid 컴포넌트가 있는지 확인하세요.");
             return;
         }
 
@@ -106,7 +106,7 @@ public class MapDataExporter : Editor
             }
 
             EditorUtility.SetDirty(info);
-            Debug.Log($"<color=cyan>[Export ID 발급]</color> '{info.gameObject.name}'에 새 ID 할당 -> {autoGimmickId}");
+            //Debug.Log($"<color=cyan>[Export ID 발급]</color> '{info.gameObject.name}'에 새 ID 할당 -> {autoGimmickId}");
         }
 
 
@@ -125,10 +125,10 @@ public class MapDataExporter : Editor
         // 각 Grid 순회
         foreach (MapModuleGrid grid in grids)
         {
-            Debug.Log($"[Export] Grid 처리 중: {grid.gameObject.name}");
+            //Debug.Log($"[Export] Grid 처리 중: {grid.gameObject.name}");
 
             GimmickInfo[] allGimmicks = grid.GetComponentsInChildren<GimmickInfo>(true);
-            Debug.Log($"[Export]   └─ 찾은 GimmickInfo 개수: {allGimmicks.Length}");
+            //Debug.Log($"[Export]   └─ 찾은 GimmickInfo 개수: {allGimmicks.Length}");
 
             foreach (GimmickInfo info in allGimmicks)
             {
@@ -175,7 +175,7 @@ public class MapDataExporter : Editor
                 }
                 else
                 {
-                    Debug.LogWarning($"[Export] 스킵됨: Tag가 {tag}. (Gimmick 또는 Breakable이어야 함)");
+                    //Debug.LogWarning($"[Export] 스킵됨: Tag가 {tag}. (Gimmick 또는 Breakable이어야 함)");
                 }
             }
         }
@@ -183,10 +183,10 @@ public class MapDataExporter : Editor
         // 결과 확인
         if (totalGimmicksFound == 0)
         {
-            Debug.LogError("[Export] 추출된 기믹이 0개입니다!");
-            Debug.LogError("[Export] 확인사항:");
-            Debug.LogError("  1. GimmickInfo 컴포넌트가 붙어있는지");
-            Debug.LogError("  2. Tag가 'Gimmick' 또는 'Breakable'인지");
+            //Debug.LogError("[Export] 추출된 기믹이 0개입니다!");
+            //Debug.LogError("[Export] 확인사항:");
+            //Debug.LogError("  1. GimmickInfo 컴포넌트가 붙어있는지");
+            //Debug.LogError("  2. Tag가 'Gimmick' 또는 'Breakable'인지");
             return;
         }
 
@@ -199,14 +199,14 @@ public class MapDataExporter : Editor
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
-                Debug.Log($"[Export] 디렉토리 생성: {dirPath}");
+                //Debug.Log($"[Export] 디렉토리 생성: {dirPath}");
             }
 
             string filePath = Path.Combine(dirPath, $"{exportData.meta.map_name}_{exportData.meta.version}.json");
             File.WriteAllText(filePath, jsonOutput);
 
-            Debug.Log($"<color=green>[추출 완료]</color> {selectedObj.name} 스테이지 내 {grids.Length}개 레벨에서 총 {exportData.gimmicks.Count}개의 기믹 추출");
-            Debug.Log($"<color=green>[파일 위치]</color> {filePath}");
+            //Debug.Log($"<color=green>[추출 완료]</color> {selectedObj.name} 스테이지 내 {grids.Length}개 레벨에서 총 {exportData.gimmicks.Count}개의 기믹 추출");
+            //Debug.Log($"<color=green>[파일 위치]</color> {filePath}");
 
             AssetDatabase.Refresh();
 
@@ -215,7 +215,7 @@ public class MapDataExporter : Editor
         }
         catch (Exception e)
         {
-            Debug.LogError($"[Export] JSON 저장 실패: {e.Message}");
+            //Debug.LogError($"[Export] JSON 저장 실패: {e.Message}");
         }
     }
 }

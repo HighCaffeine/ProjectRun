@@ -40,7 +40,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
         if (!IPAddress.TryParse(ipStr, out IPAddress parsedIp))
         {
-            Debug.LogError("[System] 올바른 IP 주소 형식이 아닙니다.");
+            //Debug.LogError("[System] 올바른 IP 주소 형식이 아닙니다.");
             return;
         }
 
@@ -51,7 +51,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
             Client.Connect(parsedIp.ToString(), 11020, 5025);
 
             Client.TCP.AddPacketReceiver(this);
-            Debug.Log($"[Network] 로비 서버(11020) 연결 성공 (IP: {parsedIp})");
+            //Debug.Log($"[Network] 로비 서버(11020) 연결 성공 (IP: {parsedIp})");
 
             PlayerPrefs.SetString("ServerIP", parsedIp.ToString());
 
@@ -60,7 +60,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Network] 서버 연결 실패: {ex.Message}");
+            //Debug.LogError($"[Network] 서버 연결 실패: {ex.Message}");
             connectButton.interactable = true;
         }
     }
@@ -70,7 +70,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
     {
         if (Client.TCP == null)
         {
-            Debug.LogError("[System] 서버에 먼저 접속해야 합니다.");
+            //Debug.LogError("[System] 서버에 먼저 접속해야 합니다.");
             return;
         }
 
@@ -84,7 +84,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
         loginReq.userPW = inputName; // 더미
 
         Client.TCP.SendPacket2(E_PACKET.LOGIN_REQUEST, loginReq);
-        Debug.Log($"[Client] 로비로 로그인 요청 전송: {inputName}");
+        //Debug.Log($"[Client] 로비로 로그인 요청 전송: {inputName}");
     }
 
     // 패킷 수신 처리
@@ -101,7 +101,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
                     if (loginRes.result == 0) // 성공
                     {
-                        Debug.Log("<color=cyan>[Client] 로그인 성공! Main_Lobby 씬으로 이동합니다.</color>");
+                        //Debug.Log("<color=cyan>[Client] 로그인 성공! Main_Lobby 씬으로 이동합니다.</color>");
                         LocalPlayerInfo.ID = loginRes.userUUID;
 
                         // 씬 중복 로딩 방지
@@ -112,13 +112,13 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
                     }
                     else
                     {
-                        Debug.LogError($"[Client] 로그인 실패. ErrorCode: {loginRes.result}");
+                        //Debug.LogError($"[Client] 로그인 실패. ErrorCode: {loginRes.result}");
                         joinButton.interactable = true; // 실패 시 버튼 다시 활성화
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[Client] Login Parsing Error: {ex.Message}");
+                    //Debug.LogError($"[Client] Login Parsing Error: {ex.Message}");
                 }
                 break;
         }

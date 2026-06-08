@@ -192,6 +192,6 @@ public class MapEditorWindow : EditorWindow
         Selection.activeGameObject = instantiatedObj;
         Undo.RegisterCreatedObjectUndo(instantiatedObj, $"Spawn {prefabToSpawn.name}");
 
-        Debug.Log($"[MapEditor] [{prefabToSpawn.name}] place to [{targetGrid.name}]");
+        //Debug.Log($"[MapEditor] [{prefabToSpawn.name}] place to [{targetGrid.name}]");
     }
 }

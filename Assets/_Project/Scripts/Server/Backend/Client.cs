@@ -62,7 +62,7 @@ public static unsafe class Client
         UDP = new NetworkClient(newIp, newPort, ProtocolType.Udp);
         UDP.Start();
 
-        Debug.Log($"<color=green>[Network] TCP & UDP -> {newIp}:{newPort} 로 재연결 완료!</color>");
+        //Debug.Log($"<color=green>[Network] TCP & UDP -> {newIp}:{newPort} 로 재연결 완료!</color>");
     }
 
     private static bool OnApplicationQuit()
@@ -82,7 +82,7 @@ public static unsafe class Client
 
     private static void OnDisconnect()
     {
-        Debug.LogWarning("[Network] 서버와 연결이 끊어졌습니다.");
+        //Debug.LogWarning("[Network] 서버와 연결이 끊어졌습니다.");
     }
 
     public static void Close()

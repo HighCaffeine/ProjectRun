@@ -76,7 +76,7 @@ public class RoomListItem : MonoBehaviour
             //pingText.text = $"<color={pingColor}>{currentPing}ms</color>";
         }
 
-        Debug.Log($"[RoomListItem] roomNum={info.roomNum}, hostCharID={info.hostCharID}, guestCharID={info.guestCharID}");
+        ////Debug.Log($"[RoomListItem] roomNum={info.roomNum}, hostCharID={info.hostCharID}, guestCharID={info.guestCharID}");
         if (portraitSprites != null && portraitSprites.Length > 1)
         {
             if (hostPlayerImage != null)

@@ -129,7 +129,7 @@ public class SceneCutsceneController : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("[Cutscene] EscapeZone을 찾을 수 없습니다.");
+                //Debug.LogWarning("[Cutscene] EscapeZone을 찾을 수 없습니다.");
             }
             return;
         }
@@ -142,11 +142,11 @@ public class SceneCutsceneController : MonoBehaviour
         if (_currentCutscene.spawnAtEnd && Match.Instance != null)
         {
             SpawnLocalPlayerOnMatch();
-            Debug.Log($"[Cutscene] 종료. 플레이어 스폰: {_currentCutscene.spawnSectorIndex}");
+            //Debug.Log($"[Cutscene] 종료. 플레이어 스폰: {_currentCutscene.spawnSectorIndex}");
         }
         else
         {
-            Debug.Log($"[Cutscene] {_currentCutscene.cutsceneType} 종료. (자동 스폰 안 함)");
+            //Debug.Log($"[Cutscene] {_currentCutscene.cutsceneType} 종료. (자동 스폰 안 함)");
         }
     }
 

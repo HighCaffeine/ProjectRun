@@ -43,7 +43,7 @@ public class TestPush : MonoBehaviour
         GameObject spawned = Instantiate(playerPrefab, spawnPos, playerPivot.rotation);
         spawned.name = $"Dummy_Target_{Time.frameCount}";
 
-        Debug.Log($"정면에 {spawnPos} 위치로 타겟 B를 스폰했습니다.");
+        //Debug.Log($"정면에 {spawnPos} 위치로 타겟 B를 스폰했습니다.");
     }
 
     void PerformPunch()
@@ -92,7 +92,7 @@ public class TestPush : MonoBehaviour
 
             closestRb.AddForce(finalForce, ForceMode.Impulse);
 
-            Debug.Log($"[{closestRb.name}] 명중 거리: {minDistance:F1}m, 힘 비율: {falloffMultiplier * 100:F0}%");
+            //Debug.Log($"[{closestRb.name}] 명중 거리: {minDistance:F1}m, 힘 비율: {falloffMultiplier * 100:F0}%");
         }
     }
 }

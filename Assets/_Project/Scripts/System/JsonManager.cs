@@ -58,7 +58,7 @@ public class JsonManager : GenericSingleton<JsonManager>
 
         if (www.isDone)
         {
-            Debug.Log("Downloaded");
+            //Debug.Log("Downloaded");
         }
 
         yield return www;

@@ -17,7 +17,7 @@ public class TEST_GimmickResetTrigger : MonoBehaviour
                     break;
                 }
             }
-            Debug.Log($"<color=red>[ActorManager] 파티 전멸!</color> 방장이 섹터 {targetSector} 기믹 초기화를 요청합니다.");
+            //Debug.Log($"<color=red>[ActorManager] 파티 전멸!</color> 방장이 섹터 {targetSector} 기믹 초기화를 요청합니다.");
         }
     }
 }

@@ -39,7 +39,7 @@ public class Inventory : MonoBehaviour
             if (itemID != 0)
             {
                 TradeManager.Instance.OnRegisterItem(slotIndex, 0);
-                Debug.Log($"[Trade] {slotIndex}item cancel");
+                //Debug.Log($"[Trade] {slotIndex}item cancel");
             }
         }
 
@@ -55,11 +55,11 @@ public class Inventory : MonoBehaviour
                 {
                     TradeManager.Instance.OnRegisterItem(slotIndex, itemID);
 
-                    Debug.Log($"[Trade] {itemID} move to trade {emptySlot}slot");
+                    //Debug.Log($"[Trade] {itemID} move to trade {emptySlot}slot");
                 }
                 else
                 {
-                    Debug.Log("[Trade] trade inventory is full");
+                    //Debug.Log("[Trade] trade inventory is full");
                 }
             }
         }
@@ -93,25 +93,25 @@ public class Inventory : MonoBehaviour
             slots[i].UpdateSlot(itemID);
         }
 
-        Debug.Log($"[Inventory] UI Updated)");
+        //Debug.Log($"[Inventory] UI Updated)");
     }
 
     public void SetInventoryByIndex(int index, int itemID)
     {
         if (index < 0 || index >= InventorySize)
         {
-            Debug.LogWarning($"[Inventory] Invalid Slot Index: {index}");
+            //Debug.LogWarning($"[Inventory] Invalid Slot Index: {index}");
             return;
         }
 
         if (slots == null || index >= slots.Length)
         {
-            Debug.LogError("[Inventory] Slots array is not set up correctly");
+            //Debug.LogError("[Inventory] Slots array is not set up correctly");
             return;
         }
 
         slots[index].UpdateSlot(itemID);
 
-        Debug.Log($"[Inventory] Slot {index} updated to Item {itemID}");
+        //Debug.Log($"[Inventory] Slot {index} updated to Item {itemID}");
     }
 }

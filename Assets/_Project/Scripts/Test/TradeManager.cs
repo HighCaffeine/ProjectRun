@@ -222,7 +222,7 @@ public class TradeManager : MonoBehaviour
 
     public void CloseTradeWindow(string msg, bool isSuccess = false)
     {
-        Debug.Log(msg);
+        //Debug.Log(msg);
         tradeWindowPanel.SetActive(false);
 
         if (!isSuccess)
