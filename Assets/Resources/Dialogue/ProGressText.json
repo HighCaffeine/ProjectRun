@@ -3,57 +3,57 @@
     {
       "speaker": "사채업자",
       "text": "방금 보여드린 건 던전 진행도예요.",
-      "portrait": 0
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "길치가 아니라면 금방 이해하실 텐데.",
-      "portrait": 4
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "하얗게 빛나는 곳이 현재 위치.",
-      "portrait": 0
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "회색으로 표시된 곳은 이미 지나온 구역이에요.",
-      "portrait": 0
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "그리고 아직 표시되지 않은 곳은...",
-      "portrait": 2
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "앞으로 당신이 가야 할 던전이죠.",
-      "portrait": 0
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "다음 구역으로 넘어갈 때마다 한 번씩 보여드릴 거예요.",
-      "portrait": 1
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "설마 그 짧은 시간도 못 외우실까 봐서요.",
-      "portrait": 4
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "혹시 나중에 길이 헷갈리신다면...",
-      "portrait": 2
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "Tab 키를 눌러 확인하세요.",
-      "portrait": 0
+      "portrait": -1
     },
     {
       "speaker": "사채업자",
       "text": "물론, 굳이 Tab 키에 의존하지 않아도 될 만큼 기억력이 좋으시다면 말이죠.",
-      "portrait": 4
+      "portrait": -1
     }
   ]
 }
