@@ -34,6 +34,7 @@ public class AimState : IState
     public void Enter()
     {
         if (targetLayerMask == -1) targetLayerMask = LayerMask.GetMask("Actionable", "Player", "Monster");
+        AimIndicator();
     }
 
     public void Execute()
@@ -105,7 +106,23 @@ public class AimState : IState
         }
         actor.animator.SetBool("Move", false);
     }
+    private void AimIndicator()
+    {
+        if (!actor.IsLocal) return;
 
+        if (actor is PlayerActor pActor)
+        {
+            if (actionType == eState.Push)
+            {
+
+                pActor.PushIndicator.gameObject.SetActive(true);
+            }
+            else
+            {
+                pActor.PullIndicator.gameObject.SetActive(true);
+            }
+        }
+    }
     private void FindBestTarget(Vector3 searchForward)
     {
         currentTargetActor = null;

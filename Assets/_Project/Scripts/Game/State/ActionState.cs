@@ -42,7 +42,7 @@ public class ActionState : IState
         ResetTimer();
         TrySendActionState();
         MarkSkillUseTime();
-        PlayActionEffects();
+      //  PlayActionEffects();
 
         if (actor is PlayerActor)
         {
@@ -64,7 +64,7 @@ public class ActionState : IState
         }
 
         // Monster는 ATTACK_TIME 후에 애니메이션 재생 + 히트 판정
-        if (!attackStarted && timer >= ATTACK_TIME && actor is Monster)
+        if (!attackStarted && timer >= ATTACK_TIME && actor is MonsterActor)
         {
             attackStarted = true;
             timer = 0f;
@@ -107,7 +107,7 @@ public class ActionState : IState
         actor.lastSkillUseTime = NetworkTimeManager.Instance.GetServerTime();
     }
 
-    private void PlayActionEffects()
+   /* private void PlayActionEffects()
     {
         if (!actor.IsLocal) return;
 
@@ -123,7 +123,7 @@ public class ActionState : IState
                 pActor.PullIndicator.gameObject.SetActive(true);
             }
         }
-    }
+    }*/
 
     // ──────────────────────────────────────────────
     // 타겟 처리
@@ -169,10 +169,10 @@ public class ActionState : IState
         }
         if (actionType == eState.Pull)
         {
-            if (targetActor is Monster monster)
+            if (targetActor is MonsterActor monster)
             {
                 if (monster.monsterState == MonsterState.Stunned)
-                    monster.MonsterDead(actor.transform);
+                    monster.RequestMonsterDead();
                 return;
             }
 
@@ -180,6 +180,13 @@ public class ActionState : IState
         }
 
         finalDistance *= actor.PushMulti;
+        if (actor is PlayerActor player)
+        {
+            if (actionType == eState.Push)
+                player.pushCount++;
+            else if (actionType == eState.Pull)
+                player.pullCount++;
+        }
 
         if (ShouldSendActorTargetPacket(out Player targetPlayer))
         {
@@ -373,24 +380,28 @@ public class ActionState : IState
 
     private void UpdateTimer() => timer += Time.deltaTime;
 
+
     private void TryReturnToIdle()
     {
-        if (actor is Monster && !hitProcessed)
+        if (actor is MonsterActor && !hitProcessed)
         {
-            if (timer > CAST_TIME_MONSTER + 1.0f)
-                actor.sm.ChangeState(new IdleState(actor));
-            return;
+            if (actor is MonsterActor && !hitProcessed)
+            {
+                if (timer > CAST_TIME_MONSTER + 1.0f)
+                    actor.sm.ChangeState(new IdleState(actor));
+                return;
+            }
+
+            float castTime;
+            if (actor is MonsterActor)
+                castTime = CAST_TIME_MONSTER;
+            else
+                castTime = (actionType == eState.Push) ? CAST_TIME_PUSH : CAST_TIME_PULL;
+
+            if (timer < castTime) return;
+
+            actor.sm.ChangeState(new IdleState(actor));
         }
-
-        float castTime;
-        if (actor is Monster)
-            castTime = CAST_TIME_MONSTER;
-        else
-            castTime = (actionType == eState.Push) ? CAST_TIME_PUSH : CAST_TIME_PULL;
-
-        if (timer < castTime) return;
-
-        actor.sm.ChangeState(new IdleState(actor));
     }
 
     // ──────────────────────────────────────────────

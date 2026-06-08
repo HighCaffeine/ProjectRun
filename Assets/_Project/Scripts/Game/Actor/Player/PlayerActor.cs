@@ -664,7 +664,7 @@ public class PlayerActor : Actor
         return dir.normalized;
     }
 
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         DrawActionRange(
@@ -723,6 +723,6 @@ public class PlayerActor : Actor
         // 중앙 방향선
         Gizmos.DrawLine(origin, origin + forward * distance);
     }
-#endif
+#endif*/
 }
 

@@ -7,7 +7,7 @@ public class Fade : MonoBehaviour
     [SerializeField] private float start = 1f;
     [SerializeField] private float end = 0f;
     CanvasGroup canvasGroup;
-    private void Start()
+    private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
     }
