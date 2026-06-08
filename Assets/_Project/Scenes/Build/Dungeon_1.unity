@@ -38416,7 +38416,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1898985042291846219, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: orthographic size
-      value: 100
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2213636179672022268, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: Priority.Enabled
@@ -73242,6 +73242,10 @@ PrefabInstance:
     - target: {fileID: 1306718690586721306, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_ReceiveGI
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1318567082623586768, guid: 0782ec89d499f9e46964484793990574, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1318584186800755373, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_StaticEditorFlags
