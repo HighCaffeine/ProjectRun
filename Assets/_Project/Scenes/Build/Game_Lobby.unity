@@ -22,7 +22,7 @@ RenderSettings:
   m_LinearFogEnd: 400
   m_AmbientSkyColor: {r: 0.5209957, g: 0.6795426, b: 1, a: 1}
   m_AmbientEquatorColor: {r: 1, g: 0.9473069, b: 0.8069525, a: 1}
-  m_AmbientGroundColor: {r: 0, g: 0.27889434, b: 1, a: 1}
+  m_AmbientGroundColor: {r: 0, g: 0.2917707, b: 1, a: 1}
   m_AmbientIntensity: 1.5
   m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
@@ -20607,7 +20607,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.30587512, y: 0.4415926}
   m_AnchorMax: {x: 0.6963126, y: 0.62240744}
-  m_AnchoredPosition: {x: -2, y: -0.59198}
+  m_AnchoredPosition: {x: -2, y: -0.59199524}
   m_SizeDelta: {x: -1.0681152, y: -4.3753967}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &381246079
@@ -22786,6 +22786,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf37df989adbdad438619820b57986aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
 --- !u!114 &883445988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22798,6 +22802,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3061f8bcd056fdc4e8b0a8d899937509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!114 &883445989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22810,6 +22826,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00fe5fc0ed43efd458515f12fd594b5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkAudioListener
+  isDefaultListener: 1
+  bOverrideScalingFactor: 0
+  scalingFactor: -1
+  listenerId: 0
 --- !u!114 &883445990
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22822,6 +22842,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46dcf1cb783960040a10eac2e06dd6d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: AK.Wwise.Unity.MonoBehaviour::AkGameObj
+  m_listeners:
+    initialListenerList: []
+    useDefaultListeners: 1
+  isEnvironmentAware: 1
+  isStaticObject: 0
+  usePositionOffsetData: 0
+  m_positionOffsetData:
+    KeepMe: 0
+    positionOffset: {x: 0, y: 0, z: 0}
+  scalingFactor: 1
+  m_posOffsetData: {fileID: 0}
+  listenerMask: 1
 --- !u!114 &883445991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26360,7 +26392,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1614865266305036123, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.0025634766
+      value: -0.0025024414
       objectReference: {fileID: 0}
     - target: {fileID: 1614865266305036123, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -26740,7 +26772,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8840330596895213531, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.1705322
+      value: 2.1705933
       objectReference: {fileID: 0}
     - target: {fileID: 8840330596895213531, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -28780,7 +28812,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8840330596895213531, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 2.468628
+      value: 2.468689
       objectReference: {fileID: 0}
     - target: {fileID: 8840330596895213531, guid: d6bc2f7f2b1a02d468391a4eb937b1b6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
