@@ -828,7 +828,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 pActor.isLocal = local;
             }
 
-          //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
             if (local)
             {
@@ -841,7 +841,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 cc.center = new Vector3(0.0f, 1.0f, 0.0f);
                 cc.slopeLimit = 60f;
                 pActor.SetController(cc);
-             //   Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //   Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
                 //카메라 세팅
@@ -854,17 +854,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //     CameraManager.Instance.SetupDashEffectComp(pActor);
                 //     CameraManager.Instance.AddPosContraint(pActor.transform);
                 // }
-            //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
                 Collider[] cols = playerObj.GetComponents<Collider>();
                 foreach (Collider c in cols)
                 {
                     if (c.GetType() != typeof(CharacterController)) Destroy(c);
                 }
-             //   Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //   Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 //Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 //if (rb != null) Destroy(rb);
-            //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
                 CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
@@ -873,26 +873,26 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 Collider[] existingCols = playerObj.GetComponents<Collider>();
                 foreach (var c in existingCols) Destroy(c);
-              //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
                 if (cc != null) Destroy(cc);
-              //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
                 col.isTrigger = true;
                 col.radius = 0.5f;
                 col.height = 2f;
                 col.center = new Vector3(0, 1f, 0);
-              //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //  Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
                 rb.useGravity = false;
                 rb.isKinematic = true;
-            //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+                //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
             }
 
-           // Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
+            // Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
             pActor.isLocal = local;
 
             Player player = playerObj.GetComponent<Player>();
@@ -918,7 +918,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             VillageUiManager.Instance.UpdatePlayerIDUI();
 
-        //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            //    Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
 
             if (pActor != null && pActor.sm != null)
             {
@@ -927,10 +927,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             pActor.InitCharacterModel(finalCharID);
 
-          //  Debug.Log(
-    $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
-          //  Debug.Log(
-            $"AddPlayer name={playerName} charID={finalCharID}");
+            //  Debug.Log( $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+            //  Debug.Log($"AddPlayer name={playerName} charID={finalCharID}");
 
             return player;
         }
