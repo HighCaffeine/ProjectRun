@@ -38,6 +38,7 @@ public class MonsterActor : Actor
     [SerializeField] private Material stunnedMat;
 
     public long lastAttackerID;
+    private Vector3 estimatedPos;
 
     public override Vector3 GetMovementDirection()
     {
@@ -366,10 +367,11 @@ public class MonsterActor : Actor
             transform.position = serverPos;
             SetControllerActive(true);
             transform.rotation = serverRot;
+            estimatedPos = serverPos;
             return;
         }
 
-        transform.position = Vector3.Lerp(transform.position, serverPos, Time.deltaTime * lerpSpeed);
+        transform.position = Vector3.Lerp(transform.position, estimatedPos, Time.deltaTime * lerpSpeed);
         transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
     }
 
@@ -402,11 +404,30 @@ private void HandleNetworkSync()
             userUUID = LocalPlayerInfo.ID,
             monsterID = this.monsterID,
             currentPos = new P_PacketVector3 { x = transform.position.x, y = transform.position.y, z = transform.position.z },
-            currentRot = new P_PacketQuaternion { x = transform.rotation.x, y = transform.rotation.y, z = transform.rotation.z, w = transform.rotation.w }
+            currentRot = new P_PacketQuaternion { x = transform.rotation.x, y = transform.rotation.y, z = transform.rotation.z, w = transform.rotation.w },
+            timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
 
         Client.UDP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
         //Client.TCP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
+    }
+
+    public void OnSyncMovement(Vector3 targetPos, Quaternion targetRot, float latency)
+    {
+        Vector3 moveDelta = targetPos - serverPos;
+
+        serverPos = targetPos;
+        serverRot = targetRot;
+
+        if (moveDelta.magnitude > 0.001f && moveDelta.magnitude < snapThreshold)
+        {
+            Vector3 inferredVelocity = moveDelta / Actor.sendInterval;
+            estimatedPos = serverPos + (inferredVelocity * latency);
+        }
+        else
+        {
+            estimatedPos = serverPos;
+        }
     }
 
     public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default, long casterUUID = 0)

@@ -742,11 +742,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterMovement>(packet.data);
 
-                    Debug.Log($"[MonsterMovement] monsterID={pkt.monsterID}, inCache={_monsterCache.ContainsKey(pkt.monsterID)}, cacheKeys={string.Join(",", _monsterCache.Keys)}");
-
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
-                        targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion());
+                        long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
+                        float latency = Mathf.Max(0f, (myCurrentTime - pkt.timestamp) / 1000f);
+
+                        if (latency > 0.5f) latency = 0f;
+
+                        targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion(), latency);
                     }
                     break;
                 }

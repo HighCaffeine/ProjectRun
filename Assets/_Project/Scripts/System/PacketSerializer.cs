@@ -292,7 +292,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterMovement(P_MonsterMovement p)
     {
-        var buf = new byte[40]; //8+4+12+16
+        var buf = new byte[48]; //8+4+12+16+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
@@ -303,6 +303,7 @@ public static class PacketSerializer
         Write(buf, ref o, p.currentRot.y);
         Write(buf, ref o, p.currentRot.z);
         Write(buf, ref o, p.currentRot.w);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
     // ── 헬퍼 ───────────────────────────────────────────────

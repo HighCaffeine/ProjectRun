@@ -504,6 +504,7 @@ public struct P_MonsterMovement
     [MarshalAs(UnmanagedType.I4)] public int monsterID;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 currentPos;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketQuaternion currentRot;
+    [MarshalAs(UnmanagedType.I8)] public long timestamp;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
