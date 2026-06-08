@@ -41,7 +41,11 @@ public class DialogueManager : GenericSingleton<DialogueManager>
     {
         if (isDialogueActive)
             return;
-        if(!dialoguePanel.activeSelf)
+        
+        ActorManager.Instance.p1.canInput = false;
+        ActorManager.Instance.p2.canInput = false;
+
+        if (!dialoguePanel.activeSelf)
         {
             dialoguePanel.SetActive(true);
         }
@@ -102,8 +106,11 @@ public class DialogueManager : GenericSingleton<DialogueManager>
     }
     private void Update()
     {
+
         if (!isDialogueActive)
+        {
             return;
+        }
         if (Input.GetKeyDown(KeyCode.Space) ||Input.GetMouseButtonDown(0))
         {
             OnPressSpace();
@@ -142,6 +149,8 @@ public class DialogueManager : GenericSingleton<DialogueManager>
 
     private void EndDialogue()
     {
+        ActorManager.Instance.p1.canInput = true;
+        ActorManager.Instance.p2.canInput = true;
         currentState = DialogueState.None;
 
         isDialogueActive = false;

@@ -72,6 +72,7 @@ public class PlayerActor : Actor
     public SpriteRenderer Indicator;
     public SpriteRenderer PullIndicator;
     public SpriteRenderer PushIndicator;
+    public bool canInput = true;
     protected new void Start()
     {
         cam = Camera.main;
@@ -81,7 +82,6 @@ public class PlayerActor : Actor
             currentPos = new P_PacketVector3(),
             currentRot = new P_PacketQuaternion()
         };
-
         cachedPlayer = GetComponent<Player>();
 
         base.Start();
@@ -138,8 +138,11 @@ public class PlayerActor : Actor
 
             if (sm.currentState is IdleState || sm.currentState is MoveState || sm.currentState is AimState)
             {
-                CheckActionIntent();
-                HandleInput();
+                if (canInput)
+                {
+                    CheckActionIntent();
+                    HandleInput();
+                }
             }
 
             ApplyWind();
