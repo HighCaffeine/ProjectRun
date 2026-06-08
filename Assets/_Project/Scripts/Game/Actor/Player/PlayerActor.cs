@@ -432,7 +432,7 @@ public class PlayerActor : Actor
         };
 
    
-
+        //Client.UDP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }
     public void SetLocal(bool value)

@@ -10,12 +10,20 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
     // 동기화가 한 번이라도 완료되었는지 여부
     public bool IsSynchronized { get; private set; } = false;
 
-
+    public long CurrentRTT { get; private set; } = 0;
     private void Start()
     {
         StartCoroutine(TimeSyncLoopRoutine());
     }
 
+// NetworkTimeManager의 RTT 계산 부분
+    void Update()
+    {
+        if (Time.deltaTime > 0.05f)
+        {
+            Debug.LogWarning($"[Frame Drop] deltaTime: {Time.deltaTime * 1000f:F1}ms, RTT: {CurrentRTT}ms");
+        }
+    }
     //현재 Unix 타임스탬프
     public long GetCurrentUnixTimeMs()
     {
@@ -26,6 +34,18 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
     public long GetServerTime()
     {
         return GetCurrentUnixTimeMs() + _serverTimeOffset;
+    }
+
+    public void OnReceiveTimeSyncResponse(long clientTimestamp, long serverTimestamp, long arrivalTime)
+    {
+        long rtt = arrivalTime - clientTimestamp;
+        CurrentRTT = rtt;  // ← 추가
+        
+        long estimatedServerTime = serverTimestamp + (rtt / 2);
+        _serverTimeOffset = estimatedServerTime - arrivalTime;
+        IsSynchronized = true;
+
+        Debug.Log($"<color=lime>[TimeSync]</color> RTT: {rtt}ms, Offset: {_serverTimeOffset}ms");
     }
 
     // 서버 타임 동기화
@@ -50,7 +70,8 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
             clientTimestamp = GetCurrentUnixTimeMs()
         };
 
-        Client.TCP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
+        //Client.TCP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
+        Client.UDP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
         //Debug.Log($"[TimeSync] 서버로 시간 동기화 요청 송신: {req.clientTimestamp}");
     }
 

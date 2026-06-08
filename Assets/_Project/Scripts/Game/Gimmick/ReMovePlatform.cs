@@ -56,6 +56,8 @@ public class ReMovePlatform : BaseGimmick
             {
                 if (Client.IS_SERVER_PLAY || GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
                 {
+                    if (!GameManager.Instance.isHost) return;
+
                     isTriggered = true;
 
                     P_GimmickInteractReq req = new P_GimmickInteractReq

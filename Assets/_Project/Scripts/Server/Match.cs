@@ -149,11 +149,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.SYS_TIME_SYNC_RES:
                 {
                     var resPkt = UnsafeCode.ByteArrayToStructure<P_TimeSyncRes>(packet.data);
-
-                    if (NetworkTimeManager.Instance != null)
-                    {
-                        NetworkTimeManager.Instance.OnReceiveTimeSyncResponse(resPkt.clientTimestamp, resPkt.serverTimestamp);
-                    }
+                    long arrivalTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    NetworkTimeManager.Instance.OnReceiveTimeSyncResponse(resPkt.clientTimestamp, resPkt.serverTimestamp, arrivalTime);
                     break;
                 }
 
