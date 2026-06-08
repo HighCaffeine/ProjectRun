@@ -4,6 +4,8 @@ using UnityEngine;
 public class VillageUiManager : MonoBehaviour
 {
     public static VillageUiManager Instance;
+    public static bool isShowTutorial =false;
+    
     public TextMeshProUGUI player1IDUi;
     public TextMeshProUGUI player2IDUi;
 
@@ -16,6 +18,8 @@ public class VillageUiManager : MonoBehaviour
 
 
     [SerializeField] private GameObject deadPanel;
+
+    
 
 
     private void Awake()
@@ -72,6 +76,9 @@ public class VillageUiManager : MonoBehaviour
 
     public void TutorialDialog()
     {
+        if (isShowTutorial) return;
+
+        isShowTutorial = true;
         resultWindow.gameObject.SetActive(false);
         DialogueManager.Instance.StartDialogue("TutorialText");
     }
