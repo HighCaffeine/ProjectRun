@@ -70,11 +70,11 @@ public class AimState : IState
             {
                 playerVisual.DrawAimLine(currentTargetGimmick.TargetTransform.position);
             }
-            else if (currentTargetActor != null)
+            else if (currentTargetActor != null&& actionType == eState.Pull)
             {
                 playerVisual.DrawAimLine(currentTargetActor.transform.position);
             }
-            else
+            else if (actionType == eState.Pull)
             {
                 playerVisual.DrawAimLine(playerVisual.transform.position + aimDir * maxDistance);
             }

@@ -63,7 +63,7 @@ public class ActionState : IState
         if (!attackStarted && timer >= ATTACK_TIME && actor is MonsterActor)
         {
             attackStarted = true;
-            timer = 0f;
+            // timer = 0f; ★ 제거
             PlayActionAnimation();
         }
 
@@ -127,8 +127,8 @@ public class ActionState : IState
 
     private void ProcessTarget()
     {
-        if (!actor.IsLocal) return;
-
+        //if (!actor.IsLocal) return;
+        Debug.Log($"[ActionState] {actor.name}의 타겟 처리 시작. Actor Target: {(targetActor != null ? targetActor.name : "None")}, Gimmick Target: {(targetGimmick != null ? targetGimmick.name : "None")}");
         if (targetActor != null)
         {
            
@@ -377,24 +377,28 @@ public class ActionState : IState
 
     private void UpdateTimer() => timer += Time.deltaTime;
 
-private void TryReturnToIdle()
-{
-    if (actor is MonsterActor && !hitProcessed)
+    private void TryReturnToIdle()
     {
-        // ★ 추가된 안전장치: 애니메이션 이벤트가 누락됐어도 1.5초(여유 시간)가 지나면 강제로 Idle로 복귀
-        if (timer > CAST_TIME_MONSTER + 1.0f) 
+        if (actor is MonsterActor)
         {
-            Debug.LogWarning($"[ActionState] {actor.name}의 공격 애니메이션 이벤트(OnMonsterAttackHit)가 누락되었습니다! 강제로 Idle 전환합니다.");
-            actor.sm.ChangeState(new IdleState(actor));
+            // ★ 애니메이션 이벤트 대신 타이머로 직접 히트 처리
+            if (!hitProcessed && timer >= CAST_TIME_MONSTER)
+            {
+                hitProcessed = true;
+                ProcessTarget(); // 직접 호출
+            }
+
+            if (hitProcessed && timer >= CAST_TIME_MONSTER + 0.3f)
+            {
+                actor.sm.ChangeState(new IdleState(actor));
+            }
+            return;
         }
-        return;
+
+        float castTime = CAST_TIME_PLAYER;
+        if (timer < castTime) return;
+        actor.sm.ChangeState(new IdleState(actor));
     }
-
-    float castTime = (actor is MonsterActor) ? CAST_TIME_MONSTER : CAST_TIME_PLAYER;
-    if (timer < castTime) return;
-
-    actor.sm.ChangeState(new IdleState(actor));
-}
 
     // ──────────────────────────────────────────────
     // Exit 헬퍼
@@ -415,6 +419,7 @@ private void TryReturnToIdle()
     public void OnAttackHit()
     {
         if (hitProcessed) return;
+        Debug.Log($"[ActionState] {actor.name}의 공격 히트 이벤트 처리 시작.");
         hitProcessed = true;
         ProcessTarget();
     }

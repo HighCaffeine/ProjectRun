@@ -45,23 +45,63 @@ public class MonsterActor : Actor
         Vector3 dir = currentTarget.transform.position - transform.position;
         dir.y = 0f;
 
+        // ★ 이동 중 타겟 방향으로 회전
+        if (dir != Vector3.zero)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(dir.normalized);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, 10f * Time.deltaTime);
+        }
+
         return dir.normalized;
     }
+    public override void ApplyMovement()
+    {
+        if (controller == null || !controller.enabled) return;
+        if (monsterState == MonsterState.Stunned || monsterState == MonsterState.Dead) return;
 
+        // 넉백은 베이스 로직 사용 (verticalVelocity, horizontalMove 그대로)
+        if (sm.currentState is KnockbackState)
+        {
+            base.ApplyMovement();
+            return;
+        }
+
+        // 몬스터는 중력 없이 horizontalMove만 적용
+        Vector3 moveDelta = horizontalMove * Time.deltaTime;
+        controller.Move(moveDelta);
+        horizontalMove = Vector3.zero;
+        // ★ verticalVelocity, gravity 일절 건드리지 않음
+    }
     public override bool HasMoveIntent()
     {
         if (monsterState != MonsterState.Normal) return false;
         if (currentTarget == null) return false;
 
-        float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
+        Vector3 myPos = transform.position;
+        Vector3 targetPos = currentTarget.transform.position;
+
+        myPos.y = 0;
+        targetPos.y = 0;
+
+        float distance = Vector3.Distance(myPos, targetPos);
+
         return distance > 2f;
     }
 
     public override bool CheckActionIntent()
     {
-        if (currentTarget == null) return false;
+        if (currentTarget == null)
+            return false;
 
-        float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
+        Vector3 myPos = transform.position;
+        Vector3 targetPos = currentTarget.transform.position;
+
+        myPos.y = 0;
+        targetPos.y = 0;
+
+        float distance = Vector3.Distance(myPos, targetPos);
+
+
         return distance <= 2f;
     }
 
@@ -92,53 +132,55 @@ public class MonsterActor : Actor
             Rigidbody rb = GetComponent<Rigidbody>();
             if (rb != null) rb.isKinematic = true;
         }
+        if (meshRenderer != null)
+        {
+            meshRenderer.transform.localRotation = Quaternion.Euler(0f, 0f, 0f); // 값 조정
+        }
     }
 
-private void Update()
-{
-    if (monsterState == MonsterState.Dead) return;
+    private void Update()
+    {
+        Debug.Log($"[MonsterUpdate] {name} IsLocal={IsLocal}, state={monsterState}"); // ★ 추가
+
+        if (monsterState == MonsterState.Dead) return;
 
         if (IsLocal)
         {
-            Debug.Log("몬스터는 이즈로컬임");
             UpdateTarget();
 
-            const float HEIGHT_EPSILON = 0.05f;
+            if (currentTarget != null)
+                UpdateHeight(); // ★ sm.Update() 전에 호출해서 horizontalMove에 Y 누적
 
-            // 1. 높이 조절은 독립적으로 실행
-            if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
-            {
-                UpdateHeight();
-            }
-
-            // ★ 2. else를 지우고 무조건 상태머신과 이동을 실행하게 수정!
-            sm.Update();
-            ApplyMovement();
+            sm.Update();       // ← sm 내부에서 horizontalMove에 수평 방향 누적
+            ApplyMovement();   // ← 한번에 수평+수직 이동 (중력 없음)
 
             if (!(sm.currentState is KnockbackState))
-            {
                 TryChangeToActionState();
-            }
 
             HandleNetworkSync();
         }
         else
         {
-            sm.Update(); // 게스트 애니메이션 업데이트
-            ProcessRemoteMovement(); // 게스트 위치 동기화
+            sm.Update();
+            ProcessRemoteMovement();
         }
 
-    UpdateMaterialByState();
-}
+        UpdateMaterialByState();
+    }
     private void UpdateHeight()
     {
-        if (currentTarget == null || controller == null) return;
+        if (currentTarget == null || controller == null || !controller.enabled) return;
 
         float targetY = currentTarget.transform.position.y + heightOffset;
-        float nextY = Mathf.MoveTowards(transform.position.y, targetY, 2f * Time.deltaTime);
-        float deltaY = nextY - transform.position.y;
+        const float HEIGHT_EPSILON = 0.05f;
+        float diff = targetY - transform.position.y;
 
-        controller.Move(Vector3.up * deltaY);
+        if (Mathf.Abs(diff) <= HEIGHT_EPSILON) return;
+
+        // ★ horizontalMove의 Y에 얹어서 ApplyMovement에서 한번에 처리
+        float yStep = Mathf.MoveTowards(0f, diff, 3f * Time.deltaTime);
+        horizontalMove += Vector3.up * yStep / Time.deltaTime;
+        // ApplyMovement에서 * Time.deltaTime 하므로 나눠서 넣음
     }
 
     private void UpdateTarget()
@@ -147,36 +189,50 @@ private void Update()
         {
             Debug.Log("UpdateTarget들어옴");
             ChooseTarget();
+            Debug.Log("최종 currentTarget = " +(currentTarget == null ? "NULL" : currentTarget.name));
         }
     }
 
     private void TryChangeToActionState()
     {
+        Debug.Log($"[TryAction] currentState={sm.currentState?.GetType().Name}, CanStart={CanStartAction()}, CheckIntent={CheckActionIntent()}");
         if (!CanStartAction()) return;
+
+        float distance = currentTarget == null
+            ? -1f
+            : Vector3.Distance(transform.position, currentTarget.transform.position);
+
+   
+
         if (!CheckActionIntent()) return;
 
+        Debug.Log($"{name} ActionState 진입!");
+        
         sm.ChangeState(new ActionState(this, eState.Push, currentTarget));
     }
 
     private bool CanStartAction()
     {
-        return sm.currentState is IdleState || sm.currentState is MoveState;
+        return sm.currentState is IdleState || sm.currentState is MoveState || sm.currentState is ActionState; ;
     }
 
     public PlayerActor GetClosestPlayerTarget()
     {
         if (Match.Instance == null || Match.Instance.Players == null) return null;
-        Debug.Log("GetClosestPlayerTarget들어옴");
+
         PlayerActor closest = null;
         float minDistance = float.MaxValue;
 
-        foreach (Player player in Match.Instance.Players.Values)
+        foreach (var kvp in Match.Instance.Players)
         {
-            Debug.Log("플레이어 탐색중: " + player.Name);
-            if (player == null) continue;
+            Player player = kvp.Value;
+            if (player == null || player.gameObject == null) continue;
 
+            // ★ Player 컴포넌트에서 직접 GetComponent (매 프레임 호출 최적화 위해 Player가 캐싱하면 더 좋음)
             PlayerActor actor = player.GetComponent<PlayerActor>();
-            if (actor == null || actor.isDead || !actor.gameObject.activeInHierarchy) continue;
+            if (actor == null) continue;
+            if (actor.isDead) continue;
+            if (!actor.gameObject.activeInHierarchy) continue;
 
             float dist = Vector3.Distance(transform.position, actor.transform.position);
             if (dist < minDistance)
@@ -184,10 +240,9 @@ private void Update()
                 minDistance = dist;
                 closest = actor;
             }
-            Debug.Log(closest.name);
-            closest = ActorManager.Instance.p1; // ★ 임시로 p1을 타겟으로 고정 (테스트용)
         }
 
+        Debug.Log($"[ChooseTarget] 결과: {(closest == null ? "NULL" : closest.name)}, Players 수: {Match.Instance.Players.Count}");
         return closest;
     }
 
@@ -195,9 +250,10 @@ private void Update()
     {
         if (currentTarget != null && !currentTarget.isDead) return;
 
-        // currentTarget = GetRandomPlayerTarget(); <-- 기존 로직 삭제
-        currentTarget = GetClosestPlayerTarget(); // ★ 가장 가까운 타겟으로 변경
-        Debug.Log("호출했니");
+        currentTarget = GetClosestPlayerTarget();
+
+        if (currentTarget == null)
+            Debug.LogWarning($"[{name}] 타겟을 찾지 못함. Players.Count = {Match.Instance?.Players?.Count}");
     }
 
     // 사망 처리 동기화
@@ -372,4 +428,6 @@ private void HandleNetworkSync()
     {
         if (controller != null) controller.enabled = isActive;
     }
+
+
 }
