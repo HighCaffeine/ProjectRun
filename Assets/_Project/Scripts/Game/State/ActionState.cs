@@ -126,21 +126,26 @@ public class ActionState : IState
     // ──────────────────────────────────────────────
 
     private void ProcessTarget()
+{
+    if (!actor.IsLocal) return;
+
+    if (actor is PlayerActor player)
     {
-        if (!actor.IsLocal) return;
-
-        if (targetActor != null)
-        {
-           
-            ProcessActorTarget();
-            return;
-        }
-
-        if (targetGimmick != null)
-        {
-            ProcessGimmickTarget();
-        }
+        if (actionType == eState.Push) player.pushCount++;
+        else if (actionType == eState.Pull) player.pullCount++;
     }
+
+    if (targetActor != null)
+    {
+        ProcessActorTarget();
+        return;
+    }
+
+    if (targetGimmick != null)
+    {
+        ProcessGimmickTarget();
+    }
+}
 
     // ── Actor 타겟 ──
 
@@ -177,13 +182,6 @@ public class ActionState : IState
         }
 
         finalDistance *= actor.PushMulti;
-        if (actor is PlayerActor player)
-        {
-            if (actionType == eState.Push)
-                player.pushCount++;
-            else if (actionType == eState.Pull)
-                player.pullCount++;
-        }
 
         if (ShouldSendActorTargetPacket(out Player targetPlayer))
         {
@@ -198,8 +196,9 @@ public class ActionState : IState
         }
 
         targetActor.sm.ChangeState(new KnockbackState(
-            targetActor, knockbackDir, finalDistance,
-            actionType == eState.Pull, actor.transform.position));
+                targetActor, knockbackDir, finalDistance,
+                actionType == eState.Pull, actor.transform.position,
+                attackerID: LocalPlayerInfo.ID));
     }
 
     private bool ShouldSendActorTargetPacket(out Player targetPlayer)
@@ -336,6 +335,7 @@ public class ActionState : IState
         FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
         if (fracture != null)
         {
+            if (actor is PlayerActor player) player.destroyCount++;
             BreakFractureObject(fracture);
             return;
         }

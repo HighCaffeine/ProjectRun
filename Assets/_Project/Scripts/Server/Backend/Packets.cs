@@ -343,9 +343,13 @@ public struct P_DungeonEscapeReq
     [MarshalAs(UnmanagedType.I4)] public int p1Push;
     [MarshalAs(UnmanagedType.I4)] public int p1Pull;
     [MarshalAs(UnmanagedType.I4)] public int p1Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p1Destroy;
+    [MarshalAs(UnmanagedType.I4)] public int p1FallKill;
     [MarshalAs(UnmanagedType.I4)] public int p2Push;
     [MarshalAs(UnmanagedType.I4)] public int p2Pull;
     [MarshalAs(UnmanagedType.I4)] public int p2Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p2Destroy;
+    [MarshalAs(UnmanagedType.I4)] public int p2FallKill;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -355,9 +359,13 @@ public struct P_DungeonClearNtf
     [MarshalAs(UnmanagedType.I4)] public int p1Push;
     [MarshalAs(UnmanagedType.I4)] public int p1Pull;
     [MarshalAs(UnmanagedType.I4)] public int p1Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p1Destroy;
+    [MarshalAs(UnmanagedType.I4)] public int p1FallKill;
     [MarshalAs(UnmanagedType.I4)] public int p2Push;
     [MarshalAs(UnmanagedType.I4)] public int p2Pull;
     [MarshalAs(UnmanagedType.I4)] public int p2Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p2Destroy;
+    [MarshalAs(UnmanagedType.I4)] public int p2FallKill;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -416,6 +424,7 @@ public struct P_PlayerStatusNtf
     [MarshalAs(UnmanagedType.I1)] public byte isPull;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
     [MarshalAs(UnmanagedType.I8)] public long timestamp;
+    [MarshalAs(UnmanagedType.I8)] public long casterUUID;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

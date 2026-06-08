@@ -370,33 +370,35 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 3: pActor.sm.ChangeState(new ActionState(pActor, eState.Pull)); break; // 당기기
                                                                                                         //case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
-                                if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
-                                {
-                                    break;
-                                }
-
-                                // 지연시간 검사
-                                long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
-                                float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
-
-                                if (latency > 0.5f)
-                                {
-                                    break;
-                                }
-
-                                Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
-                                float currentDist = Vector3.Distance(pActor.transform.position, cPos);
-                                float maxValidRange = (statePkt.isPull == 1) ? 15.0f : 5.0f;
-                                bool pullFlag = (statePkt.isPull == 1);
-
-                                if (currentDist > maxValidRange)
-                                {
-                                    break;
-                                }
-
-                                pActor.lastKnockbackTime = Time.time;
-                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
+                            if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
+                            {
                                 break;
+                            }
+
+                            // 지연시간 검사
+                            long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
+                            float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
+
+                            if (latency > 0.5f)
+                            {
+                                break;
+                            }
+
+                            Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+                            float currentDist = Vector3.Distance(pActor.transform.position, cPos);
+                            float maxValidRange = (statePkt.isPull == 1) ? 15.0f : 5.0f;
+                            bool pullFlag = (statePkt.isPull == 1);
+
+                            if (currentDist > maxValidRange)
+                            {
+                                break;
+                            }
+
+                            pActor.lastKnockbackTime = Time.time;
+                            pActor.lastAttackerID = statePkt.casterUUID; 
+
+                            pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
+                            break;
                             case 6:
                                 if (pActor.ignoreServerPosTimer > 0) return;
                                 pActor.sm.ChangeState(new TeleportState(pActor, statePkt.targetDir.ToVector3()));
@@ -526,20 +528,34 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             //         break;
             //     }
             case E_PACKET.PLAYER_DEAD_NTF:
+            {
+                var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
+
+                if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
                 {
-                    var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
+                    PlayerActor deadActor = targetPlayer.GetComponent<PlayerActor>();
 
-                    if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
+                    if (deadActor != null && !deadActor.IsLocal)
                     {
-                        ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
+                        PlayerActor localActor = ActorManager.Instance.p1?.IsLocal == true 
+                            ? ActorManager.Instance.p1 
+                            : ActorManager.Instance.p2;
+
+                        if (localActor != null && deadActor.lastAttackerID == LocalPlayerInfo.ID)
+                        {
+                            localActor.fallKillCount++;
+                        }
                     }
 
-                    if (GameManager.Instance.isHost)
-                    {
-                        ActorManager.Instance.RequestGimmickReset();
-                    }
-                    break;
+                    ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
                 }
+
+                if (GameManager.Instance.isHost)
+                {
+                    ActorManager.Instance.RequestGimmickReset();
+                }
+                break;
+            }
             //컷신 -> 결과창
             // case E_PACKET.DUNGEON_CLEAR_NTF:
             // {

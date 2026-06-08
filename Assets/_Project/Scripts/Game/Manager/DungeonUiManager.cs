@@ -247,12 +247,16 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
             player1PushText.text = finalResultData.p1Push.ToString();
             player1PullText.text = finalResultData.p1Pull.ToString();
             player1FallText.text = finalResultData.p1Fall.ToString();
+            player1DestroyText.text = finalResultData.p1Destroy.ToString();
+            player1FallKillText.text = finalResultData.p1FallKill.ToString();
         }
         if (p2 != null)
         {
             player2PushText.text = finalResultData.p2Push.ToString();
             player2PullText.text = finalResultData.p2Pull.ToString();
             player2FallText.text = finalResultData.p2Fall.ToString();
+            player2DestroyText.text = finalResultData.p2Destroy.ToString();
+            player2FallKillText.text = finalResultData.p2FallKill.ToString();
         }
 
         if (resultUIPanel != null)
@@ -262,7 +266,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
 
         if (returnToVillageButton != null)
         {
-            returnToVillageButton.enabled = GameManager.Instance.isHost;
+            returnToVillageButton.interactable = GameManager.Instance.isHost;
         }
     }
 
