@@ -2,6 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum MonsterState
+{
+    Normal,
+    Knockback,
+    Stunned,
+    Dead
+}
 public class MonsterActor : Actor
 {
     [Header("Monster Network Sync")]
@@ -62,6 +70,7 @@ public class MonsterActor : Actor
         //serverPos = transform.position;
         //serverRot = transform.rotation;
         base.Start();
+        
     }
 
     public void InitMonster(int id, Vector3 pos, Quaternion rot)
@@ -89,34 +98,35 @@ private void Update()
 {
     if (monsterState == MonsterState.Dead) return;
 
-    if (IsLocal)
-    {
-        UpdateTarget();
-
-        const float HEIGHT_EPSILON = 0.05f;
-
-        // 1. 높이 조절은 독립적으로 실행
-        if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
+        if (IsLocal)
         {
-            UpdateHeight();
-        }
-        
-        // ★ 2. else를 지우고 무조건 상태머신과 이동을 실행하게 수정!
-        sm.Update();
-        ApplyMovement();
+            Debug.Log("몬스터는 이즈로컬임");
+            UpdateTarget();
 
-        if (!(sm.currentState is KnockbackState))
+            const float HEIGHT_EPSILON = 0.05f;
+
+            // 1. 높이 조절은 독립적으로 실행
+            if (currentTarget != null && Mathf.Abs(transform.position.y - (currentTarget.transform.position.y + heightOffset)) > HEIGHT_EPSILON)
+            {
+                UpdateHeight();
+            }
+
+            // ★ 2. else를 지우고 무조건 상태머신과 이동을 실행하게 수정!
+            sm.Update();
+            ApplyMovement();
+
+            if (!(sm.currentState is KnockbackState))
+            {
+                TryChangeToActionState();
+            }
+
+            HandleNetworkSync();
+        }
+        else
         {
-            TryChangeToActionState();
+            sm.Update(); // 게스트 애니메이션 업데이트
+            ProcessRemoteMovement(); // 게스트 위치 동기화
         }
-
-        HandleNetworkSync();
-    }
-    else
-    {
-        sm.Update(); // 게스트 애니메이션 업데이트
-        ProcessRemoteMovement(); // 게스트 위치 동기화
-    }
 
     UpdateMaterialByState();
 }
@@ -135,6 +145,7 @@ private void Update()
     {
         if (currentTarget == null || currentTarget.isDead)
         {
+            Debug.Log("UpdateTarget들어옴");
             ChooseTarget();
         }
     }
@@ -153,40 +164,44 @@ private void Update()
     }
 
     public PlayerActor GetClosestPlayerTarget()
-{
-    if (Match.Instance == null || Match.Instance.Players == null) return null;
-
-    PlayerActor closest = null;
-    float minDistance = float.MaxValue;
-
-    foreach (Player player in Match.Instance.Players.Values)
     {
-        if (player == null) continue;
+        if (Match.Instance == null || Match.Instance.Players == null) return null;
+        Debug.Log("GetClosestPlayerTarget들어옴");
+        PlayerActor closest = null;
+        float minDistance = float.MaxValue;
 
-        PlayerActor actor = player.GetComponent<PlayerActor>();
-        if (actor == null || actor.isDead || !actor.gameObject.activeInHierarchy) continue;
-
-        float dist = Vector3.Distance(transform.position, actor.transform.position);
-        if (dist < minDistance)
+        foreach (Player player in Match.Instance.Players.Values)
         {
-            minDistance = dist;
-            closest = actor;
+            Debug.Log("플레이어 탐색중: " + player.Name);
+            if (player == null) continue;
+
+            PlayerActor actor = player.GetComponent<PlayerActor>();
+            if (actor == null || actor.isDead || !actor.gameObject.activeInHierarchy) continue;
+
+            float dist = Vector3.Distance(transform.position, actor.transform.position);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closest = actor;
+            }
+            Debug.Log(closest.name);
+            closest = ActorManager.Instance.p1; // ★ 임시로 p1을 타겟으로 고정 (테스트용)
         }
+
+        return closest;
     }
 
-    return closest;
-}
+    private void ChooseTarget()
+    {
+        if (currentTarget != null && !currentTarget.isDead) return;
 
-private void ChooseTarget()
-{
-    if (currentTarget != null && !currentTarget.isDead) return;
-    
-    // currentTarget = GetRandomPlayerTarget(); <-- 기존 로직 삭제
-    currentTarget = GetClosestPlayerTarget(); // ★ 가장 가까운 타겟으로 변경
-}
+        // currentTarget = GetRandomPlayerTarget(); <-- 기존 로직 삭제
+        currentTarget = GetClosestPlayerTarget(); // ★ 가장 가까운 타겟으로 변경
+        Debug.Log("호출했니");
+    }
 
     // 사망 처리 동기화
-    public void RequestMonsterDead(Transform player)
+    public void RequestMonsterDead()
     {
         if (!IsLocal) return;
 
