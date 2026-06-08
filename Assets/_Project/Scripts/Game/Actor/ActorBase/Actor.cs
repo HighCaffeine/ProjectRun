@@ -44,6 +44,12 @@ public abstract class Actor : MonoBehaviour
     protected float gravity = -20f;
     protected float maxVerticalVelocity = -30f; // 최대 낙하 속도 제한
 
+
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip pushSound;
+    public AudioClip hitSound;
+    public AudioClip pullSound;
     #region �׼� ��Ÿ�� ����
     public float lastSkillUseTime = -999f;
     public const float SKILL_COOLDOWN = 1.0f;

@@ -439,6 +439,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             int nextSpawnIndex = encodedValue % 100;
 
                             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(mapID, nextSpawnIndex);
+                            DungeonPointManager.Instance.SetCurrentMap(mapID);
                             CharacterController controller = targetPlayer.GetComponent<CharacterController>();
                             if (controller != null) controller.enabled = false;
 
