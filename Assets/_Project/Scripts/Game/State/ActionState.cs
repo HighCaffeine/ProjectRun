@@ -6,12 +6,11 @@ public class ActionState : IState
     private eState actionType;
     private float timer;
 
-    private const float CAST_TIME_PUSH = 0.8f;
-    private const float CAST_TIME_PULL = 1.0f;
+    private const float CAST_TIME_PLAYER = 0.6f; 
     private const float CAST_TIME_MONSTER = 0.7f;
     private const float ATTACK_TIME = 0.05f;
 
-    private const float PLAYER_EFFECT_TIME = 0.2f; 
+    private const float PLAYER_EFFECT_TIME = 0.15f; 
 
     private float pushForce = 100f;
     private float pow = 2f;
@@ -46,10 +45,7 @@ public class ActionState : IState
 
         if (actor is PlayerActor)
         {
-            if (actionType == eState.Push) ((PlayerActor)actor).pushCount++;
-            else if (actionType == eState.Pull) ((PlayerActor)actor).pullCount++;
             PlayActionAnimation();
-            ProcessTarget();
         }
     }
 
@@ -135,6 +131,7 @@ public class ActionState : IState
 
         if (targetActor != null)
         {
+           
             ProcessActorTarget();
             return;
         }
@@ -380,29 +377,23 @@ public class ActionState : IState
 
     private void UpdateTimer() => timer += Time.deltaTime;
 
-
-    private void TryReturnToIdle()
+private void TryReturnToIdle()
+{
+    if (actor is MonsterActor && !hitProcessed)
     {
-        if (actor is MonsterActor && !hitProcessed)
+        if (timer > CAST_TIME_MONSTER + 1.0f) 
         {
-            if (actor is MonsterActor && !hitProcessed)
-            {
-                if (timer > CAST_TIME_MONSTER + 1.0f)
-                    actor.sm.ChangeState(new IdleState(actor));
-                return;
-            }
-
-            float castTime;
-            if (actor is MonsterActor)
-                castTime = CAST_TIME_MONSTER;
-            else
-                castTime = (actionType == eState.Push) ? CAST_TIME_PUSH : CAST_TIME_PULL;
-
-            if (timer < castTime) return;
-
+            Debug.LogWarning($"[ActionState] {actor.name}의 공격 애니메이션 이벤트(OnMonsterAttackHit)가 누락되었습니다! 강제로 Idle 전환합니다.");
             actor.sm.ChangeState(new IdleState(actor));
         }
+        return;
     }
+
+    float castTime = (actor is MonsterActor) ? CAST_TIME_MONSTER : CAST_TIME_PLAYER;
+    if (timer < castTime) return;
+
+    actor.sm.ChangeState(new IdleState(actor));
+}
 
     // ──────────────────────────────────────────────
     // Exit 헬퍼
