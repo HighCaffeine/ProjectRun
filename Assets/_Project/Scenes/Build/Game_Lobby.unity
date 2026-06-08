@@ -22625,6 +22625,7 @@ GameObject:
   - component: {fileID: 883445989}
   - component: {fileID: 883445992}
   - component: {fileID: 883445991}
+  - component: {fileID: 883445993}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -22894,6 +22895,14 @@ MonoBehaviour:
   scalingFactor: 1
   m_posOffsetData: {fileID: 0}
   listenerMask: 1
+--- !u!81 &883445993
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883445981}
+  m_Enabled: 1
 --- !u!1001 &895303388
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23626,11 +23635,15 @@ PrefabInstance:
     - target: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+      objectReference: {fileID: 11400000, guid: 2f5ab2dc6c8449b4abe9b726be8a771c, type: 2}
     - target: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+      objectReference: {fileID: 3606977568177496502, guid: 2f5ab2dc6c8449b4abe9b726be8a771c, type: 2}
+    - target: {fileID: 5324135937266521870, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7083554967630756265, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

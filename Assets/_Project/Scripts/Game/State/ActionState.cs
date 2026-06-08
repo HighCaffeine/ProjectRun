@@ -41,10 +41,32 @@ public class ActionState : IState
         ResetTimer();
         TrySendActionState();
         MarkSkillUseTime();
-      //  PlayActionEffects();
 
-        if (actor is PlayerActor)
+        if (actor is PlayerActor player)
         {
+            if (actionType == eState.Push)
+            {
+                if (player.audioSource != null && player.pushSound != null)
+                {
+                    Debug.Log(player.audioSource);
+                    Debug.Log(player.pushSound);
+                    Debug.Log(player.audioSource.volume);
+                    player.audioSource.PlayOneShot(player.pushSound);
+                    Debug.Log($"Played push sound for {player.name}");
+                }
+            }
+            else if (actionType == eState.Pull)
+            {
+                if (player.audioSource != null && player.pullSound != null)
+                {
+                    Debug.Log(player.audioSource);
+                    Debug.Log(player.pullSound);
+                    Debug.Log(player.audioSource.volume);
+                    player.audioSource.PlayOneShot(player.pullSound);
+                    Debug.Log($"Played pull sound for {player.name}");
+                }
+            }
+
             PlayActionAnimation();
         }
     }
@@ -59,17 +81,14 @@ public class ActionState : IState
             ProcessTarget();
         }
 
-        // Monster는 ATTACK_TIME 후에 애니메이션 재생 + 히트 판정
         if (!attackStarted && timer >= ATTACK_TIME && actor is MonsterActor)
         {
             attackStarted = true;
-            // timer = 0f; ★ 제거
             PlayActionAnimation();
         }
 
         TryReturnToIdle();
     }
-
     public void Exit()
     {
         StopActionEffects();
@@ -145,6 +164,17 @@ public class ActionState : IState
 
     private void ProcessActorTarget()
     {
+        if (actor is PlayerActor hitPlayer)
+        {
+            if (hitPlayer.audioSource != null && hitPlayer.hitSound != null)
+            {
+                Debug.Log(hitPlayer.audioSource);
+                Debug.Log(hitPlayer.hitSound);
+                Debug.Log(hitPlayer.audioSource.volume);
+                hitPlayer.audioSource.PlayOneShot(hitPlayer.hitSound);
+                Debug.Log($"Played hit sound for {hitPlayer.name}");
+            }
+        }
         Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
         dirToTarget.y = 0f;
         float minDistance = dirToTarget.magnitude;

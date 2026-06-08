@@ -22,7 +22,7 @@ public class AimState : IState
         if (actionType == eState.Push)
         {
             maxDistance = 3f;
-            maxAngle = 60f;
+            maxAngle = 86f;
         }
         else
         {
@@ -114,7 +114,6 @@ public class AimState : IState
         {
             if (actionType == eState.Push)
             {
-
                 pActor.PushIndicator.gameObject.SetActive(true);
             }
             else

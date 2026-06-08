@@ -68,7 +68,7 @@ public class DialogueManager : GenericSingleton<DialogueManager>
 
         nameText.text = line.speaker;
 
-         if (line.portrait >= 0 && line.portrait < portraits.Length)
+        if (line.portrait >= 0 && line.portrait < portraits.Length)
         {
             portraitImage.gameObject.SetActive(true);
             portraitImage.texture = portraits[line.portrait];
