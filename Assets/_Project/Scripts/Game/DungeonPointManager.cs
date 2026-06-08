@@ -69,7 +69,17 @@ public class DungeonPointManager : GenericSingleton<DungeonPointManager>
     }
     public void SetCurrentMap(int mapID)
     {
+        Debug.Log(mapID);
         ProGressUi.Instance.StageUpdate(mapID);
+        if (!GameManager.Instance.hasShownDungeonIntro)
+        {
+            GameManager.Instance.hasShownDungeonIntro = true;
+
+            ProGressUi.Instance.OnProgressFinished = () =>
+            {
+                DialogueManager.Instance.StartDialogue("ProGressText");
+            };
+        }
         DungeonUiManager.Instance.ShowProgress();
     }
 }

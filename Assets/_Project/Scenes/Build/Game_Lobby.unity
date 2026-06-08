@@ -20885,6 +20885,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 792853534}
+          m_TargetAssemblyTypeName: VillageUiManager, Assembly-CSharp
+          m_MethodName: TutorialDialog
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1001 &488171153
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23581,7 +23593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 881344733019813723, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 994975202430445075, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_fontAsset
@@ -23592,13 +23604,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_text
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+      objectReference: {fileID: 11400000, guid: 2f5ab2dc6c8449b4abe9b726be8a771c, type: 2}
     - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+      objectReference: {fileID: 3606977568177496502, guid: 2f5ab2dc6c8449b4abe9b726be8a771c, type: 2}
+    - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4222241393875307483, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: dialogueManager
       value: 
@@ -23726,6 +23746,10 @@ PrefabInstance:
     - target: {fileID: 8362730972377914645, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8969925997217490523, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 3105889779589385127, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
@@ -25242,7 +25266,7 @@ MonoBehaviour:
     spawnSectorIndex: 0
   _currentCutscene:
     cutsceneType: 0
-    director: {fileID: 0}
+    director: {fileID: 895303392}
     dummys: []
     spawnAtEnd: 0
     spawnSectorIndex: 0

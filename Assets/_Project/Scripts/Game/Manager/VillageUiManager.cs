@@ -16,6 +16,8 @@ public class VillageUiManager : MonoBehaviour
 
 
     [SerializeField] private GameObject deadPanel;
+
+
     private void Awake()
     {
         Instance = this;
@@ -52,6 +54,7 @@ public class VillageUiManager : MonoBehaviour
         {
             return;
         }
+        resultWindow.gameObject.SetActive(true);
         dialoguePanel.SetActive(true);
         GameManager.Instance.Calculate();
         resultWindow.Play("Open");
@@ -69,6 +72,7 @@ public class VillageUiManager : MonoBehaviour
 
     public void TutorialDialog()
     {
+        resultWindow.gameObject.SetActive(false);
         DialogueManager.Instance.StartDialogue("TutorialText");
     }
 

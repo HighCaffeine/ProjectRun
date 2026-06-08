@@ -21,7 +21,11 @@ public class GameManager : GenericSingleton<GameManager>
         get { return isDungeonCleared; }
         set { isDungeonCleared = value; }
     }
-    private static long clearTime; 
+    private static long clearTime;
+
+    public bool hasShownDungeonIntro = false;
+
+
     protected override void Awake()
     {
         base.Awake();

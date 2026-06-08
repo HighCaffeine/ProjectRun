@@ -41,7 +41,10 @@ public class DialogueManager : GenericSingleton<DialogueManager>
     {
         if (isDialogueActive)
             return;
-
+        if(!dialoguePanel.activeSelf)
+        {
+            dialoguePanel.SetActive(true);
+        }
         currentDialogue = DialogueLoader.Load(fileName);
 
         if (currentDialogue == null)
