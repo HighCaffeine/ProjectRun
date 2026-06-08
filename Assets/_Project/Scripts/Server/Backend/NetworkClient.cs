@@ -69,7 +69,7 @@ public unsafe class NetworkClient
             socket.Connect(endPoint);
 
             socket.NoDelay = true;
-            
+
             socket.Blocking = false;
             socket.SendBufferSize = 65536;
 
@@ -130,7 +130,7 @@ public unsafe class NetworkClient
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[Packet Error] ID: {packet.pbase.packet_id} | MSG: {ex.Message}");
+                //Debug.LogError($"[Packet Error] ID: {packet.pbase.packet_id} | MSG: {ex.Message}");
             }
         }
     }
@@ -307,12 +307,12 @@ public unsafe class NetworkClient
         {
             if (socketProtocol == ProtocolType.Tcp)
             {
-                Debug.LogError($"[TCP Send Error] {ex.Message}");
+                //Debug.LogError($"[TCP Send Error] {ex.Message}");
                 Close();
             }
             else
             {
-                Debug.LogWarning($"[UDP Send Error] {ex.Message}");
+                //Debug.LogWarning($"[UDP Send Error] {ex.Message}");
             }
         }
     }

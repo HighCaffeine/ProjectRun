@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 // 구역(Sector) 단위로 데이터를 묶어서 관리하는 구조체
 [Serializable]

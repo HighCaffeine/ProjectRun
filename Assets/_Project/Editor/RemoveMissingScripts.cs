@@ -29,7 +29,7 @@ public class RemoveMissingScripts
         }
 
         AssetDatabase.SaveAssets(); // 변경사항 저장
-        Debug.Log($"<color=cyan>[완료]</color> 씬 & 프리팹 전체 검사 완료 총 {missingCount}개의 Missing Script 제거됨.");
+        //Debug.Log($"<color=cyan>[완료]</color> 씬 & 프리팹 전체 검사 완료 총 {missingCount}개의 Missing Script 제거됨.");
     }
 
     static int CleanObject(GameObject obj, string type)
@@ -47,7 +47,7 @@ public class RemoveMissingScripts
 
             if (removedCount > 0)
             {
-                Debug.LogWarning($"[{type}] {obj.name} 에서 {removedCount}개의 Missing Script 제거됨!", obj);
+                //Debug.LogWarning($"[{type}] {obj.name} 에서 {removedCount}개의 Missing Script 제거됨!", obj);
                 EditorUtility.SetDirty(obj); // 프리팹 변경사항 마킹
             }
         }

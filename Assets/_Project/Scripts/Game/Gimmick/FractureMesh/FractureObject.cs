@@ -85,7 +85,7 @@ public class FractureObject : MonoBehaviour
 
     /* private void OnCollisionEnter(Collision collision)
      {
-         Debug.Log("충돌 감지: " + collision.gameObject.name);
+         //Debug.Log("충돌 감지: " + collision.gameObject.name);
          if (isBroken) return;
 
          float impactForce = collision.impulse.magnitude;

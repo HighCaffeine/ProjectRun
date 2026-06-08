@@ -69,7 +69,7 @@ public class MonsterSpawnArea : BaseGimmick
                 }
             }
         }
-        Debug.Log($"<color=green>[MonsterSpawnArea]</color> ({gimmickUID}) : {spawnList.Count}마리 몬스터 스폰");
+        //Debug.Log($"<color=green>[MonsterSpawnArea]</color> ({gimmickUID}) : {spawnList.Count}마리 몬스터 스폰");
     }
     public override void ResetGimmick()
     {
@@ -82,7 +82,7 @@ public class MonsterSpawnArea : BaseGimmick
         }
         spawnedMonsters.Clear();
 
-        Debug.Log($"[MonsterSpawnArea] {gimmickUID} 구역 트리거 초기화 완료");
+        //Debug.Log($"[MonsterSpawnArea] {gimmickUID} 구역 트리거 초기화 완료");
     }
 
     private void OnDrawGizmos()

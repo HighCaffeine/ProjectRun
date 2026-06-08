@@ -117,7 +117,7 @@ public class GimmickAutoFixer : Editor
         // MonsterSpawnArea 전용 트리거 처리
         FixMonsterSpawnTriggers(allGimmicks, gimmickToNewID);
 
-        Debug.Log($"<color=cyan>[완료]</color> 총 {fixedCount}개의 기믹 세팅 및 트리거 자동 연결");
+        //Debug.Log($"<color=cyan>[완료]</color> 총 {fixedCount}개의 기믹 세팅 및 트리거 자동 연결");
     }
 
     // MonsterSpawnArea 전용 트리거 처리 함수
@@ -135,7 +135,7 @@ public class GimmickAutoFixer : Editor
 
         if (spawnAreas.Count == 0)
         {
-            Debug.Log("<color=yellow>[MonsterSpawn]</color> MonsterSpawnArea가 없습니다.");
+            //Debug.Log("<color=yellow>[MonsterSpawn]</color> MonsterSpawnArea가 없습니다.");
             return;
         }
 
@@ -186,13 +186,13 @@ public class GimmickAutoFixer : Editor
                 trigger.targetGimmicks = newTargets;
                 EditorUtility.SetDirty(trigger);
                 triggerFixCount++;
-                Debug.Log($"<color=green>[MonsterSpawn Trigger]</color> {trigger.name} - {newTargets.Count}개 에어리어 재연결 완료");
+                //Debug.Log($"<color=green>[MonsterSpawn Trigger]</color> {trigger.name} - {newTargets.Count}개 에어리어 재연결 완료");
             }
         }
 
         if (triggerFixCount == 0)
         {
-            Debug.LogWarning("<color=yellow>[MonsterSpawn]</color> 연결된 트리거가 없습니다. 트리거와 스폰 구역이 같은 부모 안에 있는지 확인하세요.");
+            //Debug.LogWarning("<color=yellow>[MonsterSpawn]</color> 연결된 트리거가 없습니다. 트리거와 스폰 구역이 같은 부모 안에 있는지 확인하세요.");
         }
     }
 }

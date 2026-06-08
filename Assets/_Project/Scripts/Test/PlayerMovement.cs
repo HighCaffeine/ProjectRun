@@ -85,7 +85,7 @@ public class PlayerMovement : MonoBehaviour
         //         curRot.Set(transform.rotation);
 
         //         SendMovePacket(curPos, curRot, 0.0f, 0.0f); //밀 때 안미끄러지게 정지 패킷 전송
-        //         Debug.Log($"[Physics] Type : {type}, Target : {target.Name}({target.ID})");
+        //         //Debug.Log($"[Physics] Type : {type}, Target : {target.Name}({target.ID})");
         //     }
         // }
     }

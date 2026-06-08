@@ -87,7 +87,7 @@ public class Player : MonoBehaviour
 
         // if (isLocal && Time.frameCount % 60 == 0) // 1초에 한 번씩 출력
         // {
-        //     Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
+        //     //Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
         // }
     }
 

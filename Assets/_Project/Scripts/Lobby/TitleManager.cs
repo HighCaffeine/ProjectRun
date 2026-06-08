@@ -77,7 +77,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
 
         if (string.IsNullOrWhiteSpace(nick))
         {
-            Debug.LogWarning("[System] 닉네임을 입력해야 합니다");
+            //Debug.LogWarning("[System] 닉네임을 입력해야 합니다");
             return;
         }
 
@@ -92,7 +92,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
             Client.Connect(resolvedIP, 11020, 5025);
             Client.TCP.AddPacketReceiver(this);
 
-            Debug.Log($"<color=green>[Network] 서버 연결 성공! (Domain: {serverDomain} -> IP: {resolvedIP})</color>");
+            //Debug.Log($"<color=green>[Network] 서버 연결 성공! (Domain: {serverDomain} -> IP: {resolvedIP})</color>");
 
             P_LoginReq loginReq = default;
             loginReq.userID = nick;
@@ -101,7 +101,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Network] 서버 연결 실패: {ex.Message}");
+            //Debug.LogError($"[Network] 서버 연결 실패: {ex.Message}");
             connectButton.interactable = true;
             cancelButton.interactable = true;
         }
@@ -129,7 +129,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Network] 도메인 파싱 실패, 로컬로 전환 Error: {ex.Message}");
+            //Debug.LogError($"[Network] 도메인 파싱 실패, 로컬로 전환 Error: {ex.Message}");
             return "127.0.0.1";
         }
     }
@@ -144,7 +144,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
             if (loginRes.result == 0) // 성공
             {
                 LocalPlayerInfo.ID = loginRes.userUUID;
-                Debug.Log("<color=cyan>[Client] 로그인 성공! 로비 씬으로 진입합니다.</color>");
+                //Debug.Log("<color=cyan>[Client] 로그인 성공! 로비 씬으로 진입합니다.</color>");
 
                 if (!isSceneLoading)
                 {
@@ -155,7 +155,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
             }
             else
             {
-                Debug.LogError($"[Client] 로그인 실패 에러 코드: {loginRes.result}");
+                //Debug.LogError($"[Client] 로그인 실패 에러 코드: {loginRes.result}");
                 connectButton.interactable = true;
                 cancelButton.interactable = true;
             }

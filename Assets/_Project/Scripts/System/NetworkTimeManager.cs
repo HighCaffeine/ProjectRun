@@ -51,7 +51,7 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
         };
 
         Client.TCP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
-        Debug.Log($"[TimeSync] 서버로 시간 동기화 요청 송신: {req.clientTimestamp}");
+        //Debug.Log($"[TimeSync] 서버로 시간 동기화 요청 송신: {req.clientTimestamp}");
     }
 
     public void OnReceiveTimeSyncResponse(long clientTimestamp, long serverTimestamp)

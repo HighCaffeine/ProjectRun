@@ -181,7 +181,7 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
 
         Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-        Debug.Log("[System] Ż�� ��û ��Ŷ ���� �Ϸ�");
+        //Debug.Log("[System] Ż�� ��û ��Ŷ ���� �Ϸ�");
     }
 
 

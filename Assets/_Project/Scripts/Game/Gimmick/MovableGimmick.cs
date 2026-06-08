@@ -14,7 +14,7 @@ public class MovableGimmick : BaseGimmick
     }
     public override void Execute(P_GimmickInteractNtf ntf)
     {
-     //   Debug.Log($"[MovableGimmick Execute] state={ntf.state}, targetPos={ntf.targetPos}");
+     //   //Debug.Log($"[MovableGimmick Execute] state={ntf.state}, targetPos={ntf.targetPos}");
 
         if (!isMoving) StartCoroutine(MoveRoutine(ntf.targetPos.ToVector3()));
     }
