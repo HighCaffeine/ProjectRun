@@ -552,7 +552,7 @@ public class PlayerActor : Actor
 
         return buf;
     }
-    private void OnDrawGizmos()
+  /*  private void OnDrawGizmos()
     {
         if (!isInWind) return;
 
@@ -561,7 +561,7 @@ public class PlayerActor : Actor
 
         Gizmos.color = Color.green;
         Gizmos.DrawRay(transform.position, horizontalMove.normalized * 3f);
-    }
+    }*/
 
     public override bool Is2p => is2p;
     public bool is2p = false;
@@ -663,5 +663,66 @@ public class PlayerActor : Actor
 
         return dir.normalized;
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        DrawActionRange(
+            3f,                 // Push 거리
+            43f,                // Push 각도
+            Color.red);
+
+        DrawActionRange(
+            13f,                // Pull 거리
+            30f,                // Pull 각도
+            Color.cyan);
+    }
+
+    private void DrawActionRange(float distance, float angle, Color color)
+    {
+        Vector3 forward;
+
+        if (Application.isPlaying)
+        {
+            forward = GetPushDir();
+        }
+        else
+        {
+            forward = transform.forward;
+        }
+
+        forward.y = 0f;
+        forward.Normalize();
+
+        Gizmos.color = color;
+
+        Vector3 leftDir = Quaternion.Euler(0f, -angle, 0f) * forward;
+        Vector3 rightDir = Quaternion.Euler(0f, angle, 0f) * forward;
+
+        Vector3 origin = transform.position;
+
+        Gizmos.DrawLine(origin, origin + leftDir * distance);
+        Gizmos.DrawLine(origin, origin + rightDir * distance);
+
+        const int segments = 40;
+
+        Vector3 prevPoint = origin + leftDir * distance;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            float currentAngle = Mathf.Lerp(-angle, angle, i / (float)segments);
+
+            Vector3 dir = Quaternion.Euler(0f, currentAngle, 0f) * forward;
+            Vector3 point = origin + dir * distance;
+
+            Gizmos.DrawLine(prevPoint, point);
+
+            prevPoint = point;
+        }
+
+        // 중앙 방향선
+        Gizmos.DrawLine(origin, origin + forward * distance);
+    }
+#endif
 }
 

@@ -33180,7 +33180,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1898985042291846219, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: orthographic size
-      value: 10
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2213636179672022268, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: Priority.Enabled
@@ -53500,7 +53500,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1121538416
 RectTransform:
   m_ObjectHideFlags: 0
