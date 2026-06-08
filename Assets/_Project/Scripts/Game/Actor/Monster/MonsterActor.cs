@@ -351,7 +351,7 @@ private void HandleNetworkSync()
         //Client.TCP.SendPacket2(E_PACKET.MONSTER_MOVEMENT, pkt);
     }
 
-    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
+    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default, long casterUUID = 0)
     {
         if (!IsLocal) return;
 
