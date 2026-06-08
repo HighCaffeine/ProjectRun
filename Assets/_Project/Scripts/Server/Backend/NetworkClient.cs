@@ -68,6 +68,8 @@ public unsafe class NetworkClient
         {
             socket.Connect(endPoint);
 
+            socket.NoDelay = true;
+
             socket.Blocking = false;
             socket.SendBufferSize = 65536;
 
