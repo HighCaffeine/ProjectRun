@@ -66,8 +66,10 @@ public enum E_PACKET : ushort
 
     DUNGEON_ESCAPE_REQ = 281,
     DUNGEON_CLEAR_NTF = 282,
-    PLAYER_DEAD_REQ = 283,
-    PLAYER_DEAD_NTF = 284,
+    DUNGEON_RETURN_VILLAGE_REQ = 283,
+    DUNGEON_RETURN_VILLAGE_NTF = 284,
+    PLAYER_DEAD_REQ = 285,
+    PLAYER_DEAD_NTF = 286,
 
     // --- 5. Shop, Inventory, Trade (300 ~ 399) ---
     INVENTORY_INFO = 301,
@@ -338,11 +340,34 @@ public struct P_SceneSyncReq
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_DungeonEscapeReq
 {
-    public byte dummy;
+    [MarshalAs(UnmanagedType.I4)] public int p1Push;
+    [MarshalAs(UnmanagedType.I4)] public int p1Pull;
+    [MarshalAs(UnmanagedType.I4)] public int p1Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p2Push;
+    [MarshalAs(UnmanagedType.I4)] public int p2Pull;
+    [MarshalAs(UnmanagedType.I4)] public int p2Fall;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_DungeonClearNtf
+{
+    [MarshalAs(UnmanagedType.I4)] public int clearTimeSeconds; 
+    [MarshalAs(UnmanagedType.I4)] public int p1Push;
+    [MarshalAs(UnmanagedType.I4)] public int p1Pull;
+    [MarshalAs(UnmanagedType.I4)] public int p1Fall;
+    [MarshalAs(UnmanagedType.I4)] public int p2Push;
+    [MarshalAs(UnmanagedType.I4)] public int p2Pull;
+    [MarshalAs(UnmanagedType.I4)] public int p2Fall;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_DungeonReturnVillageReq
+{
+    public byte dummy;
+}
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+public struct P_DungeonReturnVillageNtf
 {
     public byte dummy;
 }

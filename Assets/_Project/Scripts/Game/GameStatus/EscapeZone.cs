@@ -4,41 +4,53 @@ using UnityEngine;
 public class EscapeZone : MonoBehaviour
 {
     public List<PlayerActor> escapePlayers = new List<PlayerActor>();
-    private bool isTriggered = false;
     [SerializeField] private GameObject diary;
 
     private bool _cutscenePlayed = false;
     public bool CutscenePlayed => _cutscenePlayed;
-
     public bool isFirstShowResult = false;
 
-    public void Exit()
-    {
-        P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
-        Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-        Debug.Log("[System] 탈출 요청 패킷 전송 완료");
-    }
+    private bool _escapeSent = false;
+    private bool _resultShown = false;
+    private bool isTriggered = false;
+
     private void Update()
     {
-        if (isTriggered) return;
+        if (_escapeSent) return;
 
-        if (GameManager.Instance.isHost)
+        PlayerActor localActor = GetLocalPlayerActor();
+        if (localActor == null || !escapePlayers.Contains(localActor)) return;
+
+        _escapeSent = true;
+        SendEscapePacket();
+    }
+
+    private void SendEscapePacket()
+    {
+        P_DungeonEscapeReq pkt = new P_DungeonEscapeReq();
+
+        PlayerActor localActor = GetLocalPlayerActor();
+        if (localActor == null)
         {
-            if (escapePlayers.Count < 2) return;
-
-            isTriggered = true;
-
-            Exit();
+            Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
+            return;
         }
-        else
+
+        if (localActor == ActorManager.Instance.p1)
         {
-            PlayerActor localActor = GetLocalPlayerActor();
-            if (localActor != null && escapePlayers.Contains(localActor))
-            {
-                isTriggered = true;
-                Exit();
-            }
+            pkt.p1Push = localActor.pushCount;
+            pkt.p1Pull = localActor.pullCount;
+            pkt.p1Fall = localActor.fallDeathCount;
         }
+        else // p2
+        {
+            pkt.p2Push = localActor.pushCount;
+            pkt.p2Pull = localActor.pullCount;
+            pkt.p2Fall = localActor.fallDeathCount;
+        }
+
+        Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
+        Debug.Log($"[EscapeZone] 탈출 패킷 전송 - push:{localActor.pushCount} pull:{localActor.pullCount} fall:{localActor.fallDeathCount}");
     }
 
     private PlayerActor GetLocalPlayerActor()
@@ -48,20 +60,16 @@ public class EscapeZone : MonoBehaviour
         return localPlayer.GetComponent<PlayerActor>();
     }
 
-    private bool _resultShown = false;
-
     public void OnActiveResult()
     {
         if (!_resultShown)
         {
-            // 결과창 아직 안 봤으면 -> 결과창 표시
             _resultShown = true;
             isTriggered = true;
             DungeonUiManager.Instance.ShowResult();
         }
         else
         {
-            // 결과창 이미 봤으면 -> 마을 이동
             GameManager.Instance.DungeonClear();
             GameManager.Instance.LoadVillage();
         }
@@ -75,23 +83,14 @@ public class EscapeZone : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         PlayerActor actor = other.GetComponent<PlayerActor>();
-
-        if (actor != null)
-        {
-            if (!escapePlayers.Contains(actor))
-            {
-                escapePlayers.Add(actor);
-            }
-        }
+        if (actor != null && !escapePlayers.Contains(actor))
+            escapePlayers.Add(actor);
     }
 
     private void OnTriggerExit(Collider other)
     {
         PlayerActor actor = other.GetComponent<PlayerActor>();
-
         if (actor != null)
-        {
             escapePlayers.Remove(actor);
-        }
     }
 }
