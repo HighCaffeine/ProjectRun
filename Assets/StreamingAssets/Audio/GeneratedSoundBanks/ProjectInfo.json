@@ -1,18 +1,18 @@
 {
  "ProjectInfo": {
   "Project": {
-   "Name": "CKFinalProject",
+   "Name": "CK_ProjectRun",
    "GUID": "{A7924039-5D93-4DF0-8F89-58502655489D}",
-   "Generator": "2025.1.3.9039"
+   "Generator": "2025.1.6.9117"
   },
-  "CacheRoot": "../../../../../Wwise/CKFinalProject/.cache",
+  "CacheRoot": "../../../../../ProjectRun_Wwise/.cache",
   "Platforms": [
    {
     "Name": "Windows",
     "GUID": "{E5219C91-D486-4706-858F-3236B87C7991}",
     "BasePlatform": "Windows",
     "BasePlatformGUID": "{6E0CB257-C6C8-4C5C-8366-2740DFC441EB}",
-    "Path": "../../../../../Wwise/CKFinalProject/GeneratedSoundBanks/Windows"
+    "Path": "../../../../../ProjectRun_Wwise/GeneratedSoundBanks/Windows"
    }
   ],
   "Languages": [
@@ -24,6 +24,6 @@
     "UseAsStandIn": "true"
    }
   ],
-  "FileHash": "{BF9DD836-13C7-6E95-8BB4-90B0DADE9384}"
+  "FileHash": "{D394B3B4-97DA-8667-03D2-EAC718674DD8}"
  }
 }

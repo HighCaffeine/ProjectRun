@@ -10,6 +10,8 @@
 /Assets/_Project/_WorkingSpace
 /Assets/ExternalFiles
 
+/Assets/_Recovery
+
 .utmp/
 /[Ll]ibrary/
 /[Tt]emp/
@@ -124,3 +126,5 @@ logRunSetup.txt
 WwiseUnityIntegration_*_Src.zip
 
 !Assets/Wwise/API/Runtime/Plugins/Windows/x86_64/Release/AkUnitySoundEngine.dll
+Assets/StreamingAssets/build_info
+Assets/Wwise/LauncherInfo.json.meta

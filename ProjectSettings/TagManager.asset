@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Gimmick
   - Structure
+  - Local
+  - Breakable
+  - Wall
   layers:
   - Default
   - TransparentFX
@@ -13,14 +16,14 @@ TagManager:
   - 
   - Water
   - UI
+  - LightIgnore
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Actionable
+  - Character
+  - TargetedMesh
+  - TargetedObjMesh
+  - UI_Character
+  - UI_Effect
   - 
   - 
   - 
@@ -45,3 +48,4 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
+  - Outline

@@ -1,0 +1,49 @@
+{
+ "SoundBanksInfo": {
+  "Platform": "Mac",
+  "BasePlatform": "Mac",
+  "SchemaVersion": "16",
+  "SoundBankVersion": "172",
+  "SoundBanks": [
+   {
+    "Id": "1355168291",
+    "Type": "User",
+    "GUID": "{701ECBBD-9C7B-4030-8CDB-749EE5D1C7B9}",
+    "Language": "SFX",
+    "Hash": "{8CBC2CD0-42C0-9F20-AFE8-5201E29BE1BB}",
+    "ObjectPath": "Init",
+    "ShortName": "Init",
+    "Path": "Init.bnk",
+    "Plugins": {
+     "AudioDevices": [
+      {
+       "Id": "2317455096",
+       "Name": "No_Output",
+       "ObjectPath": "\\Devices\\Default Work Unit\\No_Output",
+       "GUID": "{66AEC13F-9480-4355-9FC9-AA4AB5D12C8B}",
+       "LibName": "No Output",
+       "LibId": "11862023"
+      },
+      {
+       "Id": "3859886410",
+       "Name": "System",
+       "ObjectPath": "\\Devices\\Default Work Unit\\System",
+       "GUID": "{4B091DC1-1792-4837-A486-63F56A0AB579}",
+       "LibName": "System",
+       "LibId": "11403271"
+      }
+     ]
+    },
+    "Busses": [
+     {
+      "Id": "2246998526",
+      "Name": "Main Audio Bus",
+      "ObjectPath": "\\Busses\\Default Work Unit\\Main Audio Bus",
+      "GUID": "{1514A4D8-1DA6-412A-A17E-75CA0C2149F3}"
+     }
+    ]
+   }
+  ],
+  "FileHash": "{ECE904E7-9BBD-C600-C762-3FADAADC36EC}"
+ }
+}

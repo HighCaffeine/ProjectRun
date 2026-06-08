@@ -9,15 +9,25 @@ public class Player : MonoBehaviour
     [SerializeField] private long id;
     [SerializeField] private bool isLocal;
 
+    public long GetID() => id;
+
     [Header("Sync Data")]
-    [SerializeField] private Vector3 serverPos;
+    public Vector3 serverPos;
+    [SerializeField] private Quaternion serverRot;
     [SerializeField] private float currentSpeed = 5.0f;
     [SerializeField] private bool isMoving;
     [SerializeField] private uint lastProcessedSeq = 0;
 
+
     [Header("Calibration Settings")]
     [SerializeField] private float snapThreshold = 5.0f; // 이 이상 벌어지면 강제 텔레포트
-    [SerializeField] private float lerpSpeed = 15.0f;    // 타 플레이어 부드러운 이동 속도
+    [SerializeField] private float lerpSpeed = 10.0f;    // 타 플레이어 부드러운 이동 속도
+
+    public Vector3 ServerPos
+    {
+        get => serverPos;
+        set => serverPos = value;
+    }
 
     public string Name => this.name;
     public long ID => this.id;
@@ -34,26 +44,38 @@ public class Player : MonoBehaviour
 
     public void SetSpeed(float speed) { this.currentSpeed = speed; }
     public void SetPos(Vector3 pos) { this.serverPos = pos; }
-
+    public void SetRot(Quaternion rot) { this.serverRot = rot; }
+    private bool hasReceivedFirstSync = false;
 
     public void OnSyncMovement(P_UpdatePlayerMovement pkt)
     {
-        // if (isLocal)
-        // {
-        //     if (pkt.lastInputSeq < lastProcessedSeq) return;
-        //     lastProcessedSeq = pkt.lastInputSeq;
-        // }
+        if (isLocal)
+        {
+            if (pkt.lastInputSeq < lastProcessedSeq) return;
+            lastProcessedSeq = pkt.lastInputSeq;
 
-        if (pkt.lastInputSeq < lastProcessedSeq) return;
-        lastProcessedSeq = pkt.lastInputSeq;
+            if (actor != null && actor.sm.currentState is KnockbackState) return;
+        }
 
         serverPos = pkt.currentPos.ToVector3();
+        serverRot = pkt.currentRot.ToQuaternion();
         currentSpeed = pkt.currentSpeed;
         isMoving = pkt.isMoving;
+
+        if (!hasReceivedFirstSync)
+        {
+            hasReceivedFirstSync = true;
+            transform.position = serverPos;
+            transform.rotation = serverRot;
+        }
     }
 
     void Update()
     {
+        if (float.IsNaN(serverPos.x) || float.IsNaN(serverRot.x)) return;
+
+        if (actor != null && actor.ignoreServerPosTimer > 0f) actor.ignoreServerPosTimer -= Time.deltaTime;
+
         if (isLocal)
         {
             ProcessLocalCalibration();
@@ -63,10 +85,10 @@ public class Player : MonoBehaviour
             ProcessRemoteMovement();
         }
 
-        if (isLocal && Time.frameCount % 60 == 0) // 1초에 한 번씩 출력
-        {
-            Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
-        }
+        // if (isLocal && Time.frameCount % 60 == 0) // 1초에 한 번씩 출력
+        // {
+        //     Debug.Log($"[Sync Check] Client: {transform.position.x:F2}, {transform.position.z:F2} | Server: {serverPos.x:F2}, {serverPos.z:F2}");
+        // }
     }
 
     // private void ProcessLocalCalibration()
@@ -132,31 +154,37 @@ public class Player : MonoBehaviour
 
     public void ApplyKnockback(Vector3 attackerPos, byte actionType)
     {
-        if (actor != null && actor.IsLocal)
+        if (actor == null) return;
+
+        bool isPull = (actionType == 1);
+        Vector3 pushDir = (transform.position - attackerPos).normalized;
+        pushDir.y = 0;
+        if (isPull) pushDir = -pushDir;
+
+        if (actor.IsLocal)
         {
-            Vector3 pushDir = (transform.position - attackerPos).normalized;
-            pushDir.y = 0;
-
-            bool isPull = (actionType == 1);
-            if (isPull) pushDir = -pushDir;
-
+            // 로컬: 실제 물리 넉백 적용
             actor.sm.ChangeState(new KnockbackState(actor, pushDir, 15.0f, isPull, attackerPos));
         }
         else
         {
-            StartCoroutine(RemoteVisualRoutine());
+            // 리모트: 이펙트만 (위치는 서버에서 UPDATE_PLAYER_MOVEMENT로 옴)
+            StartCoroutine(RemoteVisualRoutine(actionType));
         }
     }
 
     private void ProcessLocalCalibration()
     {
         if (actor.sm.currentState is KnockbackState) return;
+        if (actor.ignoreServerPosTimer > 0f) return;
 
         Vector3 currentPos = transform.position;
         // 거리 체크를 X, Z 평면에서만 수행 (높이 차이는 무시)
-        float distXZ = Vector2.Distance(new Vector2(currentPos.x, currentPos.z), new Vector2(serverPos.x, serverPos.z));
+        float dx = serverPos.x - currentPos.x;
+        float dz = serverPos.z - currentPos.z;
+        float sqrDistXZ = (dx * dx) + (dz * dz);
 
-        if (distXZ > snapThreshold)
+        if (sqrDistXZ > (snapThreshold * snapThreshold)) // 제곱값끼리 비교
         {
             actor.SetControllerActive(false);
 
@@ -166,52 +194,42 @@ public class Player : MonoBehaviour
             return;
         }
 
-        if (distXZ > 0.01f)
+        if (sqrDistXZ > 0.01f)
         {
             Vector3 pullDir = (serverPos - currentPos);
             pullDir.y = 0; // 수평으로만 당김
 
             float strength = isMoving ? 1.5f : 3.0f;
-            actor.Move(pullDir, strength);
+            // actor.Move(pullDir, strength);
         }
 
         // transform.position = new Vector3(transform.position.x, lerpY, transform.position.z);
     }
     private void ProcessRemoteMovement()
     {
-        // 거리를 X, Z 기준으로만 계산
-        Vector3 flatCurrent = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 flatServer = new Vector3(serverPos.x, 0, serverPos.z);
-        float dist = Vector3.Distance(flatCurrent, flatServer);
+        Vector3 targetPos = serverPos;
+        float dist = Vector3.Distance(transform.position, targetPos);
 
-        if (dist > snapThreshold * 2.0f)
+        if (dist > snapThreshold * 2f)
         {
-            // X, Z만 맞추고 Y는 중력에 맡김
-            transform.position = new Vector3(serverPos.x, transform.position.y, serverPos.z);
+            actor.SetControllerActive(false);
+            transform.position = targetPos;
+            actor.SetControllerActive(true);
+            transform.rotation = serverRot;
             return;
         }
 
-        float adaptiveSpeed = dist > 1.0f ? lerpSpeed * 1.5f : lerpSpeed;
-
-        Vector3 targetPos = new Vector3(serverPos.x, transform.position.y, serverPos.z);
-        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * adaptiveSpeed);
-
-        Vector3 dir = (serverPos - transform.position);
-        dir.y = 0;
-        if (dir.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRot = Quaternion.LookRotation(dir.normalized);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * lerpSpeed);
-        }
+        transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * lerpSpeed);
+        transform.rotation = Quaternion.Slerp(transform.rotation, serverRot, Time.deltaTime * lerpSpeed);
     }
 
-    private IEnumerator RemoteVisualRoutine()
+    private IEnumerator RemoteVisualRoutine(byte actionType)
     {
         PlayerActor pActor = GetComponent<PlayerActor>();
         if (pActor != null)
         {
             if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = true;
-            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Play();
+            if (pActor.travelSparkParticle != null) pActor.PlayTravelSpark((eState)actionType);
         }
 
         yield return new WaitForSeconds(0.25f); // 넉백 지속시간
@@ -219,7 +237,7 @@ public class Player : MonoBehaviour
         if (pActor != null)
         {
             if (pActor.trailRenderer != null) pActor.trailRenderer.emitting = false;
-            if (pActor.travelSparkParticle != null) pActor.travelSparkParticle.Stop();
+            if (pActor.travelSparkParticle != null) pActor.StopTravelSpark();
         }
     }
 }
