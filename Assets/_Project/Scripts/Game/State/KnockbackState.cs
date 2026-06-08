@@ -19,9 +19,10 @@ public class KnockbackState : IState
     private Vector3 startPos;
     private Vector3 targetPos;
 
+    private long attackerID;
     private static Collider[] wallHitBuffer = new Collider[5];
 
-    public KnockbackState(Actor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos, float latency = 0f)
+    public KnockbackState(Actor actor, Vector3 dir, float power, bool isPull, Vector3 casterPos, float latency = 0f, long attackerID = -1)
     {
         this.actor = actor;
         this.knockbackDir = dir.normalized;
@@ -29,6 +30,7 @@ public class KnockbackState : IState
         this.isPull = isPull;
         this.casterPos = casterPos;
         this.latencyOffset = latency;
+        this.attackerID = attackerID;
     }
 
     public void Enter()
@@ -88,8 +90,8 @@ public class KnockbackState : IState
 
     private void SendKnockbackState()
     {
-        // 원본의 targetUUID: 0 파라미터 유지
-        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, targetUUID: 0, isPull: isPull, casterPos: casterPos);
+        actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, targetUUID: attackerID, isPull: isPull, casterPos: casterPos);
+        
     }
 
     private void PlayKnockbackAnimation()
@@ -102,6 +104,8 @@ public class KnockbackState : IState
         // 원본의 플레이어 및 몬스터 분기 처리 상세 유지
         if (actor is PlayerActor pActor)
         {
+            pActor.lastAttackerID = attackerID;
+
             pActor.StartCoroutine(pActor.HitStopRoutine());
             pActor.SetVerticalVelocity(3.0f);
 

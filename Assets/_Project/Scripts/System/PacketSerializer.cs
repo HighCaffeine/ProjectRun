@@ -118,7 +118,7 @@ public static class PacketSerializer
 
     static byte[] SerializePlayerStatus(P_PlayerStatusNtf p)
     {
-        var buf = new byte[46]; //8+1+12+4+1+12+8
+        var buf = new byte[54]; //8+1+12+4+1+12+8+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         buf[o++] = p.newState;
@@ -131,19 +131,24 @@ public static class PacketSerializer
         Write(buf, ref o, p.casterPos.y);
         Write(buf, ref o, p.casterPos.z);
         Write(buf, ref o, p.timestamp);
+        Write(buf, ref o, p.casterUUID);
         return buf;
     }
 
     static byte[] SerializeDungeonEscapeReq(P_DungeonEscapeReq p)
     {
-        var buf = new byte[24]; // 4 + 4 + 4 + 4 + 4 + 4
+        var buf = new byte[40];
         int o = 0;
         Write(buf, ref o, p.p1Push);
         Write(buf, ref o, p.p1Pull);
         Write(buf, ref o, p.p1Fall);
+        Write(buf, ref o, p.p1Destroy);
+        Write(buf, ref o, p.p1FallKill);
         Write(buf, ref o, p.p2Push);
         Write(buf, ref o, p.p2Pull);
         Write(buf, ref o, p.p2Fall);
+        Write(buf, ref o, p.p2Destroy);
+        Write(buf, ref o, p.p2FallKill);
         return buf;
     }
 
@@ -259,7 +264,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterStateNtf(P_MonsterStateNtf p)
     {
-        var buf = new byte[50]; //8+4+1+12+4+1+12
+        var buf = new byte[58]; //8+4+1+12+4+1+12+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
@@ -272,6 +277,7 @@ public static class PacketSerializer
         Write(buf, ref o, p.casterPos.x);
         Write(buf, ref o, p.casterPos.y);
         Write(buf, ref o, p.casterPos.z);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
 
@@ -286,7 +292,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterMovement(P_MonsterMovement p)
     {
-        var buf = new byte[40]; //8+4+12+16
+        var buf = new byte[48]; //8+4+12+16+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
@@ -297,6 +303,7 @@ public static class PacketSerializer
         Write(buf, ref o, p.currentRot.y);
         Write(buf, ref o, p.currentRot.z);
         Write(buf, ref o, p.currentRot.w);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
     // ── 헬퍼 ───────────────────────────────────────────────

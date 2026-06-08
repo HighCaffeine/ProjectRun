@@ -43,6 +43,20 @@ public class DeadZone : MonoBehaviour
 
             if (actor != null && actor.IsLocal && !actor.isDead)
             {
+                if (actor.lastAttackerID != -1 && actor.lastAttackerID != LocalPlayerInfo.ID)
+                {
+                    // 공격자 찾아서 카운트
+                    foreach (var p in ActorManager.Instance.actors.Values)
+                    {
+                        Player player = p.GetComponent<Player>();
+                        if (player != null && player.ID == actor.lastAttackerID)
+                        {
+                            p.fallKillCount++;
+                            break;
+                        }
+                    }
+                }
+                
                 ActorManager.Instance.OnPlayerDead(other.name);
             }
         }

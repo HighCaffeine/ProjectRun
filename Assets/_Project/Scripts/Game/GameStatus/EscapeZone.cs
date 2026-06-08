@@ -41,12 +41,16 @@ public class EscapeZone : MonoBehaviour
             pkt.p1Push = localActor.pushCount;
             pkt.p1Pull = localActor.pullCount;
             pkt.p1Fall = localActor.fallDeathCount;
+            pkt.p1Destroy = localActor.destroyCount;
+            pkt.p1FallKill = localActor.fallKillCount;
         }
-        else // p2
+        else
         {
             pkt.p2Push = localActor.pushCount;
             pkt.p2Pull = localActor.pullCount;
             pkt.p2Fall = localActor.fallDeathCount;
+            pkt.p2Destroy = localActor.destroyCount;
+            pkt.p2FallKill = localActor.fallKillCount;
         }
 
         Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);

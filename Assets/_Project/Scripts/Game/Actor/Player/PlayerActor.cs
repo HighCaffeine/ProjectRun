@@ -60,6 +60,8 @@ public class PlayerActor : Actor
     public int fallDeathCount = 0;
     public int pushCount = 0;
     public int pullCount = 0;
+    public int destroyCount = 0;
+    public int fallKillCount = 0;
     #endregion
     public void SetController(CharacterController cc) => this.controller = cc;
     public void SetControllerActive(bool isActive) { if (this.controller != null) this.controller.enabled = isActive; }
@@ -72,6 +74,8 @@ public class PlayerActor : Actor
     public SpriteRenderer Indicator;
     public SpriteRenderer PullIndicator;
     public SpriteRenderer PushIndicator;
+
+    public long lastAttackerID = -1;
     public bool canInput = true;
     protected new void Start()
     {
@@ -91,7 +95,7 @@ public class PlayerActor : Actor
 
         PullIndicator.gameObject.SetActive(false);
         PushIndicator.gameObject.SetActive(false);
-        fallDeathCount = 0; pushCount = 0; pullCount = 0;
+        fallDeathCount = 0; pushCount = 0; pullCount = 0; destroyCount = 0; fallKillCount = 0;
     }
     void OnApplicationFocus(bool hasFocus)
     {
@@ -405,7 +409,7 @@ public class PlayerActor : Actor
     public void ShakeCamera() { CameraManager.Instance.PlayEffect(new CameraShakeEffect(CAMERA_SHAKE, CAMERA_SHAKE, 0.3f)); }
 
     // 상태 변경 패킷 전송용 함수
-    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default)
+    public override void SendStateChange(eState stateCode, Vector3 dir = default, float param = 0f, long targetUUID = 0, bool isPull = false, Vector3 casterPos = default, long casterUUID = 0)
     {
         if (GameManager.Instance == null) return;
         if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
@@ -423,7 +427,8 @@ public class PlayerActor : Actor
             isPull = isPull ? (byte)1 : (byte)0,
             casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z },
 
-            timestamp = NetworkTimeManager.Instance.GetServerTime()
+            timestamp = NetworkTimeManager.Instance.GetServerTime(),
+            casterUUID = casterUUID
         };
 
    

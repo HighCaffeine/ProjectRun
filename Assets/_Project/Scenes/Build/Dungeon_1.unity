@@ -96706,11 +96706,11 @@ PrefabInstance:
     - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: bc830ab3fb806ad45ac3a8738df56f46, type: 2}
+      objectReference: {fileID: 11400000, guid: 24e9108eeec904c458eed000319593b3, type: 2}
     - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: -6562454266388396948, guid: bc830ab3fb806ad45ac3a8738df56f46, type: 2}
+      objectReference: {fileID: -5968235118441240360, guid: 24e9108eeec904c458eed000319593b3, type: 2}
     - target: {fileID: 3277072162609191666, guid: f5e23a89a7bd4434a92d3ff69703b14c, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
@@ -169137,9 +169137,12 @@ MonoBehaviour:
   fallDeathCount: 0
   pushCount: 0
   pullCount: 0
+  destroyCount: 0
+  fallKillCount: 0
   Indicator: {fileID: 1613898371752105879}
   PullIndicator: {fileID: 248714965247651203}
   PushIndicator: {fileID: 6298201647857387764}
+  lastAttackerID: -1
   is2p: 0
 --- !u!1001 &8111336623185049214
 PrefabInstance:
