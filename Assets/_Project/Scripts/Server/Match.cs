@@ -927,10 +927,8 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             pActor.InitCharacterModel(finalCharID);
 
-          //  Debug.Log(
-    $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
-          //  Debug.Log(
-            $"AddPlayer name={playerName} charID={finalCharID}");
+          //  Debug.Log($"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+          //  Debug.Log($"AddPlayer name={playerName} charID={finalCharID}");
 
             return player;
         }
