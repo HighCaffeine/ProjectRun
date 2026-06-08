@@ -67,6 +67,10 @@ public class DungeonUiManager : GenericSingleton<DungeonUiManager>
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if(DialogueManager.Instance.isDialogueActive)
+            {
+                return;
+            }
             ToggleSetting();
         }
         if (Input.GetKeyDown(KeyCode.Tab))
