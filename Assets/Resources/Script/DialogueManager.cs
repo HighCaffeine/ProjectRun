@@ -104,10 +104,13 @@ public class DialogueManager : GenericSingleton<DialogueManager>
     {
         if (!isDialogueActive)
             return;
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) ||Input.GetMouseButtonDown(0))
         {
             OnPressSpace();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            EndDialogue();
         }
     }
 
@@ -128,7 +131,6 @@ public class DialogueManager : GenericSingleton<DialogueManager>
     {
         currentIndex++;
 
-        // ������ �ٱ��� �Ϸ�
         if (currentIndex >= currentDialogue.lines.Count)
         {
             EndDialogue();
