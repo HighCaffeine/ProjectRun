@@ -42,7 +42,7 @@ public class ProGressUi : GenericSingleton<ProGressUi>
 
         targetImage = stageImages[mapID];
 
-        Debug.Log($"[ProGressUi] StageUpdate: 현재 MapID = {mapID}, UI 업데이트 완료"); 
+    
     }
     private IEnumerator CrossFade(CanvasGroup fadeObject, float duration, float start, float end)
     {

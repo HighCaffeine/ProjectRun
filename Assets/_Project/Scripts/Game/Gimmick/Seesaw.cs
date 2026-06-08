@@ -16,7 +16,7 @@ public class Seesaw : MonoBehaviour
 
     // void OnTriggerEnter(Collider other)
     // {
-    //     Debug.Log("Trigger Enter: " + other.name);
+    //     //Debug.Log("Trigger Enter: " + other.name);
     //     if (other.GetComponent<PlayerActor>())
     //     {
     //         players.Add(other.transform);

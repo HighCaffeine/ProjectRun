@@ -127,30 +127,10 @@ public class ActionState : IState
 
     private void ProcessTarget()
     {
-        if (!actor.IsLocal) return;
-
-        if (actor is PlayerActor player)
+        //if (!actor.IsLocal) return;
+    if (targetActor != null)
         {
-            if (actionType == eState.Push) player.pushCount++;
-            else if (actionType == eState.Pull) player.pullCount++;
-            
-            //if (!actor.IsLocal) return;
-            Debug.Log($"[ActionState] {actor.name}의 타겟 처리 시작. Actor Target: {(targetActor != null ? targetActor.name : "None")}, Gimmick Target: {(targetGimmick != null ? targetGimmick.name : "None")}");
-            if (targetActor != null)
-            {
-            
-                ProcessActorTarget();
-                return;
-            }
-
-            if (targetGimmick != null)
-            {
-                ProcessGimmickTarget();
-            }
-        }
-
-        if (targetActor != null)
-        {
+           
             ProcessActorTarget();
             return;
         }
@@ -196,6 +176,13 @@ public class ActionState : IState
         }
 
         finalDistance *= actor.PushMulti;
+        if (actor is PlayerActor player)
+        {
+            if (actionType == eState.Push)
+                player.pushCount++;
+            else if (actionType == eState.Pull)
+                player.pullCount++;
+        }
 
         if (ShouldSendActorTargetPacket(out Player targetPlayer))
         {
@@ -210,9 +197,8 @@ public class ActionState : IState
         }
 
         targetActor.sm.ChangeState(new KnockbackState(
-                targetActor, knockbackDir, finalDistance,
-                actionType == eState.Pull, actor.transform.position,
-                attackerID: LocalPlayerInfo.ID));
+            targetActor, knockbackDir, finalDistance,
+            actionType == eState.Pull, actor.transform.position));
     }
 
     private bool ShouldSendActorTargetPacket(out Player targetPlayer)
@@ -349,7 +335,6 @@ public class ActionState : IState
         FractureObject fracture = targetGimmick.GetComponent<FractureObject>();
         if (fracture != null)
         {
-            if (actor is PlayerActor player) player.destroyCount++;
             BreakFractureObject(fracture);
             return;
         }
@@ -433,7 +418,7 @@ public class ActionState : IState
     public void OnAttackHit()
     {
         if (hitProcessed) return;
-        Debug.Log($"[ActionState] {actor.name}의 공격 히트 이벤트 처리 시작.");
+      
         hitProcessed = true;
         ProcessTarget();
     }

@@ -10,7 +10,7 @@ public class ZFightingFixer : EditorWindow
         GameObject[] selectedObjects = Selection.gameObjects;
         if (selectedObjects.Length == 0)
         {
-            Debug.LogWarning("최상위 루트 오브젝트를 선택해주세요");
+            //Debug.LogWarning("최상위 루트 오브젝트를 선택해주세요");
             return;
         }
 
@@ -35,7 +35,7 @@ public class ZFightingFixer : EditorWindow
 
         if (targetsToRecord.Count == 0)
         {
-            Debug.LogWarning("조정할 하위 오브젝트가 없습니다.");
+            //Debug.LogWarning("조정할 하위 오브젝트가 없습니다.");
             return;
         }
 
@@ -48,6 +48,6 @@ public class ZFightingFixer : EditorWindow
             targetsToRecord[i].position = pos;
         }
 
-        Debug.Log($"<color=green>[Z-Fighting Fix]</color> 루트 제외 총 {targetsToRecord.Count}개의 하위 오브젝트 Y값 미세 조정");
+        //Debug.Log($"<color=green>[Z-Fighting Fix]</color> 루트 제외 총 {targetsToRecord.Count}개의 하위 오브젝트 Y값 미세 조정");
     }
 }

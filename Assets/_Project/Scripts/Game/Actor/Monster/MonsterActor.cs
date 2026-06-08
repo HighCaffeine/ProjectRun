@@ -193,8 +193,8 @@ public class MonsterActor : Actor
     private void UpdateTarget()
     {
         if (currentTarget == null || currentTarget.isDead)
-        {
-            ChooseTarget();
+        { 
+            ChooseTarget();     
         }
     }
 
@@ -202,18 +202,17 @@ public class MonsterActor : Actor
     // 공격 / 타겟팅 로직 (쿨다운 복구 완료)
     // ────────────────────────────────────────────────
     private void TryChangeToActionState()
-    {
+    {   
         if (!CanStartAction()) return;
         if (!CheckActionIntent()) return;
 
-        // ★ 쿨다운 갱신
         lastAttackTime = Time.time;
+
         sm.ChangeState(new ActionState(this, eState.Push, currentTarget));
     }
 
     private bool CanStartAction()
     {
-        // ★ 쿨다운 체크 복구 + 액션 중복 실행 방지
         if (Time.time - lastAttackTime < attackCooldown) return false;
         return sm.currentState is IdleState || sm.currentState is MoveState;
     }

@@ -252,7 +252,7 @@ public class KnockbackState : IState
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-            Debug.Log($"<color=yellow>[KnockbackState]</color> BreakableWall 충돌 패킷 전송 - GimmickID: {wall.gimmickUID}");
+        
         }
         else
         {

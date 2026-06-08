@@ -11,27 +11,27 @@ public class PathVisualizer : MonoBehaviour
         Instance = this;
     }
 
-    // ¼­¹ö ±Ô°Ý°ú À¯»çÇÑ ÆÐÅ¶ µ¥ÀÌÅÍ ±¸Á¶ (½Ã¹Ä·¹ÀÌ¼Ç ¿ë)
-    // ½ÇÁ¦·Î´Â ³×Æ®¿öÅ© ¶óÀÌºê·¯¸®ÀÇ ¼ö½Å ¹öÆÛ¿¡¼­ ÆÄ½ÌÇÑ °ªÀ» »ç¿ëÇÏ½Ã¸é µË´Ï´Ù.
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½Ô°Ý°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¶ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ã¹Ä·ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½)
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Î´ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½Ìºê·¯ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û¿ï¿½ï¿½ï¿½ ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï½Ã¸ï¿½ ï¿½Ë´Ï´ï¿½.
     private Vector3[] receivedPath = new Vector3[10];
     private int receivedPathCount = 0;
 
-    // ±âÁî¸ð »ö»ó ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     public Color pathColor = Color.green;
     public Color waypointColor = Color.red;
     public bool showOnlyWhenSelected = false;
 
     /// <summary>
-    /// ³×Æ®¿öÅ© ¸ðµâ¿¡¼­ ÆÐÅ¶À» ¹ÞÀ¸¸é ÀÌ ÇÔ¼ö¸¦ È£ÃâÇÏ¿© µ¥ÀÌÅÍ¸¦ °»½ÅÇÕ´Ï´Ù.
+    /// ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½â¿¡ï¿½ï¿½ ï¿½ï¿½Å¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.
     /// </summary>
-    /// <param name="count">À¯È¿ÇÑ °æ·Î Á¡ÀÇ °³¼ö</param>
-    /// <param name="pathArray">¼­¹ö·ÎºÎÅÍ ¹ÞÀº ÁÂÇ¥ ¹è¿­</param>
+    /// <param name="count">ï¿½ï¿½È¿ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½</param>
+    /// <param name="pathArray">ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½è¿­</param>
     public void OnReceivePathPacket(int count, P_PacketVector3[] pathArray)
     {
-        // 1. µ¥ÀÌÅÍ À¯È¿¼º °Ë»ç
-        if (count > 10) count = 10; // ¼­¹ö ½ºÆå(Max 10)¿¡ µû¸¥ ¾ÈÀüÀåÄ¡
+        // 1. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¿ï¿½ï¿½ ï¿½Ë»ï¿½
+        if (count > 10) count = 10; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(Max 10)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡
 
-        // 2. µ¥ÀÌÅÍ º¹»ç (³×Æ®¿öÅ© ¹öÆÛ°¡ Àç»ç¿ëµÉ ¼ö ÀÖÀ¸¹Ç·Î °ª º¹»ç ±ÇÀå)
+        // 2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½ï¿½ï¿½Û°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         receivedPathCount = count;
         for (int i = 0; i < count; i++)
         {
@@ -40,7 +40,7 @@ public class PathVisualizer : MonoBehaviour
     }
 
     /// <summary>
-    /// ¿¡µðÅÍ ¾À ºä¿¡ ±×¸²À» ±×¸®´Â À¯´ÏÆ¼ ÄÝ¹é ÇÔ¼öÀÔ´Ï´Ù.
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ä¿¡ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ¼ ï¿½Ý¹ï¿½ ï¿½Ô¼ï¿½ï¿½Ô´Ï´ï¿½.
     /// </summary>
     void OnDrawGizmos()
     {
@@ -48,7 +48,7 @@ public class PathVisualizer : MonoBehaviour
         DrawPath();
     }
 
-    // ¿ÀºêÁ§Æ®°¡ ¼±ÅÃµÇ¾úÀ» ¶§¸¸ ±×¸®°í ½Í´Ù¸é ÀÌ ÇÔ¼ö »ç¿ë
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ÃµÇ¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½Í´Ù¸ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½
     void OnDrawGizmosSelected()
     {
         if (showOnlyWhenSelected)
@@ -57,49 +57,49 @@ public class PathVisualizer : MonoBehaviour
 
     void DrawPath()
     {
-        // °æ·Î°¡ ¾ø°Å³ª Á¡ÀÌ 2°³ ¹Ì¸¸ÀÌ¸é ±×¸± ¼ö ¾øÀ½
+        // ï¿½ï¿½Î°ï¿½ ï¿½ï¿½ï¿½Å³ï¿½ ï¿½ï¿½ï¿½ï¿½ 2ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½Ì¸ï¿½ ï¿½×¸ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (receivedPathCount < 2) return;
 
-        // 1. °æ·Î ¼± ±×¸®±â
+        // 1. ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
         Gizmos.color = pathColor;
         for (int i = 0; i < receivedPathCount - 1; i++)
         {
             Vector3 start = receivedPath[i];
             Vector3 end = receivedPath[i + 1];
 
-            // (¿É¼Ç) ¹Ù´Ú¿¡ ¹¯È÷Áö ¾Êµµ·Ï »ìÂ¦ ¶ç¿ö¼­ ±×¸®±â
+            // (ï¿½É¼ï¿½) ï¿½Ù´Ú¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Êµï¿½ï¿½ï¿½ ï¿½ï¿½Â¦ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
             // start.y += 0.1f; 
             // end.y += 0.1f;
 
             Gizmos.DrawLine(start, end);
         }
 
-        // 2. ¿þÀÌÆ÷ÀÎÆ®(²ªÀÌ´Â Á¡) Ç¥½Ã
+        // 2. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®(ï¿½ï¿½ï¿½Ì´ï¿½ ï¿½ï¿½) Ç¥ï¿½ï¿½
         Gizmos.color = waypointColor;
         for (int i = 0; i < receivedPathCount; i++)
         {
-            Gizmos.DrawSphere(receivedPath[i], 0.3f); // ¹ÝÁö¸§ 0.3ÀÇ ±¸
+            Gizmos.DrawSphere(receivedPath[i], 0.3f); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0.3ï¿½ï¿½ ï¿½ï¿½
         }
     }
 
     // ---------------------------------------------------------
-    // [Å×½ºÆ®¿ë] ¿¡µðÅÍ¿¡¼­ ¿ìÅ¬¸¯À¸·Î °¡»óÀÇ °æ·Î µ¥ÀÌÅÍ¸¦ ³Ö¾îº¸´Â ±â´É
+    // [ï¿½×½ï¿½Æ®ï¿½ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½Ö¾îº¸ï¿½ï¿½ ï¿½ï¿½ï¿½
     // ---------------------------------------------------------
     [ContextMenu("Test Simulate Receive Path")]
     public void TestReceive()
     {
         P_PacketVector3[] dummyPath = new P_PacketVector3[10];
 
-        // ÀÓÀÇÀÇ °æ·Î µ¥ÀÌÅÍ »ý¼º (ÇöÀç À§Ä¡ ±âÁØ)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½)
         var pos = this.transform.position;
         dummyPath[0].Set(pos);
         dummyPath[1].Set(this.transform.position + new Vector3(20, 0, 20));
         dummyPath[2].Set(this.transform.position + new Vector3(50, 0, 50));
         dummyPath[3].Set(this.transform.position + new Vector3(80, 0, 20));
 
-        // µ¥ÀÌÅÍ ¼ö½Å ½Ã¹Ä·¹ÀÌ¼Ç (Á¡ 4°³)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¹Ä·ï¿½ï¿½Ì¼ï¿½ (ï¿½ï¿½ 4ï¿½ï¿½)
         OnReceivePathPacket(4, dummyPath);
 
-        Debug.Log("Simulated Path Received!");
+        //Debug.Log("Simulated Path Received!");
     }
 }

@@ -23,7 +23,7 @@ public class CheckpointTrigger : BaseGimmick
             DungeonPointManager.Instance.currentSectorIndex = targetSpawnIndex;
             ActorManager.Instance.UpdateAllSpawnPoints(targetMapID, targetSpawnIndex);
 
-            Debug.Log($"<color=yellow>[Checkpoint]</color> Map {targetMapID} - Sector {targetSpawnIndex} 체크포인트 설정");
+        
 
             // 서버 모드일 경우 패킷 전송
             if (Client.IS_SERVER_PLAY && GameManager.Instance.currentMode == GameManager.PlayMode.Server_Online)
@@ -43,7 +43,7 @@ public class CheckpointTrigger : BaseGimmick
                     timestamp = NetworkTimeManager.Instance.GetServerTime()
                 };
                 Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-                Debug.Log($"[Checkpoint] 서버로 체크포인트 패킷 전송: {encodedValue} (Map{targetMapID}_Sector{targetSpawnIndex})");
+             
             }
         }
     }
@@ -63,7 +63,7 @@ public class CheckpointTrigger : BaseGimmick
             DungeonPointManager.Instance.currentSectorIndex = sectorIndex;
             ActorManager.Instance.UpdateAllSpawnPoints(mapID, sectorIndex);
 
-            Debug.Log($"<color=cyan>[Checkpoint NTF]</color> 모든 플레이어 스폰 포인트 갱신: Map{mapID}_Sector{sectorIndex}");
+        
         }
     }
 }

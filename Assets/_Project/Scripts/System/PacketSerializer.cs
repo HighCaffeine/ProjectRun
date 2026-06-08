@@ -38,7 +38,7 @@ public static class PacketSerializer
             case P_MonsterDeadReq p: return SerializeMonsterDeadReq(p);
             case P_MonsterMovement p: return SerializeMonsterMovement(p);
             default:
-                Debug.LogError($"[PacketSerializer] 미등록 패킷: {packet.GetType().Name}");
+                //Debug.LogError($"[PacketSerializer] 미등록 패킷: {packet.GetType().Name}");
                 return new byte[0];
         }
     }

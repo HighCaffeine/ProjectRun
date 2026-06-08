@@ -226,7 +226,7 @@ public class MapEditorVer2 : EditorWindow
     {
         if (prefab == null)
         {
-            Debug.LogWarning($"[MapEditor] {defaultName} 프리팹이 등록되지 않았습니다.");
+            //Debug.LogWarning($"[MapEditor] {defaultName} 프리팹이 등록되지 않았습니다.");
             return;
         }
 
@@ -339,7 +339,7 @@ public class MapEditorVer2 : EditorWindow
         Undo.RegisterCreatedObjectUndo(groupObj, $"Place {groupName} Set");
         Selection.activeGameObject = groupObj;
 
-        Debug.Log($"<color=cyan>[MapEditor]</color> {groupName}_{uid} 생성 ");
+        //Debug.Log($"<color=cyan>[MapEditor]</color> {groupName}_{uid} 생성 ");
     }
 
     private GameObject CreatePivot(string name)
@@ -357,7 +357,7 @@ public class MapEditorVer2 : EditorWindow
         BaseGimmick targetGimmick = Selection.activeGameObject.GetComponentInChildren<BaseGimmick>();
         if (targetGimmick == null)
         {
-            Debug.LogWarning("[MapEditor] 선택한 오브젝트가 기믹이 아님");
+            //Debug.LogWarning("[MapEditor] 선택한 오브젝트가 기믹이 아님");
             return;
         }
 
@@ -410,7 +410,7 @@ public class MapEditorVer2 : EditorWindow
         Undo.RegisterCreatedObjectUndo(triggerObj, "Create Sub Trigger");
         Selection.activeGameObject = triggerObj;
 
-        Debug.Log($"<color=green>[MapEditor]</color> 보조 스위치가 생성");
+        //Debug.Log($"<color=green>[MapEditor]</color> 보조 스위치가 생성");
     }
 
     private void GenerateMonsterSpawnTrigger()
@@ -420,7 +420,7 @@ public class MapEditorVer2 : EditorWindow
 
         if (selectedObjects.Length == 0)
         {
-            Debug.LogWarning("[MapEditor] 선택한 오브젝트가 없습니다.");
+            //Debug.LogWarning("[MapEditor] 선택한 오브젝트가 없습니다.");
             return;
         }
 
@@ -438,7 +438,7 @@ public class MapEditorVer2 : EditorWindow
 
         if (spawnAreas.Count == 0)
         {
-            Debug.LogWarning("[MapEditor] 선택한 오브젝트 중 MonsterSpawnArea가 없습니다.");
+            //Debug.LogWarning("[MapEditor] 선택한 오브젝트 중 MonsterSpawnArea가 없습니다.");
             return;
         }
 
@@ -495,7 +495,7 @@ public class MapEditorVer2 : EditorWindow
         Undo.RegisterCreatedObjectUndo(triggerObj, "Create Monster Spawn Trigger");
         Selection.activeGameObject = triggerObj;
 
-        Debug.Log($"<color=green>[MapEditor]</color> 몬스터 스폰 트리거 생성 ({spawnAreas.Count}개 구역 등록)");
+        //Debug.Log($"<color=green>[MapEditor]</color> 몬스터 스폰 트리거 생성 ({spawnAreas.Count}개 구역 등록)");
     }
 
     private void DrawHorizontalLine(int height = 1)

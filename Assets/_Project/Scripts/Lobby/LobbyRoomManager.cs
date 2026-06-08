@@ -147,7 +147,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
         {
             P_GameStartReq req = new P_GameStartReq { roomNumber = selectedRoomNum };
             Client.TCP.SendPacket2(E_PACKET.GAME_START_REQUEST, req);
-            Debug.Log("[Lobby] 방장이 게임 시작을 요청");
+            //Debug.Log("[Lobby] 방장이 게임 시작을 요청");
         }
         else
         {
@@ -230,7 +230,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 {
                     var hostNtf = UnsafeCode.ByteArrayToStructure<P_RoomHostNtf>(packet.data);
                     currentHostUUID = hostNtf.hostUUID;
-                    Debug.Log($"[HostNTF] hostUUID={hostNtf.hostUUID}, myID={LocalPlayerInfo.ID}, match={LocalPlayerInfo.ID == currentHostUUID}");
+                    //Debug.Log($"[HostNTF] hostUUID={hostNtf.hostUUID}, myID={LocalPlayerInfo.ID}, match={LocalPlayerInfo.ID == currentHostUUID}");
                     if (pendingIsHost)
                     {
                         myRoomIsHost = true;
@@ -263,7 +263,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                     int currentCharID = LocalPlayerInfo.CharacterID;
                     P_RoomCharSelectReq req = new P_RoomCharSelectReq { charID = currentCharID };
                     Client.TCP.SendPacket2(E_PACKET.ROOM_CHAR_SELECT_REQ, req);
-                    Debug.Log($"[Lobby] 게스트 입장 - 호스트 캐릭터 재전송: {currentCharID}");
+                    //Debug.Log($"[Lobby] 게스트 입장 - 호스트 캐릭터 재전송: {currentCharID}");
                 }
                 break;
             case E_PACKET.ROOM_USER_INFO_NTF:
@@ -290,7 +290,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
             case E_PACKET.ROOM_CHAR_SELECT_NTF:
                 {
                     var charNtf = UnsafeCode.ByteArrayToStructure<P_RoomCharSelectNtf>(packet.data);
-                    Debug.Log($"[Lobby] Char NTF userUUID={charNtf.userUUID}, myID={LocalPlayerInfo.ID}, isMe={charNtf.userUUID == LocalPlayerInfo.ID}");
+                    //Debug.Log($"[Lobby] Char NTF userUUID={charNtf.userUUID}, myID={LocalPlayerInfo.ID}, isMe={charNtf.userUUID == LocalPlayerInfo.ID}");
 
                     if (!isInsideRoom) break;
 
@@ -313,7 +313,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 {
                     var startNtf = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);
 
-                    Debug.Log($"<color=magenta>[Handover] 게임 서버로 이동 포트: {startNtf.GameServerPort} Token: {startNtf.AuthToken}</color>");
+                    //Debug.Log($"<color=magenta>[Handover] 게임 서버로 이동 포트: {startNtf.GameServerPort} Token: {startNtf.AuthToken}</color>");
 
                     LocalPlayerInfo.AuthToken = startNtf.AuthToken;
 
@@ -339,7 +339,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[Network] 도메인 파싱 실패, 로컬로 전환 Error: {ex.Message}");
+            //Debug.LogError($"[Network] 도메인 파싱 실패, 로컬로 전환 Error: {ex.Message}");
             return "127.0.0.1";
         }
     }
@@ -393,6 +393,6 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
     public void StopLobbyPolling()
     {
         CancelInvoke(nameof(RequestRoomList));
-        Debug.Log("[Lobby] 로비 패킷 폴링 중단됨.");
+        //Debug.Log("[Lobby] 로비 패킷 폴링 중단됨.");
     }
 }

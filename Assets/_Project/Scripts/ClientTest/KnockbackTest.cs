@@ -24,7 +24,7 @@ public class KnockbackTest : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            Debug.Log("¹ÐÄ¡±â");
+            //Debug.Log("ï¿½ï¿½Ä¡ï¿½ï¿½");
             TryKnockback(false);
         }
 
@@ -33,7 +33,7 @@ public class KnockbackTest : MonoBehaviour
             TryKnockback(true);
         }
 
-        //  »÷µå¹é »ý¼º
+        //  ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
       /*  if (Input.GetKeyDown(KeyCode.Q))
         {
             SpawnDummy();

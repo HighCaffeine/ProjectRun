@@ -19,13 +19,13 @@ public class GimmickTrigger : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"<color=yellow>[GimmickTrigger]</color> OnTriggerEnter 발동! 밟은 객체: {other.name}");
+     //   //Debug.Log($"<color=yellow>[GimmickTrigger]</color> OnTriggerEnter 발동! 밟은 객체: {other.name}");
         ProcessInteract(other.gameObject);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log($"<color=yellow>[GimmickTrigger]</color> OnCollisionEnter 발동! 밟은 객체: {collision.gameObject.name}");
+     //   //Debug.Log($"<color=yellow>[GimmickTrigger]</color> OnCollisionEnter 발동! 밟은 객체: {collision.gameObject.name}");
         ProcessInteract(collision.gameObject);
     }
 
@@ -61,7 +61,7 @@ public class GimmickTrigger : MonoBehaviour
                                 timestamp = NetworkTimeManager.Instance.GetServerTime()
                             };
                             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-                            Debug.Log($"<color=cyan>[GimmickTrigger]</color> {target.gimmickID}번 기믹 REQ 패킷");
+                          //  //Debug.Log($"<color=cyan>[GimmickTrigger]</color> {target.gimmickID}번 기믹 REQ 패킷");
                         }
                     }
                 }

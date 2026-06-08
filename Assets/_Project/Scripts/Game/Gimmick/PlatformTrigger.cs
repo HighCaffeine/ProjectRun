@@ -11,7 +11,7 @@ public class PlatformTrigger : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
+      //  //Debug.Log(other.name);
         PlayerActor actor = other.GetComponent<PlayerActor>();
 
         if (actor != null && actor.IsLocal)

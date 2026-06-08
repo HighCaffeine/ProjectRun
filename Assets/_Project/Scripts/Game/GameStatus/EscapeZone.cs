@@ -54,7 +54,7 @@ public class EscapeZone : MonoBehaviour
         }
 
         Client.TCP.SendPacket2(E_PACKET.DUNGEON_ESCAPE_REQ, pkt);
-        Debug.Log($"[EscapeZone] 탈출 패킷 전송 - push:{localActor.pushCount} pull:{localActor.pullCount} fall:{localActor.fallDeathCount}");
+    
     }
 
     private PlayerActor GetLocalPlayerActor()

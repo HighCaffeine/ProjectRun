@@ -55,7 +55,7 @@ public class DataManager : GenericSingleton<DataManager>
         // 코사인 유사도 계산
         float similarity = CosineSimilarity(vector1, vector2);
 
-        Debug.Log(similarity);
+        //Debug.Log(similarity);
     }
     private static double GetCosineSimilarity(int[] a, int[] b)
     {

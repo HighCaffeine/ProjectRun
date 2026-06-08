@@ -10,7 +10,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 {
     [Header("UI Settings")]
     public TextMeshProUGUI countdownText;
-    [Header("Debug Settings")]
+    [Header("//Debug Settings")]
     public bool isDebugMode = false;
 
     public static Match Instance;
@@ -63,7 +63,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         foreach (var p in _pendingPlayers)
         {
             AddPlayer(p.uuid, p.name, p.pos, p.charID);
-            Debug.Log($"[Match] 유저 스폰 완료 ({p.name})");
+          //  //Debug.Log($"[Match] 유저 스폰 완료 ({p.name})");
         }
         _pendingPlayers.Clear();
     }
@@ -71,7 +71,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     void Awake()
     {
-        Debug.Log("Match started");
+     //   //Debug.Log("Match started");
         Instance = this;
         Players = new Dictionary<long, Player>();
         Client.TCP.AddPacketReceiver(this);
@@ -93,7 +93,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         {
             if (isServerAuthenticated)
             {
-                Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
+             //   //Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
 
                 // if (DungeonPointManager.Instance != null)
                 // {
@@ -113,7 +113,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 authReq.characterID = LocalPlayerInfo.CharacterID;
 
                 Client.TCP.SendPacket2(E_PACKET.GAME_AUTH_REQUEST, authReq);
-                Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
+              //  //Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
             }
         }
     }
@@ -166,25 +166,25 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     isServerAuthenticated = true;
 
-                    Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
+                //    //Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
 
                     //AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
                 }
                 else
                 {
-                    Debug.LogError("[Match] 토큰 인증 실패");
+                   // //Debug.LogError("[Match] 토큰 인증 실패");
                     UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Main_Lobby");
                 }
                 break;
 
             case E_PACKET.ROOM_ENTER_RESPONSE:
                 P_RoomEnterResponse roomEnterResponse = UnsafeCode.ByteArrayToStructure<P_RoomEnterResponse>(packet.data);
-                //Debug.Log($"ROOM_ENTER_RESPONSE result={roomEnterResponse.result}");
+                ////Debug.Log($"ROOM_ENTER_RESPONSE result={roomEnterResponse.result}");
                 break;
 
             case E_PACKET.ROOM_NEW_USER_NTF:
                 var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-                Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
+           //     //Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
                 if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
                     RoomMembersCache[newUser.userUUID] = new RoomMemberData { uuid = newUser.userUUID, name = newUser.userName, charID = newUser.characterID };
@@ -196,7 +196,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         charID = newUser.characterID 
                         });
 
-                    Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
+                 //   //Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
                 }
                 break;
 
@@ -213,13 +213,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         charID = userInfo.characterID 
                         });
 
-                    Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
+                  //  //Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
                 }
                 break;
             // case E_PACKET.ROOM_USER_INFO_NTF:
             //     P_RoomUserInfoNotify roomUserInfoNotify = UnsafeCode.ByteArrayToStructure<P_RoomUserInfoNotify>(packet.data);
             //     Player newPlayer = AddPlayer(roomUserInfoNotify.userUUID, roomUserInfoNotify.userName);
-            //     Debug.Log($"[Packet Raw] Server Sent X: {roomUserInfoNotify.position.x}");
+            //     //Debug.Log($"[Packet Raw] Server Sent X: {roomUserInfoNotify.position.x}");
             //     if (newPlayer != null)
             //     {
             //         Vector3 spawnPos = roomUserInfoNotify.position.ToVector3();
@@ -260,11 +260,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (GameManager.Instance.isHost)
                     {
-                        Debug.Log("[System] 방장이 되었습니다");
+                       // //Debug.Log("[System] 방장이 되었습니다");
                     }
                     else
                     {
-                        Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
+                     //   //Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
                     }
 
                     if (VillageUiManager.Instance != null) VillageUiManager.Instance.UpdatePlayerIDUI();
@@ -275,7 +275,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_COUNTDOWN_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
-                    Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
+                   // //Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     if (countdownText != null)
                     {
                         countdownText.transform.parent.gameObject.SetActive(true);
@@ -286,7 +286,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.GAME_READY_CANCEL_NTF:
                 {
-                    Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
+                 //   //Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
                     if (countdownText != null)
                     {
                         countdownText.transform.parent.gameObject.SetActive(false);
@@ -297,7 +297,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartNtf>(packet.data);
-                    Debug.Log("[System] 던전 입장");
+                 //   //Debug.Log("[System] 던전 입장");
 
                     Players.Clear();
                     if (countdownText != null)
@@ -370,35 +370,33 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 3: pActor.sm.ChangeState(new ActionState(pActor, eState.Pull)); break; // 당기기
                                                                                                         //case 4: pActor.sm.ChangeState(new DashState(pActor)); break;      // 대쉬
                             case 5:
-                            if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
-                            {
+                                if (Time.time - pActor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
+                                {
+                                    break;
+                                }
+
+                                // 지연시간 검사
+                                long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
+                                float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
+
+                                if (latency > 0.5f)
+                                {
+                                    break;
+                                }
+
+                                Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+                                float currentDist = Vector3.Distance(pActor.transform.position, cPos);
+                                float maxValidRange = (statePkt.isPull == 1) ? 15.0f : 5.0f;
+                                bool pullFlag = (statePkt.isPull == 1);
+
+                                if (currentDist > maxValidRange)
+                                {
+                                    break;
+                                }
+
+                                pActor.lastKnockbackTime = Time.time;
+                                pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
                                 break;
-                            }
-
-                            // 지연시간 검사
-                            long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
-                            float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
-
-                            if (latency > 0.5f)
-                            {
-                                break;
-                            }
-
-                            Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
-                            float currentDist = Vector3.Distance(pActor.transform.position, cPos);
-                            float maxValidRange = (statePkt.isPull == 1) ? 15.0f : 5.0f;
-                            bool pullFlag = (statePkt.isPull == 1);
-
-                            if (currentDist > maxValidRange)
-                            {
-                                break;
-                            }
-
-                            pActor.lastKnockbackTime = Time.time;
-                            pActor.lastAttackerID = statePkt.casterUUID; 
-
-                            pActor.sm.ChangeState(new KnockbackState(pActor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
-                            break;
                             case 6:
                                 if (pActor.ignoreServerPosTimer > 0) return;
                                 pActor.sm.ChangeState(new TeleportState(pActor, statePkt.targetDir.ToVector3()));
@@ -427,10 +425,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
+                    ////Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
 
-                    Debug.Log($"<color=yellow>[GIMMICK RAW]</color> 수신된 ID: {ntf.gimmickID}, State: {ntf.state}");
+                //    //Debug.Log($"<color=yellow>[GIMMICK RAW]</color> 수신된 ID: {ntf.gimmickID}, State: {ntf.state}");
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone)
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
@@ -456,33 +454,25 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
                             }
 
-                            Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
+                        //    //Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
                         }
                         break;
                     }
 
                     if (ntf.gimmickKey == (byte)eGimmickKey.BreakableWall)
                     {
-                        //Debug.Log($"<color=cyan> [Match packet ntf]{ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey}");
+                        ////Debug.Log($"<color=cyan> [Match packet ntf]{ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey}");
                     }
 
-                    //Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
+                    ////Debug.Log($"[GIMMICK NTF] {ntf.gimmickID} ({(eGimmickKey)ntf.gimmickKey})");
 
                     if (_gimmickCache.TryGetValue(ntf.gimmickID, out var targetGimmick))
                     {
-                        if (targetGimmick.gimmickType == eGimmickType.Breakable)
-                        {
-                            if (Players.TryGetValue(ntf.activeUUID, out Player activePlayer))
-                            {
-                                PlayerActor pActor = activePlayer.GetComponent<PlayerActor>();
-                                if (pActor != null) pActor.destroyCount++;
-                            }
-                        }
                         targetGimmick.Execute(ntf);
                     }
                     else
                     {
-                        Debug.LogError($"<color=red>[GIMMICK 에러]</color> ID {ntf.gimmickID} 없음");
+                     //   //Debug.LogError($"<color=red>[GIMMICK 에러]</color> ID {ntf.gimmickID} 없음");
                     }
 
                     // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
@@ -506,7 +496,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         if (_gimmickCache.TryGetValue(targetID, out BaseGimmick gimmick))
                         {
                             gimmick.ResetGimmick();
-                            Debug.Log($"[Gimmick] {targetID}번 기믹 초기화 완료");
+                        //    //Debug.Log($"[Gimmick] {targetID}번 기믹 초기화 완료");
                         }
                     }
                     break;
@@ -530,44 +520,30 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             //                 targetPlayer.SetPos(respawnPos);
 
-            //                 Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
+            //                 //Debug.Log($"[System] 다른 유저({ntf.userUUID}) 사망 및 부활 코루틴 실행");
             //             }
             //         }
             //         break;
             //     }
             case E_PACKET.PLAYER_DEAD_NTF:
-            {
-                var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
-
-                if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
                 {
-                    PlayerActor deadActor = targetPlayer.GetComponent<PlayerActor>();
+                    var ntf = UnsafeCode.ByteArrayToStructure<P_PlayerDeadNtf>(packet.data);
 
-                    if (deadActor != null && !deadActor.IsLocal)
+                    if (Players.TryGetValue(ntf.userUUID, out Player targetPlayer))
                     {
-                        PlayerActor localActor = ActorManager.Instance.p1?.IsLocal == true 
-                            ? ActorManager.Instance.p1 
-                            : ActorManager.Instance.p2;
-
-                        if (localActor != null && deadActor.lastAttackerID == LocalPlayerInfo.ID)
-                        {
-                            localActor.fallKillCount++;
-                        }
+                        ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
                     }
 
-                    ActorManager.Instance.OnPlayerDead(targetPlayer.gameObject.name);
+                    if (GameManager.Instance.isHost)
+                    {
+                        ActorManager.Instance.RequestGimmickReset();
+                    }
+                    break;
                 }
-
-                if (GameManager.Instance.isHost)
-                {
-                    ActorManager.Instance.RequestGimmickReset();
-                }
-                break;
-            }
             //컷신 -> 결과창
             // case E_PACKET.DUNGEON_CLEAR_NTF:
             // {
-            //     Debug.Log("<color=cyan>[System] 던전 클리어 NTF 수신</color>");
+            //     //Debug.Log("<color=cyan>[System] 던전 클리어 NTF 수신</color>");
 
             //     EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
 
@@ -634,10 +610,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             //     if (PathVisualizer.Instance != null)
             //     {
             //         PathVisualizer.Instance.OnReceivePathPacket(movePath.path_count, movePath.path);
-            //         Debug.Log($"MOVE_PATH_RESPONSE pathCount={movePath.path_count}");
+            //         //Debug.Log($"MOVE_PATH_RESPONSE pathCount={movePath.path_count}");
             //         for (int i = 0; i < movePath.path_count; i++)
             //         {
-            //             Debug.Log($"MOVE_PATH_RESPONSE path[{i}]=({movePath.path[i]})");
+            //             //Debug.Log($"MOVE_PATH_RESPONSE path[{i}]=({movePath.path[i]})");
             //         }
             //     }
             //     break;
@@ -645,19 +621,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var invenInfo = UnsafeCode.ByteArrayToStructure<P_InventoryInfo>(packet.data);
                 Inventory.Instance.SetInventory(invenInfo.itemIDs);
 
-                Debug.Log("[Inventory] Update");
+              //  //Debug.Log("[Inventory] Update");
                 break;
             case E_PACKET.SHOP_INFO:
                 if (GameManager.Instance == null) break;
                 if (ShopManager.Instance == null)
                 {
-                    Debug.LogWarning("ShopManager가 없어서 패킷을 무시합니다.");
+                //    //Debug.LogWarning("ShopManager가 없어서 패킷을 무시합니다.");
                     break;
                 }
                 var shopInfo = UnsafeCode.ByteArrayToStructure<P_ShopInfo>(packet.data);
                 ShopManager.Instance.SetTargetShopTime(shopInfo.nextUpdateTime, shopInfo.itemID);
 
-                Debug.Log($"[Shop] Update ItemID: {shopInfo.itemID}, Next Update Time: {shopInfo.nextUpdateTime}");
+              //  //Debug.Log($"[Shop] Update ItemID: {shopInfo.itemID}, Next Update Time: {shopInfo.nextUpdateTime}");
                 break;
             case E_PACKET.SHOP_BUY_RESPONSE:
                 var buyInfo = UnsafeCode.ByteArrayToStructure<P_ShopBuyResponse>(packet.data);
@@ -665,13 +641,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                 msg = buyInfo.isSuccess ? "Success" : "Failed";
 
-                Debug.Log($"[Shop] Item Buy Result : {msg}");
+              //  //Debug.Log($"[Shop] Item Buy Result : {msg}");
                 break;
             case E_PACKET.TRADE_REQUEST_NTF:
                 var reqNtf = UnsafeCode.ByteArrayToStructure<P_TradeRequestNtf>(packet.data);
                 TradeManager.Instance.ShowRequestPopup(reqNtf.requesterName, reqNtf.requesterUUID);
 
-                //Debug.Log($"[Trade] Trade Request From {reqNtf.requesterName}({reqNtf.requesterUUID})");
+                ////Debug.Log($"[Trade] Trade Request From {reqNtf.requesterName}({reqNtf.requesterUUID})");
                 Chat.Instance.AddMessage($"<color=yellow>[System] Trade Request From {reqNtf.requesterName}({reqNtf.requesterUUID})");
                 break;
             case E_PACKET.TRADE_RESPONSE:
@@ -690,27 +666,27 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var startNtf = UnsafeCode.ByteArrayToStructure<P_TradeStartNtf>(packet.data);
                 TradeManager.Instance.OpenTradeWindow(startNtf.partnerUUID, startNtf.userName);
 
-                Debug.Log($"[Trade] Trade Start With {startNtf.partnerUUID} User");
+             //   //Debug.Log($"[Trade] Trade Start With {startNtf.partnerUUID} User");
                 break;
             case E_PACKET.TRADE_ITEM_NTF:
                 var itemNtf = UnsafeCode.ByteArrayToStructure<P_TradeItemNtf>(packet.data);
                 TradeManager.Instance.SetPartnerItem(itemNtf.slotIndex, itemNtf.itemID);
 
-                Debug.Log($"[Trade] Add {itemNtf.itemID} item to Partner {itemNtf.slotIndex} Slot");
+              //  //Debug.Log($"[Trade] Add {itemNtf.itemID} item to Partner {itemNtf.slotIndex} Slot");
                 break;
             case E_PACKET.TRADE_LOCK_NTF:
                 var lockNtf = UnsafeCode.ByteArrayToStructure<P_TradeLockNtf>(packet.data);
                 TradeManager.Instance.SetPartnerLockState(lockNtf.isLocked);
                 TradeManager.Instance.CheckConfirmState();
 
-                Debug.Log("[Trade] Partner Trade Lock State: " + lockNtf.isLocked);
+                ////Debug.Log("[Trade] Partner Trade Lock State: " + lockNtf.isLocked);
                 break;
             case E_PACKET.TRADE_CONFIRM_NTF:
                 var confirmNtf = UnsafeCode.ByteArrayToStructure<P_TradeConfirmNtf>(packet.data);
 
-                Debug.Log($"[Trade] Partner Confirmed State: {confirmNtf.isConfirmed}");
+             //   //Debug.Log($"[Trade] Partner Confirmed State: {confirmNtf.isConfirmed}");
 
-                Debug.Log($"/{confirmNtf.confirmUserUUID}/, /{LocalPlayerInfo.ID}/");
+              //  //Debug.Log($"/{confirmNtf.confirmUserUUID}/, /{LocalPlayerInfo.ID}/");
                 if (confirmNtf.confirmUserUUID == LocalPlayerInfo.ID)
                 {
                     TradeManager.Instance.SetMyConfirmState(confirmNtf.isConfirmed);
@@ -727,13 +703,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                 if (result.isSuccess)
                 {
-                    Debug.Log("[Trade] Trade Success");
+                //    //Debug.Log("[Trade] Trade Success");
                     msg = "[Trade] Trade Success";
                     TradeManager.Instance.CloseTradeWindow(msg, true);
                 }
                 else
                 {
-                    Debug.Log("[Trade] Trade Fail");
+                //    //Debug.Log("[Trade] Trade Fail");
                     msg = "[Trade] Trade Fail";
                     TradeManager.Instance.CloseTradeWindow(msg);
                 }
@@ -742,14 +718,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterMovement>(packet.data);
 
+                //    //Debug.Log($"[MonsterMovement] monsterID={pkt.monsterID}, inCache={_monsterCache.ContainsKey(pkt.monsterID)}, cacheKeys={string.Join(",", _monsterCache.Keys)}");
+
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
-                        long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
-                        float latency = Mathf.Max(0f, (myCurrentTime - pkt.timestamp) / 1000f);
-
-                        if (latency > 0.5f) latency = 0f;
-
-                        targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion(), latency);
+                        targetMonster.OnSyncMovement(pkt.currentPos.ToVector3(), pkt.currentRot.ToQuaternion());
                     }
                     break;
                 }
@@ -760,12 +733,6 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
-                        if (Players.TryGetValue(targetMonster.lastAttackerID, out Player killer))
-                        {
-                            PlayerActor killerActor = killer.GetComponent<PlayerActor>();
-                            if (killerActor != null) killerActor.fallKillCount++;
-                        }
-
                         Players.TryGetValue(pkt.userUUID, out Player p);
                         Vector3 dir = targetMonster.transform.position - p.transform.position;
 
@@ -781,7 +748,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     if (_monsterCache.TryGetValue(statePkt.monsterID, out MonsterActor actor))
                     {
                         if (actor == null) break;
-                        actor.lastAttackerID = statePkt.userUUID;
+
                         //5번의 경우 스킵 X
                         if (actor.IsLocal && statePkt.newState != 5) break;
 
@@ -791,29 +758,22 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                             case 1: actor.sm.ChangeState(new MoveState(actor)); break;
                             case 2: actor.sm.ChangeState(new ActionState(actor, eState.Push)); break; // 밀기
                                                                                                       //case 3: actor.sm.ChangeState(new ActionState(actor, eState.Pull)); break; // 당기기
-                            case 5: // 넉백
-                            if (Time.time - actor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
-                            {
+                            case 5:
+                                if (Time.time - actor.lastKnockbackTime < PlayerActor.KNOCKBACK_IMMUNE_TIME)
+                                {
+                                    break;
+                                }
+
+                                actor.lastKnockbackTime = Time.time;
+
+                                bool pullFlag = (statePkt.isPull == 1);
+                                Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
+
+                                actor.sm.ChangeState(new KnockbackState(actor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos));
+
                                 break;
-                            }
-
-                            long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
-                            float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
-
-                            if (latency > 0.5f)
-                            {
-                                break;
-                            }
-
-                            actor.lastKnockbackTime = Time.time;
-
-                            bool pullFlag = (statePkt.isPull == 1);
-                            Vector3 cPos = new Vector3(statePkt.casterPos.x, statePkt.casterPos.y, statePkt.casterPos.z);
-
-                            actor.sm.ChangeState(new KnockbackState(actor, statePkt.targetDir.ToVector3(), statePkt.param, pullFlag, cPos, latency));
-                            break;
-                            }
                         }
+                    }
                     break;
                 }
                 break;
@@ -844,7 +804,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 playerObj.transform.position = spawnPos;
             }
 
-            int debugIndex = 0;
+            int DebugIndex = 0;
             playerObj.name = playerName;
 
             // if (local)
@@ -868,7 +828,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 pActor.isLocal = local;
             }
 
-            Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+          //  //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
 
             if (local)
             {
@@ -881,7 +841,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 cc.center = new Vector3(0.0f, 1.0f, 0.0f);
                 cc.slopeLimit = 60f;
                 pActor.SetController(cc);
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+             //   //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
 
                 //카메라 세팅
@@ -894,17 +854,17 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 //     CameraManager.Instance.SetupDashEffectComp(pActor);
                 //     CameraManager.Instance.AddPosContraint(pActor.transform);
                 // }
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            //    //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 // 충돌 꼬임 방지를 위해 콜라이더 제거
                 Collider[] cols = playerObj.GetComponents<Collider>();
                 foreach (Collider c in cols)
                 {
                     if (c.GetType() != typeof(CharacterController)) Destroy(c);
                 }
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+             //   //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 //Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 //if (rb != null) Destroy(rb);
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            //    //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
 
                 CameraOcclusionSingleLayerFader co = GetComponent<CameraOcclusionSingleLayerFader>();
                 co.SetPlayer(pActor.transform);
@@ -913,26 +873,26 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             {
                 Collider[] existingCols = playerObj.GetComponents<Collider>();
                 foreach (var c in existingCols) Destroy(c);
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+              //  //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 CharacterController cc = playerObj.GetComponent<CharacterController>();
                 if (cc != null) Destroy(cc);
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+              //  //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 CapsuleCollider col = playerObj.AddComponent<CapsuleCollider>();
                 col.isTrigger = true;
                 col.radius = 0.5f;
                 col.height = 2f;
                 col.center = new Vector3(0, 1f, 0);
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+              //  //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
                 Rigidbody rb = playerObj.GetComponent<Rigidbody>();
                 if (rb == null) rb = playerObj.AddComponent<Rigidbody>();
                 rb.useGravity = false;
                 rb.isKinematic = true;
-                Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+            //    //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
 
                 pActor.SetPlayerPivot(playerObj.transform.GetChild(0));
             }
 
-            Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
+           // //Debug.Log($"<color=yellow>[AddPlayer] id={id}, LocalID={LocalPlayerInfo.ID}, isLocal={local}</color>");
             pActor.isLocal = local;
 
             Player player = playerObj.GetComponent<Player>();
@@ -958,7 +918,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             VillageUiManager.Instance.UpdatePlayerIDUI();
 
-            Debug.Log($"<color=cyan>AddPlayer_{debugIndex++}</color>");
+        //    //Debug.Log($"<color=cyan>AddPlayer_{//DebugIndex++}</color>");
 
             if (pActor != null && pActor.sm != null)
             {
@@ -967,16 +927,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             pActor.InitCharacterModel(finalCharID);
 
-            Debug.Log(
-    $"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
-            Debug.Log(
-            $"AddPlayer name={playerName} charID={finalCharID}");
+          //  //Debug.Log($"p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+          //  //Debug.Log($"AddPlayer name={playerName} charID={finalCharID}");
 
             return player;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[AddPlayer CRASH] {e.StackTrace}");
+            ////Debug.LogError($"[AddPlayer CRASH] {e.StackTrace}");
             return null;
         }
     }
@@ -1004,7 +962,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     //         }
     //     }
 
-    //     Debug.Log($"[AssignP1P2] p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
+    //     //Debug.Log($"[AssignP1P2] p1={ActorManager.Instance.p1?.name}, p2={ActorManager.Instance.p2?.name}");
     // }
     public void SpawnLocalPlayer(int sectorIndex)
     {
@@ -1040,7 +998,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
-            Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
+           // //Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
 
             pActor.SetControllerActive(false);
             pActor.transform.position = spawnPos;
@@ -1060,14 +1018,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         yield return new WaitForFixedUpdate();
 
         pActor.SendMovePacket(0.0f, 0.0f);
-        Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
+      //  //Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
     }
 
     private void RemovePlayer(long id)
     {
         if (Players != null && Players.TryGetValue(id, out Player player) && player != null)
         {
-            Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
+          //  //Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
 
             if (player.gameObject != null)
             {
@@ -1079,7 +1037,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
         else
         {
-            Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
+          //  //Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
         }
     }
 

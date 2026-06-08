@@ -28,6 +28,6 @@ public class SectorGimmickManager : MonoBehaviour
         }
 
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_BULK_RESET_REQ, req);
-        Debug.Log($"[SectorManager] 섹터 {sectorIndex}의 기믹 {req.count}개 초기화 패킷 서버로 전송");
+      //  //Debug.Log($"[SectorManager] 섹터 {sectorIndex}의 기믹 {req.count}개 초기화 패킷 서버로 전송");
     }
 }

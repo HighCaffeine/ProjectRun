@@ -18,16 +18,13 @@ public class WindZone : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<PlayerActor>())
-        {
-            Debug.Log("�÷��̾ �ٶ� ���� ���Խ��ϴ�.");
-        }
+
     }
     private void OnTriggerExit(Collider other)
     {
         if (other.GetComponent<PlayerActor>())
         {
-            Debug.Log("�÷��̾ �ٶ� ������ �������ϴ�.");
+           
             other.GetComponent<PlayerActor>().ResetWind();
         }
     }
