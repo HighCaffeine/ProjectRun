@@ -15,18 +15,18 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.37900499, g: 0.43527085, b: 0.4811321, a: 1}
-  m_FogMode: 3
+  m_FogColor: {r: 0.6666667, g: 0.85098046, b: 1, a: 1}
+  m_FogMode: 1
   m_FogDensity: 0.01
-  m_LinearFogStart: 0
-  m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.18307228, g: 0.19530974, b: 0.20754719, a: 1}
-  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
-  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_LinearFogStart: 40
+  m_LinearFogEnd: 400
+  m_AmbientSkyColor: {r: 0.5209957, g: 0.6795426, b: 1, a: 1}
+  m_AmbientEquatorColor: {r: 1, g: 0.9473069, b: 0.8069525, a: 1}
+  m_AmbientGroundColor: {r: 0, g: 0.2917707, b: 1, a: 1}
   m_AmbientIntensity: 1.5
-  m_AmbientMode: 0
+  m_AmbientMode: 1
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 9917a6b20baa68e40a67e592b892cff4, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -94,7 +94,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: bccad5faf0dddcf46ad59fc0b8c52900, type: 2}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 8cca8f5a0d805ca45b5edb212d0f5a13, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
