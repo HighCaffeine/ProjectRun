@@ -43,6 +43,14 @@ public class GoldManager : GenericSingleton<GoldManager>
     public void ApplyResultGold(int gold)
     {
         ResultGold = gold;
-        DebtGold -= gold;
+        if(debtGold - gold >0)
+        {
+          DebtGold -= gold;           
+        }
+        else if(debtGold - gold<0)
+        {
+            debtGold =0;
+            userGold = gold -debtGold;
+        }
     }
 }
