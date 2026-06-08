@@ -243,7 +243,7 @@ public class Platform : BaseGimmick
 
     public override void ResetGimmick()
     {
-        Debug.Log($"[Platform] {gimmickUID}번 리셋 호출됨! 이동 전 위치: {TargetTransform.position}");
+       // Debug.Log($"[Platform] {gimmickUID}번 리셋 호출됨! 이동 전 위치: {TargetTransform.position}");
 
         StopAllCoroutines();
 
@@ -256,7 +256,7 @@ public class Platform : BaseGimmick
 
         Physics.SyncTransforms();
 
-        Debug.Log($"[Platform] {gimmickUID}번 시작 위치로 이동 완료! 현재 위치: {TargetTransform.position}");
+      //  Debug.Log($"[Platform] {gimmickUID}번 시작 위치로 이동 완료! 현재 위치: {TargetTransform.position}");
 
         Collider[] cols = GetComponentsInChildren<Collider>();
         foreach (Collider c in cols)

@@ -140,7 +140,6 @@ public class MonsterActor : Actor
 
     private void Update()
     {
-        Debug.Log($"[MonsterUpdate] {name} IsLocal={IsLocal}, state={monsterState}"); // ★ 추가
 
         if (monsterState == MonsterState.Dead) return;
 
@@ -186,16 +185,13 @@ public class MonsterActor : Actor
     private void UpdateTarget()
     {
         if (currentTarget == null || currentTarget.isDead)
-        {
-            Debug.Log("UpdateTarget들어옴");
-            ChooseTarget();
-            Debug.Log("최종 currentTarget = " +(currentTarget == null ? "NULL" : currentTarget.name));
+        { 
+            ChooseTarget();     
         }
     }
 
     private void TryChangeToActionState()
-    {
-        Debug.Log($"[TryAction] currentState={sm.currentState?.GetType().Name}, CanStart={CanStartAction()}, CheckIntent={CheckActionIntent()}");
+    {   
         if (!CanStartAction()) return;
 
         float distance = currentTarget == null
@@ -206,7 +202,6 @@ public class MonsterActor : Actor
 
         if (!CheckActionIntent()) return;
 
-        Debug.Log($"{name} ActionState 진입!");
         
         sm.ChangeState(new ActionState(this, eState.Push, currentTarget));
     }
@@ -242,7 +237,7 @@ public class MonsterActor : Actor
             }
         }
 
-        Debug.Log($"[ChooseTarget] 결과: {(closest == null ? "NULL" : closest.name)}, Players 수: {Match.Instance.Players.Count}");
+    
         return closest;
     }
 
@@ -252,8 +247,7 @@ public class MonsterActor : Actor
 
         currentTarget = GetClosestPlayerTarget();
 
-        if (currentTarget == null)
-            Debug.LogWarning($"[{name}] 타겟을 찾지 못함. Players.Count = {Match.Instance?.Players?.Count}");
+  
     }
 
     // 사망 처리 동기화

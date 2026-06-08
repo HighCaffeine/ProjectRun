@@ -17,7 +17,7 @@ public class NextZone : MonoBehaviour
 
             Vector3 destPos = DungeonPointManager.Instance.GetSpawnPosition(targetMapID, targetMapStartIndex);
 
-            Debug.Log(destPos);
+        
 
             actor.OnUpdatePoint?.Invoke(actor.name, targetMapStartIndex);
 
@@ -29,7 +29,7 @@ public class NextZone : MonoBehaviour
             {
                 actor.transform.position = destPos;
                 actor.GetComponent<Player>().SetPos(destPos);
-                Debug.Log($"[Debug] 로컬 모드: {targetMapStartIndex}번 구역으로 강제 이동");
+            
                 return;
             }
 
@@ -48,7 +48,7 @@ public class NextZone : MonoBehaviour
             };
 
             Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-            Debug.Log($"[System] Map{targetMapID}_Sector{targetMapStartIndex}번 구역으로 이동 요청 (encoded: {encodedValue})");
+         
         }
     }
 }

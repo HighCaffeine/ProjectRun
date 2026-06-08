@@ -86,7 +86,7 @@ public class ActorManager : GenericSingleton<ActorManager>
             if (p1 == targetActor) p1 = null;
             if (p2 == targetActor) p2 = null;
 
-            Debug.Log($"[ActorManager] {name} 퇴장 처리 완료.");
+           // Debug.Log($"[ActorManager] {name} 퇴장 처리 완료.");
         }
     }
 
@@ -120,7 +120,7 @@ public class ActorManager : GenericSingleton<ActorManager>
                 GameManager.Instance.isHost = newHost.IsLocal;
             }
 
-            Debug.Log($"[ActorManager] 호스트 변경 완료 -> 새로운 호스트: {newHost.gameObject.name} (여캐여부 P1:{newHost == p1})");
+           // Debug.Log($"[ActorManager] 호스트 변경 완료 -> 새로운 호스트: {newHost.gameObject.name} (여캐여부 P1:{newHost == p1})");
         }
     }
 
@@ -156,20 +156,20 @@ public class ActorManager : GenericSingleton<ActorManager>
             actors.Add(actorID, actor);
             actor.OnUpdatePoint += UpdateSpawnIndex;
 
-            Debug.Log($"[ActorManager] {actorID} 초기 스폰 포인트: Map{currentMap}_Sector{currentSector}");
+           // Debug.Log($"[ActorManager] {actorID} 초기 스폰 포인트: Map{currentMap}_Sector{currentSector}");
         }
     }
 
     public void UpdateSpawnIndex(string playerName, int newSectorIndex)
     {
-        Debug.Log($"[UpdateSpawnIndex] {playerName}_{newSectorIndex}");
+//Debug.Log($"[UpdateSpawnIndex] {playerName}_{newSectorIndex}");
 
         if (spawnPoints.ContainsKey(playerName))
         {
             string current = spawnPoints[playerName];
             string mapLevel = current.Split('_')[0];
             spawnPoints[playerName] = $"{mapLevel}_{newSectorIndex}";
-            Debug.Log($"[System] {playerName}의 스폰 포인트가 {newSectorIndex} 구역으로 갱신되었습니다.");
+         //   Debug.Log($"[System] {playerName}의 스폰 포인트가 {newSectorIndex} 구역으로 갱신되었습니다.");
         }
     }
 
@@ -206,7 +206,7 @@ public class ActorManager : GenericSingleton<ActorManager>
         req.respawnPos = new P_PacketVector3 { x = spawnPos.x, y = spawnPos.y, z = spawnPos.z };
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_DEAD_REQ, req);
-        Debug.Log($"[System] 사망 패킷 전송 완료 (부활 좌표: {spawnPos})");
+      //  Debug.Log($"[System] 사망 패킷 전송 완료 (부활 좌표: {spawnPos})");
     }
 
     public Actor GetActor(string name)
@@ -222,7 +222,7 @@ public class ActorManager : GenericSingleton<ActorManager>
         List<string> keys = new List<string>(actors.Keys);
         foreach (var id in keys)
         {
-            Debug.Log($"{mapID}_{newIndex}");
+          //  Debug.Log($"{mapID}_{newIndex}");
             spawnPoints[id] = $"{mapID}_{newIndex}";
         }
     }

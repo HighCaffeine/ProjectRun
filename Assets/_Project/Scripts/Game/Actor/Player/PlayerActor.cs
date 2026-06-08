@@ -124,7 +124,7 @@ public class PlayerActor : Actor
         };
 
         Client.TCP.SendPacket2(E_PACKET.GIMMICK_INTERACT_REQ, req);
-        Debug.Log($"[System] Map{0}_Sector{0}번 구역으로 이동 요청 (encoded: {encodedValue})");
+
     }
 
     void Update()
@@ -426,7 +426,7 @@ public class PlayerActor : Actor
             timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
 
-        Debug.Log($"[SendStateChange] 현재 모드: {GameManager.Instance.currentMode}, 상태: {stateCode}");
+   
 
         Client.TCP.SendPacket2(E_PACKET.PLAYER_STATUS_NTF, pkt);
     }

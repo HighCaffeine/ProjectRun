@@ -128,8 +128,7 @@ public class ActionState : IState
     private void ProcessTarget()
     {
         //if (!actor.IsLocal) return;
-        Debug.Log($"[ActionState] {actor.name}의 타겟 처리 시작. Actor Target: {(targetActor != null ? targetActor.name : "None")}, Gimmick Target: {(targetGimmick != null ? targetGimmick.name : "None")}");
-        if (targetActor != null)
+    if (targetActor != null)
         {
            
             ProcessActorTarget();
@@ -419,7 +418,7 @@ public class ActionState : IState
     public void OnAttackHit()
     {
         if (hitProcessed) return;
-        Debug.Log($"[ActionState] {actor.name}의 공격 히트 이벤트 처리 시작.");
+      
         hitProcessed = true;
         ProcessTarget();
     }
