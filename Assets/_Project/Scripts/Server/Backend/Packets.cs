@@ -516,6 +516,7 @@ public struct P_MonsterStateNtf
     [MarshalAs(UnmanagedType.R4)] public float param;
     [MarshalAs(UnmanagedType.I1)] public byte isPull;
     [MarshalAs(UnmanagedType.Struct)] public P_PacketVector3 casterPos;
+    [MarshalAs(UnmanagedType.I8)] public long timestamp;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

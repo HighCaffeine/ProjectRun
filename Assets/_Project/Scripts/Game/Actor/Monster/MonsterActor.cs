@@ -37,6 +37,8 @@ public class MonsterActor : Actor
     [SerializeField] private Material normalMat;
     [SerializeField] private Material stunnedMat;
 
+    public long lastAttackerID;
+
     public override Vector3 GetMovementDirection()
     {
         if (monsterState == MonsterState.Stunned) return Vector3.zero;
@@ -418,7 +420,8 @@ private void HandleNetworkSync()
             targetDir = new P_PacketVector3 { x = dir.x, y = dir.y, z = dir.z },
             param = param,
             isPull = isPull ? (byte)1 : (byte)0,
-            casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z }
+            casterPos = new P_PacketVector3 { x = casterPos.x, y = casterPos.y, z = casterPos.z },
+            timestamp = NetworkTimeManager.Instance.GetServerTime()
         };
 
         Client.TCP.SendPacket2(E_PACKET.MONSTER_STATE_NTF, pkt);

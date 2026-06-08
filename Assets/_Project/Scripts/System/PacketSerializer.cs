@@ -264,7 +264,7 @@ public static class PacketSerializer
 
     static byte[] SerializeMonsterStateNtf(P_MonsterStateNtf p)
     {
-        var buf = new byte[50]; //8+4+1+12+4+1+12
+        var buf = new byte[58]; //8+4+1+12+4+1+12+8
         int o = 0;
         Write(buf, ref o, p.userUUID);
         Write(buf, ref o, p.monsterID);
@@ -277,6 +277,7 @@ public static class PacketSerializer
         Write(buf, ref o, p.casterPos.x);
         Write(buf, ref o, p.casterPos.y);
         Write(buf, ref o, p.casterPos.z);
+        Write(buf, ref o, p.timestamp);
         return buf;
     }
 
