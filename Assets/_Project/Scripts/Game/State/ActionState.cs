@@ -146,10 +146,11 @@ public class ActionState : IState
 
     private void ProcessTarget()
     {
-        //if (!actor.IsLocal) return;
-    if (targetActor != null)
+        // 로컬 액터만 타겟 처리 (리모트는 서버 브로드캐스트로 처리됨)
+        if (!actor.IsLocal) return;
+
+        if (targetActor != null)
         {
-           
             ProcessActorTarget();
             return;
         }

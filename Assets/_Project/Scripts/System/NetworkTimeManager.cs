@@ -70,22 +70,22 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
             clientTimestamp = GetCurrentUnixTimeMs()
         };
 
-        //Client.TCP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
-        Client.UDP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
+        Client.TCP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
+        //Client.UDP.SendPacket2(E_PACKET.SYS_TIME_SYNC_REQ, req);
         //Debug.Log($"[TimeSync] 서버로 시간 동기화 요청 송신: {req.clientTimestamp}");
     }
 
-    public void OnReceiveTimeSyncResponse(long clientTimestamp, long serverTimestamp)
-    {
-        long now = GetCurrentUnixTimeMs();
-        long rtt = now - clientTimestamp;
-        // 패킷이 왔을 때 예상 서버 시간 -> 서버가 패킷 생성한 시간 + RTT / 2
-        long estimatedServerTime = serverTimestamp + (rtt / 2);
+    // public void OnReceiveTimeSyncResponse(long clientTimestamp, long serverTimestamp)
+    // {
+    //     long now = GetCurrentUnixTimeMs();
+    //     long rtt = now - clientTimestamp;
+    //     // 패킷이 왔을 때 예상 서버 시간 -> 서버가 패킷 생성한 시간 + RTT / 2
+    //     long estimatedServerTime = serverTimestamp + (rtt / 2);
 
-        // 오프셋 계산
-        _serverTimeOffset = estimatedServerTime - now;
-        IsSynchronized = true;
+    //     // 오프셋 계산
+    //     _serverTimeOffset = estimatedServerTime - now;
+    //     IsSynchronized = true;
 
-        Debug.Log($"<color=lime>[TimeSync 완료]</color> RTT: {rtt}ms, 오차 보정값(Offset): {_serverTimeOffset}ms");
-    }
+    //     Debug.Log($"<color=lime>[TimeSync 완료]</color> RTT: {rtt}ms, 오차 보정값(Offset): {_serverTimeOffset}ms");
+    // }
 }

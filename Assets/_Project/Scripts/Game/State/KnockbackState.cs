@@ -90,8 +90,11 @@ public class KnockbackState : IState
 
     private void SendKnockbackState()
     {
+        // 로컬 액터만 서버로 상태 전송 (리모트는 이미 서버 브로드캐스트로 받은 것)
+        if (!actor.IsLocal) return;
+        if (GameManager.Instance.currentMode != GameManager.PlayMode.Server_Online) return;
+
         actor.SendStateChange(eState.Knockback, knockbackDir, initialPower, targetUUID: attackerID, isPull: isPull, casterPos: casterPos);
-        
     }
 
     private void PlayKnockbackAnimation()
@@ -145,7 +148,7 @@ public class KnockbackState : IState
 
     private float GetSmoothProgress()
     {
-        float t = timer / DURATION;
+        float t = Mathf.Clamp01(timer / DURATION);
         float logValue = Mathf.Log(1f + K * t) / logDivisor;
 
         return isPull ? 1f - ((1f - logValue) * (1f - logValue)) : logValue;
@@ -295,6 +298,7 @@ public class KnockbackState : IState
 
     private void SendStopMovePacket()
     {
+        if (!actor.IsLocal) return;
         actor.SendMovePacket(0f, 0f);
     }
 }

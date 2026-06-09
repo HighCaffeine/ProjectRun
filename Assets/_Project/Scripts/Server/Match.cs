@@ -320,15 +320,12 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (Players.TryGetValue(updatePkt.userUUID, out Player player))
                     {
-                        if (updatePkt.userUUID == LocalPlayerInfo.ID)
-                        {
-                            player.serverPos = updatePkt.currentPos.ToVector3();
-                        }
-                        else
-                        {
-                            // 위치/회전 보간 처리
-                            player.OnSyncMovement(updatePkt);
+                        // 로컬/리모트 모두 OnSyncMovement로 통일 (seq 검사 및 KnockbackState 가드 포함)
+                        player.OnSyncMovement(updatePkt);
 
+                        // 리모트 플레이어만 상태 머신 동기화
+                        if (updatePkt.userUUID != LocalPlayerInfo.ID)
+                        {
                             PlayerActor pActor = player.GetComponent<PlayerActor>();
                             if (pActor != null && pActor.sm != null)
                             {
@@ -372,11 +369,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                                     break;
                                 }
 
-                                // 지연시간 검사
+                                // 지연시간 검사 (서버 시계 오차 포함해서 여유있게 2초로 설정)
                                 long myCurrentTime = NetworkTimeManager.Instance.GetServerTime();
                                 float latency = Mathf.Max(0f, (myCurrentTime - statePkt.timestamp) / 1000f);
 
-                                if (latency > 0.5f)
+                                if (latency > 2.0f)
                                 {
                                     break;
                                 }
@@ -731,8 +728,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
-                        Players.TryGetValue(pkt.userUUID, out Player p);
-                        Vector3 dir = targetMonster.transform.position - p.transform.position;
+                        Vector3 dir = Vector3.forward; // 기본 방향
+                        if (Players.TryGetValue(pkt.userUUID, out Player p) && p != null)
+                        {
+                            dir = targetMonster.transform.position - p.transform.position;
+                        }
 
                         targetMonster.ExecuteMonsterDead(dir);
                         _monsterCache.Remove(pkt.monsterID);

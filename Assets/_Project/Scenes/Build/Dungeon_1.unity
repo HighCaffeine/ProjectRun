@@ -15,17 +15,17 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.6666667, g: 0.85098046, b: 1, a: 1}
+  m_FogColor: {r: 0.40000004, g: 0.73333335, b: 1, a: 1}
   m_FogMode: 1
   m_FogDensity: 0.007
   m_LinearFogStart: 40
   m_LinearFogEnd: 400
-  m_AmbientSkyColor: {r: 0.5209957, g: 0.6795426, b: 1, a: 1}
-  m_AmbientEquatorColor: {r: 1, g: 0.9473069, b: 0.8069525, a: 1}
-  m_AmbientGroundColor: {r: 0, g: 0.27889434, b: 1, a: 1}
+  m_AmbientSkyColor: {r: 0.71118903, g: 0.8260119, b: 1.0541611, a: 1}
+  m_AmbientEquatorColor: {r: 0.13843165, g: 0.1559265, b: 0.19806935, a: 1}
+  m_AmbientGroundColor: {r: 1.0262831, g: 3.3725173, b: 4.0730104, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 1
-  m_SubtractiveShadowColor: {r: 0.3019608, g: 0.3019608, b: 0.3019608, a: 1}
+  m_SubtractiveShadowColor: {r: 0.41960788, g: 0.4784314, b: 0.627451, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: 9917a6b20baa68e40a67e592b892cff4, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -35,9 +35,9 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 0.5
+  m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 1983669001}
+  m_Sun: {fileID: 0}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -38460,44 +38460,68 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: m_SceneBindings.Array.size
-      value: 14
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[9].key
+      propertyPath: m_SceneBindings.Array.data[6].key
+      value: 
+      objectReference: {fileID: -2056283621122908195, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[7].key
       value: 
       objectReference: {fileID: 7318066990545723325, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[10].key
+      propertyPath: m_SceneBindings.Array.data[8].key
       value: 
       objectReference: {fileID: -5956960098031121416, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[11].key
+      propertyPath: m_SceneBindings.Array.data[9].key
       value: 
       objectReference: {fileID: 1501732606780815378, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[12].key
+      propertyPath: m_SceneBindings.Array.data[10].key
       value: 
       objectReference: {fileID: 4501254520878861618, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[11].key
+      value: 
+      objectReference: {fileID: -5613889549127465684, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[12].key
+      value: 
+      objectReference: {fileID: -5613889549127465684, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: m_SceneBindings.Array.data[13].key
       value: 
       objectReference: {fileID: -5613889549127465684, guid: e8011b2fc2f3e0940a6ecd42b54123c1, type: 2}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[9].value
+      propertyPath: m_SceneBindings.Array.data[6].value
+      value: 
+      objectReference: {fileID: 1880632105}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[7].value
       value: 
       objectReference: {fileID: 731977275}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[10].value
+      propertyPath: m_SceneBindings.Array.data[8].value
       value: 
       objectReference: {fileID: 731977274}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[11].value
+      propertyPath: m_SceneBindings.Array.data[9].value
       value: 
       objectReference: {fileID: 653588319133097722}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-      propertyPath: m_SceneBindings.Array.data[12].value
+      propertyPath: m_SceneBindings.Array.data[10].value
       value: 
       objectReference: {fileID: 731977276}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[11].value
+      value: 
+      objectReference: {fileID: 1882119191}
+    - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+      propertyPath: m_SceneBindings.Array.data[12].value
+      value: 
+      objectReference: {fileID: 1882119191}
     - target: {fileID: 5432500034408942146, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       propertyPath: m_SceneBindings.Array.data[13].value
       value: 
@@ -38597,6 +38621,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 6695783301568725910, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+    - {fileID: 2182784331475286493, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+    - {fileID: 4357883541982486478, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 451367343215573148, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
       insertIndex: -1
@@ -38606,16 +38632,6 @@ PrefabInstance:
 --- !u!4 &731977270 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7489949461634381513, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-  m_PrefabInstance: {fileID: 731977269}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &731977271 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2182784331475286493, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
-  m_PrefabInstance: {fileID: 731977269}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &731977272 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4357883541982486478, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
   m_PrefabInstance: {fileID: 731977269}
   m_PrefabAsset: {fileID: 0}
 --- !u!320 &731977273 stripped
@@ -42763,8 +42779,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 822740017}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.19996333, y: -0.37361252, z: 0.08282741, w: -0.90198004}
-  m_LocalPosition: {x: -58.46, y: 7.929999, z: -28.709995}
+  m_LocalRotation: {x: 0.31598538, y: 0.3596048, z: -0.13088542, w: 0.8681629}
+  m_LocalPosition: {x: -18.050259, y: 12.683626, z: -32.95026}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -60910,7 +60926,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3937983903223963566, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: gimmick_id
-      value: 1006
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 3937983903223963566, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: properties.Array.size
@@ -60986,7 +61002,7 @@ PrefabInstance:
       objectReference: {fileID: 199024451}
     - target: {fileID: 6492811558293272256, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: gimmickUID
-      value: 1006
+      value: 1013
       objectReference: {fileID: 0}
     - target: {fileID: 7669275132528683585, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -61759,7 +61775,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3937983903223963566, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: gimmick_id
-      value: 1048
+      value: 1010
       objectReference: {fileID: 0}
     - target: {fileID: 3937983903223963566, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: properties.Array.size
@@ -61835,7 +61851,7 @@ PrefabInstance:
       objectReference: {fileID: 1260768215}
     - target: {fileID: 6492811558293272256, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: gimmickUID
-      value: 1048
+      value: 1010
       objectReference: {fileID: 0}
     - target: {fileID: 7669275132528683585, guid: 1e0a929fc35b02d498bd4dd5eb6335a8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -77796,6 +77812,7 @@ PrefabInstance:
     - {fileID: 2808621469426338373, guid: 0782ec89d499f9e46964484793990574, type: 3}
     - {fileID: 7416723292742891676, guid: 0782ec89d499f9e46964484793990574, type: 3}
     - {fileID: 4461425420361124968, guid: 0782ec89d499f9e46964484793990574, type: 3}
+    - {fileID: 2868492478059806527, guid: 0782ec89d499f9e46964484793990574, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3060489461518685392, guid: 0782ec89d499f9e46964484793990574, type: 3}
       insertIndex: 3
@@ -80687,7 +80704,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 0
 --- !u!4 &1406922716
 Transform:
@@ -92539,7 +92556,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1614741018}
   m_Layer: 0
-  m_Name: Platform_1048
+  m_Name: Platform_1010
   m_TagString: Gimmick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103621,15 +103638,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 91053761092147869, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1002
+      value: ReMovePlatform_1022
       objectReference: {fileID: 0}
     - target: {fileID: 97623394202544125, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1023
+      value: 1024
       objectReference: {fileID: 0}
     - target: {fileID: 125888474074280355, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: MovableGimmick_1034
+      value: MovableGimmick_1000
       objectReference: {fileID: 0}
     - target: {fileID: 128381211947254967, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103641,11 +103658,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 139272710723502411, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1024
+      value: 1050
       objectReference: {fileID: 0}
     - target: {fileID: 200502983291984807, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1043
+      value: 1044
+      objectReference: {fileID: 0}
+    - target: {fileID: 209523731815315385, guid: 0782ec89d499f9e46964484793990574, type: 3}
+      propertyPath: currentMapID
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 224589982068139483, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -103653,11 +103674,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 240572488760971273, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1030
+      value: 1041
       objectReference: {fileID: 0}
     - target: {fileID: 256561623845316526, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1055
+      value: 1049
       objectReference: {fileID: 0}
     - target: {fileID: 266193018126238943, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_LocalPosition.x
@@ -103705,7 +103726,7 @@ PrefabInstance:
       objectReference: {fileID: 1211699113}
     - target: {fileID: 311731281777145507, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1015
+      value: ReMovePlatform_1018
       objectReference: {fileID: 0}
     - target: {fileID: 345580158685253230, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103717,15 +103738,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 387400287037271331, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1036
+      value: Platform_1015
       objectReference: {fileID: 0}
     - target: {fileID: 394821824338213346, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1049
+      value: 1002
       objectReference: {fileID: 0}
     - target: {fileID: 415931054331305791, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1055
+      value: ReMovePlatform_1049
       objectReference: {fileID: 0}
     - target: {fileID: 418538089171824994, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103733,7 +103754,7 @@ PrefabInstance:
       objectReference: {fileID: 1620034593}
     - target: {fileID: 441006115439500853, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1009
+      value: 1052
       objectReference: {fileID: 0}
     - target: {fileID: 457628850451532063, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103769,7 +103790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 574827746136429381, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1046
+      value: 1054
       objectReference: {fileID: 0}
     - target: {fileID: 617707306242908552, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103781,11 +103802,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 622705637527905838, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1044
+      value: ReMovePlatform_1053
       objectReference: {fileID: 0}
     - target: {fileID: 634947074022510141, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1030
+      value: ReMovePlatform_1041
       objectReference: {fileID: 0}
     - target: {fileID: 703649936001998348, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -103813,7 +103834,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 788358448831326943, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1056
+      value: 1039
       objectReference: {fileID: 0}
     - target: {fileID: 788358448831326943, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_type
@@ -103833,7 +103854,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 934853245908086382, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1016
+      value: 1046
       objectReference: {fileID: 0}
     - target: {fileID: 934853245908086382, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_type
@@ -103865,11 +103886,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 994504999504616880, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1035
+      value: ReMovePlatform_1031
       objectReference: {fileID: 0}
     - target: {fileID: 1027231256925282308, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1001
+      value: 1057
       objectReference: {fileID: 0}
     - target: {fileID: 1029063980810686104, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -103889,11 +103910,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1174054169617093126, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1029
+      value: 1055
       objectReference: {fileID: 0}
     - target: {fileID: 1190963005784347307, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1047
+      value: 1019
       objectReference: {fileID: 0}
     - target: {fileID: 1205835951988916094, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103901,7 +103922,7 @@ PrefabInstance:
       objectReference: {fileID: 1551036546}
     - target: {fileID: 1221488164526053949, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1026
+      value: 1045
       objectReference: {fileID: 0}
     - target: {fileID: 1239277556398888027, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_LocalPosition.x
@@ -103913,11 +103934,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1276874338788973046, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1022
+      value: 1027
       objectReference: {fileID: 0}
     - target: {fileID: 1286276896325320325, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1037
+      value: 1029
       objectReference: {fileID: 0}
     - target: {fileID: 1296781362852068217, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103933,11 +103954,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1325957279590499673, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1039
+      value: Platform_1026
       objectReference: {fileID: 0}
     - target: {fileID: 1346945269711799937, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1011
+      value: 1037
       objectReference: {fileID: 0}
     - target: {fileID: 1415071354087295712, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -103961,7 +103982,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1533438692163041744, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1050
+      value: Platform_1032
       objectReference: {fileID: 0}
     - target: {fileID: 1562848887713635465, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103973,7 +103994,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1576029114807012176, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1025
+      value: 1006
       objectReference: {fileID: 0}
     - target: {fileID: 1624232912095752787, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103981,7 +104002,7 @@ PrefabInstance:
       objectReference: {fileID: 1064177540}
     - target: {fileID: 1684620446351978874, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1054
+      value: 1023
       objectReference: {fileID: 0}
     - target: {fileID: 1708174872674322400, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -103993,11 +104014,11 @@ PrefabInstance:
       objectReference: {fileID: 1691943978}
     - target: {fileID: 1749969599286400649, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1039
+      value: 1026
       objectReference: {fileID: 0}
     - target: {fileID: 1752679182228072444, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1035
+      value: 1031
       objectReference: {fileID: 0}
     - target: {fileID: 1763722370068829310, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104033,19 +104054,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1913353945941773973, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: CheckpointTrigger_1027
+      value: CheckpointTrigger_1034
       objectReference: {fileID: 0}
     - target: {fileID: 1932163293050599637, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1021
+      value: 1036
       objectReference: {fileID: 0}
     - target: {fileID: 1936680866598983988, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1042
+      value: 1028
       objectReference: {fileID: 0}
     - target: {fileID: 1998859424663622122, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1057
+      value: 1016
       objectReference: {fileID: 0}
     - target: {fileID: 2016120571659105094, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Enabled
@@ -104053,7 +104074,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2058394261907026945, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1015
+      value: 1018
       objectReference: {fileID: 0}
     - target: {fileID: 2082099363805270936, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104081,19 +104102,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2125963812147106147, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1032
+      value: 1009
       objectReference: {fileID: 0}
     - target: {fileID: 2130590942016903250, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1026
+      value: Platform_1045
       objectReference: {fileID: 0}
     - target: {fileID: 2189036256003460274, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1019
+      value: 1051
       objectReference: {fileID: 0}
     - target: {fileID: 2236207098487576851, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1057
+      value: ReMovePlatform_1016
       objectReference: {fileID: 0}
     - target: {fileID: 2282078860236407827, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104105,11 +104126,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2301447577283141598, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1002
+      value: 1022
       objectReference: {fileID: 0}
     - target: {fileID: 2324358325119260383, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1033
+      value: BreakableObj_1001
       objectReference: {fileID: 0}
     - target: {fileID: 2330101289640724222, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104117,7 +104138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2356517448433759379, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1004
+      value: 1011
       objectReference: {fileID: 0}
     - target: {fileID: 2363146493725025961, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
@@ -104129,7 +104150,7 @@ PrefabInstance:
       objectReference: {fileID: 952989186}
     - target: {fileID: 2446053472508243841, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1000
+      value: 1056
       objectReference: {fileID: 0}
     - target: {fileID: 2446053472508243841, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: properties.Array.data[0].value
@@ -104137,7 +104158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2457099301100708116, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1043
+      value: ReMovePlatform_1044
       objectReference: {fileID: 0}
     - target: {fileID: 2470383447789672501, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104145,7 +104166,7 @@ PrefabInstance:
       objectReference: {fileID: 1809601422}
     - target: {fileID: 2484464531039282734, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1002
+      value: 1022
       objectReference: {fileID: 0}
     - target: {fileID: 2486025291693511567, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Enabled
@@ -104157,7 +104178,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2519482609193526387, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1041
+      value: ReMovePlatform_1043
       objectReference: {fileID: 0}
     - target: {fileID: 2519963577071946308, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104169,11 +104190,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2554727833942619081, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1049
+      value: 1002
       objectReference: {fileID: 0}
     - target: {fileID: 2561000483282648819, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1046
+      value: ReMovePlatform_1054
       objectReference: {fileID: 0}
     - target: {fileID: 2562714755288444209, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104189,7 +104210,7 @@ PrefabInstance:
       objectReference: {fileID: 1380596013}
     - target: {fileID: 2667855461716413184, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1053
+      value: 1014
       objectReference: {fileID: 0}
     - target: {fileID: 2708252109071003123, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104201,11 +104222,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2726983850838154764, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1035
+      value: 1031
       objectReference: {fileID: 0}
     - target: {fileID: 2753833787720083482, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1057
+      value: 1016
       objectReference: {fileID: 0}
     - target: {fileID: 2761240856916492720, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104229,11 +104250,11 @@ PrefabInstance:
       objectReference: {fileID: 1575581728}
     - target: {fileID: 2767622586235294332, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1037
+      value: BreakableObj_1029
       objectReference: {fileID: 0}
     - target: {fileID: 2785241965852743844, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1052
+      value: ReMovePlatform_1017
       objectReference: {fileID: 0}
     - target: {fileID: 2804912912427690562, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104245,7 +104266,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2808614645780034261, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1018
+      value: ReMovePlatform_1030
       objectReference: {fileID: 0}
     - target: {fileID: 2808621469426338373, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104253,15 +104274,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2810545340140928905, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1052
+      value: 1017
       objectReference: {fileID: 0}
     - target: {fileID: 2833983262681345494, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1023
+      value: 1024
       objectReference: {fileID: 0}
     - target: {fileID: 2873381209409801056, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1024
+      value: 1050
       objectReference: {fileID: 0}
     - target: {fileID: 2874381087006482891, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104281,7 +104302,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3057036644844407890, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1044
+      value: 1053
       objectReference: {fileID: 0}
     - target: {fileID: 3077373800386702394, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104297,19 +104318,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3141648474697750728, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1003
+      value: 1047
       objectReference: {fileID: 0}
     - target: {fileID: 3171857457702292341, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1003
+      value: ReMovePlatform_1047
       objectReference: {fileID: 0}
     - target: {fileID: 3182122639646664092, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: CheckpointTrigger_1012
+      value: CheckpointTrigger_1038
       objectReference: {fileID: 0}
     - target: {fileID: 3184796182414516230, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1022
+      value: 1027
       objectReference: {fileID: 0}
     - target: {fileID: 3186377675307693385, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_LocalPosition.x
@@ -104337,15 +104358,15 @@ PrefabInstance:
       objectReference: {fileID: 1229744689}
     - target: {fileID: 3229404074095065308, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1013
+      value: 1007
       objectReference: {fileID: 0}
     - target: {fileID: 3229762058488309251, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1014
+      value: BreakableObj_1025
       objectReference: {fileID: 0}
     - target: {fileID: 3246483693915220827, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1047
+      value: 1019
       objectReference: {fileID: 0}
     - target: {fileID: 3325699803606419235, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104357,15 +104378,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3327838608651640742, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: MovableGimmick_1005
+      value: MovableGimmick_1042
       objectReference: {fileID: 0}
     - target: {fileID: 3348443452779275376, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1050
+      value: 1032
       objectReference: {fileID: 0}
     - target: {fileID: 3364024376904743059, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1036
+      value: 1015
       objectReference: {fileID: 0}
     - target: {fileID: 3366803367529121012, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104389,7 +104410,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3403519162206846833, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1011
+      value: 1037
       objectReference: {fileID: 0}
     - target: {fileID: 3437319338568609887, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104413,7 +104434,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3491140123840366376, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1020
+      value: 1033
       objectReference: {fileID: 0}
     - target: {fileID: 3498081735250602654, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104445,7 +104466,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3617060657704633952, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1028
+      value: 1012
       objectReference: {fileID: 0}
     - target: {fileID: 3617060657704633952, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: properties.Array.size
@@ -104461,7 +104482,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3658563990785145671, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1053
+      value: Platform_1014
       objectReference: {fileID: 0}
     - target: {fileID: 3683756980541791436, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104477,7 +104498,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3693149291686376644, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1018
+      value: 1030
       objectReference: {fileID: 0}
     - target: {fileID: 3703625067914299899, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104489,27 +104510,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3722859185834016501, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1041
+      value: 1043
       objectReference: {fileID: 0}
     - target: {fileID: 3732217804266920436, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1001
+      value: 1057
       objectReference: {fileID: 0}
     - target: {fileID: 3733951485085286779, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1025
+      value: 1006
       objectReference: {fileID: 0}
     - target: {fileID: 3735238767940880605, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1029
+      value: BreakableObj_1055
       objectReference: {fileID: 0}
     - target: {fileID: 3758131357171593103, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1038
+      value: 1035
       objectReference: {fileID: 0}
     - target: {fileID: 3762522165113689895, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1019
+      value: BreakableObj_1051
       objectReference: {fileID: 0}
     - target: {fileID: 3801832523560558688, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104517,7 +104538,7 @@ PrefabInstance:
       objectReference: {fileID: 1463012601}
     - target: {fileID: 3850798079062615719, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1028
+      value: Platform_1012
       objectReference: {fileID: 0}
     - target: {fileID: 3862203106250709326, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_LocalPosition.y
@@ -104529,19 +104550,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3891057822373725154, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1009
+      value: ReMovePlatform_1052
       objectReference: {fileID: 0}
     - target: {fileID: 3906314051928513661, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1010
+      value: 1020
       objectReference: {fileID: 0}
     - target: {fileID: 3910693743482902573, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1029
+      value: 1055
       objectReference: {fileID: 0}
     - target: {fileID: 3921636239983527879, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1011
+      value: ReMovePlatform_1037
       objectReference: {fileID: 0}
     - target: {fileID: 3928838189294650129, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104549,7 +104570,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3950830474566249539, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: CheckpointTrigger_1016
+      value: CheckpointTrigger_1046
       objectReference: {fileID: 0}
     - target: {fileID: 3951099571798211171, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104573,7 +104594,7 @@ PrefabInstance:
       objectReference: {fileID: 1395090250}
     - target: {fileID: 4023756479964181678, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1037
+      value: 1029
       objectReference: {fileID: 0}
     - target: {fileID: 4024943920868503085, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104585,11 +104606,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4066613947530888857, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1019
+      value: 1051
       objectReference: {fileID: 0}
     - target: {fileID: 4077478593957658089, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1047
+      value: ReMovePlatform_1019
       objectReference: {fileID: 0}
     - target: {fileID: 4102722345583208346, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104605,7 +104626,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4172877254633434354, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1045
+      value: 1048
       objectReference: {fileID: 0}
     - target: {fileID: 4172877254633434354, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_type
@@ -104637,11 +104658,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4211085524842212021, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1046
+      value: 1054
       objectReference: {fileID: 0}
     - target: {fileID: 4231310582161850980, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1027
+      value: 1034
       objectReference: {fileID: 0}
     - target: {fileID: 4231310582161850980, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_type
@@ -104649,7 +104670,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4239436405062555355, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1049
+      value: BreakableObj_1002
       objectReference: {fileID: 0}
     - target: {fileID: 4245335867304096004, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104665,11 +104686,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4291499317525404488, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1032
+      value: 1009
       objectReference: {fileID: 0}
     - target: {fileID: 4293110816016279493, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1009
+      value: 1052
       objectReference: {fileID: 0}
     - target: {fileID: 4339270859908475730, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104677,7 +104698,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4386201960771465982, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1021
+      value: 1036
       objectReference: {fileID: 0}
     - target: {fileID: 4413840397092340535, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104693,7 +104714,7 @@ PrefabInstance:
       objectReference: {fileID: 1596720305}
     - target: {fileID: 4469128027129667166, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1055
+      value: 1049
       objectReference: {fileID: 0}
     - target: {fileID: 4494161977974359443, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104705,7 +104726,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4529594643189737977, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1030
+      value: 1041
       objectReference: {fileID: 0}
     - target: {fileID: 4529784194702454662, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104733,19 +104754,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4668449012939735323, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1005
+      value: 1042
       objectReference: {fileID: 0}
     - target: {fileID: 4669055537683189718, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1055
+      value: 1049
       objectReference: {fileID: 0}
     - target: {fileID: 4691952872574932093, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1051
+      value: BreakableObj_1004
       objectReference: {fileID: 0}
     - target: {fileID: 4693563301498926716, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1020
+      value: Platform_1033
       objectReference: {fileID: 0}
     - target: {fileID: 4699543193379146674, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104757,7 +104778,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4723423134838371295, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1043
+      value: 1044
       objectReference: {fileID: 0}
     - target: {fileID: 4741146824315675893, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104765,7 +104786,7 @@ PrefabInstance:
       objectReference: {fileID: 573742578}
     - target: {fileID: 4761136656175157757, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1036
+      value: 1015
       objectReference: {fileID: 0}
     - target: {fileID: 4783330080568733795, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104777,7 +104798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4811411603488771358, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1050
+      value: 1032
       objectReference: {fileID: 0}
     - target: {fileID: 4823873480405776355, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104805,7 +104826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4912825272927804618, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1024
+      value: BreakableObj_1050
       objectReference: {fileID: 0}
     - target: {fileID: 4925343852711730542, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104813,11 +104834,11 @@ PrefabInstance:
       objectReference: {fileID: 1182587316}
     - target: {fileID: 4970867610612502101, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: CheckpointTrigger_1045
+      value: CheckpointTrigger_1048
       objectReference: {fileID: 0}
     - target: {fileID: 4997421702778107469, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1009
+      value: 1052
       objectReference: {fileID: 0}
     - target: {fileID: 5046857559389404357, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104833,7 +104854,7 @@ PrefabInstance:
       objectReference: {fileID: 1645894467}
     - target: {fileID: 5066858679202850351, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1017
+      value: 1003
       objectReference: {fileID: 0}
     - target: {fileID: 5113192175329684990, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104845,7 +104866,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5136149250680906141, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1034
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5226007495885466278, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_LocalPosition.x
@@ -104909,7 +104930,7 @@ PrefabInstance:
       objectReference: {fileID: 460643081}
     - target: {fileID: 5302825216334174982, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1034
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 5311927943790174844, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104921,15 +104942,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5313049782182306414, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1053
+      value: 1014
       objectReference: {fileID: 0}
     - target: {fileID: 5332259207479904572, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1007
+      value: 1021
       objectReference: {fileID: 0}
     - target: {fileID: 5339755313951735213, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1042
+      value: Platform_1028
       objectReference: {fileID: 0}
     - target: {fileID: 5385000610024500615, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -104937,7 +104958,7 @@ PrefabInstance:
       objectReference: {fileID: 1127362946}
     - target: {fileID: 5437528088165008819, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1031
+      value: BreakableObj_1005
       objectReference: {fileID: 0}
     - target: {fileID: 5460031791368175806, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104949,23 +104970,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5493196017386265512, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1027
+      value: 1034
       objectReference: {fileID: 0}
     - target: {fileID: 5550081073411836028, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1001
+      value: 1057
       objectReference: {fileID: 0}
     - target: {fileID: 5570880603826865903, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1000
+      value: 1056
       objectReference: {fileID: 0}
     - target: {fileID: 5576610487674384253, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1041
+      value: 1043
       objectReference: {fileID: 0}
     - target: {fileID: 5588662244441367884, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1018
+      value: 1030
       objectReference: {fileID: 0}
     - target: {fileID: 5593131976878054334, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -104973,11 +104994,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5627676901253823360, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1005
+      value: 1042
       objectReference: {fileID: 0}
     - target: {fileID: 5675934671945173475, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1001
+      value: ReMovePlatform_1057
       objectReference: {fileID: 0}
     - target: {fileID: 5711988350561961493, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105021,19 +105042,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5917585737041160532, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1013
+      value: 1007
       objectReference: {fileID: 0}
     - target: {fileID: 5990024476967518053, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: CheckpointTrigger_1056
+      value: CheckpointTrigger_1039
       objectReference: {fileID: 0}
     - target: {fileID: 6007115367796524861, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1023
+      value: BreakableObj_1024
       objectReference: {fileID: 0}
     - target: {fileID: 6067984938123820035, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1000
+      value: Platform_1056
       objectReference: {fileID: 0}
     - target: {fileID: 6095652879391900961, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105041,11 +105062,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6098612374446448090, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1044
+      value: 1053
       objectReference: {fileID: 0}
     - target: {fileID: 6103846471643708846, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1014
+      value: 1025
       objectReference: {fileID: 0}
     - target: {fileID: 6108375601029387328, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105065,7 +105086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6149447181047875904, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1003
+      value: 1047
       objectReference: {fileID: 0}
     - target: {fileID: 6163365789478712902, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105077,7 +105098,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6200964810992834840, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1033
+      value: 1001
       objectReference: {fileID: 0}
     - target: {fileID: 6215184167161682973, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105085,7 +105106,7 @@ PrefabInstance:
       objectReference: {fileID: 1233678574}
     - target: {fileID: 6281211115679760618, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1032
+      value: BreakableObj_1009
       objectReference: {fileID: 0}
     - target: {fileID: 6283562084041033506, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105105,11 +105126,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6384431115766597345, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1038
+      value: 1035
       objectReference: {fileID: 0}
     - target: {fileID: 6411380087431969170, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1057
+      value: 1016
       objectReference: {fileID: 0}
     - target: {fileID: 6413246098441352657, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
@@ -105125,7 +105146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6471471581290409473, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1052
+      value: 1017
       objectReference: {fileID: 0}
     - target: {fileID: 6473436112168557543, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105133,7 +105154,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6474519623867440037, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1025
+      value: BreakableObj_1006
       objectReference: {fileID: 0}
     - target: {fileID: 6480153691328688910, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105141,11 +105162,11 @@ PrefabInstance:
       objectReference: {fileID: 1968968501}
     - target: {fileID: 6524481279647347987, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1010
+      value: 1020
       objectReference: {fileID: 0}
     - target: {fileID: 6533176646113286069, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1031
+      value: 1005
       objectReference: {fileID: 0}
     - target: {fileID: 6594161578339710700, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105165,11 +105186,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6687453723110567494, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1020
+      value: 1033
       objectReference: {fileID: 0}
     - target: {fileID: 6704472318235733930, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1022
+      value: ReMovePlatform_1027
       objectReference: {fileID: 0}
     - target: {fileID: 6746353429661348223, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105189,15 +105210,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6807843016615945499, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1004
+      value: 1011
       objectReference: {fileID: 0}
     - target: {fileID: 6813945453701672718, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1028
+      value: 1012
       objectReference: {fileID: 0}
     - target: {fileID: 6827733237783666175, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1056
+      value: 1039
       objectReference: {fileID: 0}
     - target: {fileID: 6852885026438854946, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105209,11 +105230,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6863843954956231624, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1051
+      value: 1004
       objectReference: {fileID: 0}
     - target: {fileID: 6905230556171787385, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1015
+      value: 1018
       objectReference: {fileID: 0}
     - target: {fileID: 6920920615935947909, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105221,11 +105242,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6944443049465244676, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1017
+      value: 1003
       objectReference: {fileID: 0}
     - target: {fileID: 7007103379403312726, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1002
+      value: 1022
       objectReference: {fileID: 0}
     - target: {fileID: 7023702789652438649, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105233,7 +105254,7 @@ PrefabInstance:
       objectReference: {fileID: 25302912}
     - target: {fileID: 7036764418325811030, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1038
+      value: Platform_1035
       objectReference: {fileID: 0}
     - target: {fileID: 7049553947866300375, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
@@ -105249,7 +105270,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7088309201747355017, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1015
+      value: 1018
       objectReference: {fileID: 0}
     - target: {fileID: 7136657125995082570, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
@@ -105257,11 +105278,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7174671300354278158, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1054
+      value: Platform_1023
       objectReference: {fileID: 0}
     - target: {fileID: 7201436211322690795, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1004
+      value: 1011
       objectReference: {fileID: 0}
     - target: {fileID: 7215007800692865990, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105269,7 +105290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7225388085295175665, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1052
+      value: 1017
       objectReference: {fileID: 0}
     - target: {fileID: 7227471796093673013, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105281,7 +105302,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7243833266562933889, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1016
+      value: 1046
       objectReference: {fileID: 0}
     - target: {fileID: 7311554976972146658, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105305,11 +105326,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7379763406352048504, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: Platform_1010
+      value: Platform_1020
       objectReference: {fileID: 0}
     - target: {fileID: 7393957771744261748, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1035
+      value: 1031
       objectReference: {fileID: 0}
     - target: {fileID: 7418878548409686182, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105317,7 +105338,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7478470552341576115, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1007
+      value: BreakableObj_1021
       objectReference: {fileID: 0}
     - target: {fileID: 7496051610024101975, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105329,7 +105350,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7556420678910521520, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1003
+      value: 1047
       objectReference: {fileID: 0}
     - target: {fileID: 7561141311430428081, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105337,7 +105358,7 @@ PrefabInstance:
       objectReference: {fileID: 1714535399}
     - target: {fileID: 7577423572728865834, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1044
+      value: 1053
       objectReference: {fileID: 0}
     - target: {fileID: 7699177252888465819, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105361,11 +105382,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7817992299391194889, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1011
+      value: 1037
       objectReference: {fileID: 0}
     - target: {fileID: 7819086313342893391, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1004
+      value: ReMovePlatform_1011
       objectReference: {fileID: 0}
     - target: {fileID: 7839081758649955632, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105393,7 +105414,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7947023265544487715, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1047
+      value: 1019
       objectReference: {fileID: 0}
     - target: {fileID: 8007178457387763144, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105401,15 +105422,15 @@ PrefabInstance:
       objectReference: {fileID: 1451845525}
     - target: {fileID: 8031615193458346110, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1022
+      value: 1027
       objectReference: {fileID: 0}
     - target: {fileID: 8040484249822023844, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1013
+      value: 1007
       objectReference: {fileID: 0}
     - target: {fileID: 8066362865752638231, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1007
+      value: 1021
       objectReference: {fileID: 0}
     - target: {fileID: 8068291389665699752, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105417,19 +105438,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8070669964901552947, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1033
+      value: 1001
       objectReference: {fileID: 0}
     - target: {fileID: 8071611069674740924, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1018
+      value: 1030
       objectReference: {fileID: 0}
     - target: {fileID: 8075725240012944003, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1012
+      value: 1038
       objectReference: {fileID: 0}
     - target: {fileID: 8137701621473662605, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1041
+      value: 1043
       objectReference: {fileID: 0}
     - target: {fileID: 8168512550766839537, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Enabled
@@ -105437,7 +105458,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8192145940283295536, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: ReMovePlatform_1013
+      value: ReMovePlatform_1007
       objectReference: {fileID: 0}
     - target: {fileID: 8226875602034435208, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105449,11 +105470,11 @@ PrefabInstance:
       objectReference: {fileID: 185010446}
     - target: {fileID: 8238983042501917169, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1045
+      value: 1048
       objectReference: {fileID: 0}
     - target: {fileID: 8267411755247597445, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1014
+      value: 1025
       objectReference: {fileID: 0}
     - target: {fileID: 8290345236796167618, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105477,7 +105498,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8427566260840234983, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1039
+      value: 1026
       objectReference: {fileID: 0}
     - target: {fileID: 8427566260840234983, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: properties.Array.size
@@ -105517,11 +105538,11 @@ PrefabInstance:
       objectReference: {fileID: 1988908133}
     - target: {fileID: 8529226382061711450, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1042
+      value: 1028
       objectReference: {fileID: 0}
     - target: {fileID: 8618512170043269834, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1017
+      value: BreakableObj_1003
       objectReference: {fileID: 0}
     - target: {fileID: 8643823505581906966, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_IsActive
@@ -105541,11 +105562,11 @@ PrefabInstance:
       objectReference: {fileID: 896108961}
     - target: {fileID: 8733724114841436877, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1046
+      value: 1054
       objectReference: {fileID: 0}
     - target: {fileID: 8741419271429761507, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1051
+      value: 1004
       objectReference: {fileID: 0}
     - target: {fileID: 8768299084761431335, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -105561,7 +105582,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8856431893652626392, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1012
+      value: 1038
       objectReference: {fileID: 0}
     - target: {fileID: 8856431893652626392, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_type
@@ -105581,27 +105602,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8925403930618976276, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1054
+      value: 1023
       objectReference: {fileID: 0}
     - target: {fileID: 8936845232090466863, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1043
+      value: 1044
       objectReference: {fileID: 0}
     - target: {fileID: 8957105278699664211, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmick_id
-      value: 1026
+      value: 1045
       objectReference: {fileID: 0}
     - target: {fileID: 8981310965916507550, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: gimmickUID
-      value: 1031
+      value: 1005
       objectReference: {fileID: 0}
     - target: {fileID: 8999192973690664168, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Name
-      value: BreakableObj_1021
+      value: BreakableObj_1036
       objectReference: {fileID: 0}
     - target: {fileID: 9050254353574084993, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: targetGimmicks.Array.data[0].gimmickID
-      value: 1030
+      value: 1041
       objectReference: {fileID: 0}
     - target: {fileID: 9053902842108514421, guid: 0782ec89d499f9e46964484793990574, type: 3}
       propertyPath: m_Mesh
@@ -106670,6 +106691,11 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &1880632105 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8349488716791362952, guid: 812781aa5d28adc49b8beb4bc84da016, type: 3}
+  m_PrefabInstance: {fileID: 731977269}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1882119188
 GameObject:
   m_ObjectHideFlags: 0
@@ -106726,8 +106752,8 @@ MonoBehaviour:
     - {fileID: 731977276}
     - {fileID: 731977275}
     - {fileID: 731977274}
-    - {fileID: 731977272}
-    - {fileID: 731977271}
+    - {fileID: 0}
+    - {fileID: 0}
     spawnAtEnd: 0
     spawnSectorIndex: 0
   - cutsceneType: 3
@@ -113316,11 +113342,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2187865723406819899, guid: 837e19fe259696e42a6d4c958ba6c1e0, type: 3}
   m_PrefabInstance: {fileID: 1983668998}
   m_PrefabAsset: {fileID: 0}
---- !u!108 &1983669001 stripped
-Light:
-  m_CorrespondingSourceObject: {fileID: 6800526929421730602, guid: 837e19fe259696e42a6d4c958ba6c1e0, type: 3}
-  m_PrefabInstance: {fileID: 1983668998}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1983669002 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5515136597042324073, guid: 837e19fe259696e42a6d4c958ba6c1e0, type: 3}
@@ -116245,7 +116266,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2027989700}
   m_Layer: 0
-  m_Name: Platform_1006
+  m_Name: Platform_1013
   m_TagString: Gimmick
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117222,7 +117243,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2048080251
 Transform:
@@ -188408,6 +188429,10 @@ MonoBehaviour:
   moveSpeed: 5
   playerPivot: {fileID: 245091146899763187}
   animator: {fileID: 0}
+  audioSource: {fileID: 0}
+  pushSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  pullSound: {fileID: 0}
   lastSkillUseTime: -999
   lastKnockbackTime: -999
   characterModels: []
