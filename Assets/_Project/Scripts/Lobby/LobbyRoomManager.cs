@@ -276,7 +276,7 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                         {
                             int oppositeCharID = (userInfoNtf.characterID == 0) ? 1 : 0;
 
-                            if (playerInfoUI != null) 
+                            if (playerInfoUI != null)
                             {
                                 playerInfoUI.ForceSetCharacter(oppositeCharID, true);
                             }
@@ -313,16 +313,13 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                 {
                     var startNtf = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);
 
-                    //Debug.Log($"<color=magenta>[Handover] 게임 서버로 이동 포트: {startNtf.GameServerPort} Token: {startNtf.AuthToken}</color>");
-
                     LocalPlayerInfo.AuthToken = startNtf.AuthToken;
-
                     StopLobbyPolling();
 
                     string serverDomain = "game.chungkang.local";
                     string resolvedIP = ResolveDomain(serverDomain);
 
-                    Client.SafeDisconnectAndReconnect(resolvedIP, startNtf.GameServerPort, this);
+                    Client.SafeDisconnectAndReconnect(resolvedIP, startNtf.GameServerPort, startNtf.GameServerUdpPort, this);
 
                     UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Game_Lobby");
                     break;

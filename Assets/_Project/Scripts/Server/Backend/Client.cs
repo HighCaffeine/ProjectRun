@@ -37,9 +37,9 @@ public static unsafe class Client
         }
     }
 
-    public static void SafeDisconnectAndReconnect(string newIp, int newPort, IPacketReceiver currentReceiver)
+    public static void SafeDisconnectAndReconnect(string ip, int tcpPort, int udpPort, IPacketReceiver currentReceiver)
     {
-        // 1. TCP 소켓 재연결
+        // TCP 소켓 재연결
         if (TCP != null)
         {
             TCP.RemovePacketReceiver(currentReceiver);
@@ -47,7 +47,7 @@ public static unsafe class Client
             TCP = null;
         }
 
-        TCP = new NetworkClient(newIp, newPort, ProtocolType.Tcp);
+        TCP = new NetworkClient(ip, tcpPort, ProtocolType.Tcp);
         TCP.OnDisconnect -= OnDisconnect;
         TCP.OnDisconnect += OnDisconnect;
         TCP.Start();
@@ -59,10 +59,10 @@ public static unsafe class Client
             UDP = null;
         }
 
-        UDP = new NetworkClient(newIp, newPort, ProtocolType.Udp);
+        UDP = new NetworkClient(ip, udpPort, ProtocolType.Udp);
         UDP.Start();
 
-        //Debug.Log($"<color=green>[Network] TCP & UDP -> {newIp}:{newPort} 로 재연결 완료!</color>");
+        //Debug.Log($"<color=green>[Network] TCP & UDP -> {newIp}:{newPort} 로 재연결 완료</color>");
     }
 
     private static bool OnApplicationQuit()

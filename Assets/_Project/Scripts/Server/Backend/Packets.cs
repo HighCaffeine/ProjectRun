@@ -282,6 +282,7 @@ public struct P_RoomChatNotify
 public struct P_MatchStartNtf
 {
     [MarshalAs(UnmanagedType.U2)] public ushort GameServerPort;
+    [MarshalAs(UnmanagedType.U2)] public ushort GameServerUdpPort;
     [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)] public string AuthToken;
 }
 
@@ -355,7 +356,7 @@ public struct P_DungeonEscapeReq
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct P_DungeonClearNtf
 {
-    [MarshalAs(UnmanagedType.I4)] public int clearTimeSeconds; 
+    [MarshalAs(UnmanagedType.I4)] public int clearTimeSeconds;
     [MarshalAs(UnmanagedType.I4)] public int p1Push;
     [MarshalAs(UnmanagedType.I4)] public int p1Pull;
     [MarshalAs(UnmanagedType.I4)] public int p1Fall;

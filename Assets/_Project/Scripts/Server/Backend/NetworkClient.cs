@@ -48,6 +48,9 @@ public unsafe class NetworkClient
 
     private ConcurrentQueue<Packet> packetQueue = new ConcurrentQueue<Packet>();
 
+    private long _pingSentTime;
+    public long LastRTT => Interlocked.Read(ref _lastRTT);
+    private long _lastRTT;
 
     private const int MAX_PROCESS_PER_FRAME = 1000; // 한 프레임당 최대 처리 패킷 수
     public event Action OnDisconnect;
@@ -216,10 +219,15 @@ public unsafe class NetworkClient
 
                 int bytesReceived = 0;
                 try { bytesReceived = socket.Receive(clientBuffer, offset, packet.pbase.length - offset, SocketFlags.None); }
-                catch { break; }
+                catch (Exception ex) { /*break;*/Debug.LogError($"[TCP Recv Error] {ex.Message}"); }
+                Debug.Log($"[TCP] packet_id:{packet.pbase.packet_id} length:{packet.pbase.length} offset:{offset} received:{bytesReceived}");
 
-                // 여기서도 0 이하 무한 루프 방지
-                if (bytesReceived <= 0) break;
+                if (bytesReceived < 0) break;
+                if (bytesReceived == 0)
+                {
+                    Thread.Sleep(1);
+                    continue;
+                }
 
                 offset += bytesReceived;
                 if (offset < packet.pbase.length) continue;
@@ -233,6 +241,14 @@ public unsafe class NetworkClient
                 else
                 {
                     packet.data = new byte[0];
+                }
+
+                if (packet.pbase.packet_id == (ushort)E_PACKET.SYS_TIME_SYNC_RES)
+                {
+                    long recvTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    Interlocked.Exchange(ref _lastRTT, recvTime - Interlocked.Read(ref _pingSentTime));
+                    packetQueue.Enqueue(packet);
+                    continue;
                 }
 
                 // synchronizationContext.Post((object state) => { HandlePacket(packet); }, null);
@@ -250,6 +266,10 @@ public unsafe class NetworkClient
         }
     }
 
+    public void RecordPingSentTime()
+    {
+        Interlocked.Exchange(ref _pingSentTime, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+    }
 
     private void SendData(E_PACKET packetId, byte[] data)
     {
@@ -372,9 +392,10 @@ public unsafe class NetworkClient
         {
             if (socketProtocol == ProtocolType.Tcp)
             {
-                socket.BeginSend(buff, 0, buff.Length, SocketFlags.None, (ar) =>
+                var capturedSocket = socket;
+                capturedSocket.BeginSend(buff, 0, buff.Length, SocketFlags.None, (ar) =>
                 {
-                    try { if (socket != null) socket.EndSend(ar); } catch { Close(); }
+                    try { capturedSocket.EndSend(ar); } catch { Close(); }
                 }, null);
             }
             else
