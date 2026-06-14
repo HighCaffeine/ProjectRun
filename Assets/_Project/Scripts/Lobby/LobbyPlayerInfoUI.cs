@@ -36,34 +36,34 @@ public class LobbyPlayerInfoUI : MonoBehaviour
     }
 
     public void ForceSetCharacter(int charID, bool isLocal = true)
-{
-    if (isLocal)
     {
-        if (currentCharID >= 0 && currentCharID < characterModels.Length && characterModels[currentCharID] != null)
+        if (isLocal)
         {
-            characterModels[currentCharID].SetActive(false);
-        }
-        
-        currentCharID = charID;
-        LocalPlayerInfo.CharacterID = currentCharID;
-        UpdateCharacterModel();
-    }
-    else
-    {
-        for (int i = 0; i < characterModels.Length; i++)
-        {
-            if (characterModels[i] != null)
+            if (currentCharID >= 0 && currentCharID < characterModels.Length && characterModels[currentCharID] != null)
             {
-                characterModels[i].SetActive(false);
+                characterModels[currentCharID].SetActive(false);
+            }
+
+            currentCharID = charID;
+            LocalPlayerInfo.CharacterID = currentCharID;
+            UpdateCharacterModel();
+        }
+        else
+        {
+            for (int i = 0; i < characterModels.Length; i++)
+            {
+                if (characterModels[i] != null)
+                {
+                    characterModels[i].SetActive(false);
+                }
+            }
+
+            if (charID >= 0 && charID < characterModels.Length && characterModels[charID] != null)
+            {
+                characterModels[charID].SetActive(true);
             }
         }
-        
-        if (charID >= 0 && charID < characterModels.Length && characterModels[charID] != null)
-        {
-            characterModels[charID].SetActive(true);
-        }
     }
-}
 
     public void OnClickChangeCharacter()
     {
@@ -95,7 +95,7 @@ public class LobbyPlayerInfoUI : MonoBehaviour
 
     private void UpdateCharacterModel()
     {
-        //Debug.Log($"<color=red>[//Debug] 모델 업데이트 호출됨! 호출위치 스택 확인: </color>\n{System.Environment.StackTrace}");
+        //Debug.Log($"<color=red>[//Debug] 모델 업데이트 호출됨 호출위치 스택 확인: </color>\n{System.Environment.StackTrace}");
         for (int i = 0; i < characterModels.Length; i++)
         {
             if (characterModels[i] != null)
@@ -114,6 +114,6 @@ public class LobbyPlayerInfoUI : MonoBehaviour
         LocalPlayerInfo.Name = newName;
         nicknameText.text = newName;
 
-        //Debug.Log($"[Lobby] 닉네임이 {newName}(으)로 변경됨!");
+        //Debug.Log($"[Lobby] 닉네임이 {newName}(으)로 변경됨");
     }
 }

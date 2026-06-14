@@ -101,7 +101,7 @@ public class MainMenuGUI : MonoBehaviour, IPacketReceiver
 
                     if (loginRes.result == 0) // 성공
                     {
-                        //Debug.Log("<color=cyan>[Client] 로그인 성공! Main_Lobby 씬으로 이동합니다.</color>");
+                        //Debug.Log("<color=cyan>[Client] 로그인 성공 Main_Lobby 씬으로 이동합니다.</color>");
                         LocalPlayerInfo.ID = loginRes.userUUID;
 
                         // 씬 중복 로딩 방지

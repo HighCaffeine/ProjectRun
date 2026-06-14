@@ -24,7 +24,7 @@ public class FPSDisplayUI : MonoBehaviour
 
     private void Awake()
     {
-        QualitySettings.vSyncCount = vSync ? 1 : 0;
+        //QualitySettings.vSyncCount = vSync ? 1 : 0;
         Application.targetFrameRate = targetFrameRate;
     }
 

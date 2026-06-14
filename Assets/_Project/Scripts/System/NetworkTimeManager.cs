@@ -39,11 +39,29 @@ public class NetworkTimeManager : GenericSingleton<NetworkTimeManager>
     public void OnReceiveTimeSyncResponse(long clientTimestamp, long serverTimestamp, long arrivalTime)
     {
         long rtt = arrivalTime - clientTimestamp;
-        CurrentRTT = rtt;  // ← 추가
+
+        if (IsSynchronized && rtt > 500)
+        {
+            Debug.LogWarning($"[TimeSync] RTT 스파이크 ({rtt}ms). 오프셋 갱신 스킵");
+
+            CurrentRTT = rtt;
+            return;
+        }
+
+        CurrentRTT = rtt;
 
         long estimatedServerTime = serverTimestamp + (rtt / 2);
-        _serverTimeOffset = estimatedServerTime - arrivalTime;
-        IsSynchronized = true;
+        long newOffset = estimatedServerTime - arrivalTime;
+
+        if (IsSynchronized)
+        {
+            _serverTimeOffset = (long)(_serverTimeOffset * 0.8f + newOffset * 0.2f);
+        }
+        else
+        {
+            _serverTimeOffset = newOffset;
+            IsSynchronized = true;
+        }
 
         Debug.Log($"<color=lime>[TimeSync]</color> RTT: {rtt}ms, Offset: {_serverTimeOffset}ms");
     }

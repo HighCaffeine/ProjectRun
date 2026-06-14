@@ -309,6 +309,18 @@ public class LobbyRoomManager : MonoBehaviour, IPacketReceiver
                     break;
                 }
 
+            case E_PACKET.ROOM_READY_STATUS_NTF:
+                {
+                    var readyNtf = UnsafeCode.ByteArrayToStructure<P_RoomReadyStatusNtf>(packet.data);
+
+                    // 내가 현재 방 안에 있고 호스트일 때만 시작 버튼 활성화 상태를 갱신
+                    if (isInsideRoom && myRoomIsHost)
+                    {
+                        roomActionButton.interactable = readyNtf.isReady;
+                    }
+                    break;
+                }
+
             case E_PACKET.MATCH_START_NTF:
                 {
                     var startNtf = UnsafeCode.ByteArrayToStructure<P_MatchStartNtf>(packet.data);

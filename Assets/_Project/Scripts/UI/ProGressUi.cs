@@ -42,7 +42,7 @@ public class ProGressUi : GenericSingleton<ProGressUi>
 
         targetImage = stageImages[mapID];
 
-    
+
     }
     private IEnumerator CrossFade(CanvasGroup fadeObject, float duration, float start, float end)
     {
@@ -50,21 +50,24 @@ public class ProGressUi : GenericSingleton<ProGressUi>
 
         fadeObject.alpha = start;
 
-        if (instage)
-        { 
-            targetImage.color = new Color(255, 255, 255, 255);
-        }
-        else
+        if (targetImage != null)
         {
-            targetImage.color = new Color(255, 255, 255, 0);
+            if (instage)
+            {
+                targetImage.color = new Color(1f, 1f, 1f, 1f);
+            }
+            else
+            {
+                targetImage.color = new Color(1f, 1f, 1f, 0f);
+            }
         }
 
-            while (time < duration)
-            {
-                time += Time.deltaTime;
-                fadeObject.alpha = Mathf.Lerp(start, end, time / duration);
-                yield return null;
-            }
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            fadeObject.alpha = Mathf.Lerp(start, end, time / duration);
+            yield return null;
+        }
         fadeObject.alpha = end;
 
         if (targetImage != null)
@@ -77,14 +80,12 @@ public class ProGressUi : GenericSingleton<ProGressUi>
                 {
                     time += Time.deltaTime;
                     Color color = targetImage.color;
-                    color.a = Mathf.Lerp(start, end, time / duration);  
+                    color.a = Mathf.Lerp(start, end, time / duration);
                     targetImage.color = color;
                     yield return null;
                 }
             }
-            
         }
-        
 
         time = duration;
 
@@ -97,7 +98,7 @@ public class ProGressUi : GenericSingleton<ProGressUi>
             yield return null;
         }
 
-        instage= false;
+        instage = false;
 
         OnProgressFinished?.Invoke();
         OnProgressFinished = null;

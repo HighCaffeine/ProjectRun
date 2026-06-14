@@ -30,7 +30,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
     //토큰 인증용
     public static bool isServerAuthenticated = false;
 
-#region 타임라인용 스폰 로직
+    #region 타임라인용 스폰 로직
     public bool isRemoteSpawnAllowed = false; // 타임라인에서 허용하기 전까지는 false
 
     private struct PendingPlayer
@@ -63,7 +63,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         foreach (var p in _pendingPlayers)
         {
             AddPlayer(p.uuid, p.name, p.pos, p.charID);
-          //  Debug.Log($"[Match] 유저 스폰 완료 ({p.name})");
+            //  Debug.Log($"[Match] 유저 스폰 완료 ({p.name})");
         }
         _pendingPlayers.Clear();
     }
@@ -71,7 +71,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     void Awake()
     {
-     //   Debug.Log("Match started");
+        //   Debug.Log("Match started");
         Instance = this;
         Players = new Dictionary<long, Player>();
         Client.TCP.AddPacketReceiver(this);
@@ -93,7 +93,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         {
             if (isServerAuthenticated)
             {
-             //   Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
+                //   Debug.Log("[Match] 이미 서버 인증이 완료된 상태입니다.");
 
                 // if (DungeonPointManager.Instance != null)
                 // {
@@ -113,7 +113,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 authReq.characterID = LocalPlayerInfo.CharacterID;
 
                 Client.TCP.SendPacket2(E_PACKET.GAME_AUTH_REQUEST, authReq);
-              //  Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
+                //  Debug.Log("[Match] 게임 서버(11021)에 인증 토큰 제출 승인을 기다립니다...");
             }
         }
     }
@@ -136,8 +136,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
     void OnDestroy()
     {
-        Client.TCP.RemovePacketReceiver(this);
-        Client.UDP.RemovePacketReceiver(this);
+        if (Client.TCP != null)
+        {
+            Client.TCP.RemovePacketReceiver(this);
+        }
+
+        if (Client.UDP != null)
+        {
+            Client.UDP.RemovePacketReceiver(this);
+        }
     }
 
     public unsafe void OnPacketReceived(Packet packet)
@@ -163,13 +170,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     isServerAuthenticated = true;
 
-                //    Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
+                    //    Debug.Log($"<color=green>[Match] 서버 인증 성공! 새 Session ID: {LocalPlayerInfo.ID}</color>");
 
                     //AddPlayer(LocalPlayerInfo.ID, LocalPlayerInfo.Name, Vector3.zero);
                 }
                 else
                 {
-                   // Debug.LogError("[Match] 토큰 인증 실패");
+                    // Debug.LogError("[Match] 토큰 인증 실패");
                     UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Main_Lobby");
                 }
                 break;
@@ -181,19 +188,20 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.ROOM_NEW_USER_NTF:
                 var newUser = UnsafeCode.ByteArrayToStructure<P_RoomNewUserNotify>(packet.data);
-           //     Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
+                //     Debug.Log($"<color=yellow>[NTF 체크] 게스트 입장 알림 수신 -> Name: '{newUser.userName}', CharID: {newUser.characterID}</color>");
                 if (newUser.userUUID != LocalPlayerInfo.ID)
                 {
                     RoomMembersCache[newUser.userUUID] = new RoomMemberData { uuid = newUser.userUUID, name = newUser.userName, charID = newUser.characterID };
                     //AddPlayer(newUser.userUUID, newUser.userName, Vector3.zero, newUser.characterID);
-                    _pendingPlayers.Add(new PendingPlayer { 
-                        uuid = newUser.userUUID, 
-                        name = newUser.userName, 
-                        pos = Vector3.zero, 
-                        charID = newUser.characterID 
-                        });
+                    _pendingPlayers.Add(new PendingPlayer
+                    {
+                        uuid = newUser.userUUID,
+                        name = newUser.userName,
+                        pos = Vector3.zero,
+                        charID = newUser.characterID
+                    });
 
-                 //   Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
+                    //   Debug.Log($"[Match] 신규 유저 스폰 완료: {newUser.userName}");
                 }
                 break;
 
@@ -203,14 +211,15 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     RoomMembersCache[userInfo.userUUID] = new RoomMemberData { uuid = userInfo.userUUID, name = userInfo.userName, charID = userInfo.characterID };
                     //AddPlayer(userInfo.userUUID, userInfo.userName, userInfo.position.ToVector3(), userInfo.characterID);
-                    _pendingPlayers.Add(new PendingPlayer { 
-                        uuid = userInfo.userUUID, 
-                        name = userInfo.userName, 
-                        pos = userInfo.position.ToVector3(), 
-                        charID = userInfo.characterID 
-                        });
+                    _pendingPlayers.Add(new PendingPlayer
+                    {
+                        uuid = userInfo.userUUID,
+                        name = userInfo.userName,
+                        pos = userInfo.position.ToVector3(),
+                        charID = userInfo.characterID
+                    });
 
-                  //  Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
+                    //  Debug.Log($"[Match] 기존 유저 스폰 완료: {userInfo.userName}");
                 }
                 break;
             // case E_PACKET.ROOM_USER_INFO_NTF:
@@ -257,11 +266,11 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                     if (GameManager.Instance.isHost)
                     {
-                       // Debug.Log("[System] 방장이 되었습니다");
+                        // Debug.Log("[System] 방장이 되었습니다");
                     }
                     else
                     {
-                     //   Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
+                        //   Debug.Log($"[System] 현재 방장: {hostPkt.hostUUID}");
                     }
 
                     if (VillageUiManager.Instance != null) VillageUiManager.Instance.UpdatePlayerIDUI();
@@ -272,7 +281,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_COUNTDOWN_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartCountdownNtf>(packet.data);
-                   // Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
+                    // Debug.Log($"[System] {pkt.remainSeconds}초 뒤 던전으로 출발합니다");
                     if (countdownText != null)
                     {
                         countdownText.transform.parent.gameObject.SetActive(true);
@@ -283,7 +292,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             case E_PACKET.GAME_READY_CANCEL_NTF:
                 {
-                 //   Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
+                    //   Debug.Log("[System] 플레이어가 준비 구역을 이탈하여 취소되었습니다.");
                     if (countdownText != null)
                     {
                         countdownText.transform.parent.gameObject.SetActive(false);
@@ -294,7 +303,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.GAME_START_NTF:
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_GameStartNtf>(packet.data);
-                 //   Debug.Log("[System] 던전 입장");
+                    //   Debug.Log("[System] 던전 입장");
 
                     Players.Clear();
                     if (countdownText != null)
@@ -419,10 +428,10 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var ntf = UnsafeCode.ByteArrayToStructure<P_GimmickInteractNtf>(packet.data);
 
-                    //Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
+                    Debug.Log($"[GIMMICK RAW] ID={ntf.gimmickID}, key={ntf.gimmickKey}, state={ntf.state}");
                     // Next 구역 텔레포트
 
-                //    Debug.Log($"<color=yellow>[GIMMICK RAW]</color> 수신된 ID: {ntf.gimmickID}, State: {ntf.state}");
+                    //    Debug.Log($"<color=yellow>[GIMMICK RAW]</color> 수신된 ID: {ntf.gimmickID}, State: {ntf.state}");
                     if (ntf.state == 2 && ntf.gimmickKey == (byte)eGimmickKey.NextZone)
                     {
                         if (Players.TryGetValue(ntf.activeUUID, out Player targetPlayer))
@@ -449,7 +458,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                                 pActor.OnUpdatePoint?.Invoke(targetPlayer.gameObject.name, nextSpawnIndex);
                             }
 
-                        //    Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
+                            //    Debug.Log($"[NextZone] Player {ntf.activeUUID} teleported to Map{mapID}_Sector{nextSpawnIndex}");
                         }
                         break;
                     }
@@ -467,7 +476,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                     }
                     else
                     {
-                     //   Debug.LogError($"<color=red>[GIMMICK 에러]</color> ID {ntf.gimmickID} 없음");
+                        //   Debug.LogError($"<color=red>[GIMMICK 에러]</color> ID {ntf.gimmickID} 없음");
                     }
 
                     // BaseGimmick[] allGimmicks = FindObjectsByType<BaseGimmick>(FindObjectsSortMode.None);
@@ -491,7 +500,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                         if (_gimmickCache.TryGetValue(targetID, out BaseGimmick gimmick))
                         {
                             gimmick.ResetGimmick();
-                        //    Debug.Log($"[Gimmick] {targetID}번 기믹 초기화 완료");
+                            //    Debug.Log($"[Gimmick] {targetID}번 기믹 초기화 완료");
                         }
                     }
                     break;
@@ -561,44 +570,44 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             //결과창 -> 컷씬
             case E_PACKET.DUNGEON_CLEAR_NTF:
-            {
-                var clearPkt = UnsafeCode.ByteArrayToStructure<P_DungeonClearNtf>(packet.data);
-                
-                if (DungeonUiManager.Instance != null) 
                 {
-                    DungeonUiManager.Instance.SetFinalResult(clearPkt);
-                }
+                    var clearPkt = UnsafeCode.ByteArrayToStructure<P_DungeonClearNtf>(packet.data);
 
-                EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
-                if (escapeZone != null)
-                {
-                    if (escapeZone.isFirstShowResult)
+                    if (DungeonUiManager.Instance != null)
                     {
-                        escapeZone.OnActiveResult(); // 결과창 먼저
+                        DungeonUiManager.Instance.SetFinalResult(clearPkt);
+                    }
+
+                    EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+                    if (escapeZone != null)
+                    {
+                        if (escapeZone.isFirstShowResult)
+                        {
+                            escapeZone.OnActiveResult(); // 결과창 먼저
+                        }
+                        else
+                        {
+                            SceneCutsceneController.Instance.PlayCutscene(ECutsceneType.DungeonEscape); // 컷씬 먼저
+                        }
+                    }
+                    break;
+                }
+            case E_PACKET.DUNGEON_RETURN_VILLAGE_NTF:
+                {
+                    var pkt = UnsafeCode.ByteArrayToStructure<P_DungeonReturnVillageNtf>(packet.data);
+
+                    EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
+                    if (escapeZone != null)
+                    {
+                        escapeZone.GoToVillage();
                     }
                     else
                     {
-                        SceneCutsceneController.Instance.PlayCutscene(ECutsceneType.DungeonEscape); // 컷씬 먼저
+                        GameManager.Instance.DungeonClear();
+                        GameManager.Instance.LoadVillage();
                     }
+                    break;
                 }
-                break;
-            }
-            case E_PACKET.DUNGEON_RETURN_VILLAGE_NTF:
-            {
-                var pkt = UnsafeCode.ByteArrayToStructure<P_DungeonReturnVillageNtf>(packet.data);
-
-                EscapeZone escapeZone = FindFirstObjectByType<EscapeZone>();
-                if (escapeZone != null)
-                {
-                    escapeZone.GoToVillage();
-                }
-                else
-                {
-                    GameManager.Instance.DungeonClear();
-                    GameManager.Instance.LoadVillage();
-                }
-                break;
-            }
             // case E_PACKET.MOVE_PATH_RESPONSE:
             //     P_MovePathResponse movePath = UnsafeCode.ByteArrayToStructure<P_MovePathResponse>(packet.data);
 
@@ -616,19 +625,19 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var invenInfo = UnsafeCode.ByteArrayToStructure<P_InventoryInfo>(packet.data);
                 Inventory.Instance.SetInventory(invenInfo.itemIDs);
 
-              //  Debug.Log("[Inventory] Update");
+                //  Debug.Log("[Inventory] Update");
                 break;
             case E_PACKET.SHOP_INFO:
                 if (GameManager.Instance == null) break;
                 if (ShopManager.Instance == null)
                 {
-                //    Debug.LogWarning("ShopManager가 없어서 패킷을 무시합니다.");
+                    //    Debug.LogWarning("ShopManager가 없어서 패킷을 무시합니다.");
                     break;
                 }
                 var shopInfo = UnsafeCode.ByteArrayToStructure<P_ShopInfo>(packet.data);
                 ShopManager.Instance.SetTargetShopTime(shopInfo.nextUpdateTime, shopInfo.itemID);
 
-              //  Debug.Log($"[Shop] Update ItemID: {shopInfo.itemID}, Next Update Time: {shopInfo.nextUpdateTime}");
+                //  Debug.Log($"[Shop] Update ItemID: {shopInfo.itemID}, Next Update Time: {shopInfo.nextUpdateTime}");
                 break;
             case E_PACKET.SHOP_BUY_RESPONSE:
                 var buyInfo = UnsafeCode.ByteArrayToStructure<P_ShopBuyResponse>(packet.data);
@@ -636,7 +645,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                 msg = buyInfo.isSuccess ? "Success" : "Failed";
 
-              //  Debug.Log($"[Shop] Item Buy Result : {msg}");
+                //  Debug.Log($"[Shop] Item Buy Result : {msg}");
                 break;
             case E_PACKET.TRADE_REQUEST_NTF:
                 var reqNtf = UnsafeCode.ByteArrayToStructure<P_TradeRequestNtf>(packet.data);
@@ -661,13 +670,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 var startNtf = UnsafeCode.ByteArrayToStructure<P_TradeStartNtf>(packet.data);
                 TradeManager.Instance.OpenTradeWindow(startNtf.partnerUUID, startNtf.userName);
 
-             //   Debug.Log($"[Trade] Trade Start With {startNtf.partnerUUID} User");
+                //   Debug.Log($"[Trade] Trade Start With {startNtf.partnerUUID} User");
                 break;
             case E_PACKET.TRADE_ITEM_NTF:
                 var itemNtf = UnsafeCode.ByteArrayToStructure<P_TradeItemNtf>(packet.data);
                 TradeManager.Instance.SetPartnerItem(itemNtf.slotIndex, itemNtf.itemID);
 
-              //  Debug.Log($"[Trade] Add {itemNtf.itemID} item to Partner {itemNtf.slotIndex} Slot");
+                //  Debug.Log($"[Trade] Add {itemNtf.itemID} item to Partner {itemNtf.slotIndex} Slot");
                 break;
             case E_PACKET.TRADE_LOCK_NTF:
                 var lockNtf = UnsafeCode.ByteArrayToStructure<P_TradeLockNtf>(packet.data);
@@ -679,9 +688,9 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
             case E_PACKET.TRADE_CONFIRM_NTF:
                 var confirmNtf = UnsafeCode.ByteArrayToStructure<P_TradeConfirmNtf>(packet.data);
 
-             //   Debug.Log($"[Trade] Partner Confirmed State: {confirmNtf.isConfirmed}");
+                //   Debug.Log($"[Trade] Partner Confirmed State: {confirmNtf.isConfirmed}");
 
-              //  Debug.Log($"/{confirmNtf.confirmUserUUID}/, /{LocalPlayerInfo.ID}/");
+                //  Debug.Log($"/{confirmNtf.confirmUserUUID}/, /{LocalPlayerInfo.ID}/");
                 if (confirmNtf.confirmUserUUID == LocalPlayerInfo.ID)
                 {
                     TradeManager.Instance.SetMyConfirmState(confirmNtf.isConfirmed);
@@ -698,13 +707,13 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
                 if (result.isSuccess)
                 {
-                //    Debug.Log("[Trade] Trade Success");
+                    //    Debug.Log("[Trade] Trade Success");
                     msg = "[Trade] Trade Success";
                     TradeManager.Instance.CloseTradeWindow(msg, true);
                 }
                 else
                 {
-                //    Debug.Log("[Trade] Trade Fail");
+                    //    Debug.Log("[Trade] Trade Fail");
                     msg = "[Trade] Trade Fail";
                     TradeManager.Instance.CloseTradeWindow(msg);
                 }
@@ -713,7 +722,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
                 {
                     var pkt = UnsafeCode.ByteArrayToStructure<P_MonsterMovement>(packet.data);
 
-                //    Debug.Log($"[MonsterMovement] monsterID={pkt.monsterID}, inCache={_monsterCache.ContainsKey(pkt.monsterID)}, cacheKeys={string.Join(",", _monsterCache.Keys)}");
+                    //    Debug.Log($"[MonsterMovement] monsterID={pkt.monsterID}, inCache={_monsterCache.ContainsKey(pkt.monsterID)}, cacheKeys={string.Join(",", _monsterCache.Keys)}");
 
                     if (_monsterCache.TryGetValue(pkt.monsterID, out MonsterActor targetMonster))
                     {
@@ -996,7 +1005,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
 
             P_SceneSyncReq syncReq = new P_SceneSyncReq();
             Client.TCP.SendPacket2(E_PACKET.SCENE_SYNC_REQ, syncReq);
-           // Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
+            // Debug.Log("<color=cyan>1. [요청] 서버로 SCENE_SYNC_REQ 보냄</color>");
 
             pActor.SetControllerActive(false);
             pActor.transform.position = spawnPos;
@@ -1016,14 +1025,14 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         yield return new WaitForFixedUpdate();
 
         pActor.SendMovePacket(0.0f, 0.0f);
-      //  Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
+        //  Debug.Log($"<color=green>[스폰 완료] 내 초기 위치 서버로 동기화 완료: {pActor.transform.position}</color>");
     }
 
     private void RemovePlayer(long id)
     {
         if (Players != null && Players.TryGetValue(id, out Player player) && player != null)
         {
-          //  Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
+            //  Debug.Log($"<color=orange>[Match]</color> 유저 퇴장 및 삭제 완료 (UUID: {id})");
 
             if (player.gameObject != null)
             {
@@ -1035,7 +1044,7 @@ public unsafe class Match : MonoBehaviour, IPacketReceiver
         }
         else
         {
-          //  Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
+            //  Debug.LogWarning($"<color=red>[Match]</color> 삭제하려는 유저를 찾을 수 없습니다. (UUID: {id})");
         }
     }
 

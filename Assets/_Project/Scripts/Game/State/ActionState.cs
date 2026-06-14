@@ -6,11 +6,11 @@ public class ActionState : IState
     private eState actionType;
     private float timer;
 
-    private const float CAST_TIME_PLAYER = 0.6f; 
+    private const float CAST_TIME_PLAYER = 0.6f;
     private const float CAST_TIME_MONSTER = 0.7f;
     private const float ATTACK_TIME = 0.05f;
 
-    private const float PLAYER_EFFECT_TIME = 0.15f; 
+    private const float PLAYER_EFFECT_TIME = 0.15f;
 
     private float pushForce = 100f;
     private float pow = 2f;
@@ -20,7 +20,7 @@ public class ActionState : IState
 
     private bool attackStarted = false;
     private bool hitProcessed = false;
-    private bool effectProcessed = false; 
+    private bool effectProcessed = false;
 
     public ActionState(Actor actor, eState type, Actor targetActor = null, BaseGimmick targetGimmick = null)
     {
@@ -48,22 +48,22 @@ public class ActionState : IState
             {
                 if (player.audioSource != null && player.pushSound != null)
                 {
-                    Debug.Log(player.audioSource);
-                    Debug.Log(player.pushSound);
-                    Debug.Log(player.audioSource.volume);
+                    //Debug.Log(player.audioSource);
+                    //Debug.Log(player.pushSound);
+                    //Debug.Log(player.audioSource.volume);
                     player.audioSource.PlayOneShot(player.pushSound);
-                    Debug.Log($"Played push sound for {player.name}");
+                    //Debug.Log($"Played push sound for {player.name}");
                 }
             }
             else if (actionType == eState.Pull)
             {
                 if (player.audioSource != null && player.pullSound != null)
                 {
-                    Debug.Log(player.audioSource);
-                    Debug.Log(player.pullSound);
-                    Debug.Log(player.audioSource.volume);
+                    //Debug.Log(player.audioSource);
+                    //Debug.Log(player.pullSound);
+                    //Debug.Log(player.audioSource.volume);
                     player.audioSource.PlayOneShot(player.pullSound);
-                    Debug.Log($"Played pull sound for {player.name}");
+                    //Debug.Log($"Played pull sound for {player.name}");
                 }
             }
 
@@ -122,23 +122,23 @@ public class ActionState : IState
         actor.lastSkillUseTime = NetworkTimeManager.Instance.GetServerTime();
     }
 
-   /* private void PlayActionEffects()
-    {
-        if (!actor.IsLocal) return;
+    /* private void PlayActionEffects()
+     {
+         if (!actor.IsLocal) return;
 
-        if (actor is PlayerActor pActor)
-        {
-            if (actionType == eState.Push)
-            {
-                pActor.PushParticle();
-                pActor.PushIndicator.gameObject.SetActive(true);
-            }
-            else
-            {
-                pActor.PullIndicator.gameObject.SetActive(true);
-            }
-        }
-    }*/
+         if (actor is PlayerActor pActor)
+         {
+             if (actionType == eState.Push)
+             {
+                 pActor.PushParticle();
+                 pActor.PushIndicator.gameObject.SetActive(true);
+             }
+             else
+             {
+                 pActor.PullIndicator.gameObject.SetActive(true);
+             }
+         }
+     }*/
 
     // ──────────────────────────────────────────────
     // 타겟 처리
@@ -169,11 +169,11 @@ public class ActionState : IState
         {
             if (hitPlayer.audioSource != null && hitPlayer.hitSound != null)
             {
-                Debug.Log(hitPlayer.audioSource);
-                Debug.Log(hitPlayer.hitSound);
-                Debug.Log(hitPlayer.audioSource.volume);
+                //Debug.Log(hitPlayer.audioSource);
+                //Debug.Log(hitPlayer.hitSound);
+                //Debug.Log(hitPlayer.audioSource.volume);
                 hitPlayer.audioSource.PlayOneShot(hitPlayer.hitSound);
-                Debug.Log($"Played hit sound for {hitPlayer.name}");
+                //Debug.Log($"Played hit sound for {hitPlayer.name}");
             }
         }
         Vector3 dirToTarget = targetActor.transform.position - actor.transform.position;
@@ -184,7 +184,7 @@ public class ActionState : IState
             ? pushForce
             : Mathf.Max(0f, minDistance - 1.5f);
 
-     Vector3 knockbackDir;
+        Vector3 knockbackDir;
 
         if (actionType == eState.Push)
         {
@@ -399,7 +399,7 @@ public class ActionState : IState
         }
 
         return startPos + pushDir * pushDistance;
-    } 
+    }
 
     // ──────────────────────────────────────────────
     // Execute 헬퍼
@@ -449,7 +449,7 @@ public class ActionState : IState
     public void OnAttackHit()
     {
         if (hitProcessed) return;
-      
+
         hitProcessed = true;
         ProcessTarget();
     }

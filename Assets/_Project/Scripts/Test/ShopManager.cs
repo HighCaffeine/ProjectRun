@@ -60,7 +60,7 @@ public class ShopManager : MonoBehaviour
 
         if (isSuccess)
         {
-            //Debug.Log("<color=green>[Shop] 구매 성공!</color>");
+            //Debug.Log("<color=green>[Shop] 구매 성공</color>");
         }
         else
         {

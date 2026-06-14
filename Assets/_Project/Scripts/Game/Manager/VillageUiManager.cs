@@ -4,8 +4,8 @@ using UnityEngine;
 public class VillageUiManager : MonoBehaviour
 {
     public static VillageUiManager Instance;
-    public static bool isShowTutorial =false;
-    
+    public static bool isShowTutorial = false;
+
     public TextMeshProUGUI player1IDUi;
     public TextMeshProUGUI player2IDUi;
 
@@ -19,7 +19,7 @@ public class VillageUiManager : MonoBehaviour
 
     [SerializeField] private GameObject deadPanel;
 
-    
+
 
 
     private void Awake()
@@ -32,13 +32,13 @@ public class VillageUiManager : MonoBehaviour
     {
         if (GameManager.IsDungeonCleared)
         {
-            GameManager.IsDungeonCleared =false;
+            GameManager.IsDungeonCleared = false;
             OnResult();
         }
     }
     public void UpdatePlayerIDUI()
     {
-        if(player1IDUi == null || player2IDUi ==null)
+        if (player1IDUi == null || player2IDUi == null)
             return;
 
         if (ActorManager.Instance.p1 != null)
@@ -78,8 +78,19 @@ public class VillageUiManager : MonoBehaviour
     {
         if (isShowTutorial) return;
 
+        if (DialogueManager.Instance == null)
+        {
+            Invoke(nameof(TutorialDialog), 0.2f);
+            return;
+        }
+
         isShowTutorial = true;
-        resultWindow.gameObject.SetActive(false);
+
+        if (resultWindow != null)
+        {
+            resultWindow.gameObject.SetActive(false);
+        }
+
         DialogueManager.Instance.StartDialogue("TutorialText");
     }
 
@@ -99,4 +110,3 @@ public class VillageUiManager : MonoBehaviour
         }
     }
 }
-    

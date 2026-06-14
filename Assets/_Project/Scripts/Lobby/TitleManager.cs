@@ -144,7 +144,7 @@ public class TitleManager : MonoBehaviour, IPacketReceiver
             if (loginRes.result == 0) // 성공
             {
                 LocalPlayerInfo.ID = loginRes.userUUID;
-                //Debug.Log("<color=cyan>[Client] 로그인 성공! 로비 씬으로 진입합니다.</color>");
+                //Debug.Log("<color=cyan>[Client] 로그인 성공 로비 씬으로 진입</color>");
 
                 if (!isSceneLoading)
                 {

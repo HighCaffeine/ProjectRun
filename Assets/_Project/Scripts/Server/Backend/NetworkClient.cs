@@ -219,8 +219,8 @@ public unsafe class NetworkClient
 
                 int bytesReceived = 0;
                 try { bytesReceived = socket.Receive(clientBuffer, offset, packet.pbase.length - offset, SocketFlags.None); }
-                catch (Exception ex) { /*break;*/Debug.LogError($"[TCP Recv Error] {ex.Message}"); }
-                Debug.Log($"[TCP] packet_id:{packet.pbase.packet_id} length:{packet.pbase.length} offset:{offset} received:{bytesReceived}");
+                catch (Exception ex) { Debug.LogError($"[TCP Recv Error] {ex.Message}"); break; }
+                //Debug.Log($"[TCP] packet_id:{packet.pbase.packet_id} length:{packet.pbase.length} offset:{offset} received:{bytesReceived}");
 
                 if (bytesReceived < 0) break;
                 if (bytesReceived == 0)
@@ -248,6 +248,10 @@ public unsafe class NetworkClient
                     long recvTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     Interlocked.Exchange(ref _lastRTT, recvTime - Interlocked.Read(ref _pingSentTime));
                     packetQueue.Enqueue(packet);
+
+                    clientBuffer = null;
+                    offset = 0;
+                    bBase = false;
                     continue;
                 }
 
